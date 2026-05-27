@@ -298,27 +298,40 @@ theorem const_isLocallyBounded [TopologicalSpace α] [SeminormedAddCommGroup β]
 @[fun_prop]
 theorem IsLocallyBounded.add [TopologicalSpace α] [SeminormedAddCommGroup β] {f g : α → β}
     (hf : IsLocallyBounded f) (hg : IsLocallyBounded g) :
-    IsLocallyBounded (f + g) :=
+    IsLocallyBounded (fun x ↦ f x + g x) :=
   ⟨fun _ ↦ (hf.boundedAtFilter _).add (hg.boundedAtFilter _)⟩
+
+@[fun_prop]
+theorem IsLocallyBounded.sub [TopologicalSpace α] [SeminormedAddCommGroup β] {f g : α → β}
+    (hf : IsLocallyBounded f) (hg : IsLocallyBounded g) :
+    IsLocallyBounded (fun x ↦ f x - g x) :=
+  ⟨fun _ ↦ (hf.boundedAtFilter _).sub (hg.boundedAtFilter _)⟩
 
 @[fun_prop]
 theorem IsLocallyBounded.neg [TopologicalSpace α] [SeminormedAddCommGroup β] {f : α → β}
     (hf : IsLocallyBounded f) :
-    IsLocallyBounded (- f) :=
+    IsLocallyBounded (fun x ↦ - f x) :=
   ⟨fun _ ↦ (hf.boundedAtFilter _).neg⟩
 
 @[fun_prop]
 theorem IsLocallyBounded.smul
     {𝕜 : Type*} [TopologicalSpace α] [SeminormedRing 𝕜] [SeminormedAddCommGroup β] [Module 𝕜 β]
     [IsBoundedSMul 𝕜 β] {f : α → β} (c : 𝕜)
-    (hf : IsLocallyBounded f) : IsLocallyBounded (c • f) :=
+    (hf : IsLocallyBounded f) : IsLocallyBounded (fun x ↦ c • f x) :=
   ⟨fun _ ↦ (hf.boundedAtFilter _).smul _⟩
 
 @[fun_prop]
 theorem IsLocallyBounded.mul [TopologicalSpace α] [SeminormedRing β] {f g : α → β}
     (hf : IsLocallyBounded f) (hg : IsLocallyBounded g) :
-    IsLocallyBounded (f * g) :=
+    IsLocallyBounded (fun x ↦ f x * g x) :=
   ⟨fun _ ↦ (hf.boundedAtFilter _).mul (hg.boundedAtFilter _)⟩
+
+/- Added by Claude -/
+@[fun_prop]
+theorem IsLocallyBounded.norm [TopologicalSpace α] [SeminormedAddCommGroup β] {f : α → β}
+    (hf : IsLocallyBounded f) :
+    IsLocallyBounded (fun x ↦ ‖f x‖) :=
+  ⟨fun _ ↦ Asymptotics.isBigO_norm_left.mpr (hf.boundedAtFilter _)⟩
 
 end Combinators
 
@@ -371,27 +384,40 @@ theorem const_isLocallyBoundedOn [TopologicalSpace α] [SeminormedAddCommGroup �
 @[fun_prop]
 theorem IsLocallyBoundedOn.add [TopologicalSpace α] [SeminormedAddCommGroup β] {f g : α → β}
     {s : Set α} (hf : IsLocallyBoundedOn f s) (hg : IsLocallyBoundedOn g s) :
-    IsLocallyBoundedOn (f + g) s :=
+    IsLocallyBoundedOn (fun x ↦ f x + g x) s :=
   ⟨fun _ hx ↦ (hf.boundedAtFilter hx).add (hg.boundedAtFilter hx)⟩
+
+@[fun_prop]
+theorem IsLocallyBoundedOn.sub [TopologicalSpace α] [SeminormedAddCommGroup β] {f g : α → β}
+    {s : Set α} (hf : IsLocallyBoundedOn f s) (hg : IsLocallyBoundedOn g s) :
+    IsLocallyBoundedOn (fun x ↦ f x - g x) s :=
+  ⟨fun _ hx ↦ (hf.boundedAtFilter hx).sub (hg.boundedAtFilter hx)⟩
 
 @[fun_prop]
 theorem IsLocallyBoundedOn.neg [TopologicalSpace α] [SeminormedAddCommGroup β] {f : α → β}
     {s : Set α} (hf : IsLocallyBoundedOn f s) :
-    IsLocallyBoundedOn (-f) s :=
+    IsLocallyBoundedOn (fun x ↦ -f x) s :=
   ⟨fun _ hx ↦ (hf.boundedAtFilter hx).neg⟩
 
 @[fun_prop]
 theorem IsLocallyBoundedOn.smul
     {𝕜 : Type*} [TopologicalSpace α] [SeminormedRing 𝕜] [SeminormedAddCommGroup β] [Module 𝕜 β]
     [IsBoundedSMul 𝕜 β] {f : α → β} {s : Set α} (c : 𝕜)
-    (hf : IsLocallyBoundedOn f s) : IsLocallyBoundedOn (c • f) s :=
+    (hf : IsLocallyBoundedOn f s) : IsLocallyBoundedOn (fun x ↦ c • f x) s :=
   ⟨fun _ hx ↦ (hf.boundedAtFilter hx).smul _⟩
 
 @[fun_prop]
 theorem IsLocallyBoundedOn.mul [TopologicalSpace α] [SeminormedRing β] {f g : α → β} {s : Set α}
     (hf : IsLocallyBoundedOn f s) (hg : IsLocallyBoundedOn g s) :
-    IsLocallyBoundedOn (f * g) s :=
+    IsLocallyBoundedOn (fun x ↦ f x * g x) s :=
   ⟨fun _ hx ↦ (hf.boundedAtFilter hx).mul (hg.boundedAtFilter hx)⟩
+
+/- Added by Claude -/
+@[fun_prop]
+theorem IsLocallyBoundedOn.norm [TopologicalSpace α] [SeminormedAddCommGroup β] {f : α → β}
+    {s : Set α} (hf : IsLocallyBoundedOn f s) :
+    IsLocallyBoundedOn (fun x ↦ ‖f x‖) s :=
+  ⟨fun _ hx ↦ Asymptotics.isBigO_norm_left.mpr (hf.boundedAtFilter hx)⟩
 
 end OnCombinators
 

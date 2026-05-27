@@ -216,6 +216,19 @@ theorem summatory_le_support_mul_UB {R : Type*} {f : ℕ → R}
 open Filter
 open scoped Topology
 
+
+open MeasureTheory in
+@[fun_prop]
+theorem aeStronglyMeasurable_summatory
+    {R : Type*} [NormedAddCommGroup R] [MeasurableSpace R] {f : ℕ → R} :
+    AEStronglyMeasurable (summatory f) := by
+  have : summatory f = (fun n : ℕ ↦ ∑ i ∈ Finset.Ioc 0 n, f i) ∘ (⌊·⌋₊) := by
+    ext x; simp [summatory_apply]
+  rw [this]
+  apply AEStronglyMeasurable.comp_measurable
+  · fun_prop
+  · fun_prop
+
 @[fun_prop]
 theorem measurable_summatory
     {R : Type*} [NormedAddCommGroup R] [MeasurableSpace R] {f : ℕ → R} :

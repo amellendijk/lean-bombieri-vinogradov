@@ -2,6 +2,7 @@ import Mathlib
 import Architect
 
 import BV.Mathlib.MeasureTheory.Function.LocallyIntegrable
+import BV.Mathlib.Analysis.Calculus.Deriv.Slope
 
 import BV.ForMathlib.Indicator
 
@@ -45,6 +46,25 @@ lemma DirichletCharacter.one_natCast_apply {q : ℕ} [NeZero q] (n : ℕ) :
   · exact MulChar.map_nonunit _ (fun hu => h ((ZMod.isUnit_iff_coprime n q).mp hu).symm)
 
 notation3 "Δ_[" f "](" x "; " q ", " a ")" => Delta f x q a
+
+@[fun_prop]
+lemma isLocallyBounded_Delta {R : Type*} [NormedField R] (f : ℕ → R) (q : ℕ) (a : ZMod q) :
+    IsLocallyBounded fun x ↦ Δ_[f](x; q, a) := by
+  simp [Delta]
+  fun_prop
+
+@[fun_prop]
+lemma isLocallyBoundedOn_Delta {R : Type*} [NormedField R] {s : Set ℝ} (f : ℕ → R) (q : ℕ) (a : ZMod q) :
+    IsLocallyBoundedOn (fun x ↦ Δ_[f](x; q, a)) s := by
+  simp [Delta]
+  fun_prop
+
+open MeasureTheory in
+@[fun_prop]
+lemma aeStronglyMeasurable_Delta {R : Type*} [NormedField R] [MeasurableSpace R] (f : ℕ → R) (q : ℕ) (a : ZMod q) :
+    AEStronglyMeasurable (fun x ↦ Δ_[f](x; q, a)) := by
+  simp [Delta]
+  fun_prop
 
 @[blueprint(statement :=
 /--
@@ -509,7 +529,7 @@ theorem Delta_one_bound {x : ℝ} {q : ℕ} (a : ZMod q) (hq : 0 < q) : ‖Δ_[f
 -- TODO: make this proof pretty.
 /-- Abel summation stated interms of `summatory`. -/
 theorem abel_summation_summatory {𝕜 : Type*} [RCLike 𝕜] (c : ℕ → 𝕜) {f f' : ℝ → 𝕜}
-    {a b : ℝ} (hac : ∀ n : ℕ, 0 < n → n ≤ a → c n = 0) (ha : 0 ≤ a) (hab : a ≤ b)
+    {a b : ℝ} (hac : ∀ n : ℕ, 0 < n → n ≤ a → c n * f n = 0) (ha : 0 ≤ a) (hab : a ≤ b)
     (hf_diff : ∀ t ∈ Set.Icc a b, HasDerivAt f (f' t) t)
     (hf_int : MeasureTheory.LocallyIntegrableOn f' (Set.Icc a b)) :
     summatory (fun k ↦ f k * c k) b = f b * summatory c b - f a * summatory c a
@@ -548,9 +568,8 @@ theorem abel_summation_summatory {𝕜 : Type*} [RCLike 𝕜] (c : ℕ → 𝕜)
   · rw [eq_comm]
     apply Finset.sum_subset
     · gcongr; simp
-    · simp only [Finset.mem_Ioc, not_and, not_le, mul_eq_zero, and_imp]
+    · simp only [Finset.mem_Ioc, not_and, not_le, and_imp, mul_comm]
       intro k hk_pos hkb habk
-      right
       apply hac k hk_pos
       rw [← Nat.le_floor_iff ha]
       grind
@@ -568,7 +587,6 @@ Notes:
 The API surrounding LocallyIntegrableOn is annoying and disjointed.
 The main problem is that proving f*g is locally integrable basically requires one of the two functions to be continuous.
 -/
--- There's this really _annoying_ fact issue with the lower bound: I want to take the integral from 1; but (I think) this only works if the summatory function used strict inequality. But we can just use 1-ε in practise, but ofc. this requires slightly more differentiability. Or does it? Maybe DifferentiableAt g 1 is enough?
 open MeasureTheory in
 @[blueprint (latexEnv := "lemma") (statement := /--
 If $g$ is continuously differentiable on $[1, x]$ then
@@ -576,18 +594,18 @@ $$\Delta_g(x;\,q,\,a) = \Delta_1(x;\,q,\,a)\,g(x) - \int_1^x \Delta_1(t;\,q,\,a)
 -/) (proof := /--
 By Abel summation.
 -/) (uses := [Delta_one_bound])]
-theorem Delta_abel_summation {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit a) (g g' : ℝ → ℂ) {l x : ℝ}
-    (hg : ∀ t ∈ Set.Icc l x, HasDerivAt g (g' t) t)
-    (hg_int : MeasureTheory.LocallyIntegrableOn g' (Set.Icc l x))
-    (hl : 0 ≤ l) (hl' : l < 1) (hlx : l ≤ x) :
-    Δ_[fun n ↦ g n](x; q, a) = Δ_[fun _ ↦ (1 : ℂ)](x; q, a) * g x - ∫ t in Set.Ioc l x, Δ_[fun _ ↦ (1 : ℂ)](t; q, a) * g' t := by
+theorem Delta_abel_summation {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit a) (g g' : ℝ → ℂ) {x : ℝ} (hx : 1 ≤ x)
+    (hg : ∀ t ∈ Set.Icc 1 x, HasDerivAt g (g' t) t)
+    (hg_int : MeasureTheory.LocallyIntegrableOn g' (Set.Icc 1 x))
+    (hg_one : g 1 = 0) :
+    Δ_[fun n ↦ g n](x; q, a) = Δ_[fun _ ↦ (1 : ℂ)](x; q, a) * g x - ∫ t in Set.Ioc 1 x, Δ_[fun _ ↦ (1 : ℂ)](t; q, a) * g' t := by
   simp_rw [Delta_eq_sum_char ha]
   simp_rw [← Finset.sum_filter, Finset.mul_sum, Finset.sum_mul]
   rw [MeasureTheory.integral_finset_sum _ ?A, ← Finset.sum_sub_distrib]
   case A =>
     intro χ hχ
     rw [← IntegrableOn]
-    apply IntegrableOn.mono_set (t := Set.Icc l x) _ (by grind)
+    apply IntegrableOn.mono_set (t := Set.Icc 1 x) _ (by grind)
     apply MeasureTheory.LocallyIntegrableOn.integrableOn_isCompact _ ?compact
     case compact => apply ConditionallyCompleteLinearOrder.isCompact_Icc
     pull summatory
@@ -599,18 +617,14 @@ theorem Delta_abel_summation {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit
   simp_rw [mul_assoc, MeasureTheory.integral_const_mul, ← mul_sub]
   congr! 3 with χ hχ
   let c : ℕ → ℂ := fun n ↦ χ n
-  have hn' {P : ℕ → Prop} (n : ℕ) : 0 < n → n ≤ l → P n := by
-    intro hn hn'
-    have := hn'.trans_lt hl'
-    norm_cast at this
-    grind
-  have := abel_summation_summatory (c := c) (f := (fun n ↦ g n)) (a := l) (b := x) (by apply hn') hl hlx hg hg_int
+  have := abel_summation_summatory (c := c) (f := (fun n ↦ g n)) (b := x) ?A (a := 1) (by norm_num) hx hg hg_int
+  case A =>
+    intro n _ hn
+    norm_cast at hn
+    simp [hg_one, show n = 1 by lia]
   rw [this]
   congr! 1
-  · rw [summatory_eq_zero (x := l)]
-    · simp
-      rw [mul_comm]
-    · apply hn'
+  · simp [hg_one, c, mul_comm]
   congr! 2 with x
   simp [mul_comm, c]
 
@@ -643,15 +657,20 @@ lemma Complex.ofReal_integral {X : Type*} [MeasurableSpace X] {«μ» : MeasureT
 
 attribute [norm_cast] integral_complex_ofReal
 
-theorem Delta_abel_summation_real {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit a) (g  : ℝ → ℝ) {l x : ℝ}
-    (hg : ∀ t ∈ Set.Icc l x, DifferentiableAt ℝ g t)
-    (hg_int : MeasureTheory.LocallyIntegrableOn (deriv g) (Set.Icc l x))
-    (hl : 0 ≤ l) (hl' : l < 1) (hlx : l ≤ x) :
-    Δ_[fun n ↦ g n](x; q, a) = Δ_[fun _ ↦ (1 : ℝ)](x; q, a) * g x - ∫ t in Set.Ioc l x, Δ_[fun _ ↦ (1 : ℝ)](t; q, a) * deriv g t := by
+-- There really ought to be an RCLike version.
+theorem Delta_abel_summation_real {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit a) (g g' : ℝ → ℝ) {x : ℝ} (hx : 1 ≤ x)
+    (hg : ∀ t ∈ Set.Icc 1 x, HasDerivAt g (g' t) t)
+    (hg_int : MeasureTheory.LocallyIntegrableOn g' (Set.Icc 1 x))
+    (hg_one : g 1 = 0) :
+    Δ_[fun n ↦ g n](x; q, a) = Δ_[fun _ ↦ (1 : ℝ)](x; q, a) * g x - ∫ t in Set.Ioc 1 x, Δ_[fun _ ↦ (1 : ℝ)](t; q, a) * g' t := by
   apply_fun Complex.ofReal
   · push_cast
-    apply Delta_abel_summation (g := fun n ↦ g n) ha _ _ hl hl' hlx
-    sorry
+    apply Delta_abel_summation (g := fun n ↦ g n) (g' := fun t ↦ (g' t : ℂ)) ha (x := x) hx ?diff ?int (by simpa using hg_one)
+    case diff =>
+      intro t ht
+      exact (hg t ht).ofReal_comp
+    case int =>
+      exact hg_int.ofReal
   · exact Complex.ofReal_injective
 
 
@@ -678,37 +697,84 @@ theorem Complex.ofReal_antilipschitzWith : AntilipschitzWith 1 Complex.ofReal :=
   intro x y
   norm_cast
 
+attribute [fun_prop] MeasureTheory.LocallyIntegrableOn.norm
+
+open MeasureTheory in
+theorem Delta_monotone_bound_aux {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit a) (g g' : ℝ → ℝ) {x : ℝ} (hx : 1 ≤ x)
+    (hg : ∀ t ∈ Set.Icc 1 x, HasDerivAt g (g' t) t)
+    (hg_int : MeasureTheory.LocallyIntegrableOn g' (Set.Icc 1 x))
+    (hg_mono : MonotoneOn g (Set.Icc 1 x))
+    (hg_one : g 1 = 0)
+    :
+    ‖Δ_[fun n ↦ g n](x; q, a)‖ ≤ 2 * g x := by
+  have hg_nonneg {y : ℝ} (hy : 1 ≤ y) (hy' : y ≤ x) : 0 ≤ g y := hg_one ▸ hg_mono (by simpa using hx) (by simp [hy, hy']) hy
+  have hg'_nonneg {y : ℝ} (hy : 1 < y) (hy' : y < x) : 0 ≤ g' y := by
+    simp only [Set.mem_Icc, and_imp] at hg
+    apply (hg y hy.le hy'.le).nonneg_of_monotoneOn_of_mem_nhds hg_mono
+    simp
+    grind
+  grw [Delta_abel_summation_real ha g g' hx hg hg_int hg_one, norm_sub_le, two_mul, norm_mul, Delta_one_bound _ hq.pos]
+  gcongr
+  · simp only [Real.norm_eq_abs, one_mul]
+    rw [abs_of_nonneg]
+    apply hg_nonneg hx le_rfl
+  · grw [norm_integral_le_integral_norm]
+    trans ∫ x in Set.Ioc 1 x, ‖Δ_[fun n ↦ (1 : ℝ)](x; q, a)‖ * g' x
+    · gcongr
+      · rw [← integrableOn_Icc_iff_integrableOn_Ioc]
+        apply MeasureTheory.LocallyIntegrableOn.integrableOn_isCompact
+        · simp_rw [norm_mul]
+          apply LocallyIntegrableOn.isLocallyBoundedOn_mul
+          · simp
+          · fun_prop
+          · fun_prop
+          · fun_prop
+        · apply ConditionallyCompleteLinearOrder.isCompact_Icc
+        -- TODO: This is basically the same proof as above!
+      · rw [← integrableOn_Icc_iff_integrableOn_Ioc]
+        apply MeasureTheory.LocallyIntegrableOn.integrableOn_isCompact
+        · apply LocallyIntegrableOn.isLocallyBoundedOn_mul
+          · simp
+          · fun_prop
+          · fun_prop
+          · fun_prop
+        · apply ConditionallyCompleteLinearOrder.isCompact_Icc
+      · simp
+      · sorry
+    trans (∫ t in Set.Ioc 1 x, g' t)
+    · gcongr
+      · sorry
+      · sorry
+      · simp
+      · grw [Delta_one_bound, one_mul]
+        · -- This is not provable, we should switch to Set.Ioo
+          sorry
+        · apply hq.pos
+    · apply le_of_eq
+      rw [← intervalIntegral.integral_of_le, intervalIntegral.integral_eq_sub_of_hasDerivAt (f := g)]
+      · simp [hg_one]
+      · simpa [hx] using hg
+      · rw [intervalIntegrable_iff_integrableOn_Ioc_of_le hx, ← integrableOn_Icc_iff_integrableOn_Ioc]
+        apply MeasureTheory.LocallyIntegrableOn.integrableOn_isCompact
+        · exact hg_int
+        · apply ConditionallyCompleteLinearOrder.isCompact_Icc
+      · exact hx
+
 open MeasureTheory in
 --TODO : Add g 0 = 0 condition and remove ‖‖
 @[blueprint (latexEnv := "lemma") (statement := /--
 If $g$ is continuously differentiable and monotone on $[1, x]$ with $g(1) = 0$, then for all $t \ge 1$ and $a \in (\Z/q\Z)^*$,
 $$|\Delta_g(x;\, q,\, a)| \le 2g(x)$$
 -/) (uses := [Delta_one_bound, Delta_abel_summation])]
-theorem Delta_monotone_bound {q : ℕ} [NeZero q] {a : ZMod q} (ha : IsUnit a) (g : ℝ → ℝ) {l x : ℝ} (hl : 0 ≤ l) (hl1 : l < 1) (hx : l ≤ x)
+theorem Delta_monotone_bound {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit a) (g : ℝ → ℝ) {l x : ℝ} (hl : 0 ≤ l) (hl1 : l < 1) (hx : l ≤ x)
     (hg : ∀ t ∈ Set.Icc l x, DifferentiableAt ℝ g t)
     (hg_int : MeasureTheory.LocallyIntegrableOn (deriv g) (Set.Icc l x))
-    (hg_mono : MonotoneOn g (Set.Icc 1 x))
+    (hg_mono : MonotoneOn g (Set.Icc l x))
     (hg1 : g 1 = 0)
     :
-    ‖Δ_[fun n ↦ (g n : ℂ)](x; q, a)‖ ≤ 2 * g x := by
-  let g' (x : ℝ) : ℂ := ↑(deriv g x)
-  grw [Delta_abel_summation (g := fun n ↦ g n) (g' := g') (l := l) ha ?diff ?int hl hl1 hx, norm_sub_le, norm_mul, norm_integral_le_integral_norm, Delta_one_bound]
-  case diff =>
-    simp_rw [g']
-    intro t ht
-    have := (hg t ht).hasDerivAt
-    apply this.ofReal_comp
-  case int =>
-    simp_rw [g']
-    rw [MeasureTheory.locallyIntegrableOn_iff_locallyIntegrable_restrict]
-    ·
-      --have := MeasureTheory.LipschitzWith.integrable_comp_iff_of_antilipschitz (m := inferInstance) («μ» := MeasureTheory.volume)
-        -- (g := Complex.ofReal) (f := deriv g)
-        -- Complex.ofReal_lipschitzWith Complex.ofReal_antilipschitzWith (by simp)
-      -- MeasureTheory.LipschitzWith.integrable_comp_iff_of_antilipschitz
-      sorry
-    · apply isClosed_Icc
+    ‖Δ_[fun n ↦ g n](x; q, a)‖ ≤ 2 * g x := by
   sorry
+  -- grw [Delta_abel_summation (g := fun n ↦ g n) (g' := g') (l := l) ha ?diff ?int hl hl1 hx, norm_sub_le, norm_mul, norm_integral_le_integral_norm, Delta_one_bound]
 
 @[blueprint (statement := /--
 Let $v \ge 0$ and let $f$ be an arithmetic function supported on $[1, x]$. For $x \ge 2$, $q \in \N$ and $a \in (\Z/q\Z)^*$,
