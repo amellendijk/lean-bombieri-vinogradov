@@ -66,6 +66,36 @@ lemma aeStronglyMeasurable_Delta {R : Type*} [NormedField R] [MeasurableSpace R]
   simp [Delta]
   fun_prop
 
+@[push_cast]
+lemma Complex.ofReal_setIndicator {ι : Type*} {s : Set ι} (f : ι → ℝ) (n : ι) :
+  (↑(s.indicator (fun n ↦ f n) n) : ℂ) = s.indicator (fun n ↦ (f n : ℂ)) n := by
+  classical
+  simp [Set.indicator_apply]
+  split_ifs <;> simp
+
+@[push_cast]
+lemma Complex.ofReal_onCoprime {f : ℕ → ℝ} (r n : ℕ): (↑(onCoprime r (fun n ↦ f n) n) : ℂ) = (onCoprime r (fun n ↦ (f n : ℂ)) n) := by
+  simp [onCoprime]
+  split_ifs <;> simp
+
+@[norm_cast]
+lemma Complex.ofReal_summatory {g : ℕ → ℝ} {x : ℝ} : (↑(summatory (fun n ↦ g n) x) : ℂ) = (summatory (fun n ↦ (g n : ℂ)) x) := by
+  simp [summatory]
+
+@[push_cast]
+lemma Complex.ofReal_Delta {g : ℕ → ℝ} {x : ℝ} {q : ℕ} {a : ZMod q} : ↑(Δ_[fun n ↦ g n](x; q, a)) = Δ_[fun n ↦ (g n : ℂ)](x; q, a) := by
+  simp [Delta]
+  push_cast
+  rfl
+
+@[push_cast]
+lemma Complex.ofReal_integral {X : Type*} [MeasurableSpace X] {«μ» : MeasureTheory.Measure X} {f : X → ℝ} : ↑(∫ (x : X), f x ∂«μ») = ∫ (x : X), (↑(f x) : ℂ) ∂«μ» := by
+  apply Eq.symm
+  apply integral_complex_ofReal
+
+attribute [norm_cast] integral_complex_ofReal
+
+
 @[blueprint(statement :=
 /--
 $$\Delta_f(y ;q, a) = \frac{1}{\varphi(q)} \sum_{\chi \pmod{q}, \chi \ne \chi_0} \bar\chi(a) \sum_{n \le y} f(n) \chi(n) $$
@@ -324,6 +354,14 @@ theorem Delta_convolution_eq {y : ℝ} {q : ℕ} [NeZero q] {a : ZMod q} (ha : I
     simp [this, MulChar.map_nonunit, summatory_zero]
   · exact ha
 
+-- theorem Delta_convolution_eq_real {y : ℝ} {q : ℕ} [NeZero q] {a : ZMod q} (ha : IsUnit a) (f g : ArithmeticFunction ℝ) :
+--     Δ_[f*g](y; q, a) = summatory (fun k ↦ if k.Coprime q then f k * Δ_[g](y/k; q, a * (k : ZMod q)⁻¹) else 0) y := by
+--   apply_fun Complex.ofReal
+--   push_cast
+--   · have {n : ℕ} : ((f * g) n) = ((algebraMap _ _ f) * ↑g : ArithmeticFunction ℂ) n := by
+--       sorry
+--     sorry
+--   · exact Complex.ofReal_injective
 
 /-! ### Periodic function lemmas for Delta_one_bound -/
 
@@ -628,35 +666,6 @@ theorem Delta_abel_summation {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit
   congr! 2 with x
   simp [mul_comm, c]
 
-@[push_cast]
-lemma Complex.ofReal_setIndicator {ι : Type*} {s : Set ι} (f : ι → ℝ) (n : ι) :
-  (↑(s.indicator (fun n ↦ f n) n) : ℂ) = s.indicator (fun n ↦ (f n : ℂ)) n := by
-  classical
-  simp [Set.indicator_apply]
-  split_ifs <;> simp
-
-@[push_cast]
-lemma Complex.ofReal_onCoprime {f : ℕ → ℝ} (r n : ℕ): (↑(onCoprime r (fun n ↦ f n) n) : ℂ) = (onCoprime r (fun n ↦ (f n : ℂ)) n) := by
-  simp [onCoprime]
-  split_ifs <;> simp
-
-@[push_cast]
-lemma Complex.ofReal_summatory {g : ℕ → ℝ} {x : ℝ} : (↑(summatory (fun n ↦ g n) x) : ℂ) = (summatory (fun n ↦ (g n : ℂ)) x) := by
-  simp [summatory]
-
-@[push_cast]
-lemma Complex.ofReal_Delta {g : ℕ → ℝ} {x : ℝ} {q : ℕ} {a : ZMod q} : ↑(Δ_[fun n ↦ g n](x; q, a)) = Δ_[fun n ↦ (g n : ℂ)](x; q, a) := by
-  simp [Delta]
-  push_cast
-  rfl
-
-@[push_cast]
-lemma Complex.ofReal_integral {X : Type*} [MeasurableSpace X] {«μ» : MeasureTheory.Measure X} {f : X → ℝ} : ↑(∫ (x : X), f x ∂«μ») = ∫ (x : X), (↑(f x) : ℂ) ∂«μ» := by
-  apply Eq.symm
-  apply integral_complex_ofReal
-
-attribute [norm_cast] integral_complex_ofReal
-
 -- There really ought to be an RCLike version.
 theorem Delta_abel_summation_real {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit a) (g g' : ℝ → ℝ) {x : ℝ} (hx : 1 ≤ x)
     (hg : ∀ t ∈ Set.Icc 1 x, HasDerivAt g (g' t) t)
@@ -719,37 +728,27 @@ theorem Delta_monotone_bound_aux {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : Is
     rw [abs_of_nonneg]
     apply hg_nonneg hx le_rfl
   · grw [norm_integral_le_integral_norm]
-    trans ∫ x in Set.Ioc 1 x, ‖Δ_[fun n ↦ (1 : ℝ)](x; q, a)‖ * g' x
-    · gcongr
-      · rw [← integrableOn_Icc_iff_integrableOn_Ioc]
+    trans ∫ x in Set.Ioc 1 x, g' x
+    · simp_rw [MeasureTheory.integral_Ioc_eq_integral_Ioo]
+      gcongr
+      · rw [← integrableOn_Icc_iff_integrableOn_Ioo]
         apply MeasureTheory.LocallyIntegrableOn.integrableOn_isCompact
         · simp_rw [norm_mul]
+          -- We can't fun_prop this lemma, as we have to make a choice of which term is bounded
           apply LocallyIntegrableOn.isLocallyBoundedOn_mul
           · simp
           · fun_prop
           · fun_prop
           · fun_prop
         · apply ConditionallyCompleteLinearOrder.isCompact_Icc
-        -- TODO: This is basically the same proof as above!
-      · rw [← integrableOn_Icc_iff_integrableOn_Ioc]
+      · rw [← integrableOn_Icc_iff_integrableOn_Ioo]
         apply MeasureTheory.LocallyIntegrableOn.integrableOn_isCompact
-        · apply LocallyIntegrableOn.isLocallyBoundedOn_mul
-          · simp
-          · fun_prop
-          · fun_prop
-          · fun_prop
+        · exact hg_int
         · apply ConditionallyCompleteLinearOrder.isCompact_Icc
       · simp
-      · sorry
-    trans (∫ t in Set.Ioc 1 x, g' t)
-    · gcongr
-      · sorry
-      · sorry
-      · simp
-      · grw [Delta_one_bound, one_mul]
-        · -- This is not provable, we should switch to Set.Ioo
-          sorry
-        · apply hq.pos
+      · grw [norm_mul, Delta_one_bound, one_mul, Real.norm_of_nonneg]
+        · grind
+        · exact hq.pos
     · apply le_of_eq
       rw [← intervalIntegral.integral_of_le, intervalIntegral.integral_eq_sub_of_hasDerivAt (f := g)]
       · simp [hg_one]
@@ -766,15 +765,15 @@ open MeasureTheory in
 If $g$ is continuously differentiable and monotone on $[1, x]$ with $g(1) = 0$, then for all $t \ge 1$ and $a \in (\Z/q\Z)^*$,
 $$|\Delta_g(x;\, q,\, a)| \le 2g(x)$$
 -/) (uses := [Delta_one_bound, Delta_abel_summation])]
-theorem Delta_monotone_bound {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit a) (g : ℝ → ℝ) {l x : ℝ} (hl : 0 ≤ l) (hl1 : l < 1) (hx : l ≤ x)
-    (hg : ∀ t ∈ Set.Icc l x, DifferentiableAt ℝ g t)
-    (hg_int : MeasureTheory.LocallyIntegrableOn (deriv g) (Set.Icc l x))
-    (hg_mono : MonotoneOn g (Set.Icc l x))
+theorem Delta_monotone_bound {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit a) (g : ℝ → ℝ) {x : ℝ} (hx : 1 ≤ x)
+    (hg : ∀ t ∈ Set.Icc 1 x, DifferentiableAt ℝ g t)
+    (hg_int : MeasureTheory.LocallyIntegrableOn (deriv g) (Set.Icc 1 x))
+    (hg_mono : MonotoneOn g (Set.Icc 1 x))
     (hg1 : g 1 = 0)
     :
     ‖Δ_[fun n ↦ g n](x; q, a)‖ ≤ 2 * g x := by
-  sorry
-  -- grw [Delta_abel_summation (g := fun n ↦ g n) (g' := g') (l := l) ha ?diff ?int hl hl1 hx, norm_sub_le, norm_mul, norm_integral_le_integral_norm, Delta_one_bound]
+  apply Delta_monotone_bound_aux (g' := deriv g) ha g hx ?deriv hg_int hg_mono hg1
+  case deriv => apply fun t ht ↦ (hg t ht).hasDerivAt
 
 @[blueprint (statement := /--
 Let $v \ge 0$ and let $f$ be an arithmetic function supported on $[1, x]$. For $x \ge 2$, $q \in \N$ and $a \in (\Z/q\Z)^*$,
@@ -783,4 +782,5 @@ $$|\Delta_{f * \log^v}(x;\, q,\, a)| \le 2(\log x)^v \sum_{k \le x} |f(k)|$$
 Straightforward application of the previous lemmas.
 -/) (uses := [Delta_one_bound, Delta_abel_summation, Delta_monotone_bound])]
 theorem Delta_flog_bound {v : ℕ} {f : ArithmeticFunction ℝ} {x : ℝ} (hx : 2 ≤ x) {q : ℕ} (a : ZMod q) (ha : IsUnit a) : Δ_[f * ppow log v](x; q, a) ≤ 2 * (Real.log x)^v * summatory (fun k ↦ |f k|) x := by
+  -- rw [Delta_convolution_eq (g := log.ppow v)]
   sorry
