@@ -2,10 +2,10 @@
 A Lean blueprint documenting a formalization of Bombieri-Vinogradov.
 
 ## Links
-* [Webpage](https://fldutchmann.github.io/lean-bombieri-vinogradov/)
-* [Blueprint](https://fldutchmann.github.io/lean-bombieri-vinogradov/blueprint/)
-* [Documentation](https://fldutchmann.github.io/lean-bombieri-vinogradov/docs/)
-* [Dependency Graph](https://fldutchmann.github.io/lean-bombieri-vinogradov/blueprint/dep_graph_document.html)
+* [Webpage](https://amellendijk.github.io/lean-bombieri-vinogradov/)
+* [Blueprint](https://amellendijk.github.io/lean-bombieri-vinogradov/blueprint/)
+* [Documentation](https://amellendijk.github.io/lean-bombieri-vinogradov/docs/)
+* [Dependency Graph](https://amellendijk.github.io/lean-bombieri-vinogradov/blueprint/dep_graph_document.html)
 
 ## Bombieri-Vinogradov
 The Bombieri-Vinogradov theorem states that for each fixed $A \geq 0$,

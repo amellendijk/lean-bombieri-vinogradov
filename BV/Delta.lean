@@ -5,6 +5,7 @@ import BV.Mathlib.MeasureTheory.Function.LocallyIntegrable
 import BV.Mathlib.Analysis.Calculus.Deriv.Slope
 
 import BV.ForMathlib.Indicator
+import BV.ForMathlib.RCLikeToComplex
 
 import BV.Axioms
 import BV.Defs
@@ -95,31 +96,35 @@ lemma Complex.ofReal_integral {X : Type*} [MeasurableSpace X] {«μ» : MeasureT
 
 attribute [norm_cast] integral_complex_ofReal
 
+attribute [push] RingHom.map_add
+attribute [push] RingHom.map_sub
 
+-- Thought: Instead of RCLike should I just take anything that ℂ is an algebra over? I don't need completeness here...
 @[blueprint(statement :=
 /--
 $$\Delta_f(y ;q, a) = \frac{1}{\varphi(q)} \sum_{\chi \pmod{q}, \chi \ne \chi_0} \bar\chi(a) \sum_{n \le y} f(n) \chi(n) $$
 -/)]
-lemma Delta_eq_sum_char {f : ℕ → ℂ} {y : ℝ} {q : ℕ} [NeZero q] {a : ZMod q}
+lemma Delta_eq_sum_char {𝕜 : Type*} [Field 𝕜] [Algebra 𝕜 ℂ] {f : ℕ → 𝕜} {y : ℝ} {q : ℕ} [NeZero q] {a : ZMod q}
     (ha : IsUnit a) :
     open Classical in
-    (↑(Delta f y q a) : ℂ) = (Nat.totient q : ℂ)⁻¹ *
+    (algebraMap _ _ (Delta f y q a))  = (Nat.totient q : ℂ)⁻¹ *
       ∑ χ : DirichletCharacter ℂ q, if χ ≠ 1 then
-        star (χ (a : ZMod q)) * summatory (fun n => (f n : ℂ) * χ n) y
+        star (χ (a : ZMod q)) * summatory (fun n => algebraMap _ _ (f n) * χ n) y
       else 0 := by
   have hφ : (Nat.totient q : ℂ) ≠ 0 :=
     Nat.cast_ne_zero.mpr (Nat.totient_pos.mpr (NeZero.pos q)).ne'
   simp only [Delta, summatory, Nat.modEqs, onCoprime, Set.indicator_apply, Set.mem_setOf_eq]
   -- Suffices to prove the equivalent form with φ cleared
-  suffices h : (q.totient : ℂ) * ∑ i ∈ Nat.Icc 1 y, ↑(if (i : ZMod q) = (a : ZMod q) then f i else 0) -
-      ∑ i ∈ Nat.Icc 1 y, ↑(if q.Coprime i then f i else 0) =
+  suffices h : (q.totient : ℂ) * ∑ i ∈ Nat.Icc 1 y, algebraMap _ _ (if (i : ZMod q) = (a : ZMod q) then f i else 0) -
+      ∑ i ∈ Nat.Icc 1 y, algebraMap _ _ (if q.Coprime i then f i else 0) =
       ∑ χ : DirichletCharacter ℂ q, if χ ≠ 1 then
-        star (χ (a : ZMod q)) * ∑ x ∈ Nat.Icc 1 y, (f x : ℂ) * χ x else 0 by
+        star (χ (a : ZMod q)) * ∑ x ∈ Nat.Icc 1 y, algebraMap _ _ (f x) * χ x else 0 by
+    simp at ⊢ h
     field_simp [hφ]
     linear_combination h
   -- Let F χ = star(χ a') * ∑_n f(n) χ(n)
   set F := fun χ : DirichletCharacter ℂ q =>
-    star (χ (a : ZMod q)) * ∑ x ∈ Nat.Icc 1 y, (f x : ℂ) * χ x
+    star (χ (a : ZMod q)) * ∑ x ∈ Nat.Icc 1 y, algebraMap _ _ (f x) * χ x
   -- Step 1: Split off the χ = 1 term: ∑_{χ≠1} F χ = ∑_χ F χ - F 1
   have hsplit : ∑ χ : DirichletCharacter ℂ q, (if χ ≠ 1 then F χ else 0) = ∑ χ, F χ - F 1 := by
     have hadd := Finset.add_sum_erase Finset.univ F (Finset.mem_univ (1 : DirichletCharacter ℂ q))
@@ -130,17 +135,16 @@ lemma Delta_eq_sum_char {f : ℕ → ℂ} {y : ℝ} {q : ℕ} [NeZero q] {a : ZM
     grind
   rw [hsplit]
   have hFsum : ∑ χ : DirichletCharacter ℂ q, F χ =
-      (q.totient : ℂ) * ∑ i ∈ Nat.Icc 1 y, ↑(if (i : ZMod q) = (a : ZMod q) then f i else 0) := by
+      (q.totient : ℂ) * ∑ i ∈ Nat.Icc 1 y, algebraMap _ _ (if (i : ZMod q) = (a : ZMod q) then f i else 0) := by
     have := DirichletCharacter.sum_char_inv_mul_char_eq ℂ ha
     simp only [F, Finset.mul_sum]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl (fun y hy ↦ ?_)
-    simp_rw [mul_comm (f y : ℂ), ← mul_assoc, ← Finset.sum_mul, MulChar.star_apply',
+    simp_rw [mul_comm <| algebraMap _ _ (f y), ← mul_assoc, ← Finset.sum_mul, MulChar.star_apply',
       DirichletCharacter.inv_zmod_apply ha, this]
     simp only [eq_comm]
     split_ifs <;> simp
-
-  have hF1 : F 1 = ∑ i ∈ Nat.Icc 1 y, ↑(if q.Coprime i then f i else 0) := by
+  have hF1 : F 1 = ∑ i ∈ Nat.Icc 1 y, algebraMap _ _ (if q.Coprime i then f i else 0) := by
     simp only [F, MulChar.one_apply ha, star_one, one_mul, DirichletCharacter.one_natCast_apply]
     congr! 1 with n
     split_ifs <;> simp
@@ -283,17 +287,17 @@ lemma sum_primes_not_dvd_log_eq_id [ProofData] (A : ℕ) {q : ℕ} (hq : 0 < q) 
   apply le_of_eq
   ring
 
-def ArithmeticFunction.twist {q : ℕ} (f : ArithmeticFunction ℂ) (c : DirichletCharacter ℂ q)  : ArithmeticFunction ℂ := ⟨
-  fun n ↦ f n * c n,
+def ArithmeticFunction.twist {𝕜 : Type*} [Field 𝕜] [Algebra 𝕜 ℂ] {q : ℕ} (f : ArithmeticFunction 𝕜) (c : DirichletCharacter ℂ q)  : ArithmeticFunction ℂ := ⟨
+  fun n ↦ algebraMap _ _ (f n) * c n,
   by simp
 ⟩
 
 @[simp]
-theorem ArithmeticFunction.twist_apply {q : ℕ} {f : ArithmeticFunction ℂ} {χ : DirichletCharacter ℂ q} {n : ℕ} :
-    f.twist χ n = f n * χ ↑n := rfl
+theorem ArithmeticFunction.twist_apply {𝕜 : Type*} [Field 𝕜] [Algebra 𝕜 ℂ] {q : ℕ} {f : ArithmeticFunction 𝕜} {χ : DirichletCharacter ℂ q} {n : ℕ} :
+    f.twist χ n = algebraMap _ _ (f n) * χ ↑n := rfl
 
 open ArithmeticFunction in
-theorem ArithmeticFunction.mul_twist {q : ℕ} (f g : ArithmeticFunction ℂ) (χ : DirichletCharacter ℂ q) (n : ℕ) :
+theorem ArithmeticFunction.mul_twist {𝕜 : Type*} [Field 𝕜] [Algebra 𝕜 ℂ] {q : ℕ} (f g : ArithmeticFunction 𝕜) (χ : DirichletCharacter ℂ q) (n : ℕ) :
     (f * g).twist χ n = (f.twist χ * g.twist χ) n := by
   simp [← mul_assoc, Finset.sum_mul]
   congr! 1 with ⟨a, b⟩ hab
@@ -327,13 +331,15 @@ lemma ZMod.isUnit_inv' {q : ℕ} (n : ZMod q) : IsUnit n → IsUnit n⁻¹ := by
 If $f$ is an arithmetic function supported on $[1, y]$ then
 $$\Delta_{f*g}(x;\,q,\,a) = \sum_{\substack{k \le y \\ (k,q)=1}} f(k)\, \Delta_g\!\left(\frac{x}{k};\, q,\, a\bar{k}\right)$$
 -/)]
-theorem Delta_convolution_eq {y : ℝ} {q : ℕ} [NeZero q] {a : ZMod q} (ha : IsUnit a) (f g : ArithmeticFunction ℂ) :
+theorem Delta_convolution_eq {𝕜 : Type*} [Field 𝕜] [Algebra 𝕜 ℂ] {y : ℝ} {q : ℕ} [NeZero q] {a : ZMod q} (ha : IsUnit a) (f g : ArithmeticFunction 𝕜) :
     Δ_[f*g](y; q, a) = summatory (fun k ↦ if k.Coprime q then f k * Δ_[g](y/k; q, a * (k : ZMod q)⁻¹) else 0) y := by
-  rw [Delta_eq_sum_char (f := ↑(f*g))]
+  apply_fun algebraMap 𝕜 ℂ
+  rw [Delta_eq_sum_char (f := (f*g))]
   simp_rw [← twist_apply, mul_twist, ← Finset.sum_filter]
   simp_rw [summatory_mul_eq_summatory]
   simp only [twist_apply]
   pull summatory
+  simp only [map_summatory, apply_ite, map_mul]
   congr! 2 with n
   split_ifs with hn
   · rw [Delta_eq_sum_char, ← Finset.sum_filter]
@@ -353,6 +359,7 @@ theorem Delta_convolution_eq {y : ℝ} {q : ℕ} [NeZero q] {a : ZMod q} (ha : I
   · have : ¬ IsUnit (n : ZMod q) := by simp [ZMod.isUnit_iff_coprime, hn]
     simp [this, MulChar.map_nonunit, summatory_zero]
   · exact ha
+  · apply RingHom.injective
 
 -- theorem Delta_convolution_eq_real {y : ℝ} {q : ℕ} [NeZero q] {a : ZMod q} (ha : IsUnit a) (f g : ArithmeticFunction ℝ) :
 --     Δ_[f*g](y; q, a) = summatory (fun k ↦ if k.Coprime q then f k * Δ_[g](y/k; q, a * (k : ZMod q)⁻¹) else 0) y := by
@@ -637,7 +644,10 @@ theorem Delta_abel_summation {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit
     (hg_int : MeasureTheory.LocallyIntegrableOn g' (Set.Icc 1 x))
     (hg_one : g 1 = 0) :
     Δ_[fun n ↦ g n](x; q, a) = Δ_[fun _ ↦ (1 : ℂ)](x; q, a) * g x - ∫ t in Set.Ioc 1 x, Δ_[fun _ ↦ (1 : ℂ)](t; q, a) * g' t := by
-  simp_rw [Delta_eq_sum_char ha]
+  -- TODO: Figure out if we want to phrase this nicer.
+  have test {f x} := Delta_eq_sum_char (𝕜 := ℂ) ha (y := x) (q := q) (f := f)
+  simp only [Algebra.algebraMap_self, RingHom.id_apply] at test
+  simp_rw [test]
   simp_rw [← Finset.sum_filter, Finset.mul_sum, Finset.sum_mul]
   rw [MeasureTheory.integral_finset_sum _ ?A, ← Finset.sum_sub_distrib]
   case A =>
@@ -781,6 +791,64 @@ $$|\Delta_{f * \log^v}(x;\, q,\, a)| \le 2(\log x)^v \sum_{k \le x} |f(k)|$$
 -/) (proof := /--
 Straightforward application of the previous lemmas.
 -/) (uses := [Delta_one_bound, Delta_abel_summation, Delta_monotone_bound])]
-theorem Delta_flog_bound {v : ℕ} {f : ArithmeticFunction ℝ} {x : ℝ} (hx : 2 ≤ x) {q : ℕ} (a : ZMod q) (ha : IsUnit a) : Δ_[f * ppow log v](x; q, a) ≤ 2 * (Real.log x)^v * summatory (fun k ↦ |f k|) x := by
-  -- rw [Delta_convolution_eq (g := log.ppow v)]
-  sorry
+theorem Delta_flog_bound {v : ℕ} {f : ArithmeticFunction ℝ} {x : ℝ} (hx : 2 ≤ x) {q : ℕ} [NeZero q] (a : ZMod q) (ha : IsUnit a) : ‖Δ_[f * ppow log v](x; q, a)‖ ≤ 2 * (Real.log x)^v * summatory (fun k ↦ |f k|) x := by
+  have hlog_nonneg : 0 ≤ Real.log x := by
+    apply Real.log_nonneg (by grind)
+  rw [Delta_convolution_eq (𝕜 := ℝ) ha, ← mul_summatory]
+  grw [norm_summatory_le]
+  gcongr with n hn_pos hnx
+  split_ifs with h
+  · by_cases hv : v = 0
+    · subst hv
+      simp only [ppow_zero, Delta_zeta_eq_Delta_one, norm_mul, pow_zero, mul_one]
+      grw [Delta_one_bound]
+      · simp
+        have : 0 ≤ |f n| := abs_nonneg _
+        linarith only [this]
+      · exact NeZero.pos _
+    replace hv : 0 < v := by grind
+    have : ⇑(log.ppow v) = (fun n : ℕ ↦ (Real.log n)^v) := by
+      ext n
+      simp [hv]
+    grw [norm_mul, this, Delta_monotone_bound (g := fun x ↦ (Real.log x)^v)]
+    · simp only [Real.norm_eq_abs, ge_iff_le]
+      ring_nf
+      gcongr
+      · apply Real.log_nonneg
+        field_simp
+        exact hnx
+      · conv_rhs => rw [← mul_one x]
+        gcongr
+        field_simp
+        norm_cast
+    · simp [ha]
+      have : (n : ZMod q) = (n : ℤ) := by simp
+      rw [this]
+      apply ZMod.isUnit_inv
+      simp only [Int.cast_natCast, ZMod.isUnit_iff_coprime]
+      exact h
+    · field_simp
+      exact hnx
+    · simp only [Set.mem_Icc, and_imp]
+      intro t h1t htx
+      apply DifferentiableAt.pow
+      apply Real.differentiableAt_log
+      grind
+    ·
+      sorry
+    · apply MonotoneOn.comp (t := Set.Ici 0) (g := (· ^ v))
+      · apply zpow_left_monoOn₀  (n := v)
+        grind
+      · intro x hx y hy hxy
+        simp only [Set.mem_Icc] at hx hy ⊢
+        gcongr
+        grind
+      · intro a
+        simp only [Set.mem_Icc, Set.mem_Ici, and_imp]
+        intro h1a _
+        apply Real.log_nonneg h1a
+    · simp
+      grind
+
+  · simp only [norm_zero]
+    positivity

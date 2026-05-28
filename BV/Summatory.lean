@@ -105,6 +105,19 @@ theorem summatory_congr {R : Type*} [AddCommMonoid R]
   simp only [Nat.mem_Icc, Nat.one_le_cast] at hn
   apply h n (by grind) hn.2
 
+@[gcongr]
+theorem summatory_le_summatory {R : Type*} [AddCommMonoid R] [PartialOrder R] [IsOrderedAddMonoid R]
+    {f g : ℕ → R} {x : ℝ} (h : ∀ n : ℕ, 0 < n → n ≤ x → f n ≤ g n) :
+    summatory f x ≤ summatory g x := by
+  by_cases hx : x < 0
+  · simp [hx, summatory_of_neg]
+  · simp_rw [summatory_apply]
+    gcongr with n hn
+    simp only [Finset.mem_Ioc] at hn
+    apply h n hn.1 _
+    exact_mod_cast calc n ≤ (⌊x⌋₊ : ℝ) := mod_cast hn.2
+      _ ≤ x := Nat.floor_le (by grind)
+
 theorem summatory_congr_fun {R : Type*} [AddCommMonoid R] [PartialOrder R] [IsOrderedAddMonoid R]
     {f g : ℕ → R} {x : ℝ} (h : ∀ n : ℕ, 0 < n → n ≤ x → f n = g n) :
     summatory f x = summatory g x := by
@@ -154,6 +167,14 @@ theorem summatory_zero {R : Type*} [AddCommMonoid R] {x : ℝ} :
     summatory (fun _ ↦ (0 : R)) x = 0 := by
   simp [summatory]
 
+@[simp, push]
+theorem map_summatory {M : Type u_3} {N : Type u_4} [AddCommMonoid M] [AddCommMonoid N] {G : Type u_7} [FunLike G M N] [AddMonoidHomClass G M N] (g : G) (f : ℕ → M) (x : ℝ) :
+    g (summatory (fun n ↦ f n) x) = summatory (fun n ↦ g (f n)) x := by
+  simp [summatory_apply]
+
+theorem norm_summatory_le {M :Type*} [SeminormedAddCommGroup M] (f : ℕ → M) (x : ℝ) : ‖summatory f x‖ ≤ summatory (fun n ↦ ‖f n‖) x := by
+  simp_rw [summatory_apply]
+  grw [norm_sum_le]
 
 /- This positivity extension was written by an LLM. -/
 open Qq Lean Meta Mathlib.Meta.Positivity in
