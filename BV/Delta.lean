@@ -785,6 +785,12 @@ theorem Delta_monotone_bound {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit
   apply Delta_monotone_bound_aux (g' := deriv g) ha g hx ?deriv hg_int hg_mono hg1
   case deriv => apply fun t ht ↦ (hg t ht).hasDerivAt
 
+
+open MeasureTheory in
+lemma _root_.Set.EqOn.aeEq [MeasureSpace α] {s : Set α} {f g : α → β} (h : s.EqOn f g) (h2 : volume sᶜ = 0) : f =ᵐ[volume] g :=
+  Set.EqOn.eventuallyEq_of_mem h h2
+
+open MeasureTheory in
 @[blueprint (statement := /--
 Let $v \ge 0$ and let $f$ be an arithmetic function supported on $[1, x]$. For $x \ge 2$, $q \in \N$ and $a \in (\Z/q\Z)^*$,
 $$|\Delta_{f * \log^v}(x;\, q,\, a)| \le 2(\log x)^v \sum_{k \le x} |f(k)|$$
@@ -834,8 +840,25 @@ theorem Delta_flog_bound {v : ℕ} {f : ArithmeticFunction ℝ} {x : ℝ} (hx : 
       apply DifferentiableAt.pow
       apply Real.differentiableAt_log
       grind
-    ·
-      sorry
+    · have : deriv (fun x ↦ (Real.log x) ^ v)
+        =ᵐ[(MeasureTheory.volume).restrict ({0}ᶜ)] fun x ↦ v * (Real.log x)^(v-1) * x⁻¹ := by
+        simp
+        apply Set.EqOn.aeEq (s := {0}ᶜ)
+        · intro x;
+          simp +contextual
+        · simp
+      apply LocallyIntegrableOn.congr this.symm _ |>.mono_set
+      · simp
+      apply ContinuousOn.locallyIntegrableOn
+      · apply ContinuousOn.mul
+        · apply ContinuousOn.mul
+          · fun_prop
+          · apply ContinuousOn.pow
+            apply Real.continuousOn_log.mono
+            simp
+        · apply continuousOn_inv₀.mono
+          simp
+      simp
     · apply MonotoneOn.comp (t := Set.Ici 0) (g := (· ^ v))
       · apply zpow_left_monoOn₀  (n := v)
         grind
@@ -849,6 +872,5 @@ theorem Delta_flog_bound {v : ℕ} {f : ArithmeticFunction ℝ} {x : ℝ} (hx : 
         apply Real.log_nonneg h1a
     · simp
       grind
-
   · simp only [norm_zero]
     positivity

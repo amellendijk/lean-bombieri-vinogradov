@@ -23,3 +23,10 @@ git = "https://github.com/PatrickMassot/checkdecls.git"
 name = "leancert"
 git = "https://github.com/alerad/leancert"
 rev = "v4.28.1"
+
+[[require]]
+name = "PrimeNumberTheoremAnd"
+git = "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd.git"
+rev = "11265859849c1b7029fa68dfb2e3822596c74c9d"
+
+
