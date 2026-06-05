@@ -6,8 +6,6 @@ import BV.LambdaLE
 import BV.LambdaSharp
 import BV.LambdaFlat
 
--- namespace BombieriVinogradov
-
 open ArithmeticFunction
 
 noncomputable section
@@ -23,6 +21,7 @@ a fundamental result in analytic number theory.
 
 def C_BV_L (A : ℝ) : ℝ := sorry
 
+open ProofData in
 @[blueprint (statement :=
 /--
 For each fixed $A \ge 0$ we have

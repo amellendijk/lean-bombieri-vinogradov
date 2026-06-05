@@ -170,7 +170,7 @@ I'm trying to find the right level of generality for some
 
 open MeasureTheory
 
-theorem MeasureTheory.IntegrableAtFilter.mul_boundedAtFilter {α : Type u_1} {ε' : Type u_4}
+theorem MeasureTheory.IntegrableAtFilter.mul_boundedAtFilter {α ε' : Type*}
     {mα : MeasurableSpace α} {μ : Measure α} [NormedRing ε']
     {l : Filter α} (hl : l.IsMeasurablyGenerated) {f g : α → ε'} (hg_meas : AEStronglyMeasurable g μ)
     (hf : IntegrableAtFilter f l μ) (hg : l.BoundedAtFilter g) :
@@ -198,7 +198,7 @@ theorem MeasureTheory.IntegrableAtFilter.mul_boundedAtFilter {α : Type u_1} {ε
       grind
 
 -- TODO: Figure out how to not repeat the previous proof
-theorem MeasureTheory.IntegrableAtFilter.boundedAtFilter_mul {α : Type u_1} {ε' : Type u_4}
+theorem MeasureTheory.IntegrableAtFilter.boundedAtFilter_mul {α ε' : Type*}
     {mα : MeasurableSpace α} {μ : Measure α} [NormedRing ε']
     {l : Filter α} (hl : l.IsMeasurablyGenerated) {f g : α → ε'} (hg_meas : AEStronglyMeasurable g μ)
     (hf : IntegrableAtFilter f l μ) (hg : l.BoundedAtFilter g) :

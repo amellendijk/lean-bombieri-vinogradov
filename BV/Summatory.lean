@@ -44,6 +44,10 @@ theorem card_natIcc_zero (x : ℝ) (hx : 0 ≤ x) :
 theorem Nat.Icc_eq_empty_of_neg (x : ℝ) {y : ℝ} (hy : y < 0) : Nat.Icc x y = ∅ := by
   simp [Nat.Icc, hy]
 
+@[simp]
+theorem Nat.Icc_eq_empty_of_lt (x : ℝ) {y : ℝ} (hy : y < x) : Nat.Icc x y = ∅ := by
+  simp [Nat.Icc, hy]
+
 @[grind =>]
 theorem Nat.Icc_mono_left {x₁ x₂ y : ℝ} (hx : x₁ ≤ x₂) : Nat.Icc x₂ y ⊆ Nat.Icc x₁ y := by
   intro n
@@ -70,6 +74,14 @@ theorem summatory_of_neg {R : Type*} [AddCommMonoid R]
     {f : ℕ → R} {x : ℝ} (hx : x < 0) :
     summatory f x = 0 := by
   simp [summatory, Nat.Icc_eq_empty_of_neg _ hx]
+
+theorem summatory_of_nonpos {R : Type*} [AddCommMonoid R]
+    {f : ℕ → R} {x : ℝ} (hx : x ≤ 0) :
+    summatory f x = 0 := by
+  simp [summatory]
+  rw [Nat.Icc_eq_empty_of_lt]
+  · simp
+  · grind
 
 theorem summatory_apply {R : Type*} [AddCommMonoid R] {f : ℕ → R} {x : ℝ} :
     summatory f x = ∑ n ∈ Finset.Ioc 0 ⌊x⌋₊, f n := by
@@ -168,11 +180,11 @@ theorem summatory_zero {R : Type*} [AddCommMonoid R] {x : ℝ} :
   simp [summatory]
 
 @[simp, push]
-theorem map_summatory {M : Type u_3} {N : Type u_4} [AddCommMonoid M] [AddCommMonoid N] {G : Type u_7} [FunLike G M N] [AddMonoidHomClass G M N] (g : G) (f : ℕ → M) (x : ℝ) :
+theorem map_summatory {M N : Type*} [AddCommMonoid M] [AddCommMonoid N] {G : Type*} [FunLike G M N] [AddMonoidHomClass G M N] (g : G) (f : ℕ → M) (x : ℝ) :
     g (summatory (fun n ↦ f n) x) = summatory (fun n ↦ g (f n)) x := by
   simp [summatory_apply]
 
-theorem norm_summatory_le {M :Type*} [SeminormedAddCommGroup M] (f : ℕ → M) (x : ℝ) : ‖summatory f x‖ ≤ summatory (fun n ↦ ‖f n‖) x := by
+theorem norm_summatory_le {M : Type*} [SeminormedAddCommGroup M] (f : ℕ → M) (x : ℝ) : ‖summatory f x‖ ≤ summatory (fun n ↦ ‖f n‖) x := by
   simp_rw [summatory_apply]
   grw [norm_sum_le]
 

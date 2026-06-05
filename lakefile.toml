@@ -2,6 +2,9 @@ name = "BV"
 version = "0.1.0"
 defaultTargets = ["BV"]
 
+[leanOptions]
+autoImplicit = false
+
 [[lean_lib]]
 name = "BV"
 

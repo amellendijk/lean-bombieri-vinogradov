@@ -205,7 +205,7 @@ lemma ArithmeticFunction.mul_coe_zeta_apply (f : ArithmeticFunction ℝ) (n : �
   · grind
 
 open ProofData in
-lemma test [ProofData] {k : ℕ} (hk : 0 < k) {q : ℕ} (hq : 0 < q) :
+lemma sum_vonMangoldt_le_log [ProofData] {k : ℕ} (hk : 0 < k) {q : ℕ} (hq : 0 < q) :
     |∑ p ∈ Finset.Ioc 0 ⌊x ^ ((1:ℝ) / k)⌋₊ with Nat.Prime p, if ¬q.Coprime (p ^ k) then Λ p else 0| ≤ log q := by
   have {p : ℕ} (hp : p.Prime) : ¬ q.Coprime (p^k) ↔ p ∣ q := by
     rw [Nat.coprime_comm]
@@ -256,7 +256,7 @@ lemma sum_vonMangoldt_not_coprime_ll_logq [ProofData] {q : ℕ} (hq : 0 < q) :
     simp +contextual (disch := grind) only [ArithmeticFunction.vonMangoldt_apply_pow]
     trans (∑ x ∈ Finset.Icc 1 ⌊Real.log x / Real.log 2⌋₊, Real.log q)
     · gcongr with d hd
-      convert test _ hq
+      convert sum_vonMangoldt_le_log _ hq
       · grind
     simp only [Finset.sum_const, Nat.card_Icc, add_tsub_cancel_right, nsmul_eq_mul]
     grw [Nat.floor_le (by positivity), C_SVNC]
@@ -306,7 +306,7 @@ theorem ArithmeticFunction.mul_twist {𝕜 : Type*} [Field 𝕜] [Algebra 𝕜 �
   simp only [Nat.cast_mul, map_mul]
   ring
 
-theorem ArithmeticFunction.summatory_mul_eq_summatory {R : Type u_2} [Semiring R] (f g : ArithmeticFunction R) (x : ℝ) :
+theorem ArithmeticFunction.summatory_mul_eq_summatory {R : Type*} [Semiring R] (f g : ArithmeticFunction R) (x : ℝ) :
     summatory (f * g) x  = summatory (fun n ↦ f n * summatory g (x/n)) x := by
   have := ArithmeticFunction.sum_Ioc_mul_eq_sum_sum f g (⌊x⌋₊)
   simp_rw [summatory_apply, this, Nat.floor_div_natCast]
@@ -787,7 +787,7 @@ theorem Delta_monotone_bound {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit
 
 
 open MeasureTheory in
-lemma _root_.Set.EqOn.aeEq [MeasureSpace α] {s : Set α} {f g : α → β} (h : s.EqOn f g) (h2 : volume sᶜ = 0) : f =ᵐ[volume] g :=
+lemma _root_.Set.EqOn.aeEq {α β : Type*} [MeasureSpace α] {s : Set α} {f g : α → β} (h : s.EqOn f g) (h2 : volume sᶜ = 0) : f =ᵐ[volume] g :=
   Set.EqOn.eventuallyEq_of_mem h h2
 
 open MeasureTheory in

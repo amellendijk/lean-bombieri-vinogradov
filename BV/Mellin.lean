@@ -1,6 +1,8 @@
 import Mathlib.Order.Filter.ZeroAndBoundedAtFilter
+import Mathlib.Analysis.MellinInversion
 
 import PrimeNumberTheoremAnd.MellinCalculus
+import PrimeNumberTheoremAnd.MediumPNT
 
 import BV.Mathlib.MeasureTheory.Function.LocallyIntegrable
 
@@ -168,7 +170,7 @@ lemma isBigO_nhds_eventually_principal {X E F : Type*} [PseudoMetricSpace X] [No
   use c
   simpa using hr
 
-lemma test
+lemma mellin_bump_bounded_aux
     {ν : ℝ → ℝ} (diffν : ContDiff ℝ 1 ν)
     (suppν : ν.support ⊆ Set.Icc (1 / 2) 2) :
     (fun s ↦ 𝓜 (fun x ↦ (ν x : ℂ)) s) =O[nhds 0] fun _ ↦ (1:ℝ) := by
@@ -177,9 +179,9 @@ lemma test
 
 lemma mellin_bump_bounded {σ₁ σ₂ : ℝ} (hσ₂ : 0 ≤ σ₂) {ν : ℝ → ℝ} (diffν : ContDiff ℝ 1 ν)
     (suppν : ν.support ⊆ Set.Icc (1 / 2) 2) :
-    𝓜 (fun x ↦ (ν x : ℂ)) =O[principal {s | σ₁ ≤ s.re ∧ s.re ≤ σ₂ ∧ s ≠ 0}] fun _ ↦ (1 : ℝ) := by
+    𝓜 (fun x ↦ (ν x : ℂ)) =O[principal {s | σ₁ ≤ s.re ∧ s.re ≤ σ₂}] fun _ ↦ (1 : ℝ) := by
   obtain ⟨r, hr⟩ := eventually_mem_nhdsWithin.and
-    (isBigO_nhds_eventually_principal (X := ℂ) (test diffν suppν)) |>.exists
+    (isBigO_nhds_eventually_principal (X := ℂ) (mellin_bump_bounded_aux diffν suppν)) |>.exists
   simp only [mem_Ioi, dist_zero_right] at hr
   have h₄ :
     (𝓜 fun x => ↑(ν x : ℂ)) =O[𝓟 {s | σ₁ ≤ s.re ∧ s.re ≤ σ₂ ∧ s ≠ 0 ∧ r ≤ ‖s‖}]
@@ -189,8 +191,17 @@ lemma mellin_bump_bounded {σ₁ σ₂ : ℝ} (hσ₂ : 0 ≤ σ₂) {ν : ℝ �
   · have := h₄.sup hr.2
     simp only [ne_eq, sup_principal, ← setOf_or] at this
     apply this.mono
-    simp only [ne_eq, le_principal_iff, mem_principal, setOf_subset_setOf, and_imp]
-    grind
+    simp only [le_principal_iff, mem_principal, setOf_subset_setOf, and_imp]
+    intro s hs₁ hs₂
+    by_cases hs : ‖s‖ < r
+    · simp [hs]
+    · push Not at hs
+      left
+      simp [hs]
+      refine ⟨hs₁, hs₂, ?_⟩
+      rintro rfl
+      simp only [norm_zero] at hs
+      grind
   · simp
     grind
   · simp
@@ -208,3 +219,80 @@ lemma mellin_isBigO_pow {σ₁ σ₂ : ℝ}
       =O[principal (Complex.re ⁻¹' (Set.Icc σ₁ σ₂))]
       fun s ↦ (1+‖s‖)^k := by
   sorry
+
+/--
+Written by Claude:
+
+In case the comments don't give it away, this lemma is written by claude. It's adapting a result
+that was implicit in MediumPNT.
+
+The Mellin transform of the smoothed indicator `Smooth1 ν ε` is vertically integrable along the
+line `Re s = σ`, for any `0 < σ ≤ 2`. The integrand is `O(1/(σ² + t²))` by `MellinOfSmooth1b`, and
+`t ↦ (σ² + t²)⁻¹` is integrable since `σ ≠ 0`. (This is the content of
+`SmoothedChebyshevDirichlet_aux_integrable` in `MediumPNT`, generalised from `1 < σ` to `0 < σ`.) -/
+lemma Smooth1_verticalIntegrable
+    {ν : ℝ → ℝ}
+    (diffν : ContDiff ℝ 1 ν)
+    (νpos : ∀ x > 0, 0 ≤ ν x)
+    (suppν : ν.support ⊆ Icc (1 / 2) 2)
+    (mass_one : ∫ x in Ioi 0, ν x / x = 1)
+    {ε : ℝ} (εpos : 0 < ε) (ε_lt_one : ε < 1)
+    {σ : ℝ} (σ_pos : 0 < σ) (σ_le : σ ≤ 2) :
+    VerticalIntegrable (𝓜 (fun x ↦ (Smooth1 ν ε x : ℂ))) σ := by
+  -- Abbreviation for the `(σ + t*I).re = σ` simplification used repeatedly below.
+  have hre : ∀ t : ℝ, ((σ : ℂ) + t * I).re = σ := fun t => by simp
+  obtain ⟨c, cpos, hc⟩ := MellinOfSmooth1b diffν suppν
+  have hσ : σ ≠ 0 := σ_pos.ne'
+  have hg : Integrable (fun t : ℝ ↦ (σ ^ 2 + t ^ 2)⁻¹) := by
+    have key : Integrable (fun t : ℝ ↦ (σ ^ 2)⁻¹ * (1 + (σ⁻¹ * t) ^ 2)⁻¹) :=
+      (integrable_inv_one_add_sq.comp_mul_left' (inv_ne_zero hσ)).const_mul _
+    refine key.congr (Filter.Eventually.of_forall fun t ↦ ?_)
+    have h1 : σ ^ 2 + t ^ 2 ≠ 0 := by positivity
+    have h2 : (1 : ℝ) + (σ⁻¹ * t) ^ 2 ≠ 0 := by positivity
+    field_simp
+  refine Integrable.mono' (hg.const_mul (c / ε)) ?_ (Filter.Eventually.of_forall fun t ↦ ?_)
+  · -- Strong measurability via continuity (`𝓜 …` is differentiable on `re > 0`).
+    apply Continuous.aestronglyMeasurable
+    refine continuous_iff_continuousAt.mpr fun t ↦ ?_
+    have hline : ContinuousAt (fun y : ℝ ↦ (σ : ℂ) + y * I) t := by fun_prop
+    exact ContinuousAt.comp (g := fun s : ℂ ↦ 𝓜 (fun x ↦ (Smooth1 ν ε x : ℂ)) s)
+      (f := fun y : ℝ ↦ (σ : ℂ) + y * I)
+      (Smooth1MellinDifferentiable diffν suppν ⟨εpos, ε_lt_one⟩ νpos mass_one
+        (s := σ + t * I) (by rw [hre]; exact σ_pos)).continuousAt hline
+  · -- Pointwise `O(1/(σ² + t²))` bound from `MellinOfSmooth1b`.
+    calc ‖𝓜 (fun x ↦ (Smooth1 ν ε x : ℂ)) (σ + t * I)‖
+        ≤ c * (ε * ‖(σ : ℂ) + t * I‖ ^ 2)⁻¹ :=
+          hc (σ / 2) (by linarith) (σ + t * I) (by rw [hre]; linarith) (by rw [hre]; linarith)
+            ε εpos ε_lt_one
+      _ = c / ε * (σ ^ 2 + t ^ 2)⁻¹ := by
+          rw [Complex.sq_norm, Complex.normSq_add_mul_I, mul_inv]; ring
+
+/--
+In case the comments don't give it away, this lemma is written by claude. It's adapting a result
+that was implicit in MediumPNT
+
+The smoothed indicator `Smooth1 ν ε` equals the inverse Mellin transform of its own
+Mellin transform — equation (*) of `notes/theorem26_6_smooth.md`. This is the specialization of
+`mellinInv_mellin_eq` to `f = fun x ↦ (Smooth1 ν ε x : ℂ)`, proved implicitly inside
+`SmoothedChebyshevDirichlet` in `PrimeNumberTheoremAnd.MediumPNT`. The vertical integrability of
+the Mellin transform is established inline (as in `SmoothedChebyshevDirichlet_aux_integrable`) from
+the `O(1/‖s‖²)` decay of `MellinOfSmooth1b`, valid for any `0 < σ ≤ 2`. -/
+lemma Smooth1_mellinInv_mellin_eq
+    {ν : ℝ → ℝ}
+    (diffν : ContDiff ℝ 1 ν)
+    (νpos : ∀ x > 0, 0 ≤ ν x)
+    (suppν : ν.support ⊆ Icc (1 / 2) 2)
+    (mass_one : ∫ x in Ioi 0, ν x / x = 1)
+    {ε : ℝ} (εpos : 0 < ε) (ε_lt_one : ε < 1)
+    {σ : ℝ} (σ_pos : 0 < σ) (σ_le : σ ≤ 2)
+    {x : ℝ} (hx : 0 < x) :
+    mellinInv σ (𝓜 (fun x ↦ (Smooth1 ν ε x : ℂ))) x
+      = (Smooth1 ν ε x : ℂ) := by
+  apply mellinInv_mellin_eq σ (fun x ↦ (Smooth1 ν ε x : ℂ)) hx
+  · -- `MellinConvergent` at `σ`.
+    exact Smooth1MellinConvergent diffν suppν ⟨εpos, ε_lt_one⟩ νpos mass_one
+      (by simpa using σ_pos)
+  · -- `VerticalIntegrable (𝓜 …) σ`.
+    exact Smooth1_verticalIntegrable diffν νpos suppν mass_one εpos ε_lt_one σ_pos σ_le
+  · -- `ContinuousAt` of `fun x ↦ ↑(Smooth1 ν ε x)` at `x`.
+    exact (Smooth1ContinuousAt diffν νpos suppν εpos hx).ofReal
