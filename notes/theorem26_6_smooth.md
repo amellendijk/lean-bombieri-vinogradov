@@ -34,7 +34,7 @@ $$
 | `Smooth1Properties_above` | $\widetilde{1}_\varepsilon(x) = 0$ for $x \geq 1 + c_2\varepsilon$ (with $\varepsilon < 1$), where $c_2 = 2\log 2$ |
 | `MellinConvolutionTransform` | $\mathcal{M}[f * g](s) = \mathcal{M}[f](s)\cdot\mathcal{M}[g](s)$ |
 | `MellinOfDeltaSpike` | $\mathcal{M}[\nu_\varepsilon](s) = \mathcal{M}[\nu](\varepsilon s)$ |
-| Rapid decay of $\mathcal{M}[\nu]$ | $|\mathcal{M}[\nu](\xi)| \ll_A (1+|\xi|)^{-A}$ on any bounded vertical strip (since $\nu \in C^\infty_c((0,\infty))$) |
+| Rapid decay of $\mathcal{M}[\nu]$ | $\|\mathcal{M}[\nu](\xi)\| \ll_A (1+\|\xi\|)^{-A}$ on any bounded vertical strip (since $\nu \in C^\infty_c((0,\infty))$) |
 
 ---
 
@@ -82,7 +82,7 @@ In particular, **there is no transition-zone error term**: $\max_{y \le x} |T(y,
 
 ### Step 2: Mellin-integral representation of the smooth sum
 
-Since $\widetilde{1}_\varepsilon$ is $C^\infty$ with compact support in $(0,\infty)$, its Mellin transform $\mathcal{M}[\widetilde{1}_\varepsilon]$ is entire and Schwartz along verticals, so Mellin inversion
+Since $\widetilde{1}_\varepsilon$ is $C^\infty$ on $(0,\infty)$, is 1 near zero and vanishes for $x \ge 2^\varepsilon$, its Mellin transform $\mathcal{M}[\widetilde{1}_\varepsilon]$ is entire and Schwartz along verticals, so Mellin inversion
 $$
 \widetilde{1}_\varepsilon(t) = \frac{1}{2\pi i}\int_{(\sigma)} \mathcal{M}[\widetilde{1}_\varepsilon](s)\,t^{-s}\,ds
 $$

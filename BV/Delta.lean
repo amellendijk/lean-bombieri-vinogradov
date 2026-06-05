@@ -797,7 +797,8 @@ $$|\Delta_{f * \log^v}(x;\, q,\, a)| \le 2(\log x)^v \sum_{k \le x} |f(k)|$$
 -/) (proof := /--
 Straightforward application of the previous lemmas.
 -/) (uses := [Delta_one_bound, Delta_abel_summation, Delta_monotone_bound])]
-theorem Delta_flog_bound {v : ℕ} {f : ArithmeticFunction ℝ} {x : ℝ} (hx : 2 ≤ x) {q : ℕ} [NeZero q] (a : ZMod q) (ha : IsUnit a) : ‖Δ_[f * ppow log v](x; q, a)‖ ≤ 2 * (Real.log x)^v * summatory (fun k ↦ |f k|) x := by
+theorem Delta_flog_bound {v : ℕ} {f : ArithmeticFunction ℝ} {x : ℝ} (hx : 2 ≤ x) {q : ℕ} [NeZero q] (a : ZMod q) (ha : IsUnit a) :
+    ‖Δ_[f * ppow log v](x; q, a)‖ ≤ 2 * (Real.log x)^v * summatory (fun k ↦ |f k|) x := by
   have hlog_nonneg : 0 ≤ Real.log x := by
     apply Real.log_nonneg (by grind)
   rw [Delta_convolution_eq (𝕜 := ℝ) ha, ← mul_summatory]
