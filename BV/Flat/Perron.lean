@@ -575,8 +575,6 @@ theorem dpoly_large_sieve_mul [FG] {Q : ℝ} (hQ : 1 ≤ Q) {s : ℂ} (hs : 0 �
       (√(summatory (fun m ↦ ‖f m‖ ^ 2) M) * √(summatory (fun n ↦ ‖g n‖ ^ 2) N)) := by
   have hM0 : (0 : ℝ) ≤ M := hM_pos.le
   have hN0 : (0 : ℝ) ≤ N := hN_pos.le
-  have hMQ : (0 : ℝ) ≤ M + Q ^ 2 := add_nonneg hM0 (sq_nonneg Q)
-  have hNQ : (0 : ℝ) ≤ N + Q ^ 2 := add_nonneg hN0 (sq_nonneg Q)
   have hA : (0 : ℝ) ≤ summatory (fun m ↦ ‖f m‖ ^ 2) M :=
     summatory_nonneg _ _ (fun n _ ↦ by positivity)
   have hB : (0 : ℝ) ≤ summatory (fun n ↦ ‖g n‖ ^ 2) N :=
@@ -769,24 +767,18 @@ theorem summatory_sup_T_le [Bump] [FG] {ε σ Q x : ℝ} (hε_pos : 0 < ε) (hε
       (by rw [← MeasureTheory.integral_Ici_eq_integral_Ioi]; exact mass_one)
       hε_pos hε_one hσ_pos hσ2).norm
   have hK_nonneg : ∀ t, 0 ≤ K t := fun t ↦ norm_nonneg _
-  have hP_nonneg : ∀ q (χ : DirichletCharacter ℂ q) t, 0 ≤ P q χ t :=
-    fun q χ t ↦ mul_nonneg (norm_nonneg _) (norm_nonneg _)
   have hw_nonneg : ∀ q, 0 ≤ w q := fun q ↦ by rw [hwdef]; positivity
   have hPK_int : ∀ (q : ℕ) (χ : DirichletCharacter ℂ q), Integrable (fun t ↦ P q χ t * K t) :=
     fun q χ ↦ integrable_dpoly_mul_mellin hσ_pos hσ2 hε_pos hε_one χ
   have hwPK_int : ∀ (q : ℕ) (χ : DirichletCharacter ℂ q),
       Integrable (fun t ↦ (w q * P q χ t) * K t) := fun q χ ↦
     ((hPK_int q χ).const_mul (w q)).congr (Filter.Eventually.of_forall fun t ↦ by ring)
-  have hint_nonneg : ∀ (q : ℕ) (χ : DirichletCharacter ℂ q),
-      0 ≤ ∫ t, P q χ t * K t := fun q χ ↦
-    MeasureTheory.integral_nonneg fun t ↦ mul_nonneg (hP_nonneg q χ t) (hK_nonneg t)
   -- Step 3: the sup over `y` of `‖T ε y χ‖` is bounded by the `y`-free vertical integral.
   have hsup : ∀ (q : ℕ) (χ : DirichletCharacter ℂ q),
       (⨆ y ∈ Icc 1 (x + 1), ‖T ε y χ‖) ≤
         (2 * π)⁻¹ * (x + 1) ^ σ * ∫ t, P q χ t * K t := by
     intro q χ
-    have hb : 0 ≤ (2 * π)⁻¹ * (x + 1) ^ σ * ∫ t, P q χ t * K t :=
-      mul_nonneg (mul_nonneg (by positivity) (by positivity)) (hint_nonneg q χ)
+    have hb : 0 ≤ (2 * π)⁻¹ * (x + 1) ^ σ * ∫ t, P q χ t * K t := by positivity
     apply Real.iSup_le _ hb
     intro y
     apply Real.iSup_le _ hb
@@ -858,7 +850,8 @@ noncomputable instance Bump.instDefault : Bump where
   suppν := SmoothExistence.choose_spec.2.2.1
   mass_one := SmoothExistence.choose_spec.2.2.2
 
-set_option maxHeartbeats 1000000 in
+-- set_option maxHeartbeats 1000000 in
+#count_heartbeats in
 open _root_.Classical in
 /-- Theorem 26.6 of Koukoulopoulos, smoothed form (existential version): there is a constant
 `C` (depending only on the bump `ν`) such that for `x ≥ 1`, `Q > 0` and the calibrated smoothing
@@ -919,42 +912,27 @@ theorem summatory_T_ll_exists [Bump] :
   by_cases hQ1 : 1 ≤ Q
   case neg =>
     rw [summatory, Nat.Icc_eq_empty_of_lt _ (by linarith), Finset.sum_empty]
-    have hB : 0 ≤ √(N * M) + √M * Q + √N * Q + Q ^ 2 :=
-      add_nonneg (add_nonneg (add_nonneg (Real.sqrt_nonneg _)
-        (mul_nonneg (Real.sqrt_nonneg _) hQ.le)) (mul_nonneg (Real.sqrt_nonneg _) hQ.le))
-        (sq_nonneg _)
-    exact mul_nonneg (mul_nonneg (mul_nonneg (mul_nonneg (by positivity) hB) h1logx)
-      (Real.sqrt_nonneg _)) (Real.sqrt_nonneg _)
+    positivity
   case pos =>
     have hM0 : (0 : ℝ) ≤ M := hM_pos.le
     have hN0 : (0 : ℝ) ≤ N := hN_pos.le
     have hQ0 : (0 : ℝ) ≤ Q := hQ.le
-    have hB' : 0 ≤ √(N * M) + √M * Q + √N * Q + Q ^ 2 :=
-      add_nonneg (add_nonneg (add_nonneg (Real.sqrt_nonneg _)
-        (mul_nonneg (Real.sqrt_nonneg _) hQ0)) (mul_nonneg (Real.sqrt_nonneg _) hQ0))
-        (sq_nonneg _)
+    have hB' : 0 ≤ √(N * M) + √M * Q + √N * Q + Q ^ 2 := by positivity
     -- `(x+1)^σ = e ≤ 3`
     have hxσ : (x + 1) ^ σ ≤ 3 := by
       rw [Real.rpow_def_of_pos (by linarith), hσdef, mul_inv_cancel₀ hlog.ne']
       linarith [Real.exp_one_lt_d9]
     -- `√((M+Q²)(N+Q²)) ≤ √(NM) + √M Q + √N Q + Q²`
     have hsqrt : √((M + Q ^ 2) * (N + Q ^ 2)) ≤ √(N * M) + √M * Q + √N * Q + Q ^ 2 := by
-      have ha := Real.sq_sqrt hM0
-      have hb := Real.sq_sqrt hN0
       have hnm : √(N * M) = √N * √M := Real.sqrt_mul hN0 M
-      have ha0 := Real.sqrt_nonneg M
-      have hb0 := Real.sqrt_nonneg N
       have hkey : (M + Q ^ 2) * (N + Q ^ 2) ≤ (√(N * M) + √M * Q + √N * Q + Q ^ 2) ^ 2 := by
-        nlinarith [mul_nonneg (mul_nonneg ha0 hb0) hQ0,
-          mul_nonneg (mul_nonneg ha0 hQ0) hQ0, mul_nonneg (mul_nonneg hb0 hQ0) hQ0,
-          mul_nonneg (mul_nonneg ha0 hb0) (mul_nonneg hQ0 hQ0),
-          mul_nonneg (mul_nonneg (mul_nonneg ha0 hb0) hb0) hQ0,
-          mul_nonneg (mul_nonneg (mul_nonneg ha0 ha0) hb0) hQ0,
-          mul_nonneg (mul_nonneg (mul_nonneg ha0 hQ0) hQ0) hQ0,
-          mul_nonneg (mul_nonneg (mul_nonneg hb0 hQ0) hQ0) hQ0]
-      calc √((M + Q ^ 2) * (N + Q ^ 2))
-          ≤ √((√(N * M) + √M * Q + √N * Q + Q ^ 2) ^ 2) := Real.sqrt_le_sqrt hkey
-        _ = _ := Real.sqrt_sq hB'
+        have h {M : ℝ} (hM : 0 ≤ M) : (M + Q^2) ≤ (√M + Q)^2 := by
+          conv_lhs => rw [← Real.sq_sqrt hM]
+          nlinarith only [hQ0, Real.sqrt_nonneg M]
+        grw [h hM0, h hN0, hnm]
+        apply le_of_eq
+        ring
+      grw [hkey, Real.sqrt_sq hB']
     -- the kernel integral is `≪ 1 + log x`
     have hJ : (∫ t : ℝ, ‖mellin (fun x ↦ (Smooth1 ν ε x : ℂ)) ((σ : ℂ) + t * I)‖) ≤
         C_J * (3 * (1 + Real.log x)) := by
@@ -991,8 +969,6 @@ theorem summatory_T_ll_exists [Bump] :
             (max C_LS 0 * (√(N * M) + √M * Q + √N * Q + Q ^ 2) *
               (√(summatory (fun m ↦ ‖f m‖ ^ 2) M) * √(summatory (fun n ↦ ‖g n‖ ^ 2) N))) *
             (C_J * (3 * (1 + Real.log x))) := by
-          have hint_nonneg : 0 ≤ ∫ t : ℝ, ‖mellin (fun x ↦ (Smooth1 ν ε x : ℂ))
-              ((σ : ℂ) + t * I)‖ := MeasureTheory.integral_nonneg fun t ↦ norm_nonneg _
           gcongr
       _ = ((2 * π)⁻¹ * 3 * (max C_LS 0 * (C_J * 3))) *
             (√(N * M) + √M * Q + √N * Q + Q ^ 2) * (1 + Real.log x) *
@@ -1001,11 +977,8 @@ theorem summatory_T_ll_exists [Bump] :
       _ ≤ ((2 * π)⁻¹ * 3 * (max C_LS 0 * (C_J * 3)) + 1) *
             (√(N * M) + √M * Q + √N * Q + Q ^ 2) * (1 + Real.log x) *
             √(summatory (fun m ↦ ‖f m‖ ^ 2) M) * √(summatory (fun n ↦ ‖g n‖ ^ 2) N) := by
-          have hc : (2 * π)⁻¹ * 3 * (max C_LS 0 * (C_J * 3)) ≤
-              (2 * π)⁻¹ * 3 * (max C_LS 0 * (C_J * 3)) + 1 := by linarith
-          exact mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right
-            (mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right hc hB') h1logx)
-            (Real.sqrt_nonneg _)) (Real.sqrt_nonneg _)
+          gcongr
+          linarith
 
 /-- The implied constant in the smoothed Theorem 26.6; depends only on the bump `ν`. -/
 noncomputable def C_LSC [Bump] : ℝ := summatory_T_ll_exists.choose
@@ -1045,9 +1018,6 @@ theorem summatory_T_ll_nat [Bump] [FG] {ε Q : ℝ} (hQ : 0 < Q) {x : ℝ} (hx :
       simp only [mem_Icc] at hy
       have hε_pos : 0 < ε := by
         rw [hε]
-        have hlog2 := Real.log_two_gt_d9
-        have hx0 : (0 : ℝ) < x := by linarith
-        have h6 : (0 : ℝ) < 6 * Real.log 2 := by linarith
         positivity
       exact norm_T_le_const hε_pos (by linarith [hy.1])
     by_cases h : K ∈ Icc 1 ⌊x⌋₊
