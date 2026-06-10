@@ -851,8 +851,6 @@ noncomputable instance Bump.instDefault : Bump where
   mass_one := SmoothExistence.choose_spec.2.2.2
 
 -- set_option maxHeartbeats 1000000 in
-#count_heartbeats in
-open _root_.Classical in
 /-- Theorem 26.6 of Koukoulopoulos, smoothed form (existential version): there is a constant
 `C` (depending only on the bump `ν`) such that for `x ≥ 1`, `Q > 0` and the calibrated smoothing
 width `ε = ((6 log 2) x)⁻¹`,
@@ -864,11 +862,13 @@ the choice `σ = 1/\log(x+1)` so that `y^σ ≤ e ≤ 3`, Cauchy–Schwarz plus 
 height `t` (`dpoly_large_sieve_mul`), and the kernel integral bound `J ≪ 1 + log x`
 (`kernel_integral_le`). -/
 theorem summatory_T_ll_exists [Bump] :
+  open _root_.Classical in
     ∃ C, 0 < C ∧ ∀ [FG], ∀ {ε Q x : ℝ}, 0 < Q → 1 ≤ x → ε = (6 * Real.log 2)⁻¹ * x⁻¹ →
       summatory (fun q ↦ ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
         (q : ℝ) * ((q.totient : ℝ))⁻¹ * ⨆ y ∈ Icc 1 (x + 1), ‖T ε y χ‖) Q ≤
       C * (√(N * M) + √M * Q + √N * Q + Q ^ 2) * (1 + Real.log x) *
         √(summatory (fun m ↦ ‖f m‖ ^ 2) M) * √(summatory (fun n ↦ ‖g n‖ ^ 2) N) := by
+  classical
   obtain ⟨C_J, hC_J_pos, hC_J⟩ := kernel_integral_le (diffν.of_le (by simp))
     (fun x _ ↦ νpos x) suppν
     (by rw [← MeasureTheory.integral_Ici_eq_integral_Ioi]; exact mass_one)
@@ -929,7 +929,7 @@ theorem summatory_T_ll_exists [Bump] :
         have h {M : ℝ} (hM : 0 ≤ M) : (M + Q^2) ≤ (√M + Q)^2 := by
           conv_lhs => rw [← Real.sq_sqrt hM]
           nlinarith only [hQ0, Real.sqrt_nonneg M]
-        grw [h hM0, h hN0, hnm]
+        grw [h hM_pos.le, h hN0, hnm]
         apply le_of_eq
         ring
       grw [hkey, Real.sqrt_sq hB']
@@ -949,7 +949,8 @@ theorem summatory_T_ll_exists [Bump] :
         have hexp2 : Real.exp 2 = Real.exp 1 * Real.exp 1 := by
           rw [← Real.exp_add]; norm_num
         have h6 : (6 : ℝ) * Real.log 2 ≤ Real.exp 2 := by
-          nlinarith [Real.exp_one_gt_d9]
+          grw [hexp2, ← Real.exp_one_gt_d9, hlog2']
+          norm_num
         calc Real.log (6 * Real.log 2) ≤ Real.log (Real.exp 2) := Real.log_le_log h6log2 h6
           _ = 2 := Real.log_exp 2
       calc (∫ t : ℝ, ‖mellin (fun x ↦ (Smooth1 ν ε x : ℂ)) ((σ : ℂ) + t * I)‖)
@@ -1088,7 +1089,7 @@ theorem T_eq_sharp {x : ℝ} (hx : 1 ≤ x) [Bump] [FG] {q : ℕ} {ε : ℝ} (h�
       grw [hε]
       field_simp
       have := Real.log_two_gt_d9
-      nlinarith
+      nlinarith only [this, hx]
     · push Not at h
       grw [hε]
       have : (K : ℝ) + 1 ≤ m * n := by
