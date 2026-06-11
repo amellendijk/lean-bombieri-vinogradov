@@ -27,14 +27,104 @@ noncomputable def T [ProofData] (C : ℝ) (r : ℕ) (Q : ℝ) : ℝ :=
 
 /-! ### Reduction to character sums -/
 
+namespace DirichletCharacter
+
+/-- If `ξ` is a primitive character mod `d` and `d ∣ q` with `q ≠ 0`, then the character mod `q`
+induced by `ξ` has conductor `d`. -/
+theorem conductor_changeLevel_of_isPrimitive {q d : ℕ} [NeZero q] (hd : d ∣ q)
+    {ξ : DirichletCharacter ℂ d} (hξ : ξ.IsPrimitive) :
+    (changeLevel hd ξ).conductor = d := by
+  have hq : q ≠ 0 := NeZero.ne q
+  have hd0 : d ≠ 0 := fun h ↦ hq (Nat.eq_zero_of_zero_dvd (h ▸ hd))
+  have h1 : (changeLevel hd ξ).conductor ∣ d :=
+    (changeLevel hd ξ).conductor_dvd_of_mem_conductorSet hq ⟨hd, ξ, rfl⟩
+  have h2 : ξ = changeLevel h1 (changeLevel hd ξ).primitiveCharacter := by
+    apply changeLevel_injective hd
+    rw [← changeLevel_trans _ h1 hd]
+    exact (changeLevel_primitiveCharacter _).symm
+  have h3 : ξ.conductor ∣ (changeLevel hd ξ).conductor :=
+    ξ.conductor_dvd_of_mem_conductorSet hd0 ⟨h1, _, h2⟩
+  have hξ' : ξ.conductor = d := hξ
+  exact Nat.dvd_antisymm h1 ((dvd_of_eq hξ'.symm).trans h3)
+
+/-- Summing a function over the characters mod `q` of conductor `d` is the same as summing
+over the primitive characters mod `d`, via `changeLevel`. -/
+theorem sum_conductor_eq {R : Type*} [AddCommMonoid R] {q d : ℕ} [NeZero q] (hd : d ∣ q)
+    (f : DirichletCharacter ℂ q → R) :
+  open Classical in
+    ∑ χ : DirichletCharacter ℂ q with χ.conductor = d, f χ =
+      ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive, f (ξ.changeLevel hd) := by
+  classical
+  refine (Finset.sum_bij (fun ξ _ ↦ changeLevel hd ξ) ?_ ?_ ?_ fun _ _ ↦ rfl).symm
+  · intro ξ hξ
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hξ ⊢
+    exact conductor_changeLevel_of_isPrimitive hd hξ
+  · intro ξ₁ _ ξ₂ _ h
+    exact changeLevel_injective hd h
+  · intro χ hχ
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hχ
+    subst hχ
+    exact ⟨χ.primitiveCharacter,
+      Finset.mem_filter.mpr ⟨Finset.mem_univ _, χ.primitiveCharacter_isPrimitive⟩,
+      χ.changeLevel_primitiveCharacter⟩
+
+end DirichletCharacter
+
+/-- Version of `character_sum_by_conductor` without the restriction to non-principal
+characters: every character mod `q` arises from a unique primitive character mod a
+unique divisor `d` of `q` (its conductor). -/
+theorem character_sum_by_conductor' {R : Type*} [AddCommMonoid R] {q : ℕ} [NeZero q]
+    (f : DirichletCharacter ℂ q → R) :
+  open Classical in
+    ∑ χ : DirichletCharacter ℂ q, f χ =
+      ∑ d ∈ q.divisors.attach, ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive,
+        f (ξ.changeLevel (Nat.dvd_of_mem_divisors d.2)) := by
+  classical
+  rw [← Finset.sum_fiberwise_of_maps_to (t := q.divisors.attach)
+    (g := fun χ : DirichletCharacter ℂ q ↦
+      (⟨χ.conductor, Nat.mem_divisors.mpr ⟨χ.conductor_dvd_level, NeZero.ne q⟩⟩ :
+        {d : ℕ // d ∈ q.divisors}))
+    (fun _ _ ↦ Finset.mem_attach _ _) f]
+  refine Finset.sum_congr rfl fun d _ ↦ ?_
+  rw [← DirichletCharacter.sum_conductor_eq (Nat.dvd_of_mem_divisors d.2) f]
+  exact Finset.sum_congr (Finset.filter_congr fun χ _ ↦ by simp [Subtype.ext_iff]) fun _ _ ↦ rfl
+
 @[blueprint (latexEnv := "lemma") (statement := /--
 This is a standard result. Let $f$ be a function from Dirichlet characters. Then
 $$\sum_{\substack{\chi \pmod{q} \\ \chi \ne \chi_0}} f(\chi) = \sum_{d \mid q} \sumstar_{\xi \pmod{d}} f(1_{(n,q)=1}\xi)$$
 -/)]
-theorem character_sum_by_conductor {R : Type*} [AddCommMonoid R] {q : ℕ} (f : DirichletCharacter ℂ q → R) :
+theorem character_sum_by_conductor {R : Type*} [AddCommMonoid R] {q : ℕ} [NeZero q] (f : DirichletCharacter ℂ q → R) :
   open Classical in
-    ∑ χ : DirichletCharacter ℂ q with χ ≠ 1, f χ = ∑ d ∈ q.divisors.attach, ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive, f (ξ.changeLevel (Nat.dvd_of_mem_divisors d.2)) := by
-  sorry
+    ∑ χ : DirichletCharacter ℂ q with χ ≠ 1, f χ = ∑ d ∈ q.divisors.attach with d.1 ≠ 1, ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive, f (ξ.changeLevel (Nat.dvd_of_mem_divisors d.2)) := by
+  classical
+  calc ∑ χ : DirichletCharacter ℂ q with χ ≠ 1, f χ
+      = ∑ χ : DirichletCharacter ℂ q, if χ ≠ 1 then f χ else 0 := Finset.sum_filter _ _
+    _ = ∑ d ∈ q.divisors.attach, ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive,
+          if ξ.changeLevel (Nat.dvd_of_mem_divisors d.2) ≠ 1 then
+            f (ξ.changeLevel (Nat.dvd_of_mem_divisors d.2)) else 0 :=
+        character_sum_by_conductor' _
+    _ = ∑ d ∈ q.divisors.attach, if d.1 ≠ 1 then
+          (∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive,
+            f (ξ.changeLevel (Nat.dvd_of_mem_divisors d.2))) else 0 := by
+        refine Finset.sum_congr rfl fun d _ ↦ ?_
+        by_cases hd1 : d.1 = 1
+        · rw [if_neg fun h ↦ h hd1]
+          refine Finset.sum_eq_zero fun ξ _ ↦ ?_
+          rw [if_neg]
+          simp only [ne_eq, not_not]
+          rw [DirichletCharacter.level_one' ξ hd1, DirichletCharacter.changeLevel_one]
+        · rw [if_pos hd1]
+          refine Finset.sum_congr rfl fun ξ hξ ↦ ?_
+          simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hξ
+          have hξ' : ξ.conductor = d.1 := hξ
+          have hd0 : d.1 ≠ 0 := (Nat.pos_of_mem_divisors d.2).ne'
+          rw [if_pos]
+          rw [ne_eq, DirichletCharacter.changeLevel_eq_one_iff]
+          intro h
+          exact hd1 (hξ' ▸ (DirichletCharacter.eq_one_iff_conductor_eq_one hd0).mp h)
+    _ = ∑ d ∈ q.divisors.attach with d.1 ≠ 1,
+          ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive,
+            f (ξ.changeLevel (Nat.dvd_of_mem_divisors d.2)) := (Finset.sum_filter _ _).symm
 
 @[blueprint (latexEnv := "lemma") (statement := /--
 Let $f$ be an arithmetic function. For $r \le x$, $q > 1$ and $(a, q) = 1$,
