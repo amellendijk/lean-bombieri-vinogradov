@@ -126,6 +126,61 @@ theorem character_sum_by_conductor {R : Type*} [AddCommMonoid R] {q : ℕ} [NeZe
           ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive,
             f (ξ.changeLevel (Nat.dvd_of_mem_divisors d.2)) := (Finset.sum_filter _ _).symm
 
+open Classical in
+/-- The function `G` from the blueprint proof of `character_sum_Mobius` (with `P = q`):
+for `e ≠ 1` it is `∑*_{ξ mod e} ξ̄(a) ∑_{n ≤ x} f_{rq}(n) ξ(n)`, and it vanishes at `e = 1`. -/
+private noncomputable def Gsum (f : ArithmeticFunction ℝ) (r : ℕ) {q : ℕ} (a : ZMod q) (x : ℝ)
+    (e : ℕ) : ℂ :=
+  if e = 1 then 0 else
+    ∑ ξ : DirichletCharacter ℂ e with ξ.IsPrimitive,
+      star (ξ (ZMod.cast a)) * summatory (fun n ↦ ((onCoprime (r * q) f n : ℝ) : ℂ) * ξ n) x
+
+/-- For `d ∣ q`, `∑_{e ∣ d} G(e) = φ(d) Δ_{f_{rq}}(x; d, a)`: expand `Δ` as a sum over the
+non-principal characters mod `d` (`Delta_eq_sum_char`), then group the characters by conductor
+(`character_sum_by_conductor`). -/
+private theorem sum_divisors_Gsum (f : ArithmeticFunction ℝ) {r q d : ℕ} {x : ℝ} {a : ZMod q}
+    (hq0 : q ≠ 0) (ha : IsUnit a) (hd0 : 0 < d) (hdq : d ∣ q) :
+    ∑ e ∈ d.divisors, Gsum f r a x e =
+      (d.totient : ℂ) * ((Δ_[onCoprime (r * q) f](x; d, a.cast) : ℝ) : ℂ) := by
+  classical
+  have : NeZero q := ⟨hq0⟩
+  have : NeZero d := ⟨hd0.ne'⟩
+  have ha' : IsUnit (a.cast : ZMod d) := by
+    simpa using ha.map (ZMod.castHom hdq (ZMod d))
+  have hφ : (d.totient : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.totient_pos.mpr hd0).ne'
+  have hchange : ∀ {e : ℕ} (hed : e ∣ d) (ξ : DirichletCharacter ℂ e) {b : ZMod d},
+      IsUnit b → DirichletCharacter.changeLevel hed ξ b = ξ (ZMod.cast b) := by
+    rintro e hed ξ b ⟨u, rfl⟩
+    exact DirichletCharacter.changeLevel_eq_cast_of_dvd ξ hed u
+  have hΔ := Delta_eq_sum_char (𝕜 := ℝ) (f := onCoprime (r * q) ⇑f) (y := x) (q := d)
+    (a := ZMod.cast a) ha'
+  simp only [Complex.coe_algebraMap] at hΔ
+  have hFd : (d.totient : ℂ) * ((Δ_[onCoprime (r * q) f](x; d, a.cast) : ℝ) : ℂ) =
+      ∑ χ : DirichletCharacter ℂ d with χ ≠ 1,
+        star (χ (ZMod.cast a)) * summatory (fun n ↦ ((onCoprime (r * q) f n : ℝ) : ℂ) * χ n) x := by
+    rw [Finset.sum_filter, hΔ, ← mul_assoc, mul_inv_cancel₀ hφ, one_mul]
+  rw [hFd, character_sum_by_conductor, ← Finset.sum_attach d.divisors (Gsum f r a x),
+    Finset.sum_filter]
+  refine Finset.sum_congr rfl fun e _ ↦ ?_
+  have hed : (e : ℕ) ∣ d := Nat.dvd_of_mem_divisors e.2
+  by_cases he1 : (e : ℕ) = 1
+  · simp [Gsum, he1]
+  · rw [if_pos he1]
+    simp only [Gsum, if_neg he1]
+    refine Finset.sum_congr rfl fun ξ _ ↦ ?_
+    have hcast : (ZMod.cast (a.cast : ZMod d) : ZMod (e : ℕ)) = a.cast := by
+      rw [← ZMod.natCast_val (R := ZMod d) a, ZMod.cast_natCast hed]
+      exact ZMod.natCast_val a
+    rw [hchange hed ξ ha', hcast]
+    congr 1
+    refine summatory_congr rfl fun n _ _ ↦ ?_
+    by_cases hn : (r * q).Coprime n
+    · have hnd : IsUnit ((n : ZMod d)) := by
+        rw [ZMod.isUnit_iff_coprime]
+        exact (hn.coprime_dvd_left (hdq.trans (dvd_mul_left q r))).symm
+      rw [hchange hed ξ hnd, ZMod.cast_natCast hed]
+    · simp [onCoprime_apply, hn]
+
 @[blueprint (latexEnv := "lemma") (statement := /--
 Let $f$ be an arithmetic function. For $r \le x$, $q > 1$ and $(a, q) = 1$,
 $$\sumstar_{\xi \pmod{q}} \bar\xi(a) \sum_{n \le y} \xi(n) f_r(n) = \sum_{d \mid q} \mu(q/d)\,\varphi(d)\,\Delta_{f_{rq}}(y;\, d,\, a)$$
@@ -140,10 +195,50 @@ By Möbius inversion,
 $$G_P(q) = \sum_{d \mid q} \mu(q/d)\, F_P(d) = \sum_{d \mid q} \mu(q/d)\, \Delta_{f_{rP}}(y;\, d,\, a).$$
 Set $P = q$ to conclude.
 -/) (uses := [character_sum_by_conductor])]
-theorem character_sum_Mobius (f : ArithmeticFunction ℝ) {r q : ℕ} {x : ℝ} {a : ZMod q} (hq : 1 < q) (hrx : r ≤ x) (ha : IsUnit a) :
+theorem character_sum_Mobius (f : ArithmeticFunction ℝ) {r q : ℕ} {x : ℝ} {a : ZMod q} (hq : 1 < q) (ha : IsUnit a) :
   open Classical in
     ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive, star (ξ a) * summatory (fun n ↦ ξ n * onCoprime r f n) x =
-      ∑ p ∈ q.divisorsAntidiagonal, μ p.2 * p.1.totient * Δ_[onCoprime (r*q) f](x; q, a) := by sorry
+      ∑ p ∈ q.divisorsAntidiagonal, μ p.2 * p.1.totient * ((Δ_[onCoprime (r*q) f](x; p.1, a.cast) : ℝ) : ℂ) := by
+  classical
+  have hq0 : q ≠ 0 := by omega
+  have hq1 : q ≠ 1 := by omega
+  have : NeZero q := ⟨hq0⟩
+  -- Möbius inversion of `sum_divisors_Gsum` over the divisor-closed set `{n | n ∣ q}`
+  have key := ((ArithmeticFunction.sum_eq_iff_sum_smul_moebius_eq_on
+      (f := Gsum f r a x)
+      (g := fun d ↦ (d.totient : ℂ) * ((Δ_[onCoprime (r * q) f](x; d, a.cast) : ℝ) : ℂ))
+      {n : ℕ | n ∣ q} (fun m n hmn hn ↦ hmn.trans hn)).mp
+      (fun d hd0 hdq ↦ sum_divisors_Gsum f hq0 ha hd0 hdq)) q (Nat.pos_of_ne_zero hq0) dvd_rfl
+  simp only [zsmul_eq_mul] at key
+  calc ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive,
+        star (ξ a) * summatory (fun n ↦ ξ n * onCoprime r f n) x
+      = Gsum f r a x q := ?_
+    _ = ∑ p ∈ q.divisorsAntidiagonal,
+          (μ p.1 : ℂ) * ((p.2.totient : ℂ) * ((Δ_[onCoprime (r * q) f](x; p.2, a.cast) : ℝ) : ℂ)) :=
+        key.symm
+    _ = ∑ i ∈ q.divisors,
+          (μ (q / i) : ℂ) * ((i.totient : ℂ) * ((Δ_[onCoprime (r * q) f](x; i, a.cast) : ℝ) : ℂ)) :=
+        Nat.sum_divisorsAntidiagonal' fun i j ↦
+          (μ i : ℂ) * ((j.totient : ℂ) * ((Δ_[onCoprime (r * q) f](x; j, a.cast) : ℝ) : ℂ))
+    _ = ∑ i ∈ q.divisors,
+          (μ (q / i) : ℂ) * (i.totient : ℂ) * ((Δ_[onCoprime (r * q) f](x; i, a.cast) : ℝ) : ℂ) :=
+        Finset.sum_congr rfl fun i _ ↦ (mul_assoc _ _ _).symm
+    _ = ∑ p ∈ q.divisorsAntidiagonal,
+          μ p.2 * p.1.totient * ((Δ_[onCoprime (r*q) f](x; p.1, a.cast) : ℝ) : ℂ) :=
+        (Nat.sum_divisorsAntidiagonal fun i j ↦
+          (μ j : ℂ) * (i.totient : ℂ) * ((Δ_[onCoprime (r * q) f](x; i, a.cast) : ℝ) : ℂ)).symm
+  -- It remains to identify the left-hand side with `Gsum f r a x q`.
+  simp only [Gsum, if_neg hq1]
+  refine Finset.sum_congr rfl fun ξ _ ↦ ?_
+  rw [ZMod.cast_id]
+  congr 1
+  refine summatory_congr rfl fun n _ _ ↦ ?_
+  by_cases hu : IsUnit ((n : ZMod q))
+  · have hqn : q.Coprime n := ((ZMod.isUnit_iff_coprime n q).mp hu).symm
+    rw [mul_comm]
+    congr 1
+    simp only [onCoprime_apply, Nat.coprime_mul_iff_left, and_iff_left hqn]
+  · simp [MulChar.map_nonunit ξ hu]
 
 @[blueprint (latexEnv := "lemma") (statement := /--
 $$\left|\Delta_{\Lambda^\flat}(y;\, q,\, a)\right| \le \frac{1}{\varphi(q)} \left|\sum_{\substack{d \mid q \\ 1 < d \le (\log x)^C}} \sum_{s \mid d} \mu(d/s)\,\varphi(s)\,\Delta_{\Lambda^\flat_q}(y;\,s,\,a)\right| + \frac{1}{\varphi(q)} \sum_{\substack{d \mid q \\ d > (\log x)^C}} \sumstar_{\xi \pmod{d}} S_{q/d}(y, \xi)$$
