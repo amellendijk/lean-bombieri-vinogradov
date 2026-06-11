@@ -6,6 +6,10 @@ import BV.Mellin
 import BV.Delta
 
 
+/-
+Note: There is a sloppish sorry-free version of this file on the branch claude-fable.
+-/
+
 
 namespace Mathlib.Meta.Positivity
 open Qq Lean Meta
