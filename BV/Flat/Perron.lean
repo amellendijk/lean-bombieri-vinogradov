@@ -265,14 +265,194 @@ theorem T_norm_le_integral [Bump] [FG] {q : ℕ} {ε : ℝ} (hε_pos : 0 < ε) (
         rw [hcpow]; ring
     _ = y ^ σ * ∫ t : ℝ, _ := MeasureTheory.integral_const_mul _ _
 
+/-! ### Auxiliary real-analysis lemmas for the `J`-integral (Step 4) -/
+
+/-- `t ↦ (t²)⁻¹` is integrable on `(T, ∞)` for `T > 0`. -/
+private lemma integrableOn_Ioi_inv_sq {T : ℝ} (hT : 0 < T) :
+    MeasureTheory.IntegrableOn (fun t : ℝ => (t ^ 2)⁻¹) (Set.Ioi T) := by
+  apply (integrableOn_Ioi_rpow_of_lt (a := -2) (by norm_num) hT).congr_fun ?_ measurableSet_Ioi
+  intro t ht
+  have htpos : 0 < t := hT.trans ht
+  show t ^ (-2 : ℝ) = (t ^ 2)⁻¹
+  rw [Real.rpow_neg htpos.le, show ((2 : ℝ)) = ((2 : ℕ) : ℝ) from by norm_num, Real.rpow_natCast]
+
+/-- `∫_{(T,∞)} (t²)⁻¹ = T⁻¹` for `T > 0`. -/
+private lemma integral_Ioi_inv_sq {T : ℝ} (hT : 0 < T) :
+    ∫ t in Set.Ioi T, (t ^ 2)⁻¹ = T⁻¹ := by
+  have h := integral_Ioi_rpow_of_lt (a := -2) (by norm_num) hT
+  rw [show ((-2 : ℝ) + 1) = -1 by norm_num, Real.rpow_neg_one] at h
+  rw [show (T⁻¹ : ℝ) = -T⁻¹ / (-1) by ring, ← h]
+  refine setIntegral_congr_fun measurableSet_Ioi (fun t ht => ?_)
+  have htpos : 0 < t := hT.trans ht
+  show (t ^ 2)⁻¹ = t ^ (-2 : ℝ)
+  rw [Real.rpow_neg htpos.le, show ((2 : ℝ)) = ((2 : ℕ) : ℝ) from by norm_num, Real.rpow_natCast]
+
+/-- `t ↦ (t²)⁻¹` is integrable on `(-∞, -T)` for `T > 0`. -/
+private lemma integrableOn_Iio_inv_sq {T : ℝ} (hT : 0 < T) :
+    MeasureTheory.IntegrableOn (fun t : ℝ => (t ^ 2)⁻¹) (Set.Iio (-T)) := by
+  have e : MeasurableEmbedding (fun x : ℝ => -x) :=
+    (Homeomorph.neg ℝ).measurableEmbedding
+  have key := (e.integrableOn_map_iff (μ := (volume : Measure ℝ))
+    (f := fun t : ℝ => (t ^ 2)⁻¹) (s := Set.Iio (-T))).mpr
+  rw [Measure.map_neg_eq_self] at key
+  apply key
+  have hset : (fun x : ℝ => -x) ⁻¹' Set.Iio (-T) = Set.Ioi T := by
+    ext x; simp [Set.mem_Iio, Set.mem_Ioi, neg_lt_neg_iff]
+  rw [hset]
+  apply (integrableOn_Ioi_inv_sq hT).congr_fun ?_ measurableSet_Ioi
+  intro x hx; simp [Function.comp, neg_sq]
+
+/-- `∫_{(-∞,-T)} (t²)⁻¹ = T⁻¹` for `T > 0`. -/
+private lemma integral_Iio_inv_sq {T : ℝ} (hT : 0 < T) :
+    ∫ t in Set.Iio (-T), (t ^ 2)⁻¹ = T⁻¹ := by
+  rw [setIntegral_congr_set (Iio_ae_eq_Iic), ← integral_Ioi_inv_sq hT]
+  have key := integral_comp_neg_Iic (-T) (fun t => (t ^ 2)⁻¹)
+  simp only [neg_neg, neg_sq] at key
+  exact key
+
+/-- `∫_{|t|>T} (t²)⁻¹ = 2T⁻¹` for `T > 0`. -/
+private lemma integral_compl_Icc_inv_sq {T : ℝ} (hT : 0 < T) :
+    ∫ t in (Set.Icc (-T) T)ᶜ, (t ^ 2)⁻¹ = 2 * T⁻¹ := by
+  have hcompl : (Set.Icc (-T) T)ᶜ = Set.Iio (-T) ∪ Set.Ioi T := by
+    ext t
+    simp only [Set.mem_compl_iff, Set.mem_Icc, not_and_or, not_le, Set.mem_union, Set.mem_Iio,
+      Set.mem_Ioi]
+  rw [hcompl, setIntegral_union ?_ measurableSet_Ioi (integrableOn_Iio_inv_sq hT)
+      (integrableOn_Ioi_inv_sq hT), integral_Iio_inv_sq hT, integral_Ioi_inv_sq hT]
+  · ring
+  · rw [Set.disjoint_left]
+    intro a ha hb
+    simp only [Set.mem_Iio, Set.mem_Ioi] at ha hb
+    linarith
+
+/-- `∫_{0}^{T} (σ+t)⁻¹ = log(σ+T) - log σ` for `σ > 0`, `T ≥ 0`. -/
+private lemma integral_inv_shift {σ T : ℝ} (hσ : 0 < σ) (hT : 0 ≤ T) :
+    ∫ t in (0 : ℝ)..T, (σ + t)⁻¹ = Real.log (σ + T) - Real.log σ := by
+  have hderiv : ∀ t ∈ Set.uIcc (0 : ℝ) T, HasDerivAt (fun s => Real.log (σ + s)) (σ + t)⁻¹ t := by
+    intro t ht
+    rw [Set.uIcc_of_le hT, Set.mem_Icc] at ht
+    have hpos : 0 < σ + t := by linarith [ht.1]
+    have := (Real.hasDerivAt_log hpos.ne').comp t
+      ((hasDerivAt_const t σ).add (hasDerivAt_id t))
+    simpa using this
+  rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv ?_]
+  · simp
+  · apply ContinuousOn.intervalIntegrable
+    apply ContinuousOn.inv₀
+    · fun_prop
+    · intro t ht
+      rw [Set.uIcc_of_le hT, Set.mem_Icc] at ht
+      have : 0 < σ + t := by linarith [ht.1]
+      exact this.ne'
+
+/-- `∫_{[-T,T]} (σ+|t|)⁻¹ = 2(log(σ+T) - log σ)` for `σ > 0`, `T ≥ 0`. -/
+private lemma integral_Icc_inv_abs {σ T : ℝ} (hσ : 0 < σ) (hT : 0 ≤ T) :
+    ∫ t in Set.Icc (-T) T, (σ + |t|)⁻¹ = 2 * (Real.log (σ + T) - Real.log σ) := by
+  have hcont : Continuous (fun t : ℝ => (σ + |t|)⁻¹) := by
+    apply Continuous.inv₀
+    · fun_prop
+    · intro t; exact (by positivity : (0 : ℝ) < σ + |t|).ne'
+  rw [integral_Icc_eq_integral_Ioc, ← intervalIntegral.integral_of_le (by linarith : -T ≤ T),
+    ← intervalIntegral.integral_add_adjacent_intervals (b := 0)
+      (hcont.intervalIntegrable _ _) (hcont.intervalIntegrable _ _)]
+  have hright : ∫ t in (0 : ℝ)..T, (σ + |t|)⁻¹ = Real.log (σ + T) - Real.log σ := by
+    rw [← integral_inv_shift hσ hT]
+    apply intervalIntegral.integral_congr
+    intro t ht
+    rw [Set.uIcc_of_le hT, Set.mem_Icc] at ht
+    show (σ + |t|)⁻¹ = (σ + t)⁻¹
+    rw [abs_of_nonneg ht.1]
+  have hleft : ∫ t in (-T : ℝ)..0, (σ + |t|)⁻¹ = Real.log (σ + T) - Real.log σ := by
+    have hcongr : ∫ t in (-T : ℝ)..0, (σ + |t|)⁻¹ = ∫ t in (-T : ℝ)..0, (σ - t)⁻¹ := by
+      apply intervalIntegral.integral_congr
+      intro t ht
+      rw [Set.uIcc_of_le (by linarith : -T ≤ (0 : ℝ)), Set.mem_Icc] at ht
+      show (σ + |t|)⁻¹ = (σ - t)⁻¹
+      rw [abs_of_nonpos ht.2, ← sub_eq_add_neg]
+    rw [hcongr]
+    have hderiv : ∀ t ∈ Set.uIcc (-T : ℝ) 0,
+        HasDerivAt (fun s => -Real.log (σ - s)) (σ - t)⁻¹ t := by
+      intro t ht
+      rw [Set.uIcc_of_le (by linarith : -T ≤ (0 : ℝ)), Set.mem_Icc] at ht
+      have hpos : 0 < σ - t := by linarith [ht.2]
+      have := ((Real.hasDerivAt_log hpos.ne').comp t
+        ((hasDerivAt_const t σ).sub (hasDerivAt_id t))).neg
+      simpa using this
+    rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv ?_]
+    · simp only [sub_zero, sub_neg_eq_add]; ring
+    · apply ContinuousOn.intervalIntegrable
+      apply ContinuousOn.inv₀
+      · fun_prop
+      · intro t ht
+        rw [Set.uIcc_of_le (by linarith : -T ≤ (0 : ℝ)), Set.mem_Icc] at ht
+        exact (by linarith [ht.2] : (0 : ℝ) < σ - t).ne'
+  rw [hleft, hright]; ring
+
+/-- Bound A of Step 4: on the vertical line `Re s = σ` with `0 < σ ≤ 2` and `0 < ε < 1`, the
+Mellin transform of `Smooth1 ν ε` decays like `1/‖s‖`, with a constant depending only on `ν`.
+Combines `MellinOfSmooth1a` with the strip bound `mellin_bump_bounded`. -/
+lemma exists_mellin_smooth1_boundA [Bump] :
+    ∃ C : ℝ, 0 ≤ C ∧ ∀ (ε σ t : ℝ), 0 < ε → ε < 1 → 0 < σ → σ ≤ 2 →
+      ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) ((σ : ℂ) + t * I)‖
+        ≤ C * ‖(σ : ℂ) + t * I‖⁻¹ := by
+  obtain ⟨C, hC⟩ := (mellin_bump_bounded (σ₁ := 0) (σ₂ := 2) (by norm_num)
+    (diffν.of_le (by simp)) suppν).bound
+  rw [Filter.eventually_principal] at hC
+  simp only [mem_setOf_eq, norm_one, mul_one] at hC
+  have hCnonneg : 0 ≤ C := le_trans (norm_nonneg _) (hC (1 : ℂ) (by simp))
+  refine ⟨C, hCnonneg, fun ε σ t hε hε1 hσ hσ2 ↦ ?_⟩
+  have hsre : ((σ : ℂ) + t * I).re = σ := by simp
+  rw [MellinOfSmooth1a (diffν.of_le (by simp)) suppν hε (by rw [hsre]; exact hσ),
+    norm_mul, norm_inv, mul_comm]
+  apply mul_le_mul_of_nonneg_right _ (by positivity)
+  apply hC
+  have hre : ((ε : ℂ) * ((σ : ℂ) + t * I)).re = ε * σ := by simp [Complex.mul_re]
+  rw [hre]
+  exact ⟨by positivity, by nlinarith⟩
+
+/-- Bound B of Step 4, specialised to the line `Re s = σ`: `‖𝓜(Smooth1 ν ε)(σ+tI)‖ ≤
+C·(ε‖σ+tI‖²)⁻¹` for `0 < σ ≤ 2`, `0 < ε < 1`, with `C > 0` depending only on `ν`. -/
+lemma exists_mellin_smooth1_boundB [Bump] :
+    ∃ C : ℝ, 0 < C ∧ ∀ (σ : ℝ), 0 < σ → σ ≤ 2 → ∀ (ε t : ℝ), 0 < ε → ε < 1 →
+      ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) ((σ : ℂ) + t * I)‖
+        ≤ C * (ε * ‖(σ : ℂ) + t * I‖ ^ 2)⁻¹ := by
+  obtain ⟨C, hCpos, hC⟩ := MellinOfSmooth1b (diffν.of_le (by simp)) suppν
+  refine ⟨C, hCpos, fun σ hσ hσ2 ε t hε hε1 => ?_⟩
+  have hre : ((σ : ℂ) + t * I).re = σ := by simp
+  exact hC σ hσ ((σ : ℂ) + t * I) hre.ge (hre.le.trans hσ2) ε hε hε1
+
+/-- The split-at-`1/ε` log estimate, abstracted: for `x ≥ 1` and `L = log(x+1)`,
+`log(1 + 6 log 2 · x · L) ≤ (1 + 6 log 2) · L`. -/
+lemma log_one_add_le {x L : ℝ} (hx : 1 ≤ x) (hL : L = Real.log (x + 1)) :
+    Real.log (1 + 6 * Real.log 2 * x * L) ≤ (1 + 6 * Real.log 2) * L := by
+  have hlog2 : 0 < Real.log 2 := Real.log_pos (by norm_num)
+  have hLpos : 0 < L := by rw [hL]; exact Real.log_pos (by linarith)
+  have hxpos : 0 < x := by linarith
+  have ha_pos : 0 < 6 * Real.log 2 := by positivity
+  have key : 1 + 6 * Real.log 2 * x * L ≤ (1 + x) * (1 + 6 * Real.log 2 * L) := by
+    nlinarith [mul_pos ha_pos hLpos, hxpos, mul_pos hxpos (mul_pos ha_pos hLpos)]
+  have h1 : Real.log (1 + 6 * Real.log 2 * x * L) ≤ Real.log ((1 + x) * (1 + 6 * Real.log 2 * L)) :=
+    Real.log_le_log (by positivity) key
+  rw [Real.log_mul (by positivity) (by positivity)] at h1
+  have h2 : Real.log (1 + x) = L := by rw [hL, add_comm]
+  have h3 : Real.log (1 + 6 * Real.log 2 * L) ≤ 6 * Real.log 2 * L := by
+    have := Real.log_le_sub_one_of_pos (show (0 : ℝ) < 1 + 6 * Real.log 2 * L by positivity)
+    linarith
+  calc Real.log (1 + 6 * Real.log 2 * x * L)
+      ≤ Real.log (1 + x) + Real.log (1 + 6 * Real.log 2 * L) := h1
+    _ ≤ L + 6 * Real.log 2 * L := by rw [h2]; linarith
+    _ = (1 + 6 * Real.log 2) * L := by ring
+
 /-- The constant in the `J`-integral estimate `∫ ‖𝓜(σ+tI)‖ dt ≤ C_J · log(x+1)`
-(Step 4 of `notes/theorem26_6_smooth.md`).  Its precise value comes from the split-at-`1/ε`
-estimate; it is not needed downstream, only its existence. -/
-noncomputable def C_J : ℝ := 1
+(Step 4 of `notes/theorem26_6_smooth.md`), assembled from the bump-decay constants `CA`
+(bound A, `exists_mellin_smooth1_boundA`) and `CB` (bound B, `MellinOfSmooth1b`). -/
+noncomputable def C_J [Bump] : ℝ :=
+  2 * Real.sqrt 2 * (1 + 6 * Real.log 2) * exists_mellin_smooth1_boundA.choose
+    + 2 * exists_mellin_smooth1_boundB.choose / Real.log 2
 
 /-- The implied constant of Theorem 26.6, assembled from `Real.exp 1 / (2π)` (the `y^σ ≤ e`
 prefactor), the large-sieve constant `C_LS`, and the `J`-integral constant `C_J`. -/
-noncomputable def C_LSC : ℝ := Real.exp 1 / (2 * π) * C_LS * C_J
+noncomputable def C_LSC [Bump] : ℝ := Real.exp 1 / (2 * π) * C_LS * C_J
 
 /-- Step 4 of `notes/theorem26_6_smooth.md`: summing the pointwise products
 `‖F_{σ+tI}(χ)‖·‖G_{σ+tI}(χ)‖` over `q ≤ Q` and primitive `χ (mod q)` (weighted by `q/φ(q)`),
@@ -288,6 +468,36 @@ theorem largeSieve_char_bound [FG] {Q : ℝ} (hQ : 1 ≤ Q) {σ : ℝ} (hσ_pos 
       √(summatory (fun m ↦ ‖f m‖ ^ 2) M) * √(summatory (fun n ↦ ‖g n‖ ^ 2) N) := by
   sorry
 
+/-- `‖σ + tI‖⁻¹ ≤ √2 · (σ + |t|)⁻¹` for `σ > 0`: the reverse triangle estimate
+`σ + |t| ≤ √2 · ‖σ + tI‖`. -/
+private lemma normI_inv_le {σ : ℝ} (hσ : 0 < σ) (t : ℝ) :
+    ‖(σ : ℂ) + t * I‖⁻¹ ≤ Real.sqrt 2 * (σ + |t|)⁻¹ := by
+  have hden : 0 < σ + |t| := by positivity
+  have hznorm_sq : ‖(σ : ℂ) + t * I‖ ^ 2 = σ ^ 2 + t ^ 2 := by
+    rw [Complex.sq_norm, Complex.normSq_add_mul_I]
+  have hz_pos : 0 < ‖(σ : ℂ) + t * I‖ := by
+    rw [norm_pos_iff]
+    intro h
+    have : ((σ : ℂ) + t * I).re = 0 := by rw [h]; simp
+    simp only [add_re, ofReal_re, mul_re, I_re, mul_zero, ofReal_im, I_im, mul_one, sub_self,
+      add_zero] at this
+    linarith
+  have hkey : σ + |t| ≤ Real.sqrt 2 * ‖(σ : ℂ) + t * I‖ := by
+    have hrhs : 0 ≤ Real.sqrt 2 * ‖(σ : ℂ) + t * I‖ := by positivity
+    have hsq : (σ + |t|) ^ 2 ≤ (Real.sqrt 2 * ‖(σ : ℂ) + t * I‖) ^ 2 := by
+      have heq : (Real.sqrt 2 * ‖(σ : ℂ) + t * I‖) ^ 2 = 2 * (σ ^ 2 + t ^ 2) := by
+        rw [mul_pow, Real.sq_sqrt (by norm_num), hznorm_sq]
+      rw [heq]
+      nlinarith [sq_nonneg (σ - |t|), sq_abs t]
+    calc σ + |t| = Real.sqrt ((σ + |t|) ^ 2) := (Real.sqrt_sq hden.le).symm
+      _ ≤ Real.sqrt ((Real.sqrt 2 * ‖(σ : ℂ) + t * I‖) ^ 2) := Real.sqrt_le_sqrt hsq
+      _ = Real.sqrt 2 * ‖(σ : ℂ) + t * I‖ := Real.sqrt_sq hrhs
+  rw [← div_eq_mul_inv, le_div_iff₀ hden]
+  calc ‖(σ : ℂ) + t * I‖⁻¹ * (σ + |t|)
+      ≤ ‖(σ : ℂ) + t * I‖⁻¹ * (Real.sqrt 2 * ‖(σ : ℂ) + t * I‖) :=
+        mul_le_mul_of_nonneg_left hkey (by positivity)
+    _ = Real.sqrt 2 := by field_simp
+
 /-- Step 4 of `notes/theorem26_6_smooth.md`: the `J`-integral estimate.  The Mellin kernel
 `𝓜(Smooth1 ν ε)` decays like `1/‖s‖` near the real axis and like `1/(ε‖s‖²)` in the tails;
 splitting the integral at `|t| = 1/ε` gives `J ≪ log(1/(σε)) ≍ log(x+1)`. -/
@@ -295,12 +505,113 @@ theorem mellin_J_bound [Bump] {ε : ℝ} (hε_pos : 0 < ε) (hε_one : ε < 1) {
     (hσ : σ ≤ 2) {x : ℝ} (hx : 1 ≤ x) (hσx : σ = (Real.log (x + 1))⁻¹)
     (hε : ε = (6 * Real.log 2)⁻¹ * x⁻¹) :
     ∫ t : ℝ, ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)‖ ≤ C_J * Real.log (x + 1) := by
-  -- Proof outline (Step 4 of `notes/theorem26_6_smooth.md`):
-  --   • Bound A (small `t`):  `‖𝓜(σ+tI)‖ ≤ C₁/‖σ+tI‖`  from `MellinOfSmooth1a` + `mellin_bump_bounded`.
-  --   • Bound B (large `t`):  `‖𝓜(σ+tI)‖ ≤ C₂/(ε‖σ+tI‖²)`  from `MellinOfSmooth1b`.
-  -- Split `∫` at `|t| = 1/ε`; bound A gives `∫_{|t|≤1/ε} ≪ log(1/(σε))`, bound B gives `∫_{|t|>1/ε} ≪ 1`.
-  -- Since `ε = (6 log 2)⁻¹ x⁻¹` and `σ = 1/log(x+1)`, `log(1/(σε)) ≍ log(x+1)`.
-  sorry
+  classical
+  set L := Real.log (x + 1) with hL
+  have hx1 : (1 : ℝ) < x + 1 := by linarith
+  have hL_pos : 0 < L := Real.log_pos hx1
+  have hlog2 : 0 < Real.log 2 := Real.log_pos (by norm_num)
+  have hL_ge : Real.log 2 ≤ L := by
+    rw [hL]; exact Real.log_le_log (by norm_num) (by linarith)
+  -- the two bump-decay constants
+  obtain ⟨hCA_nonneg, hCA⟩ := exists_mellin_smooth1_boundA.choose_spec
+  obtain ⟨hCB_pos, hCB⟩ := exists_mellin_smooth1_boundB.choose_spec
+  rw [C_J]
+  set CA := exists_mellin_smooth1_boundA.choose with hCAdef
+  set CB := exists_mellin_smooth1_boundB.choose with hCBdef
+  -- the split radius `T = 1/ε`
+  set T := ε⁻¹ with hTdef
+  have hT_pos : 0 < T := by positivity
+  -- the integrand is integrable on `ℝ`
+  have hVI : Integrable (fun t : ℝ ↦ mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)) :=
+    Smooth1_verticalIntegrable (diffν.of_le (by simp)) (fun x _ => νpos x) suppν
+      (by rw [← MeasureTheory.integral_Ici_eq_integral_Ioi]; exact mass_one)
+      hε_pos hε_one hσ_pos hσ
+  have hInt : Integrable (fun t : ℝ ↦ ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)‖) :=
+    hVI.norm
+  -- centre estimate `∫_{|t|≤T} ≤ 2√2 (1+6 log 2) CA · L`
+  have hcenter_log : Real.log (σ + T) - Real.log σ ≤ (1 + 6 * Real.log 2) * L := by
+    rw [← Real.log_div (by positivity) hσ_pos.ne']
+    have hTσ : (σ + T) / σ = 1 + 6 * Real.log 2 * x * L := by
+      have hx0 : x ≠ 0 := by linarith
+      have hl2 : Real.log 2 ≠ 0 := hlog2.ne'
+      have hL0 : L ≠ 0 := hL_pos.ne'
+      rw [hTdef, hσx, hε]
+      field_simp
+    rw [hTσ]
+    exact log_one_add_le hx hL
+  have hcenter : ∫ t in Set.Icc (-T) T, ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)‖
+      ≤ 2 * Real.sqrt 2 * (1 + 6 * Real.log 2) * CA * L := by
+    have hmaj_cont : Continuous (fun t : ℝ => (Real.sqrt 2 * CA) * (σ + |t|)⁻¹) := by
+      apply Continuous.mul continuous_const
+      apply Continuous.inv₀
+      · fun_prop
+      · intro t; exact (by positivity : (0 : ℝ) < σ + |t|).ne'
+    calc ∫ t in Set.Icc (-T) T, ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)‖
+        ≤ ∫ t in Set.Icc (-T) T, (Real.sqrt 2 * CA) * (σ + |t|)⁻¹ := by
+          apply setIntegral_mono_on hInt.integrableOn
+            (hmaj_cont.continuousOn.integrableOn_compact isCompact_Icc) measurableSet_Icc
+          intro t _
+          calc ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)‖
+              ≤ CA * ‖(σ : ℂ) + t * I‖⁻¹ := hCA ε σ t hε_pos hε_one hσ_pos hσ
+            _ ≤ CA * (Real.sqrt 2 * (σ + |t|)⁻¹) :=
+                mul_le_mul_of_nonneg_left (normI_inv_le hσ_pos t) hCA_nonneg
+            _ = (Real.sqrt 2 * CA) * (σ + |t|)⁻¹ := by ring
+      _ = (Real.sqrt 2 * CA) * ∫ t in Set.Icc (-T) T, (σ + |t|)⁻¹ :=
+          MeasureTheory.integral_const_mul _ _
+      _ = (Real.sqrt 2 * CA) * (2 * (Real.log (σ + T) - Real.log σ)) := by
+          rw [integral_Icc_inv_abs hσ_pos hT_pos.le]
+      _ ≤ (Real.sqrt 2 * CA) * (2 * ((1 + 6 * Real.log 2) * L)) := by
+          apply mul_le_mul_of_nonneg_left _ (mul_nonneg (Real.sqrt_nonneg 2) hCA_nonneg)
+          exact mul_le_mul_of_nonneg_left hcenter_log (by norm_num)
+      _ = 2 * Real.sqrt 2 * (1 + 6 * Real.log 2) * CA * L := by ring
+  -- tail estimate `∫_{|t|>T} ≤ 2 CB ≤ (2 CB / log 2) · L`
+  have htail : ∫ t in (Set.Icc (-T) T)ᶜ, ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)‖
+      ≤ 2 * CB / Real.log 2 * L := by
+    have hmaj_compl : MeasureTheory.IntegrableOn (fun t : ℝ => (t ^ 2)⁻¹) (Set.Icc (-T) T)ᶜ := by
+      have hcompl : (Set.Icc (-T) T)ᶜ = Set.Iio (-T) ∪ Set.Ioi T := by
+        ext t; simp only [Set.mem_compl_iff, Set.mem_Icc, not_and_or, not_le, Set.mem_union,
+          Set.mem_Iio, Set.mem_Ioi]
+      rw [hcompl]
+      exact (integrableOn_Iio_inv_sq hT_pos).union (integrableOn_Ioi_inv_sq hT_pos)
+    calc ∫ t in (Set.Icc (-T) T)ᶜ, ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)‖
+        ≤ ∫ t in (Set.Icc (-T) T)ᶜ, (CB / ε) * (t ^ 2)⁻¹ := by
+          apply setIntegral_mono_on hInt.integrableOn (hmaj_compl.const_mul (CB / ε))
+            measurableSet_Icc.compl
+          intro t ht
+          have htabs : T < |t| := by
+            simp only [Set.mem_compl_iff, Set.mem_Icc, not_and_or, not_le] at ht
+            rcases ht with h | h
+            · rw [abs_of_neg (by linarith)]; linarith
+            · rw [abs_of_pos (by linarith)]; linarith
+          have htne : t ≠ 0 := by
+            intro h; rw [h, abs_zero] at htabs; linarith
+          have ht2 : 0 < t ^ 2 := by positivity
+          have hzsq : ‖(σ : ℂ) + t * I‖ ^ 2 = σ ^ 2 + t ^ 2 := by
+            rw [Complex.sq_norm, Complex.normSq_add_mul_I]
+          have ht2le : t ^ 2 ≤ ‖(σ : ℂ) + t * I‖ ^ 2 := by rw [hzsq]; nlinarith [sq_nonneg σ]
+          calc ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)‖
+              ≤ CB * (ε * ‖(σ : ℂ) + t * I‖ ^ 2)⁻¹ := hCB σ hσ_pos hσ ε t hε_pos hε_one
+            _ ≤ CB * (ε * t ^ 2)⁻¹ := by
+                have hle : ε * t ^ 2 ≤ ε * ‖(σ : ℂ) + t * I‖ ^ 2 :=
+                  mul_le_mul_of_nonneg_left ht2le hε_pos.le
+                have hinv : (ε * ‖(σ : ℂ) + t * I‖ ^ 2)⁻¹ ≤ (ε * t ^ 2)⁻¹ := by
+                  simpa only [one_div] using one_div_le_one_div_of_le (mul_pos hε_pos ht2) hle
+                exact mul_le_mul_of_nonneg_left hinv hCB_pos.le
+            _ = (CB / ε) * (t ^ 2)⁻¹ := by rw [mul_inv]; ring
+      _ = (CB / ε) * ∫ t in (Set.Icc (-T) T)ᶜ, (t ^ 2)⁻¹ := MeasureTheory.integral_const_mul _ _
+      _ = (CB / ε) * (2 * T⁻¹) := by rw [integral_compl_Icc_inv_sq hT_pos]
+      _ = 2 * CB := by rw [hTdef, inv_inv]; field_simp
+      _ ≤ 2 * CB / Real.log 2 * L := by
+          have hLratio : 1 ≤ L / Real.log 2 := by
+            rw [le_div_iff₀ hlog2]; linarith
+          calc 2 * CB = 2 * CB * 1 := by ring
+            _ ≤ 2 * CB * (L / Real.log 2) :=
+                mul_le_mul_of_nonneg_left hLratio (mul_nonneg (by norm_num) hCB_pos.le)
+            _ = 2 * CB / Real.log 2 * L := by ring
+  -- assemble
+  rw [← MeasureTheory.integral_add_compl (measurableSet_Icc (a := -T) (b := T)) hInt]
+  refine le_trans (add_le_add hcenter htail) (le_of_eq ?_)
+  ring
 
 /-- For each `q`, `χ` and each `t`, the integrand
 `t ↦ ‖F_{σ+tI}(χ)‖·‖G_{σ+tI}(χ)‖·‖𝓜(σ+tI)‖` is integrable: the two partial-sum norms are
@@ -668,7 +979,7 @@ theorem FG.summatory_mul_char [fg : FG] {q : ℕ} {χ : DirichletCharacter ℂ q
   simp [← hab.1]
   ring
 
-theorem LargeSieve_convolution [fg : FG]
+theorem LargeSieve_convolution [Bump] [fg : FG]
     {x Q : ℝ} (hx : 1 ≤ x) (hQ : 1 ≤ Q) :
   open Classical in
     summatory (fun q ↦ ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
@@ -678,8 +989,6 @@ theorem LargeSieve_convolution [fg : FG]
   classical
   let ε := (6 * Real.log 2)⁻¹ * x⁻¹
   simp_rw [temp hx, FG.summatory_mul_char]
-  obtain ⟨ν, diffν, νpos, suppν, mass_one⟩ := SmoothExistence
-  let inst : Bump := {ν, diffν, νpos, suppν, mass_one}
   calc
     _ = summatory (fun q ↦ ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
         q * (q.totient : ℝ)⁻¹ * ⨆ K ∈ Set.Icc 1 ⌊x⌋₊, ‖T ε (K + 2⁻¹) χ‖) Q := by
