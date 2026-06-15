@@ -472,31 +472,15 @@ theorem largeSieve_char_bound [FG] {Q : ℝ} (hQ : 1 ≤ Q) {σ : ℝ} (hσ_pos 
 `σ + |t| ≤ √2 · ‖σ + tI‖`. -/
 private lemma normI_inv_le {σ : ℝ} (hσ : 0 < σ) (t : ℝ) :
     ‖(σ : ℂ) + t * I‖⁻¹ ≤ Real.sqrt 2 * (σ + |t|)⁻¹ := by
-  have hden : 0 < σ + |t| := by positivity
-  have hznorm_sq : ‖(σ : ℂ) + t * I‖ ^ 2 = σ ^ 2 + t ^ 2 := by
-    rw [Complex.sq_norm, Complex.normSq_add_mul_I]
-  have hz_pos : 0 < ‖(σ : ℂ) + t * I‖ := by
-    rw [norm_pos_iff]
-    intro h
-    have : ((σ : ℂ) + t * I).re = 0 := by rw [h]; simp
-    simp only [add_re, ofReal_re, mul_re, I_re, mul_zero, ofReal_im, I_im, mul_one, sub_self,
-      add_zero] at this
-    linarith
-  have hkey : σ + |t| ≤ Real.sqrt 2 * ‖(σ : ℂ) + t * I‖ := by
-    have hrhs : 0 ≤ Real.sqrt 2 * ‖(σ : ℂ) + t * I‖ := by positivity
-    have hsq : (σ + |t|) ^ 2 ≤ (Real.sqrt 2 * ‖(σ : ℂ) + t * I‖) ^ 2 := by
-      have heq : (Real.sqrt 2 * ‖(σ : ℂ) + t * I‖) ^ 2 = 2 * (σ ^ 2 + t ^ 2) := by
-        rw [mul_pow, Real.sq_sqrt (by norm_num), hznorm_sq]
-      rw [heq]
-      nlinarith [sq_nonneg (σ - |t|), sq_abs t]
-    calc σ + |t| = Real.sqrt ((σ + |t|) ^ 2) := (Real.sqrt_sq hden.le).symm
-      _ ≤ Real.sqrt ((Real.sqrt 2 * ‖(σ : ℂ) + t * I‖) ^ 2) := Real.sqrt_le_sqrt hsq
-      _ = Real.sqrt 2 * ‖(σ : ℂ) + t * I‖ := Real.sqrt_sq hrhs
-  rw [← div_eq_mul_inv, le_div_iff₀ hden]
-  calc ‖(σ : ℂ) + t * I‖⁻¹ * (σ + |t|)
-      ≤ ‖(σ : ℂ) + t * I‖⁻¹ * (Real.sqrt 2 * ‖(σ : ℂ) + t * I‖) :=
-        mul_le_mul_of_nonneg_left hkey (by positivity)
-    _ = Real.sqrt 2 := by field_simp
+  have : σ + t * I ≠ 0 := by
+    apply_fun Complex.re
+    simp [hσ.ne.symm]
+  rw [← sq_le_sq₀ (by positivity) (by positivity)]
+  simp [field, Complex.norm_eq_sqrt_sq_add_sq]
+  rw [Real.sq_sqrt (by positivity)]
+  conv_rhs => rw [← abs_of_nonneg (sq_nonneg t), abs_pow]
+  have : 0 ≤ (σ - |t|)^2 := by positivity
+  linarith
 
 /-- Step 4 of `notes/theorem26_6_smooth.md`: the `J`-integral estimate.  The Mellin kernel
 `𝓜(Smooth1 ν ε)` decays like `1/‖s‖` near the real axis and like `1/(ε‖s‖²)` in the tails;
