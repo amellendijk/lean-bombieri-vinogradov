@@ -297,10 +297,10 @@ private lemma integrableOn_Iio_inv_sq {T : ℝ} (hT : 0 < T) :
   rw [Measure.map_neg_eq_self] at key
   apply key
   have hset : (fun x : ℝ => -x) ⁻¹' Set.Iio (-T) = Set.Ioi T := by
-    ext x; simp [Set.mem_Iio, Set.mem_Ioi, neg_lt_neg_iff]
+    ext x; simp [Set.mem_Ioi]
   rw [hset]
   apply (integrableOn_Ioi_inv_sq hT).congr_fun ?_ measurableSet_Ioi
-  intro x hx; simp [Function.comp, neg_sq]
+  intro x hx; simp [Function.comp]
 
 /-- `∫_{(-∞,-T)} (t²)⁻¹ = T⁻¹` for `T > 0`. -/
 private lemma integral_Iio_inv_sq {T : ℝ} (hT : 0 < T) :
@@ -454,6 +454,121 @@ noncomputable def C_J [Bump] : ℝ :=
 prefactor), the large-sieve constant `C_LS`, and the `J`-integral constant `C_J`. -/
 noncomputable def C_LSC [Bump] : ℝ := Real.exp 1 / (2 * π) * C_LS * C_J
 
+/-- The large-sieve constant is nonnegative: apply the large sieve with a single nonzero
+coefficient, whose left-hand side is a nonnegative sum. -/
+lemma C_LS_nonneg : 0 ≤ C_LS := by
+  have h := large_sieve 1 le_rfl 0 1 one_pos (fun n => if n = 1 then 1 else 0)
+  -- The left-hand side of the large sieve is a sum of nonnegative terms.
+  have key : (0 : ℝ) ≤ C_LS * ((1 : ℕ) + (1 : ℝ) ^ 2) *
+      ∑ n ∈ Finset.Ioc (0 : ℤ) (0 + (1 : ℕ)), ‖(if n = 1 then (1 : ℂ) else 0)‖ ^ 2 := by
+    refine le_trans ?_ h
+    apply Finset.sum_nonneg; intro q _
+    apply Finset.sum_nonneg; intro χ _
+    positivity
+  have hS : (∑ n ∈ Finset.Ioc (0 : ℤ) (0 + (1 : ℕ)), ‖(if n = 1 then (1 : ℂ) else 0)‖ ^ 2) = 1 := by
+    rw [show Finset.Ioc (0 : ℤ) (0 + (1 : ℕ)) = {1} from by decide, Finset.sum_singleton]
+    norm_num
+  rw [hS] at key
+  nlinarith [key]
+
+/-- Reindex a sum over the integer interval `(0, k]` as a sum over the natural-number
+interval `(0, k]` via the cast `ℕ → ℤ`. -/
+lemma sum_Ioc_natCast {R : Type*} [AddCommMonoid R] (k : ℕ) (G : ℤ → R) :
+    ∑ n ∈ Finset.Ioc (0 : ℤ) (k : ℤ), G n = ∑ m ∈ Finset.Ioc (0 : ℕ) k, G (m : ℤ) := by
+  apply Finset.sum_nbij' (i := fun n : ℤ => n.toNat) (j := fun m : ℕ => (m : ℤ))
+  · intro a ha; simp only [Finset.mem_Ioc] at ha ⊢; omega
+  · intro a ha; simp only [Finset.mem_Ioc] at ha ⊢; omega
+  · intro a ha; simp only [Finset.mem_Ioc] at ha; omega
+  · intro a ha; simp only [Finset.mem_Ioc] at ha; omega
+  · intro a ha; simp only [Finset.mem_Ioc] at ha; congr 1; omega
+
+/-- One application of the large sieve to a single Dirichlet polynomial:
+`∑_{q≤Q} ∑*_χ (q/φq) ‖∑_{m≤P} h(m) χ(m) m^{-(σ+it)}‖² ≤ C_LS (P+Q²) ∑_{m≤P} ‖h(m)‖²`,
+using that summing over primitive characters is bounded by summing over all characters, and
+that the `m^{-σ}` factors with `σ > 0`, `m ≥ 1` only shrink the coefficients. -/
+lemma largeSieve_factor {Q : ℝ} (hQ : 1 ≤ Q) {σ : ℝ} (hσ_pos : 0 < σ) (t : ℝ)
+    (h : ℕ → ℂ) (P : ℝ) :
+    open Classical in
+    ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
+      (q : ℝ) * (q.totient : ℝ)⁻¹ *
+      ‖summatory (fun m ↦ h m * χ m * (m : ℂ) ^ (-(σ + t * I))) P‖ ^ 2
+    ≤ C_LS * (P + Q ^ 2) * summatory (fun m ↦ ‖h m‖ ^ 2) P := by
+  classical
+  -- Step 1: pass from primitive characters to all characters (terms are nonnegative).
+  have step1 : ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
+      (q : ℝ) * (q.totient : ℝ)⁻¹ *
+        ‖summatory (fun m ↦ h m * χ m * (m : ℂ) ^ (-(σ + t * I))) P‖ ^ 2
+      ≤ ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ∑ χ : DirichletCharacter ℂ q,
+        (q : ℝ) * (q.totient : ℝ)⁻¹ *
+        ‖summatory (fun m ↦ h m * χ m * (m : ℂ) ^ (-(σ + t * I))) P‖ ^ 2 := by
+    apply Finset.sum_le_sum; intro q _
+    apply Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _)
+    intro χ _ _; positivity
+  refine step1.trans ?_
+  have hSnn : (0 : ℝ) ≤ summatory (fun m ↦ ‖h m‖ ^ 2) P :=
+    summatory_nonneg _ _ (fun n _ => by positivity)
+  rcases Nat.eq_zero_or_pos ⌊P⌋₊ with hP0 | hPpos
+  · -- `⌊P⌋₊ = 0`: every inner sum is empty, both sides are zero.
+    have hS0 : summatory (fun m ↦ ‖h m‖ ^ 2) P = 0 := by rw [summatory_apply, hP0]; simp
+    have hT0 : ∀ (q : ℕ) (χ : DirichletCharacter ℂ q),
+        summatory (fun m ↦ h m * χ m * (m : ℂ) ^ (-(σ + t * I))) P = 0 := by
+      intro q χ; rw [summatory_apply, hP0]; simp
+    simp only [hT0, norm_zero, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true,
+      zero_pow, mul_zero, Finset.sum_const_zero]
+    rw [hS0]; simp
+  -- `⌊P⌋₊ > 0`: apply the large sieve.
+  have hP1 : (1 : ℝ) ≤ P := Nat.floor_pos.mp hPpos
+  have hPnn : (0 : ℝ) ≤ P := by linarith
+  set c : ℤ → ℂ := fun n => h n.toNat * ((n.toNat : ℂ)) ^ (-(σ + t * I)) with hc
+  have hLS := large_sieve Q hQ 0 ⌊P⌋₊ hPpos c
+  simp only [div_eq_mul_inv, zero_add] at hLS
+  -- (a) rewrite each inner large-sieve sum as our `summatory`.
+  have ha : ∀ (q : ℕ) (χ : DirichletCharacter ℂ q),
+      (∑ n ∈ Finset.Ioc (0 : ℤ) (⌊P⌋₊ : ℤ), c n * χ n)
+        = summatory (fun m ↦ h m * χ m * (m : ℂ) ^ (-(σ + t * I))) P := by
+    intro q χ
+    rw [sum_Ioc_natCast, summatory_apply]
+    apply Finset.sum_congr rfl
+    intro m hm
+    simp only [hc, Int.toNat_natCast]
+    rw [show ((m : ℤ) : ZMod q) = ((m : ℕ) : ZMod q) from by push_cast; ring]
+    ring
+  -- (b) the coefficient ℓ²-sum is bounded by `∑ ‖h m‖²`.
+  have hb : (∑ n ∈ Finset.Ioc (0 : ℤ) (⌊P⌋₊ : ℤ), ‖c n‖ ^ 2)
+      ≤ summatory (fun m ↦ ‖h m‖ ^ 2) P := by
+    rw [sum_Ioc_natCast, summatory_apply]
+    apply Finset.sum_le_sum
+    intro m hm
+    simp only [Finset.mem_Ioc] at hm
+    have hm1 : 1 ≤ m := hm.1
+    simp only [hc, Int.toNat_natCast, norm_mul, mul_pow]
+    rw [Complex.norm_natCast_cpow_of_pos (by omega)]
+    have hre : (-(σ + t * I)).re = -σ := by simp
+    rw [hre]
+    have hle1 : (m : ℝ) ^ (-σ) ≤ 1 :=
+      Real.rpow_le_one_of_one_le_of_nonpos (by exact_mod_cast hm1) (by linarith)
+    calc ‖h m‖ ^ 2 * ((m : ℝ) ^ (-σ)) ^ 2
+        ≤ ‖h m‖ ^ 2 * 1 ^ 2 := by gcongr
+      _ = ‖h m‖ ^ 2 := by ring
+  -- assemble
+  have hCLS := C_LS_nonneg
+  calc ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ∑ χ : DirichletCharacter ℂ q,
+        (q : ℝ) * (q.totient : ℝ)⁻¹ *
+        ‖summatory (fun m ↦ h m * χ m * (m : ℂ) ^ (-(σ + t * I))) P‖ ^ 2
+      = ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ∑ χ : DirichletCharacter ℂ q,
+        (q : ℝ) * (q.totient : ℝ)⁻¹ *
+        ‖∑ n ∈ Finset.Ioc (0 : ℤ) (⌊P⌋₊ : ℤ), c n * χ n‖ ^ 2 := by
+          simp_rw [ha]
+    _ ≤ C_LS * ((⌊P⌋₊ : ℝ) + Q ^ 2) * ∑ n ∈ Finset.Ioc (0 : ℤ) (⌊P⌋₊ : ℤ), ‖c n‖ ^ 2 := hLS
+    _ ≤ C_LS * ((⌊P⌋₊ : ℝ) + Q ^ 2) * summatory (fun m ↦ ‖h m‖ ^ 2) P := by
+          apply mul_le_mul_of_nonneg_left hb
+          have : (0 : ℝ) ≤ (⌊P⌋₊ : ℝ) + Q ^ 2 := by positivity
+          positivity
+    _ ≤ C_LS * (P + Q ^ 2) * summatory (fun m ↦ ‖h m‖ ^ 2) P := by
+          apply mul_le_mul_of_nonneg_right _ hSnn
+          have : (⌊P⌋₊ : ℝ) ≤ P := Nat.floor_le hPnn
+          gcongr
+
 /-- Step 4 of `notes/theorem26_6_smooth.md`: summing the pointwise products
 `‖F_{σ+tI}(χ)‖·‖G_{σ+tI}(χ)‖` over `q ≤ Q` and primitive `χ (mod q)` (weighted by `q/φ(q)`),
 Cauchy–Schwarz and two applications of the large sieve give a bound in terms of the `ℓ²` norms
@@ -466,7 +581,99 @@ theorem largeSieve_char_bound [FG] {Q : ℝ} (hQ : 1 ≤ Q) {σ : ℝ} (hσ_pos 
        ‖summatory (fun n ↦ g n * χ n * (n : ℂ) ^ (-(σ + t * I))) N‖)) Q
     ≤ C_LS * (√(N * M) + √M * Q + √N * Q + Q ^ 2) *
       √(summatory (fun m ↦ ‖f m‖ ^ 2) M) * √(summatory (fun n ↦ ‖g n‖ ^ 2) N) := by
-  sorry
+  classical
+  rw [summatory_apply]
+  set Sf : ℝ := summatory (fun m ↦ ‖f m‖ ^ 2) M with hSf
+  set Sg : ℝ := summatory (fun n ↦ ‖g n‖ ^ 2) N with hSg
+  have hSfnn : 0 ≤ Sf := summatory_nonneg _ _ (fun n _ => by positivity)
+  have hSgnn : 0 ≤ Sg := summatory_nonneg _ _ (fun n _ => by positivity)
+  -- the sigma index set of pairs `(q, χ)` with `χ` primitive
+  set s : Finset (Σ q : ℕ, DirichletCharacter ℂ q) :=
+    (Finset.Ioc 0 ⌊Q⌋₊).sigma
+      (fun q => Finset.univ.filter (fun χ : DirichletCharacter ℂ q => χ.IsPrimitive)) with hs
+  -- the Cauchy–Schwarz vectors `√(q/φq)·‖F‖` and `√(q/φq)·‖G‖`
+  set aF : (Σ q : ℕ, DirichletCharacter ℂ q) → ℝ := fun p =>
+    Real.sqrt ((p.1 : ℝ) * (p.1.totient : ℝ)⁻¹) *
+      ‖summatory (fun m ↦ f m * p.2 m * (m : ℂ) ^ (-(σ + t * I))) M‖ with haF
+  set aG : (Σ q : ℕ, DirichletCharacter ℂ q) → ℝ := fun p =>
+    Real.sqrt ((p.1 : ℝ) * (p.1.totient : ℝ)⁻¹) *
+      ‖summatory (fun n ↦ g n * p.2 n * (n : ℂ) ^ (-(σ + t * I))) N‖ with haG
+  -- LHS as a single sum over `s`
+  have eLHS : (∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
+      (q : ℝ) * (q.totient : ℝ)⁻¹ *
+      (‖summatory (fun m ↦ f m * χ m * (m : ℂ) ^ (-(σ + t * I))) M‖ *
+       ‖summatory (fun n ↦ g n * χ n * (n : ℂ) ^ (-(σ + t * I))) N‖))
+      = ∑ p ∈ s, aF p * aG p := by
+    rw [Finset.sum_sigma', hs]
+    apply Finset.sum_congr rfl; intro p _
+    simp only [haF, haG]
+    symm
+    rw [mul_mul_mul_comm, Real.mul_self_sqrt (by positivity)]
+  have eF : (∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
+      (q : ℝ) * (q.totient : ℝ)⁻¹ *
+        ‖summatory (fun m ↦ f m * χ m * (m : ℂ) ^ (-(σ + t * I))) M‖ ^ 2)
+      = ∑ p ∈ s, aF p ^ 2 := by
+    rw [Finset.sum_sigma', hs]
+    apply Finset.sum_congr rfl; intro p _
+    simp only [haF]
+    rw [mul_pow, Real.sq_sqrt (by positivity)]
+  have eG : (∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
+      (q : ℝ) * (q.totient : ℝ)⁻¹ *
+        ‖summatory (fun n ↦ g n * χ n * (n : ℂ) ^ (-(σ + t * I))) N‖ ^ 2)
+      = ∑ p ∈ s, aG p ^ 2 := by
+    rw [Finset.sum_sigma', hs]
+    apply Finset.sum_congr rfl; intro p _
+    simp only [haG]
+    rw [mul_pow, Real.sq_sqrt (by positivity)]
+  rw [eLHS]
+  -- nonnegativity of the CS sum
+  have hLHSnn : 0 ≤ ∑ p ∈ s, aF p * aG p :=
+    Finset.sum_nonneg (fun p _ => by simp only [haF, haG]; positivity)
+  -- the two large-sieve bounds
+  have hSFle : ∑ p ∈ s, aF p ^ 2 ≤ C_LS * (M + Q ^ 2) * Sf := by
+    rw [← eF, hSf]; exact largeSieve_factor hQ hσ_pos t (⇑f) M
+  have hSGle : ∑ p ∈ s, aG p ^ 2 ≤ C_LS * (N + Q ^ 2) * Sg := by
+    rw [← eG, hSg]; exact largeSieve_factor hQ hσ_pos t (⇑g) N
+  have hAFnn : 0 ≤ C_LS * (M + Q ^ 2) * Sf :=
+    le_trans (Finset.sum_nonneg (fun p _ => sq_nonneg _)) hSFle
+  -- Cauchy–Schwarz, then the large sieve bounds
+  have hsq : (∑ p ∈ s, aF p * aG p) ^ 2 ≤
+      (C_LS * (M + Q ^ 2) * Sf) * (C_LS * (N + Q ^ 2) * Sg) :=
+    (Finset.sum_mul_sq_le_sq_mul_sq s aF aG).trans
+      (mul_le_mul hSFle hSGle (Finset.sum_nonneg (fun p _ => sq_nonneg _)) hAFnn)
+  -- the constant comparison `√((M+Q²)(N+Q²)) ≤ √(NM)+√M Q+√N Q+Q²`
+  have hQ0 : (0 : ℝ) ≤ Q := by linarith
+  have hM := hM_pos.le
+  have hN := hN_pos.le
+  have hκ : (M + Q ^ 2) * (N + Q ^ 2)
+      ≤ (√(N * M) + √M * Q + √N * Q + Q ^ 2) ^ 2 := by
+    have ha := Real.sqrt_nonneg M
+    have hb := Real.sqrt_nonneg N
+    have e1 : √M ^ 2 = M := Real.sq_sqrt hM
+    have e2 : √N ^ 2 = N := Real.sq_sqrt hN
+    have e3 : √(N * M) = √N * √M := Real.sqrt_mul hN M
+    rw [e3]
+    nlinarith [e1, e2, ha, hb, hQ0, mul_nonneg ha hQ0, mul_nonneg hb hQ0,
+      mul_nonneg ha hb, mul_nonneg (mul_nonneg ha hb) hQ0, sq_nonneg Q]
+  -- the RHS is nonnegative and its square dominates `AF·AG`
+  have hκnn : 0 ≤ √(N * M) + √M * Q + √N * Q + Q ^ 2 :=
+    add_nonneg (add_nonneg (add_nonneg (Real.sqrt_nonneg _)
+      (mul_nonneg (Real.sqrt_nonneg _) hQ0)) (mul_nonneg (Real.sqrt_nonneg _) hQ0)) (sq_nonneg _)
+  have hRHSnn : 0 ≤ C_LS * (√(N * M) + √M * Q + √N * Q + Q ^ 2) * √Sf * √Sg :=
+    mul_nonneg (mul_nonneg (mul_nonneg C_LS_nonneg hκnn) (Real.sqrt_nonneg _)) (Real.sqrt_nonneg _)
+  have hfin : (C_LS * (M + Q ^ 2) * Sf) * (C_LS * (N + Q ^ 2) * Sg)
+      ≤ (C_LS * (√(N * M) + √M * Q + √N * Q + Q ^ 2) * √Sf * √Sg) ^ 2 := by
+    have hRHS2 : (C_LS * (√(N * M) + √M * Q + √N * Q + Q ^ 2) * √Sf * √Sg) ^ 2
+        = C_LS ^ 2 * (√(N * M) + √M * Q + √N * Q + Q ^ 2) ^ 2 * Sf * Sg := by
+      rw [mul_pow, mul_pow, mul_pow, Real.sq_sqrt hSfnn, Real.sq_sqrt hSgnn]
+    rw [hRHS2]
+    nlinarith [hκ, sq_nonneg C_LS, hSfnn, hSgnn, mul_nonneg hSfnn hSgnn,
+      mul_nonneg (mul_nonneg (sq_nonneg C_LS) hSfnn) hSgnn]
+  -- conclude
+  have key : (∑ p ∈ s, aF p * aG p) ^ 2
+      ≤ (C_LS * (√(N * M) + √M * Q + √N * Q + Q ^ 2) * √Sf * √Sg) ^ 2 := hsq.trans hfin
+  have := Real.sqrt_le_sqrt key
+  rwa [Real.sqrt_sq hLHSnn, Real.sqrt_sq hRHSnn] at this
 
 /-- `‖σ + tI‖⁻¹ ≤ √2 · (σ + |t|)⁻¹` for `σ > 0`: the reverse triangle estimate
 `σ + |t| ≤ √2 · ‖σ + tI‖`. -/
