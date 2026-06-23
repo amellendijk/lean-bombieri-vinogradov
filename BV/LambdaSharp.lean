@@ -74,7 +74,33 @@ theorem summatory_abs_moebiusLEV_le [ProofData] {x : ℝ} :
 (`vonMangoldt_le_log`); the extra `log` is absorbed by the target `UV log x`. -/
 theorem summatory_abs_LambdaLEU_le [ProofData] {x : ℝ} (hx : 2 ≤ x) :
     summatory (fun k => |(Λ≤U : ArithmeticFunction ℝ) k|) x ≤ U * Real.log x := by
-  sorry
+  have hx0 : (0:ℝ) ≤ Real.log x := Real.log_nonneg (by linarith)
+  refine le_trans (le_abs_self _) ?_
+  rw [← Real.norm_eq_abs]
+  rcases le_total U x with hUx | hxU
+  · -- `U ≤ x`: the support has `≤ U` points, each of size `≤ log x`.
+    refine summatory_le_support_mul_UB x U ProofData.U_nonneg (Real.log x) ?_ ?_
+    · intro n hn
+      rw [Real.norm_eq_abs, abs_abs, abs_of_nonneg LambdaLEU_nonneg, LambdaLEU_apply_of_le hn]
+      calc Λ n ≤ Real.log n := vonMangoldt_le_log
+        _ ≤ Real.log x := by
+          rcases Nat.eq_zero_or_pos n with hn0 | hn0
+          · simpa [hn0] using hx0
+          · exact Real.log_le_log (by exact_mod_cast hn0) (le_trans hn hUx)
+    · intro n hn
+      rw [LambdaLEU_apply_of_gt hn, abs_zero]
+  · -- `x ≤ U`: the range has `≤ x` points, each of size `≤ log x`.
+    refine le_trans (summatory_le_UB x (by linarith) (Real.log x) ?_) (by gcongr)
+    intro n hn
+    rw [Real.norm_eq_abs, abs_abs, abs_of_nonneg LambdaLEU_nonneg]
+    by_cases hnU : (n : ℝ) ≤ U
+    · rw [LambdaLEU_apply_of_le hnU]
+      calc Λ n ≤ Real.log n := vonMangoldt_le_log
+        _ ≤ Real.log x := by
+          rcases Nat.eq_zero_or_pos n with hn0 | hn0
+          · simpa [hn0] using hx0
+          · exact Real.log_le_log (by exact_mod_cast hn0) hn
+    · rw [LambdaLEU_apply_of_gt (lt_of_not_ge hnU)]; exact hx0
 
 /-! ### Group F: the two term bounds -/
 
