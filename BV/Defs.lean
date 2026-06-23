@@ -84,8 +84,8 @@ class ProofData where
   x : ℝ
   le_x : 2 ≤ x
   UV_le : U * V ≤ Real.sqrt x
-  le_U : Real.exp (Real.sqrt x) ≤ U
-  le_V : Real.exp (Real.sqrt x) ≤ V
+  le_U : Real.exp (Real.sqrt (Real.log x)) ≤ U
+  le_V : Real.exp (Real.sqrt (Real.log x)) ≤ V
 
 open ProofData
 
@@ -98,7 +98,7 @@ theorem ProofData.x_pos : 0 < x := by
 
 @[grind .]
 theorem ProofData.U_pos : 0 < U := by
-  calc 0 < Real.exp (√x) := ?A
+  calc 0 < Real.exp (√x.log) := ?A
     _ ≤ U := le_U
   positivity
 
@@ -112,7 +112,7 @@ theorem ProofData.one_le_U : 1 ≤ U := by
 
 @[grind .]
 theorem ProofData.V_pos : 0 < V := by
-  calc 0 < Real.exp (√x) := ?A
+  calc 0 < Real.exp (√x.log) := ?A
     _ ≤ V := le_V
   positivity
 
