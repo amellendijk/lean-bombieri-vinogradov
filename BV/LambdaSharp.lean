@@ -61,7 +61,12 @@ theorem Delta_dilate_flog_bound {v e : ℕ} (he : 0 < e) (h : ArithmeticFunction
     {x : ℝ} (hx : 2 ≤ x) {q : ℕ} [NeZero q] (a : ZMod q) (ha : IsUnit a) :
     |Δ_[⇑(dilate e h * ppow log v)](x; q, a)|
       ≤ 2 * (Real.log x) ^ v * summatory (fun k => |h k|) x := by
-  sorry
+  rw [← Real.norm_eq_abs]
+  refine le_trans (Delta_flog_bound (f := dilate e h) hx a ha) ?_
+  have hpow : (0:ℝ) ≤ 2 * (Real.log x) ^ v := by
+    have : (0:ℝ) ≤ Real.log x := Real.log_nonneg (by linarith)
+    positivity
+  exact mul_le_mul_of_nonneg_left (summatory_abs_dilate_le he h) hpow
 
 /-! ### Group E (specialised `ℓ¹` bounds) -/
 
