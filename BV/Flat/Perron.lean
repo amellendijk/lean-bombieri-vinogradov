@@ -6,6 +6,17 @@ import BV.Mellin
 import BV.Delta
 
 
+/-
+Some token numbers from Opus:
+ Session
+ Total cost:            $35.38
+ Total duration (API):  1h 17m 2s
+ Total duration (wall): 1d 5h 4m
+ Total code changes:    987 lines added, 149 lines removed
+ Usage by model:
+     claude-haiku-4-5:  1.6k input, 57 output, 0 cache read, 0 cache write ($0.0019)
+      claude-opus-4-8:  17.0k input, 379.3k output, 30.2m cache read, 1.1m cache write ($35.38)
+-/
 
 namespace Mathlib.Meta.Positivity
 open Qq Lean Meta
@@ -176,6 +187,51 @@ theorem T_eq_integral_sum {σ : ℝ} (hσ_pos : 0 < σ) (hσ : σ ≤ 2)
     exact integrable_term hσ_pos hσ hε_pos hε_one hy m i
       (Finset.mem_Ioc.mp hm).1 (Finset.mem_Ioc.mp hi).1
 
+/-- A `range`-of-bounded-supremum function `z ↦ ⨆ (_ : z ∈ S), φ z` (with `φ` real-valued) is
+bounded above as soon as `φ` is bounded by some nonnegative `B` on `S`: off `S` the inner
+supremum is `0`, and on `S` it equals `φ z ≤ B`. This is the common engine behind the three
+`BddAbove` side-goals produced by `le_ciSup`/`le_ciSup_of_le`. -/
+private lemma bddAbove_range_biSup {α : Type*} {φ : α → ℝ} {S : Set α} {B : ℝ}
+    (hB : 0 ≤ B) (hbound : ∀ z ∈ S, φ z ≤ B) :
+    BddAbove (Set.range fun z => ⨆ (_ : z ∈ S), φ z) := by
+  refine ⟨B, ?_⟩
+  rintro _ ⟨z, rfl⟩
+  exact Real.iSup_le (fun hz => hbound z hz) hB
+
+/-- `‖summatory f z‖` is bounded by the total `ℓ¹` mass `summatory ‖f·‖ x` whenever `⌊z⌋₊ ≤ ⌊x⌋₊`:
+the summatory is a sum over `Ioc 0 ⌊z⌋₊ ⊆ Ioc 0 ⌊x⌋₊` of terms whose norms are nonnegative. -/
+private lemma norm_summatory_le {f : ℕ → ℂ} {z x : ℝ} (h : ⌊z⌋₊ ≤ ⌊x⌋₊) :
+    ‖summatory f z‖ ≤ summatory (fun m => ‖f m‖) x := by
+  rw [summatory_apply, summatory_apply]
+  exact (norm_sum_le _ _).trans
+    (Finset.sum_le_sum_of_subset_of_nonneg (Finset.Ioc_subset_Ioc le_rfl h)
+      (fun i _ _ => norm_nonneg _))
+
+/-- A uniform (in `y ≥ 1`) bound on `‖T ε y χ‖`: each summand carries a factor
+`Smooth1 ν ε (mn/y) ∈ [0,1]`, so the double sum is dominated by the `y`-independent quantity
+`∑_{m≤M} ∑_{n≤N} ‖f m‖‖χ m‖‖g n‖‖χ n‖`. -/
+private lemma norm_T_le [Bump] [FG] {q : ℕ} {ε : ℝ} (hε_pos : 0 < ε)
+    {χ : DirichletCharacter ℂ q} {y : ℝ} (hy : 1 ≤ y) :
+    ‖T ε y χ‖ ≤ ∑ m ∈ Finset.Ioc 0 ⌊M⌋₊, ∑ n ∈ Finset.Ioc 0 ⌊N⌋₊,
+      ‖f m‖ * ‖χ (m : ZMod q)‖ * ‖g n‖ * ‖χ (n : ZMod q)‖ := by
+  have hy0 : (0 : ℝ) < y := by linarith
+  rw [T, summatory_apply]
+  refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun m hm => ?_)
+  simp only [Finset.mem_Ioc] at hm
+  rw [summatory_apply]
+  refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun n hn => ?_)
+  simp only [Finset.mem_Ioc] at hn
+  have hmpos : (0 : ℝ) < m := by exact_mod_cast hm.1
+  have hnpos : (0 : ℝ) < n := by exact_mod_cast hn.1
+  have hpos : 0 < (m : ℝ) * n / y := by positivity
+  have hs1 : ‖(↑(Smooth1 ν ε ((m : ℝ) * n / y)) : ℂ)‖ ≤ 1 := by
+    rw [Complex.norm_real, Real.norm_eq_abs,
+      abs_of_nonneg (Smooth1Nonneg (fun x _ => νpos x) hpos hε_pos)]
+    exact Smooth1LeOne (fun x _ => νpos x)
+      (by rw [← MeasureTheory.integral_Ici_eq_integral_Ioi]; exact mass_one) hε_pos hpos
+  rw [norm_mul, norm_mul, norm_mul, norm_mul]
+  exact mul_le_of_le_one_right (by positivity) hs1
+
 theorem sup_summatory_eq_sup_nat {f : ℕ → ℂ}
     {x : ℝ} (hx : 1 ≤ x) :
   open Classical in
@@ -201,7 +257,11 @@ theorem sup_summatory_eq_sup_nat {f : ℕ → ℂ}
       simp only [Finset.coe_Icc, this, ciSup_unique, ge_iff_le]
       apply le_of_eq
       simp_rw [summatory_apply, hfloor_add_half]
-    · sorry
+    · refine bddAbove_range_biSup (B := summatory (fun m => ‖f m‖) x)
+        (by positivity) ?_
+      intro K hK
+      simp only [Finset.coe_Icc, mem_Icc] at hK
+      exact norm_summatory_le (by rw [hfloor_add_half]; exact hK.2)
   · apply Real.iSup_le _ (by positivity)
     intro K
     apply Real.iSup_le _ (by positivity)
@@ -215,7 +275,11 @@ theorem sup_summatory_eq_sup_nat {f : ℕ → ℂ}
         · grind
       simp [this, ciSup_unique, ge_iff_le]
       simp [summatory_apply, hfloor_add_half]
-    · sorry
+    · refine bddAbove_range_biSup (B := summatory (fun m => ‖f m‖) x)
+        (by positivity) ?_
+      intro y hy
+      simp only [mem_Icc] at hy
+      exact norm_summatory_le (Nat.floor_mono hy.2)
 
 
 theorem temp [fg : FG]
@@ -1016,7 +1080,13 @@ theorem summatory_T_ll_nat [Bump] [FG] {ε Q : ℝ} (hε_pos : 0 < ε)(hQ : 1 �
     apply Real.iSup_le _ (by positivity)
     intro K
     apply le_ciSup_of_le (c := K + (2⁻¹ : ℝ))
-    · sorry
+    · refine bddAbove_range_biSup
+        (B := ∑ m ∈ Finset.Ioc 0 ⌊M⌋₊, ∑ n ∈ Finset.Ioc 0 ⌊N⌋₊,
+          ‖f m‖ * ‖χ (m : ZMod q)‖ * ‖g n‖ * ‖χ (n : ZMod q)‖)
+        (Finset.sum_nonneg fun _ _ => Finset.sum_nonneg fun _ _ => by positivity) ?_
+      intro y hy
+      simp only [mem_Icc] at hy
+      exact norm_T_le hε_pos hy.1
     by_cases h : K ∈ Icc 1 ⌊x⌋₊
     · have h' : K + (2 : ℝ)⁻¹ ∈ Icc 1 (x+1) := by
         simp only [mem_Icc] at h ⊢
