@@ -77,7 +77,66 @@ theorem Delta_term2_bound [ProofData] {q r : ℕ} [NeZero q] {a : ZMod q}
     (ha : IsUnit a) (hr : r ≤ x) {y : ℝ} (h2y : 2 ≤ y) (hy : y ≤ x) :
     |Δ_[onCoprime r ⇑(Λ≤U * μ≤V * (ζ : ArithmeticFunction ℝ))](y; q, a)|
       ≤ 2 * (r.divisors.card : ℝ) * U * V * Real.log x := by
-  sorry
+  have hU : (0:ℝ) ≤ U := ProofData.U_nonneg
+  have hV : (0:ℝ) ≤ V := ProofData.V_nonneg
+  have hsat : ∀ a b : ℕ, a * b ∈ {n | r.Coprime n}
+      ↔ a ∈ {n | r.Coprime n} ∧ b ∈ {n | r.Coprime n} := by
+    intro a b
+    simp only [Set.mem_setOf_eq]
+    exact Nat.coprime_mul_iff_right
+  -- rewrite the restricted function as a divisor sum of dilated `· * ζ`
+  have hfun : onCoprime r ⇑(Λ≤U * μ≤V * (ζ : ArithmeticFunction ℝ))
+      = ∑ e ∈ r.divisors,
+          (μ e : ℝ) • (⇑(dilate e ((Λ≤U * μ≤V).on {n | r.Coprime n})
+            * (ζ : ArithmeticFunction ℝ)) : ℕ → ℝ) := by
+    rw [onCoprime_eq_on_coe, ArithmeticFunction.on_mul_of_saturated _ hsat]
+    exact mul_zeta_on_coprime_coe r _
+  rw [hfun, Delta_finset_sum]
+  calc |∑ e ∈ r.divisors,
+          Δ_[(μ e : ℝ) • (⇑(dilate e ((Λ≤U * μ≤V).on {n | r.Coprime n})
+            * (ζ : ArithmeticFunction ℝ)) : ℕ → ℝ)](y; q, a)|
+      ≤ ∑ e ∈ r.divisors,
+          |Δ_[(μ e : ℝ) • (⇑(dilate e ((Λ≤U * μ≤V).on {n | r.Coprime n})
+            * (ζ : ArithmeticFunction ℝ)) : ℕ → ℝ)](y; q, a)| :=
+        Finset.abs_sum_le_sum_abs _ _
+    _ ≤ ∑ _e ∈ r.divisors, 2 * U * V * Real.log x := by
+        apply Finset.sum_le_sum
+        intro e he
+        have he' : 0 < e := Nat.pos_of_mem_divisors he
+        have hμ : |(μ e : ℝ)| ≤ 1 := by exact_mod_cast ArithmeticFunction.abs_moebius_le_one
+        have hHbound : summatory (fun k => |((Λ≤U * μ≤V).on {n | r.Coprime n}) k|) y
+            ≤ U * Real.log y * V := by
+          have e1 : summatory (fun k => |((Λ≤U * μ≤V).on {n | r.Coprime n}) k|) y
+              ≤ summatory (fun k => |(Λ≤U * μ≤V) k|) y := summatory_abs_on_le _ _
+          have e2 : summatory (fun k => |(Λ≤U * μ≤V) k|) y
+              ≤ summatory (fun k => |Λ≤U k|) y * summatory (fun k => |μ≤V k|) y :=
+            summatory_abs_mul_le _ _ (by linarith)
+          have e3 : summatory (fun k => |Λ≤U k|) y ≤ U * Real.log y :=
+            summatory_abs_LambdaLEU_le h2y
+          have e4 : summatory (fun k => |μ≤V k|) y ≤ V := summatory_abs_moebiusLEV_le
+          have hlogy : 0 ≤ Real.log y := Real.log_nonneg (by linarith)
+          calc summatory (fun k => |((Λ≤U * μ≤V).on {n | r.Coprime n}) k|) y
+              ≤ summatory (fun k => |Λ≤U k|) y * summatory (fun k => |μ≤V k|) y := e1.trans e2
+            _ ≤ (U * Real.log y) * V :=
+                mul_le_mul e3 e4 (by positivity) (by positivity)
+        have hΔ : |Δ_[⇑(dilate e ((Λ≤U * μ≤V).on {n | r.Coprime n})
+            * (ζ : ArithmeticFunction ℝ))](y; q, a)| ≤ 2 * U * V * Real.log x := by
+          rw [show (ζ : ArithmeticFunction ℝ) = log.ppow 0 from ppow_zero.symm]
+          have hflog := Delta_dilate_flog_bound (v := 0) he'
+            ((Λ≤U * μ≤V).on {n | r.Coprime n}) h2y a ha
+          rw [pow_zero, mul_one] at hflog
+          have hlogxy : Real.log y ≤ Real.log x := Real.log_le_log (by linarith) hy
+          calc |Δ_[⇑(dilate e ((Λ≤U * μ≤V).on {n | r.Coprime n}) * log.ppow 0)](y; q, a)|
+              ≤ 2 * summatory (fun k => |((Λ≤U * μ≤V).on {n | r.Coprime n}) k|) y := hflog
+            _ ≤ 2 * (U * Real.log y * V) := by linarith [hHbound]
+            _ ≤ 2 * (U * Real.log x * V) := by gcongr
+            _ = 2 * U * V * Real.log x := by ring
+        rw [Delta_smul, smul_eq_mul, abs_mul]
+        have := mul_le_mul hμ hΔ (abs_nonneg _) (by norm_num : (0:ℝ) ≤ 1)
+        rwa [one_mul] at this
+    _ = (r.divisors.card : ℝ) * (2 * U * V * Real.log x) := by
+        rw [Finset.sum_const, nsmul_eq_mul]
+    _ = 2 * (r.divisors.card : ℝ) * U * V * Real.log x := by ring
 
 /-! ### Group G: the main Type I bound -/
 
