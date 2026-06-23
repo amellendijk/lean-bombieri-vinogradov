@@ -68,7 +68,26 @@ theorem Delta_dilate_flog_bound {v e : ℕ} (he : 0 < e) (h : ArithmeticFunction
 /-- `‖μ_{≤V}‖₁ ≤ V`: `|μ| ≤ 1` on the `≤ V` supported values. -/
 theorem summatory_abs_moebiusLEV_le [ProofData] {x : ℝ} :
     summatory (fun k => |(μ≤V : ArithmeticFunction ℝ) k|) x ≤ V := by
-  sorry
+  refine le_trans (le_abs_self _) ?_
+  rw [← Real.norm_eq_abs]
+  refine le_trans (summatory_le_support_mul_UB x V ProofData.V_nonneg 1 ?_ ?_) (by simp)
+  · -- `|μ_{≤V}(n)| ≤ 1` everywhere.
+    intro n _
+    rw [Real.norm_eq_abs, abs_abs]
+    by_cases hn : n ∈ Set.Icc 1 (Nat.floor V)
+    · rw [moebiusLEV, on_apply_of_mem _ _ _ hn, ArithmeticFunction.intCoe_apply]
+      exact_mod_cast ArithmeticFunction.abs_moebius_le_one
+    · rw [moebiusLEV, on_apply_of_not_mem _ _ _ hn, abs_zero]
+      exact zero_le_one
+  · -- `μ_{≤V}` vanishes beyond `V`.
+    intro n hn
+    have : (μ≤V : ArithmeticFunction ℝ) n = 0 := by
+      rw [moebiusLEV, on_apply_of_not_mem]
+      simp only [Set.mem_Icc, not_and, not_le]
+      intro _
+      rw [Nat.floor_lt V_nonneg]
+      exact hn
+    simp [this]
 
 /-- `‖Λ_{≤U}‖₁ ≤ U·log x`: `Λ(k) ≤ log k ≤ log x` on the `≤ U` supported values
 (`vonMangoldt_le_log`); the extra `log` is absorbed by the target `UV log x`. -/
