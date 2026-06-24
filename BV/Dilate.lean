@@ -146,21 +146,73 @@ coprime set `{n | r.Coprime n}` is saturated by `Nat.coprime_mul_iff_right`. -/
 theorem ArithmeticFunction.on_mul_of_saturated {R : Type*} [Semiring R] (S : Set ℕ)
     (hS : ∀ a b, a * b ∈ S ↔ a ∈ S ∧ b ∈ S) (f g : ArithmeticFunction R) :
     (f * g).on S = f.on S * g.on S := by
-  sorry
+  ext n
+  by_cases hn : n ∈ S
+  · rw [on_apply_of_mem _ _ _ hn, mul_apply, mul_apply]
+    refine Finset.sum_congr rfl fun x hx => ?_
+    obtain ⟨hab, -⟩ := Nat.mem_divisorsAntidiagonal.mp hx
+    obtain ⟨ha, hb⟩ := (hS _ _).mp (hab ▸ hn)
+    rw [on_apply_of_mem _ _ _ ha, on_apply_of_mem _ _ _ hb]
+  · rw [on_apply_of_not_mem _ _ _ hn, mul_apply]
+    symm
+    refine Finset.sum_eq_zero fun x hx => ?_
+    obtain ⟨hab, -⟩ := Nat.mem_divisorsAntidiagonal.mp hx
+    have hnot : ¬ (x.1 ∈ S ∧ x.2 ∈ S) := fun h => hn (hab ▸ (hS _ _).mpr h)
+    rw [not_and_or] at hnot
+    rcases hnot with h | h
+    · rw [on_apply_of_not_mem _ _ _ h, zero_mul]
+    · rw [on_apply_of_not_mem _ _ _ h, mul_zero]
 
 /-- The `ℕ → R` restriction `onCoprime` agrees with the arithmetic-function
 restriction `.on {n | r.Coprime n}` (both send `0 ↦ 0` as `f 0 = 0`). -/
 theorem onCoprime_eq_on_coe {R : Type*} [Zero R] (r : ℕ) (f : ArithmeticFunction R) :
     onCoprime r (⇑f) = ⇑(f.on {n | r.Coprime n}) := by
-  sorry
+  funext n
+  rw [onCoprime_apply]
+  by_cases h : r.Coprime n
+  · rw [if_pos h, on_apply_of_mem _ _ _ (show n ∈ {n | r.Coprime n} from h)]
+  · rw [if_neg h, on_apply_of_not_mem _ _ _ (show n ∉ {n | r.Coprime n} from h)]
 
-/-- Restriction shrinks the `ℓ¹` mass. -/
-theorem summatory_abs_on_le (S : Set ℕ) (f : ArithmeticFunction ℝ) {x : ℝ} :
-    summatory (fun k => |f.on S k|) x ≤ summatory (fun k => |f k|) x := by
-  sorry
+/-- Restriction shrinks each coefficient in absolute value. -/
+theorem abs_on_le (S : Set ℕ) (f : ArithmeticFunction ℝ) (k : ℕ) :
+    |f.on S k| ≤ |f k| := by
+  by_cases hk : k ∈ S
+  · rw [on_apply_of_mem _ _ _ hk]
+  · rw [on_apply_of_not_mem _ _ _ hk, abs_zero]
+    positivity
 
 /-- `ℓ¹` submultiplicativity of Dirichlet convolution. -/
-theorem summatory_abs_mul_le (f g : ArithmeticFunction ℝ) {x : ℝ} (hx : 0 ≤ x) :
+theorem summatory_abs_mul_le (f g : ArithmeticFunction ℝ) {x : ℝ} (_hx : 0 ≤ x) :
     summatory (fun k => |(f * g) k|) x
       ≤ summatory (fun k => |f k|) x * summatory (fun k => |g k|) x := by
-  sorry
+  simp only [summatory]
+  -- Step 1: triangle inequality on each Dirichlet convolution
+  refine le_trans (Finset.sum_le_sum
+    (g := fun k => ∑ p ∈ k.divisorsAntidiagonal, |f p.1| * |g p.2|) fun k _ => ?_) ?_
+  · rw [mul_apply]
+    refine (Finset.abs_sum_le_sum_abs _ _).trans (le_of_eq ?_)
+    exact Finset.sum_congr rfl fun p _ => abs_mul _ _
+  -- Step 2: regroup the double sum and bound it by the product of marginals
+  have hdisj : (↑(Nat.Icc 1 x) : Set ℕ).PairwiseDisjoint
+      (fun k => k.divisorsAntidiagonal) := by
+    intro k₁ _ k₂ _ hne
+    simp only [Function.onFun, Finset.disjoint_left, Nat.mem_divisorsAntidiagonal]
+    rintro p ⟨h1, -⟩ ⟨h2, -⟩
+    exact hne (h1.symm.trans h2)
+  rw [← Finset.sum_biUnion hdisj, Finset.sum_mul_sum, ← Finset.sum_product']
+  apply Finset.sum_le_sum_of_subset_of_nonneg
+  · intro p hp
+    simp only [Finset.mem_biUnion, Nat.mem_divisorsAntidiagonal] at hp
+    obtain ⟨k, hk, hpk, hk0⟩ := hp
+    subst hpk
+    obtain ⟨hp1, hp2⟩ := Nat.mul_ne_zero_iff.mp hk0
+    rw [Nat.mem_Icc] at hk
+    rw [Finset.mem_product, Nat.mem_Icc, Nat.mem_Icc]
+    have hle1 : (p.1 : ℝ) ≤ (p.1 * p.2 : ℕ) := by
+      exact_mod_cast Nat.le_mul_of_pos_right _ (Nat.pos_of_ne_zero hp2)
+    have hle2 : (p.2 : ℝ) ≤ (p.1 * p.2 : ℕ) := by
+      exact_mod_cast Nat.le_mul_of_pos_left _ (Nat.pos_of_ne_zero hp1)
+    refine ⟨⟨by exact_mod_cast Nat.one_le_iff_ne_zero.2 hp1, hle1.trans hk.2⟩,
+      ⟨by exact_mod_cast Nat.one_le_iff_ne_zero.2 hp2, hle2.trans hk.2⟩⟩
+  · intro p _ _
+    positivity

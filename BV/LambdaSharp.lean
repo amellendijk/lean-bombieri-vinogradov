@@ -324,7 +324,8 @@ theorem Delta_term1_bound [ProofData] {q r : ℕ} [NeZero q] {a : ZMod q}
         -- `ℓ¹` bound for the restricted coefficient function
         have hHbound : summatory (fun k => |((μ≤V).on {n | r.Coprime n}) k|) y ≤ V := by
           have e1 : summatory (fun k => |((μ≤V).on {n | r.Coprime n}) k|) y
-              ≤ summatory (fun k => |(μ≤V) k|) y := summatory_abs_on_le _ _
+              ≤ summatory (fun k => |(μ≤V) k|) y :=
+            summatory_le_summatory (fun n _ _ => abs_on_le _ _ n)
           have e4 : summatory (fun k => |(μ≤V) k|) y ≤ V := summatory_abs_moebiusLEV_le
           linarith
         have hHnn : (0:ℝ) ≤ summatory (fun k => |((μ≤V).on {n | r.Coprime n}) k|) y := by
@@ -438,7 +439,8 @@ theorem Delta_term2_bound [ProofData] {q r : ℕ} [NeZero q] {a : ZMod q}
         have hHbound : summatory (fun k => |((Λ≤U * μ≤V).on {n | r.Coprime n}) k|) y
             ≤ U * Real.log y * V := by
           have e1 : summatory (fun k => |((Λ≤U * μ≤V).on {n | r.Coprime n}) k|) y
-              ≤ summatory (fun k => |(Λ≤U * μ≤V) k|) y := summatory_abs_on_le _ _
+              ≤ summatory (fun k => |(Λ≤U * μ≤V) k|) y :=
+            summatory_le_summatory (fun n _ _ => abs_on_le _ _ n)
           have e2 : summatory (fun k => |(Λ≤U * μ≤V) k|) y
               ≤ summatory (fun k => |Λ≤U k|) y * summatory (fun k => |μ≤V k|) y :=
             summatory_abs_mul_le _ _ (by linarith)
