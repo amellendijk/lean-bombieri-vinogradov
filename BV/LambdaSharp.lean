@@ -8,6 +8,12 @@ open scoped Moebius zeta
 
 def C_DLS : ℝ := 6
 
+/-- Constant in the average-order bound `∑_{q ≤ Q} τ(q) ≤ C_tau · Q log Q` (`sum_divisors_card_le`). -/
+def C_tau : ℝ := 3
+
+/-- Constant in the Type I sum bound `BV_LambdaSharp`. -/
+def C_BVLS : ℝ := sorry
+
 /-! ### Group D: `Δ` is linear in its function argument -/
 
 theorem Delta_sub {R : Type*} [Field R] (f g : ℕ → R) (x : ℝ) (q : ℕ) (a : ZMod q) :
@@ -513,9 +519,69 @@ theorem Delta_LambdaSharp_bound [ProofData] {q r : ℕ} [NeZero q] {a : ZMod q} 
   nlinarith [mul_nonneg (mul_nonneg (mul_nonneg hτ hV) hlogx) (by linarith : (0:ℝ) ≤ U - 1)]
 
 @[blueprint (statement := /--
+The divisor function has average order $\log$:
+$$\sum_{q \le Q} \tau(q) \ll Q \log Q,$$
+uniformly for $Q \ge 2$ (where $\tau(q) = $ `q.divisors.card`).
+-/)]
+theorem sum_divisors_card_le {Q : ℝ} (hQ : 2 ≤ Q) :
+    ∑ q ∈ Nat.Icc 0 Q, (q.divisors.card : ℝ) ≤ C_tau * Q * Real.log Q := by
+  set N := ⌊Q⌋₊ with hN
+  have hQ0 : (0:ℝ) ≤ Q := by linarith
+  have hIcc : Nat.Icc 0 Q = Finset.Icc 0 N := by
+    rw [Nat.Icc, if_pos ⟨by linarith, by linarith⟩]; simp [hN]
+  rw [hIcc]
+  -- Drop the `q = 0` term (its divisor count is `0`).
+  have hsub : ∑ q ∈ Finset.Icc 0 N, (q.divisors.card : ℝ)
+      = ∑ q ∈ Finset.Ioc 0 N, (q.divisors.card : ℝ) := by
+    refine (Finset.sum_subset Finset.Ioc_subset_Icc_self ?_).symm
+    intro x hx hxni
+    have hx0 : x = 0 := by
+      simp only [Finset.mem_Icc] at hx
+      simp only [Finset.mem_Ioc] at hxni
+      omega
+    simp [hx0]
+  rw [hsub]
+  -- `∑_{q ≤ N} τ(q) = ∑_{q ≤ N} ⌊N/q⌋` (over `ℕ`).
+  have hkey : (∑ q ∈ Finset.Ioc 0 N, q.divisors.card : ℕ) = ∑ q ∈ Finset.Ioc 0 N, (N / q) := by
+    simp_rw [← sigma_zero_apply]
+    exact sum_Ioc_sigma0_eq_sum_div N
+  have hcast : ∑ q ∈ Finset.Ioc 0 N, (q.divisors.card : ℝ)
+      = ∑ q ∈ Finset.Ioc 0 N, ((N / q : ℕ) : ℝ) := by
+    rw [← Nat.cast_sum, ← Nat.cast_sum, hkey]
+  rw [hcast]
+  -- Bound `∑ ⌊N/q⌋ ≤ N · H_N`.
+  have hharm : (harmonic N : ℝ) = ∑ q ∈ Finset.Ioc 0 N, ((q:ℝ))⁻¹ := by
+    rw [show Finset.Ioc 0 N = Finset.Icc 1 N from rfl, harmonic_eq_sum_Icc]
+    push_cast
+    rfl
+  have hbound : ∑ q ∈ Finset.Ioc 0 N, ((N / q : ℕ) : ℝ) ≤ (N:ℝ) * (harmonic N : ℝ) := by
+    rw [hharm, Finset.mul_sum]
+    apply Finset.sum_le_sum
+    intro i hi
+    calc ((N / i : ℕ):ℝ) ≤ (N:ℝ)/(i:ℝ) := Nat.cast_div_le
+      _ = (N:ℝ) * ((i:ℝ))⁻¹ := div_eq_mul_inv _ _
+  refine hbound.trans ?_
+  -- `N · H_N ≤ N (1 + log Q) ≤ Q (1 + log Q) ≤ 3 Q log Q`.
+  have hHN : (harmonic N : ℝ) ≤ 1 + Real.log Q := by
+    have := harmonic_floor_le_one_add_log Q (by linarith)
+    rwa [← hN] at this
+  have hNQ : (N:ℝ) ≤ Q := Nat.floor_le hQ0
+  have hNnn : (0:ℝ) ≤ (N:ℝ) := by positivity
+  have hloghalf : (1:ℝ)/2 ≤ Real.log Q := by
+    have h2 : Real.log 2 ≤ Real.log Q := Real.log_le_log (by norm_num) (by linarith)
+    have := Real.log_two_gt_d9
+    linarith
+  calc (N:ℝ) * (harmonic N:ℝ)
+      ≤ (N:ℝ) * (1 + Real.log Q) := mul_le_mul_of_nonneg_left hHN hNnn
+    _ ≤ Q * (1 + Real.log Q) := mul_le_mul_of_nonneg_right hNQ (by linarith)
+    _ ≤ C_tau * Q * Real.log Q := by
+        rw [C_tau]
+        nlinarith [mul_nonneg hQ0 (by linarith : (0:ℝ) ≤ Real.log Q - 1/2)]
+
+@[blueprint (statement := /--
 For each fixed $A \ge 0$, $x \ge 2$ and $1 \le Q \le \sqrt{x}/(\log x)^{A+3}$,
 $$\sum_{q \le Q} \max_{\sqrt{x} \le y \le x} \max_{a \in (\Z/q\Z)^*} |\Delta_{\Lambda^\sharp}(y;\, q,\, a)| \ll_A \frac{x}{(\log x)^A}$$
--/) (uses := [Delta_LambdaSharp_bound])]
+-/) (uses := [Delta_LambdaSharp_bound, sum_divisors_card_le])]
 theorem BV_LambdaSharp [ProofData] {A : ℕ} (Q : ℝ) (h1Q : 1 ≤ Q) (hQ : Q ≤ √x / (Real.log x)^(A+3)) :
-    ∑ q ∈ Nat.Icc 0 Q, maxya q (fun y a ↦ Δ_[Λ♯](y; q, a)) ≤ x / (Real.log x)^A := by
+    ∑ q ∈ Nat.Icc 0 Q, maxya q (fun y a ↦ Δ_[Λ♯](y; q, a)) ≤ C_BVLS * (x / (Real.log x)^A) := by
   sorry
