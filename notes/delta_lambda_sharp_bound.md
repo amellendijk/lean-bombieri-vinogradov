@@ -162,11 +162,31 @@ theorem Delta_LambdaSharp_bound [ProofData] {q r : ℕ} [NeZero q] {a : ZMod q}
     |Δ_[onCoprime r Λ♯](y; q, a)| ≤ C_DLS * r.divisors.card * U * V * Real.log x
 ```
 
-This is harmless downstream. In the Type II section `Λ♭_r` is used with
-`q ≤ (log x)^C` and `U = V = e^{√log x}` (so `UV ≤ √x`), targeting
-`≪_{A,C} x/(log x)^A`. Since `τ(r) ≪_ε r^ε ≤ x^ε`, we have
-`τ(r)·UV·log x ≤ x^{1/2+ε}·log x = o(x/(log x)^A)`, so the extra `τ(r)`
-disappears into the existing slack.
+This is harmless downstream, **but only if `τ(r)` is averaged, not bounded
+termwise by `x^ε`.** In the Type I sum (`BV_LambdaSharp`) the bound is applied
+with `r = q` and summed over `q ≤ Q ≤ √x/(log x)^{A+3}`, with `UV ≤ √x`:
+```
+∑_{q ≤ Q} |Δ_{Λ♯_q}(y;q,a)| ≤ C · UV log x · ∑_{q ≤ Q} τ(q).
+```
+The naive termwise bound `τ(q) ≪_ε q^ε ≤ x^ε` is **fatal here**: there are
+`∼ Q ≍ √x` terms, so `∑_{q≤Q} x^ε · UV log x ≈ √x · x^ε · √x · log x =
+x^{1+ε} log x`, which is far larger than the target `x/(log x)^A`. The `x^ε`
+loss is per-term and never averaged, so summing reinstates a full power of `x`.
+
+The correct route is the **Dirichlet divisor average**
+```
+∑_{q ≤ Q} τ(q) ≪ Q log Q ≤ Q log x,
+```
+which spends only a `log x` on the whole sum (a *second* `log x` beyond the one
+already in `UV log x`, hence the "`(log x)^2` loss"). With `Q ≤ √x/(log x)^{A+3}`
+and `UV ≤ √x`:
+```
+∑_{q ≤ Q} |Δ_{Λ♯_q}| ≪ √x · log x · (Q log x)
+                     ≤ √x · log x · ( √x/(log x)^{A+3} · log x )
+                     = x / (log x)^{A+1}  ≤  x/(log x)^A.
+```
+So `τ(q)` must be **kept inside the `q`-sum** and controlled on average via
+`∑_{q≤Q} τ(q) ≪ Q log Q`; replacing it pointwise by `x^ε` destroys the bound.
 
 ---
 
