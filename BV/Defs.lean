@@ -164,6 +164,24 @@ lemma log_x_pos : 0 < Real.log x := by
   apply Real.log_pos
   linarith only [le_x]
 
+/-- Under `ProofData`, the constraints `exp(√(log x)) ≤ U, V` and `U·V ≤ √x`
+force `log x` to be large; in particular `1 ≤ log x`. -/
+theorem one_le_log_x : 1 ≤ Real.log x := by
+  have hlogx : 0 < Real.log x := log_x_pos
+  -- `exp(2√L) ≤ U·V ≤ √x`
+  have hUV : Real.exp (Real.sqrt (Real.log x) + Real.sqrt (Real.log x)) ≤ Real.sqrt x := by
+    rw [Real.exp_add]
+    calc Real.exp (Real.sqrt (Real.log x)) * Real.exp (Real.sqrt (Real.log x))
+        ≤ U * V := mul_le_mul le_U le_V (le_of_lt (Real.exp_pos _)) ProofData.U_nonneg
+      _ ≤ Real.sqrt x := ProofData.UV_le
+  -- take logs: `2√L ≤ log(√x) = L/2`
+  have h1 : Real.sqrt (Real.log x) + Real.sqrt (Real.log x) ≤ Real.log (Real.sqrt x) := by
+    have := Real.log_le_log (Real.exp_pos _) hUV
+    rwa [Real.log_exp] at this
+  rw [Real.log_sqrt ProofData.x_nonneg] at h1
+  have ht : Real.sqrt (Real.log x) ^ 2 = Real.log x := Real.sq_sqrt (le_of_lt hlogx)
+  nlinarith [Real.sqrt_nonneg (Real.log x), hlogx, h1, ht]
+
 open Qq Lean Meta Mathlib.Meta.Positivity in
 @[positivity Real.log x]
 def x_positivity : PositivityExt where eval {u α} _ _ e := do
@@ -231,6 +249,17 @@ theorem maxya_le {q : ℕ} {f : ℝ → ZMod q → ℝ} {M : ℝ} (hf : ∀ y, �
   intro a
   apply maxy_le _ hM
   grind
+
+/-- Units-only version of `maxya_le`: it suffices to bound `f y a` for unit `a`. -/
+theorem maxya_le_unit {q : ℕ} {f : ℝ → ZMod q → ℝ} {M : ℝ}
+    (hf : ∀ y, √x ≤ y → y ≤ x → ∀ a : ZMod q, IsUnit a → f y a ≤ M) (hM : 0 ≤ M) :
+    maxya q f ≤ M := by
+  rw [maxya]
+  apply Real.iSup_le _ hM
+  intro a
+  apply maxy_le _ hM
+  intro y hy1 hy2
+  exact hf y hy1 hy2 a a.isUnit
 
 /-- Restrict an arithmetic function to a set, setting all values outside the set to zero.
 Like `Set.indicator` but for `ArithmeticFunction`. -/

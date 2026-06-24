@@ -48,6 +48,24 @@ lemma DirichletCharacter.one_natCast_apply {q : ℕ} [NeZero q] (n : ℕ) :
 
 notation3 "Δ_[" f "](" x "; " q ", " a ")" => Delta f x q a
 
+/-- For a unit `a`, restricting `f` to integers coprime to `q` does not change `Δ_[f](y; q, a)`,
+since `n ≡ a (mod q)` with `a` a unit forces `q.Coprime n`. -/
+theorem Delta_onCoprime_self {R : Type*} [Field R] (f : ℕ → R) (y : ℝ) {q : ℕ} {a : ZMod q}
+    (ha : IsUnit a) :
+    Δ_[onCoprime q f](y; q, a) = Δ_[f](y; q, a) := by
+  have hind : (Nat.modEqs (a : ZMod q)).indicator (onCoprime q f)
+      = (Nat.modEqs (a : ZMod q)).indicator f := by
+    funext n
+    by_cases h : n ∈ Nat.modEqs (a : ZMod q)
+    · rw [Set.indicator_of_mem h, Set.indicator_of_mem h, onCoprime_apply, if_pos]
+      rw [Nat.mem_modEqs] at h
+      have hu : IsUnit (n : ZMod q) := h ▸ ha
+      exact ((ZMod.isUnit_iff_coprime n q).mp hu).symm
+    · rw [Set.indicator_of_notMem h, Set.indicator_of_notMem h]
+  have hcop : onCoprime q (onCoprime q f) = onCoprime q f := by
+    funext n; simp only [onCoprime_apply]; split_ifs <;> rfl
+  simp only [Delta, hind, hcop]
+
 @[fun_prop]
 lemma isLocallyBounded_Delta {R : Type*} [NormedField R] (f : ℕ → R) (q : ℕ) (a : ZMod q) :
     IsLocallyBounded fun x ↦ Δ_[f](x; q, a) := by

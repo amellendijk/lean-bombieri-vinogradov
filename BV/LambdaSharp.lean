@@ -12,7 +12,7 @@ def C_DLS : ℝ := 6
 def C_tau : ℝ := 3
 
 /-- Constant in the Type I sum bound `BV_LambdaSharp`. -/
-def C_BVLS : ℝ := sorry
+def C_BVLS : ℝ := C_DLS * C_tau
 
 /-! ### Group D: `Δ` is linear in its function argument -/
 
@@ -584,4 +584,113 @@ $$\sum_{q \le Q} \max_{\sqrt{x} \le y \le x} \max_{a \in (\Z/q\Z)^*} |\Delta_{\L
 -/) (uses := [Delta_LambdaSharp_bound, sum_divisors_card_le])]
 theorem BV_LambdaSharp [ProofData] {A : ℕ} (Q : ℝ) (h1Q : 1 ≤ Q) (hQ : Q ≤ √x / (Real.log x)^(A+3)) :
     ∑ q ∈ Nat.Icc 0 Q, maxya q (fun y a ↦ Δ_[Λ♯](y; q, a)) ≤ C_BVLS * (x / (Real.log x)^A) := by
-  sorry
+  have hL1 : 1 ≤ Real.log x := one_le_log_x
+  have hLpos : 0 < Real.log x := log_x_pos
+  have hUnonneg : (0:ℝ) ≤ U := ProofData.U_nonneg
+  have hVnonneg : (0:ℝ) ≤ V := ProofData.V_nonneg
+  have hUVle : U * V ≤ √x := ProofData.UV_le
+  have hsqrt_nonneg : (0:ℝ) ≤ √x := Real.sqrt_nonneg x
+  have hsqrt_le_x : √x ≤ x := by
+    rw [Real.sqrt_le_iff]
+    exact ⟨ProofData.x_nonneg, le_self_pow₀ (by linarith [ProofData.le_x]) (by norm_num)⟩
+  -- `(log x)^(A+3) ≥ 1`, hence `Q ≤ √x ≤ x`.
+  have hpowge : (1:ℝ) ≤ (Real.log x)^(A+3) := one_le_pow₀ hL1
+  have hQ_le_sqrt : Q ≤ √x := by
+    refine hQ.trans ?_
+    rw [div_le_iff₀ (by positivity)]
+    nlinarith [hsqrt_nonneg, hpowge]
+  have hQ_le_x : Q ≤ x := hQ_le_sqrt.trans hsqrt_le_x
+  -- `2 ≤ √x` (so every `y ∈ [√x, x]` satisfies `2 ≤ y`).
+  have hsqx2 : 2 ≤ √x := by
+    have heU : Real.exp 1 ≤ U := by
+      refine le_trans (Real.exp_le_exp.mpr ?_) le_U
+      calc (1:ℝ) = Real.sqrt 1 := by simp
+        _ ≤ Real.sqrt (Real.log x) := Real.sqrt_le_sqrt hL1
+    calc (2:ℝ) ≤ Real.exp 1 := by linarith [Real.exp_one_gt_d9]
+      _ ≤ U := heU
+      _ ≤ √x := ProofData.U_le_sqrt_x
+  -- Per-term bound: `maxya q (Δ_[Λ♯]) ≤ C_DLS · τ(q) · U · V · log x`.
+  have hterm : ∀ q ∈ Nat.Icc (0:ℝ) Q, maxya q (fun y a ↦ Δ_[Λ♯](y; q, a))
+      ≤ C_DLS * (q.divisors.card : ℝ) * U * V * Real.log x := by
+    intro q hq
+    have hqQ : (q:ℝ) ≤ Q := ((Nat.mem_Icc _ _).mp hq).2
+    have hqx : (q:ℝ) ≤ x := hqQ.trans hQ_le_x
+    rcases Nat.eq_zero_or_pos q with hq0 | hqpos
+    · -- `q = 0`: `τ(0) = 0` and `Δ_[Λ♯](y; 0, a) = 0` for unit `a`.
+      subst hq0
+      apply maxya_le_unit
+      · intro y _ _ a ha
+        have hz : onCoprime 0 (⇑(Λ♯ : ArithmeticFunction ℝ)) = fun _ => (0:ℝ) := by
+          funext n
+          rw [onCoprime_apply]
+          split_ifs with h
+          · rw [Nat.coprime_zero_left] at h
+            subst h
+            have hsub : (Λ♯ : ArithmeticFunction ℝ) 1
+                = (μ≤V * log) 1 - (Λ≤U * μ≤V * (ζ : ArithmeticFunction ℝ)) 1 := rfl
+            rw [hsub, ArithmeticFunction.mul_apply_one, ArithmeticFunction.mul_apply_one,
+              ArithmeticFunction.mul_apply_one]
+            simp [ArithmeticFunction.log_apply, LambdaLEU_apply_of_le, ProofData.one_le_U]
+          · rfl
+        rw [(Delta_onCoprime_self _ y ha).symm, hz]
+        simp [Delta, summatory, onCoprime]
+      · simp
+    · -- `q ≥ 1`: use `Delta_LambdaSharp_bound` with `r = q`.
+      haveI : NeZero q := ⟨hqpos.ne'⟩
+      apply maxya_le_unit
+      · intro y hy1 hy2 a ha
+        have h2y : 2 ≤ y := le_trans hsqx2 hy1
+        have hbound := Delta_LambdaSharp_bound (q := q) (r := q) ha hqx h2y hy2
+        rw [(Delta_onCoprime_self _ y ha).symm]
+        exact (le_abs_self _).trans hbound
+      · have : (0:ℝ) ≤ (q.divisors.card : ℝ) := by positivity
+        have : (0:ℝ) ≤ C_DLS := by rw [C_DLS]; norm_num
+        positivity
+  -- Sum the per-term bounds and factor out the constants.
+  have hsum1 := Finset.sum_le_sum hterm
+  have hfactor : ∑ q ∈ Nat.Icc (0:ℝ) Q, C_DLS * (q.divisors.card : ℝ) * U * V * Real.log x
+      = C_DLS * U * V * Real.log x * ∑ q ∈ Nat.Icc (0:ℝ) Q, (q.divisors.card : ℝ) := by
+    rw [Finset.mul_sum]
+    exact Finset.sum_congr rfl (fun q _ => by ring)
+  -- Divisor average: `∑_{q ≤ Q} τ(q) ≤ C_tau · Q · log x`.
+  have hS : ∑ q ∈ Nat.Icc (0:ℝ) Q, (q.divisors.card : ℝ) ≤ C_tau * Q * Real.log x := by
+    by_cases hQ2 : 2 ≤ Q
+    · refine (sum_divisors_card_le hQ2).trans ?_
+      have hlogQ : Real.log Q ≤ Real.log x := Real.log_le_log (by linarith) hQ_le_x
+      have hCQ : (0:ℝ) ≤ C_tau * Q := by rw [C_tau]; positivity
+      nlinarith [hCQ, hlogQ]
+    · have hQ2' : Q < 2 := lt_of_not_ge hQ2
+      have h0Q : (0:ℝ) ≤ Q := by linarith
+      have hfloor : ⌊Q⌋₊ = 1 := by
+        rw [Nat.floor_eq_iff h0Q]
+        exact ⟨by exact_mod_cast h1Q, by push_cast; linarith⟩
+      have hsum_eq : ∑ q ∈ Nat.Icc (0:ℝ) Q, (q.divisors.card : ℝ) = 1 := by
+        rw [show Nat.Icc (0:ℝ) Q = Finset.Icc 0 1 by
+          rw [Nat.Icc, if_pos ⟨h0Q, h0Q⟩]; simp [hfloor]]
+        simp [Finset.sum_Icc_succ_top]
+      rw [hsum_eq, C_tau]
+      nlinarith [hL1, h1Q]
+  -- Final assembly.
+  refine (hsum1.trans (le_of_eq hfactor)).trans ?_
+  have hcoef : (0:ℝ) ≤ C_DLS * U * V * Real.log x := by
+    have : (0:ℝ) ≤ C_DLS := by rw [C_DLS]; norm_num
+    positivity
+  refine (mul_le_mul_of_nonneg_left hS hcoef).trans ?_
+  -- `C_DLS · U · V · L · (C_tau · Q · L) ≤ C_BVLS · x / L^A`.
+  have hQ3 : Q * (Real.log x)^(A+3) ≤ √x := (le_div_iff₀ (by positivity)).mp hQ
+  have hQpow : (0:ℝ) ≤ Q := by linarith
+  -- `Q · L^(A+2) ≤ Q · L^(A+3) ≤ √x`.
+  have hQ2pow : Q * (Real.log x)^(A+2) ≤ √x :=
+    le_trans (mul_le_mul_of_nonneg_left (pow_le_pow_right₀ hL1 (by omega)) hQpow) hQ3
+  -- `(U·V) · (Q·L^(A+2)) ≤ √x · √x = x`.
+  have hkey : U * V * (Q * (Real.log x)^(A+2)) ≤ x := by
+    calc U * V * (Q * (Real.log x)^(A+2))
+        ≤ √x * √x := mul_le_mul hUVle hQ2pow (by positivity) hsqrt_nonneg
+      _ = x := Real.mul_self_sqrt ProofData.x_nonneg
+  rw [C_BVLS, ← mul_div_assoc, le_div_iff₀ (by positivity : (0:ℝ) < (Real.log x)^A)]
+  have hLA2 : (Real.log x)^(A+2) = (Real.log x)^A * (Real.log x)^2 := by rw [pow_add]
+  calc C_DLS * U * V * Real.log x * (C_tau * Q * Real.log x) * (Real.log x)^A
+      = C_DLS * C_tau * (U * V * (Q * (Real.log x)^(A+2))) := by rw [hLA2]; ring
+    _ ≤ C_DLS * C_tau * x := by
+        apply mul_le_mul_of_nonneg_left hkey
+        rw [C_DLS, C_tau]; norm_num
