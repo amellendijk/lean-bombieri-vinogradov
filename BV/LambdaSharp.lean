@@ -6,17 +6,32 @@ import BV.Dilate
 open ArithmeticFunction BV ProofData
 open scoped Moebius zeta
 
-def C_DLS : ℝ := sorry
+def C_DLS : ℝ := 6
 
 /-! ### Group D: `Δ` is linear in its function argument -/
 
 theorem Delta_sub {R : Type*} [Field R] (f g : ℕ → R) (x : ℝ) (q : ℕ) (a : ZMod q) :
     Δ_[f - g](x; q, a) = Δ_[f](x; q, a) - Δ_[g](x; q, a) := by
-  sorry
+  have hind : (Nat.modEqs (a : ZMod q)).indicator (f - g)
+      = fun n => (Nat.modEqs (a : ZMod q)).indicator f n
+          - (Nat.modEqs (a : ZMod q)).indicator g n := by
+    funext n; by_cases h : n ∈ Nat.modEqs (a : ZMod q) <;> simp [h]
+  have hcop : onCoprime q (f - g)
+      = fun n => onCoprime q f n - onCoprime q g n := by
+    funext n; simp only [onCoprime, Pi.sub_apply]; split_ifs <;> simp
+  simp only [Delta, hind, hcop, summatory_sub_distrib]
+  ring
 
 theorem Delta_smul {R : Type*} [Field R] (c : R) (f : ℕ → R) (x : ℝ) (q : ℕ) (a : ZMod q) :
     Δ_[c • f](x; q, a) = c • Δ_[f](x; q, a) := by
-  sorry
+  have hind : (Nat.modEqs (a : ZMod q)).indicator (c • f)
+      = fun n => c • (Nat.modEqs (a : ZMod q)).indicator f n := by
+    funext n; by_cases h : n ∈ Nat.modEqs (a : ZMod q) <;> simp [h]
+  have hcop : onCoprime q (c • f)
+      = fun n => c • onCoprime q f n := by
+    funext n; simp only [onCoprime, Pi.smul_apply]; split_ifs <;> simp
+  simp only [Delta, hind, hcop, smul_eq_mul, summatory, ← Finset.mul_sum]
+  ring
 
 theorem Delta_add {R : Type*} [Field R] (f g : ℕ → R) (x : ℝ) (q : ℕ) (a : ZMod q) :
     Δ_[f + g](x; q, a) = Δ_[f](x; q, a) + Δ_[g](x; q, a) := by
@@ -33,7 +48,12 @@ theorem Delta_add {R : Type*} [Field R] (f g : ℕ → R) (x : ℝ) (q : ℕ) (a
 theorem Delta_finset_sum {R : Type*} [Field R] {ι : Type*} (s : Finset ι) (F : ι → ℕ → R)
     (x : ℝ) (q : ℕ) (a : ZMod q) :
     Δ_[∑ i ∈ s, F i](x; q, a) = ∑ i ∈ s, Δ_[F i](x; q, a) := by
-  sorry
+  classical
+  induction s using Finset.induction with
+  | empty =>
+      simp [Delta, summatory, onCoprime]
+  | insert i s hi ih =>
+      rw [Finset.sum_insert hi, Finset.sum_insert hi, Delta_add, ih]
 
 /-! ### Group C: Möbius expansion of the restricted analytic factor
 
@@ -465,7 +485,30 @@ summand. The number of summands contributes the $\tau(r)$ factor.
 theorem Delta_LambdaSharp_bound [ProofData] {q r : ℕ} [NeZero q] {a : ZMod q} (ha : IsUnit a)
     (hr : r ≤ x) {y : ℝ} (h2y : 2 ≤ y) (hy : y ≤ x) :
     |Δ_[onCoprime r ⇑Λ♯](y; q, a)| ≤ C_DLS * (r.divisors.card : ℝ) * U * V * Real.log x := by
-  sorry
+  -- Split `Λ♯ = μ≤V * log - Λ≤U * μ≤V * ζ` inside the (coprime-restricted) `Δ`.
+  have hsplit : onCoprime r ⇑Λ♯
+      = onCoprime r ⇑(μ≤V * log) - onCoprime r ⇑(Λ≤U * μ≤V * (ζ : ArithmeticFunction ℝ)) := by
+    funext n
+    simp only [LambdaSharp, onCoprime_apply, Pi.sub_apply]
+    split_ifs
+    · rfl
+    · rw [sub_zero]
+  rw [hsplit, Delta_sub]
+  have hT1 := Delta_term1_bound ha hr h2y hy
+  have hT2 := Delta_term2_bound ha hr h2y hy
+  have hτ : (0:ℝ) ≤ (r.divisors.card : ℝ) := by positivity
+  have hU : (1:ℝ) ≤ U := ProofData.one_le_U
+  have hV : (0:ℝ) ≤ V := ProofData.V_nonneg
+  have hlogx : (0:ℝ) ≤ Real.log x := Real.log_nonneg (by linarith [ProofData.le_x])
+  have habs : |Δ_[onCoprime r ⇑(μ≤V * log)](y; q, a)
+        - Δ_[onCoprime r ⇑(Λ≤U * μ≤V * (ζ : ArithmeticFunction ℝ))](y; q, a)|
+      ≤ |Δ_[onCoprime r ⇑(μ≤V * log)](y; q, a)|
+        + |Δ_[onCoprime r ⇑(Λ≤U * μ≤V * (ζ : ArithmeticFunction ℝ))](y; q, a)| := by
+    rw [sub_eq_add_neg]; exact (abs_add_le _ _).trans_eq (by rw [abs_neg])
+  refine habs.trans ?_
+  refine (add_le_add hT1 hT2).trans ?_
+  simp only [C_DLS]
+  nlinarith [mul_nonneg (mul_nonneg (mul_nonneg hτ hV) hlogx) (by linarith : (0:ℝ) ≤ U - 1)]
 
 @[blueprint (statement := /--
 For each fixed $A \ge 0$, $x \ge 2$ and $1 \le Q \le \sqrt{x}/(\log x)^{A+3}$,
