@@ -235,7 +235,7 @@ By Möbius inversion,
 $$G_P(q) = \sum_{d \mid q} \mu(q/d)\, F_P(d) = \sum_{d \mid q} \mu(q/d)\, \Delta_{f_{rP}}(y;\, d,\, a).$$
 Set $P = q$ to conclude.
 -/) (uses := [character_sum_by_conductor])]
-theorem character_sum_Mobius (f : ArithmeticFunction ℝ) {r q : ℕ} {x : ℝ} {a : ZMod q} (hq : 1 < q) (hrx : r ≤ x) (ha : IsUnit a) :
+theorem character_sum_Mobius (f : ArithmeticFunction ℝ) {r q : ℕ} {x : ℝ} {a : ZMod q} (hq : 1 < q) (ha : IsUnit a) :
   open Classical in
     ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive, star (ξ a) * summatory (fun n ↦ ξ n * onCoprime r f n) x =
       ∑ p ∈ q.divisorsAntidiagonal, μ p.2 * p.1.totient * Δ_[onCoprime (r*q) f](x; p.1, a.cast) := by
@@ -300,11 +300,184 @@ theorem character_sum_Mobius (f : ArithmeticFunction ℝ) {r q : ℕ} {x : ℝ} 
     simp only [Complex.ofReal_mul, Complex.ofReal_intCast, Complex.ofReal_natCast]
   rw [hLeft, hRHS]
 
+/-- `Λ♭ 1 = 0`: the flat part vanishes at `1` because its rightmost factor `μ - μ≤V` does. -/
+theorem LambdaFlat_apply_one [ProofData] : Λ♭ 1 = 0 := by
+  have hμ : (μ - μ≤V) 1 = 0 := by
+    have hsub : (μ - μ≤V) 1 = (μ 1 : ℝ) - μ≤V 1 := rfl
+    rw [hsub, moebiusLEV,
+      on_apply_of_mem _ _ _ (by
+        simp only [Set.mem_Icc]
+        exact ⟨le_refl 1, Nat.le_floor (by simpa using one_le_V)⟩)]
+    simp
+  simp [LambdaFlat, ArithmeticFunction.mul_apply, hμ]
+
+/-- For `q = 0`, the discrepancy of `Λ♭` vanishes: the only natural number congruent to a unit
+`a : ZMod 0 = ℤ` is `1` (when `a = 1`), where `Λ♭` vanishes. -/
+theorem Delta_LambdaFlat_zero [ProofData] {y : ℝ} {a : ZMod 0} (ha : IsUnit a) :
+    Δ_[Λ♭](y; 0, a) = 0 := by
+  rw [Delta]
+  simp only [Nat.totient_zero, Nat.cast_zero, inv_zero, zero_mul, sub_zero, summatory]
+  apply Finset.sum_eq_zero
+  intro i hi
+  by_cases hmem : i ∈ Nat.modEqs a
+  · rw [Set.indicator_of_mem hmem]
+    rw [Nat.mem_modEqs] at hmem
+    have hi1 : i = 1 := by
+      rcases Int.isUnit_iff.mp ha with h1 | h1
+      · have : (i : ℤ) = 1 := by exact_mod_cast h1 ▸ hmem
+        exact_mod_cast this
+      · exfalso
+        have hnn : (0 : ℤ) ≤ (i : ℤ) := Int.natCast_nonneg i
+        have : (i : ℤ) = -1 := by exact_mod_cast h1 ▸ hmem
+        rw [this] at hnn; norm_num at hnn
+    rw [hi1, LambdaFlat_apply_one]
+  · rw [Set.indicator_of_notMem hmem]
+
+/-- For `d ∣ q`, restricting coprimality to `q * d` is the same as restricting to `q`. -/
+theorem onCoprime_mul_eq_of_dvd {R : Type*} [Zero R] {f : ℕ → R} {q d : ℕ} (hdq : d ∣ q) :
+    onCoprime (q * d) f = onCoprime q f := by
+  funext n
+  simp only [onCoprime_apply, Nat.coprime_mul_iff_left]
+  by_cases h : q.Coprime n
+  · rw [if_pos ⟨h, Nat.Coprime.coprime_dvd_left hdq h⟩, if_pos h]
+  · rw [if_neg (fun hc => h hc.1), if_neg h]
+
 @[blueprint (latexEnv := "lemma") (statement := /--
 $$\left|\Delta_{\Lambda^\flat}(y;\, q,\, a)\right| \le \frac{1}{\varphi(q)} \left|\sum_{\substack{d \mid q \\ 1 < d \le (\log x)^C}} \sum_{s \mid d} \mu(d/s)\,\varphi(s)\,\Delta_{\Lambda^\flat_q}(y;\,s,\,a)\right| + \frac{1}{\varphi(q)} \sum_{\substack{d \mid q \\ d > (\log x)^C}} \sumstar_{\xi \pmod{d}} S_{q/d}(y, \xi)$$
 -/) (uses := [character_sum_by_conductor, character_sum_Mobius, S])]
 theorem Delta_LambdaFlat_decomp [ProofData] {C : ℕ} {y : ℝ} (q : ℕ) (a : ZMod q) (ha : IsUnit a)  :
-  |Δ_[Λ♭](y; q, a)| ≤ (q.totient : ℝ)⁻¹ * |∑ d ∈ q.divisors with 1 < (d : ℕ) ∧ ↑d ≤ (Real.log x)^C, ∑ p ∈ d.divisorsAntidiagonal, μ p.2 * p.1.totient * Δ_[onCoprime q Λ♭](y; p.1, a.cast)| := by sorry
+  open Classical in
+  |Δ_[Λ♭](y; q, a)| ≤ (q.totient : ℝ)⁻¹ * |∑ d ∈ q.divisors with 1 < (d : ℕ) ∧ ↑d ≤ (Real.log x)^C, ∑ p ∈ d.divisorsAntidiagonal, μ p.2 * p.1.totient * Δ_[onCoprime q Λ♭](y; p.1, a.cast)|
+    + (q.totient : ℝ)⁻¹ * ∑ d ∈ q.divisors with (Real.log x)^C < (d : ℕ), ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive, S (q/d) y ξ := by
+  classical
+  rcases Nat.eq_zero_or_pos q with rfl | hqpos
+  · -- `q = 0`: the discrepancy vanishes and the right-hand side is `0`.
+    rw [Delta_LambdaFlat_zero ha, abs_zero]
+    simp [Nat.divisors_zero]
+  haveI : NeZero q := ⟨hqpos.ne'⟩
+  set L : ℝ := (Real.log x) ^ C with hL_def
+  have hg : ∀ n, onCoprime q ⇑Λ♭ n ≠ 0 → q.Coprime n := by
+    intro n hn
+    rw [onCoprime_apply] at hn
+    split_ifs at hn with h
+    · exact h
+    · exact absurd rfl hn
+  have hφ : (q.totient : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.totient_pos.mpr hqpos).ne'
+  -- Master identity: write `Δ` as a sum of `GinnerTerm`s over the nontrivial divisors of `q`.
+  have hΔg : Δ_[onCoprime q ⇑Λ♭](y; q, a) = Δ_[Λ♭](y; q, a) := Delta_onCoprime_self _ _ ha
+  have hmaster : (↑(Δ_[Λ♭](y; q, a)) : ℂ)
+      = (q.totient : ℂ)⁻¹ * ∑ d ∈ q.divisors with d ≠ 1, GinnerTerm a (onCoprime q ⇑Λ♭) y d := by
+    have hkey := totient_mul_Delta_eq (g := onCoprime q ⇑Λ♭) ha hg (dvd_refl q) (x := y)
+    rw [ZMod.cast_id q a, hΔg] at hkey
+    have hfilt : (∑ i ∈ q.divisors, if i = 1 then 0 else GinnerTerm a (onCoprime q ⇑Λ♭) y i)
+        = ∑ i ∈ q.divisors with i ≠ 1, GinnerTerm a (onCoprime q ⇑Λ♭) y i := by
+      rw [Finset.sum_filter]
+      apply Finset.sum_congr rfl
+      intro i _
+      by_cases h : i = 1 <;> simp [h]
+    rw [hfilt] at hkey
+    rw [← hkey, ← mul_assoc, inv_mul_cancel₀ hφ, one_mul]
+  -- On the small conductors, each `GinnerTerm` is the (real) Möbius/totient/Δ sum.
+  have hGsmall : ∀ d ∈ q.divisors.filter (fun d : ℕ => 1 < d ∧ (↑d : ℝ) ≤ L),
+      GinnerTerm a (onCoprime q ⇑Λ♭) y d = ↑(∑ p ∈ d.divisorsAntidiagonal,
+        (μ p.2 : ℝ) * p.1.totient * Δ_[onCoprime q ⇑Λ♭](y; p.1, a.cast)) := by
+    intro d hd
+    rw [Finset.mem_filter, Nat.mem_divisors] at hd
+    obtain ⟨⟨hdvd, _⟩, hd1, _⟩ := hd
+    have hcs := character_sum_Mobius Λ♭ (r := q) (x := y)
+      (a := (a.cast : ZMod d)) hd1 (isUnit_cast_of_dvd hdvd ha)
+    rw [GinnerTerm, hcs]
+    congr 1
+    apply Finset.sum_congr rfl
+    intro p hp
+    have hp1 : p.1 ∣ d := Nat.dvd_of_mem_divisors (Nat.fst_mem_divisors_of_mem_antidiagonal hp)
+    rw [onCoprime_mul_eq_of_dvd hdvd, cast_cast_of_dvd hp1 hdvd]
+  -- Split the master sum into small and large conductors.
+  have hsplit : (∑ d ∈ q.divisors with d ≠ 1, GinnerTerm a (onCoprime q ⇑Λ♭) y d)
+      = (∑ d ∈ q.divisors with 1 < (d:ℕ) ∧ (↑d:ℝ) ≤ L, GinnerTerm a (onCoprime q ⇑Λ♭) y d)
+        + ∑ d ∈ q.divisors with L < ((d:ℕ):ℝ), GinnerTerm a (onCoprime q ⇑Λ♭) y d := by
+    rw [← Finset.sum_filter_add_sum_filter_not (q.divisors.filter (· ≠ 1))
+        (fun d : ℕ => (↑d:ℝ) ≤ L)]
+    have hL1 : (1:ℝ) ≤ L := by rw [hL_def]; exact one_le_pow₀ one_le_log_x
+    congr 1
+    · apply Finset.sum_congr _ (fun _ _ => rfl)
+      rw [Finset.filter_filter]
+      apply Finset.filter_congr
+      intro d hd
+      have hd0 : d ≠ 0 := (Nat.pos_of_mem_divisors hd).ne'
+      constructor
+      · rintro ⟨hne, hle⟩; exact ⟨by omega, hle⟩
+      · rintro ⟨hlt, hle⟩; exact ⟨by omega, hle⟩
+    · apply Finset.sum_congr _ (fun _ _ => rfl)
+      rw [Finset.filter_filter]
+      apply Finset.filter_congr
+      intro d hd
+      have hd0 : d ≠ 0 := (Nat.pos_of_mem_divisors hd).ne'
+      constructor
+      · rintro ⟨_, hnle⟩; push_neg at hnle; exact hnle
+      · intro hlt
+        refine ⟨?_, by push_neg; exact hlt⟩
+        have : (1:ℝ) < (d:ℝ) := lt_of_le_of_lt hL1 hlt
+        have : 1 < d := by exact_mod_cast this
+        omega
+  -- The small part equals the real Möbius sum (as a complex number).
+  have hSsmallEq : (∑ d ∈ q.divisors with 1 < (d:ℕ) ∧ (↑d:ℝ) ≤ L, GinnerTerm a (onCoprime q ⇑Λ♭) y d)
+      = ↑(∑ d ∈ q.divisors with 1 < (d:ℕ) ∧ (↑d:ℝ) ≤ L,
+          ∑ p ∈ d.divisorsAntidiagonal, (μ p.2 : ℝ) * p.1.totient * Δ_[onCoprime q ⇑Λ♭](y; p.1, a.cast)) := by
+    rw [Complex.ofReal_sum]
+    exact Finset.sum_congr rfl hGsmall
+  -- The large part is bounded termwise by the character sums `S`.
+  have hSlargeBound : ‖∑ d ∈ q.divisors with L < ((d:ℕ):ℝ), GinnerTerm a (onCoprime q ⇑Λ♭) y d‖
+      ≤ ∑ d ∈ q.divisors with L < ((d:ℕ):ℝ),
+          ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive, S (q/d) y ξ := by
+    refine le_trans (norm_sum_le _ _) ?_
+    apply Finset.sum_le_sum
+    intro d hd
+    rw [Finset.mem_filter, Nat.mem_divisors] at hd
+    obtain ⟨⟨hdvd, _⟩, _⟩ := hd
+    rw [GinnerTerm]
+    refine le_trans (norm_sum_le _ _) ?_
+    apply Finset.sum_le_sum
+    intro ξ _
+    rw [norm_mul, norm_star]
+    have hnorm1 : ‖ξ (a.cast : ZMod d)‖ = 1 := by
+      have hau : IsUnit (a.cast : ZMod d) := isUnit_cast_of_dvd hdvd ha
+      rw [← hau.unit_spec]
+      exact DirichletCharacter.unit_norm_eq_one ξ hau.unit
+    rw [hnorm1, one_mul, S]
+    apply le_of_eq
+    congr 1
+    simp only [summatory]
+    apply Finset.sum_congr rfl
+    intro n _
+    by_cases hcop : d.Coprime n
+    · have heq : onCoprime q ⇑Λ♭ n = onCoprime (q/d) ⇑Λ♭ n := by
+        simp only [onCoprime_apply]
+        by_cases hq : q.Coprime n
+        · rw [if_pos hq, if_pos (Nat.Coprime.coprime_dvd_left (Nat.div_dvd_of_dvd hdvd) hq)]
+        · rw [if_neg hq, if_neg ?_]
+          intro hqd
+          apply hq
+          have hmul := Nat.Coprime.mul_left hcop hqd
+          rwa [Nat.mul_div_cancel' hdvd] at hmul
+      rw [heq, mul_comm]
+    · have hnu : ¬ IsUnit (↑n : ZMod d) := by
+        rw [ZMod.isUnit_iff_coprime]; exact fun h => hcop h.symm
+      rw [ξ.map_nonunit hnu]; ring
+  -- Assemble.
+  rw [show |Δ_[Λ♭](y; q, a)| = ‖(↑(Δ_[Λ♭](y; q, a)) : ℂ)‖ from (Complex.norm_real _).symm,
+     hmaster, norm_mul, norm_inv, Complex.norm_natCast, hsplit, ← mul_add]
+  apply mul_le_mul_of_nonneg_left _ (by positivity)
+  calc ‖(∑ d ∈ q.divisors with 1 < (d:ℕ) ∧ (↑d:ℝ) ≤ L, GinnerTerm a (onCoprime q ⇑Λ♭) y d)
+          + ∑ d ∈ q.divisors with L < ((d:ℕ):ℝ), GinnerTerm a (onCoprime q ⇑Λ♭) y d‖
+      ≤ ‖∑ d ∈ q.divisors with 1 < (d:ℕ) ∧ (↑d:ℝ) ≤ L, GinnerTerm a (onCoprime q ⇑Λ♭) y d‖
+        + ‖∑ d ∈ q.divisors with L < ((d:ℕ):ℝ), GinnerTerm a (onCoprime q ⇑Λ♭) y d‖ := norm_add_le _ _
+    _ ≤ |∑ d ∈ q.divisors with 1 < (d:ℕ) ∧ (↑d:ℝ) ≤ L,
+            ∑ p ∈ d.divisorsAntidiagonal, (μ p.2 : ℝ) * p.1.totient * Δ_[onCoprime q ⇑Λ♭](y; p.1, a.cast)|
+          + ∑ d ∈ q.divisors with L < ((d:ℕ):ℝ),
+              ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive, S (q/d) y ξ := by
+        rw [hSsmallEq, Complex.norm_real, Real.norm_eq_abs]
+        exact add_le_add (le_refl _) hSlargeBound
 
 
 def C_DLF (A C : ℝ) : ℝ := sorry
