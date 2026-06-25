@@ -129,6 +129,98 @@ theorem character_sum_by_conductor {R : Type*} [AddCommMonoid R] {q : ℕ} [NeZe
   rw [hLHS]
   exact hRHS.symm
 
+/-- If `q` is coprime to `n`, restricting to coprimality with `r` or with `r * q` agree at `n`. -/
+lemma onCoprime_mul_right_eq {R : Type*} [Zero R] {f : ℕ → R} {r q n : ℕ} (h : q.Coprime n) :
+    onCoprime r f n = onCoprime (r * q) f n := by
+  simp only [onCoprime_apply, Nat.coprime_mul_iff_left, and_iff_left h]
+
+/-- Casting a unit `a : ZMod q` down to `ZMod d` for `d ∣ q` yields a unit. -/
+lemma isUnit_cast_of_dvd {q d : ℕ} (hdq : d ∣ q) {a : ZMod q} (ha : IsUnit a) :
+    IsUnit (a.cast : ZMod d) := by
+  rw [← ZMod.castHom_apply (h := hdq) (R := ZMod d) a]
+  exact ha.map (ZMod.castHom hdq (ZMod d))
+
+/-- Casting `a : ZMod q` down through `ZMod d` and then `ZMod e` agrees with casting directly,
+for `e ∣ d ∣ q`. -/
+lemma cast_cast_of_dvd {q d e : ℕ} (hed : e ∣ d) (hdq : d ∣ q) (a : ZMod q) :
+    ((a.cast : ZMod d).cast : ZMod e) = (a.cast : ZMod e) := by
+  rw [show (a.cast : ZMod d) = ZMod.castHom hdq (ZMod d) a from (ZMod.castHom_apply a).symm,
+    show ((ZMod.castHom hdq (ZMod d) a).cast : ZMod e)
+        = ZMod.castHom hed (ZMod e) (ZMod.castHom hdq (ZMod d) a) from (ZMod.castHom_apply _).symm,
+    ← RingHom.comp_apply, ZMod.castHom_comp, ZMod.castHom_apply]
+
+/-- The key change-of-level identity: lifting a primitive character `ξ` mod `e` to level `d`
+(for `e ∣ d ∣ q`) does not change the summand `star (χ a) * ∑ χ(n) g(n)`, provided `g` is
+supported on integers coprime to `q`. -/
+lemma changeLevel_summand_eq {q : ℕ} {a : ZMod q} (ha : IsUnit a) {g : ℕ → ℝ}
+    (hg : ∀ n, g n ≠ 0 → q.Coprime n) {x : ℝ} {d e : ℕ}
+    (hed : e ∣ d) (hdq : d ∣ q) (ξ : DirichletCharacter ℂ e) :
+    star ((DirichletCharacter.changeLevel hed ξ) (a.cast : ZMod d))
+        * summatory (fun n : ℕ => (DirichletCharacter.changeLevel hed ξ) ↑n * ↑(g n)) x
+    = star (ξ (a.cast : ZMod e)) * summatory (fun n : ℕ => ξ ↑n * ↑(g n)) x := by
+  have hPartA : (DirichletCharacter.changeLevel hed ξ) (a.cast : ZMod d) = ξ (a.cast : ZMod e) := by
+    obtain ⟨u, hu⟩ := isUnit_cast_of_dvd hdq ha
+    rw [← hu, DirichletCharacter.changeLevel_eq_cast_of_dvd ξ hed u, hu, cast_cast_of_dvd hed hdq]
+  have hPartB : (fun n : ℕ => (DirichletCharacter.changeLevel hed ξ) ↑n * (↑(g n) : ℂ))
+      = (fun n : ℕ => ξ ↑n * ↑(g n)) := by
+    funext n
+    by_cases hgn : g n = 0
+    · simp [hgn]
+    · have hdn : d.Coprime n := (hg n hgn).coprime_dvd_left hdq
+      obtain ⟨v, hv⟩ := (ZMod.isUnit_iff_coprime n d).mpr hdn.symm
+      have : (DirichletCharacter.changeLevel hed ξ) (n : ZMod d) = ξ (n : ZMod e) := by
+        rw [← hv, DirichletCharacter.changeLevel_eq_cast_of_dvd ξ hed v, hv,
+          ← ZMod.castHom_apply (h := hed) (R := ZMod e), map_natCast]
+      rw [this]
+  rw [hPartA, hPartB]
+
+open Classical in
+/-- The inner sum over primitive characters mod `e` appearing in the Möbius decomposition. -/
+noncomputable def GinnerTerm {q : ℕ} (a : ZMod q) (g : ℕ → ℝ) (x : ℝ) (e : ℕ) : ℂ :=
+  ∑ ξ : DirichletCharacter ℂ e with ξ.IsPrimitive,
+    star (ξ (a.cast : ZMod e)) * summatory (fun n : ℕ => ξ ↑n * ↑(g n)) x
+
+open Classical in
+/-- `φ(d) Δ_g(x; d, a)` equals the sum over divisors `i ∣ d` of `GinnerTerm` (with the `i = 1`
+contribution removed). This is the conductor-grouping of `Delta_eq_sum_char`. -/
+lemma totient_mul_Delta_eq {q : ℕ} [NeZero q] {a : ZMod q} (ha : IsUnit a) {g : ℕ → ℝ}
+    (hg : ∀ n, g n ≠ 0 → q.Coprime n) {x : ℝ} {d : ℕ} (hdq : d ∣ q) :
+    (d.totient : ℂ) * ↑(Δ_[g](x; d, a.cast))
+      = ∑ i ∈ d.divisors, if i = 1 then 0 else GinnerTerm a g x i := by
+  classical
+  have hd0 : d ≠ 0 := fun h => (NeZero.ne q) (Nat.eq_zero_of_zero_dvd (h ▸ hdq))
+  haveI : NeZero d := ⟨hd0⟩
+  have hφ : (d.totient : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.totient_pos.mpr (NeZero.pos d)).ne'
+  have hDelta := Delta_eq_sum_char (𝕜 := ℝ) (f := g) (y := x) (q := d)
+    (a := (a.cast : ZMod d)) (isUnit_cast_of_dvd hdq ha)
+  simp only [Complex.coe_algebraMap] at hDelta
+  rw [hDelta, ← mul_assoc, mul_inv_cancel₀ hφ, one_mul]
+  -- Commute the summatory product to match `GinnerTerm`'s convention.
+  have horder : ∀ χ : DirichletCharacter ℂ d,
+      summatory (fun n : ℕ => (↑(g n) : ℂ) * χ ↑n) x
+        = summatory (fun n : ℕ => χ ↑n * ↑(g n)) x := by
+    intro χ; congr 1; funext n; rw [mul_comm]
+  simp_rw [horder]
+  rw [← Finset.sum_filter]
+  rw [character_sum_by_conductor (q := d)
+    (f := fun χ : DirichletCharacter ℂ d => star (χ (a.cast : ZMod d)) *
+      summatory (fun n : ℕ => χ ↑n * ↑(g n)) x)]
+  -- Rewrite each conductor-fibre summand via the change-of-level identity.
+  trans (∑ e ∈ (d.divisors.filter (· ≠ 1)).attach, GinnerTerm a g x (e : ℕ))
+  · apply Finset.sum_congr rfl
+    intro e _
+    have hed : (e : ℕ) ∣ d := Nat.dvd_of_mem_divisors (Finset.mem_filter.mp e.2).1
+    rw [GinnerTerm]
+    apply Finset.sum_congr rfl
+    intro ξ _
+    exact changeLevel_summand_eq ha hg hed hdq ξ
+  trans (∑ e ∈ d.divisors.filter (· ≠ 1), GinnerTerm a g x e)
+  · exact Finset.sum_attach _ _
+  rw [Finset.sum_filter]
+  apply Finset.sum_congr rfl
+  intro i _
+  by_cases h : i = 1 <;> simp [h]
+
 @[blueprint (latexEnv := "lemma") (statement := /--
 Let $f$ be an arithmetic function. For $r \le x$, $q > 1$ and $(a, q) = 1$,
 $$\sumstar_{\xi \pmod{q}} \bar\xi(a) \sum_{n \le y} \xi(n) f_r(n) = \sum_{d \mid q} \mu(q/d)\,\varphi(d)\,\Delta_{f_{rq}}(y;\, d,\, a)$$
@@ -146,7 +238,67 @@ Set $P = q$ to conclude.
 theorem character_sum_Mobius (f : ArithmeticFunction ℝ) {r q : ℕ} {x : ℝ} {a : ZMod q} (hq : 1 < q) (hrx : r ≤ x) (ha : IsUnit a) :
   open Classical in
     ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive, star (ξ a) * summatory (fun n ↦ ξ n * onCoprime r f n) x =
-      ∑ p ∈ q.divisorsAntidiagonal, μ p.2 * p.1.totient * Δ_[onCoprime (r*q) f](x; q, a) := by sorry
+      ∑ p ∈ q.divisorsAntidiagonal, μ p.2 * p.1.totient * Δ_[onCoprime (r*q) f](x; p.1, a.cast) := by
+  classical
+  haveI : NeZero q := ⟨by omega⟩
+  set g : ℕ → ℝ := onCoprime (r * q) ⇑f with hg_def
+  have hgsupp : ∀ n, g n ≠ 0 → q.Coprime n := by
+    intro n hn
+    rw [hg_def, onCoprime_apply] at hn
+    split_ifs at hn with h
+    · exact h.coprime_dvd_left (dvd_mul_left q r)
+    · exact absurd rfl hn
+  -- Step 1: rewrite the LHS as `GinnerTerm a g x q`.
+  have hLHS : (∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive,
+      star (ξ a) * summatory (fun n : ℕ => ξ ↑n * ↑(onCoprime r ⇑f n)) x) = GinnerTerm a g x q := by
+    rw [GinnerTerm]
+    apply Finset.sum_congr rfl
+    intro ξ _
+    rw [ZMod.cast_id q a]
+    have hfun : (fun n : ℕ => ξ ↑n * (↑(onCoprime r ⇑f n) : ℂ))
+        = (fun n : ℕ => ξ ↑n * ↑(g n)) := by
+      funext n
+      by_cases hξ : ξ (↑n) = 0
+      · simp [hξ]
+      · have hu : IsUnit (↑n : ZMod q) := by
+          by_contra hnu; exact hξ (ξ.map_nonunit hnu)
+        have hqn : q.Coprime n := ((ZMod.isUnit_iff_coprime n q).mp hu).symm
+        rw [hg_def, ← onCoprime_mul_right_eq hqn]
+    rw [hfun]
+  rw [hLHS]
+  -- Step 2: Möbius inversion over divisors of `q`.
+  set Gp : ℕ → ℂ := fun i => if i ∣ q ∧ i ≠ 1 then GinnerTerm a g x i else 0 with hGp_def
+  have hmoeb := (ArithmeticFunction.sum_eq_iff_sum_smul_moebius_eq (f := Gp)
+      (g := fun n => ∑ i ∈ n.divisors, Gp i)).mp (fun n _ => rfl) q (by omega)
+  have hGpq : Gp q = GinnerTerm a g x q := by
+    simp only [hGp_def]; rw [if_pos ⟨dvd_refl q, by omega⟩]
+  rw [hGpq] at hmoeb
+  rw [← hmoeb]
+  -- Step 3: identify both sides as a sum over `q.divisors`.
+  have hLeft : (∑ p ∈ q.divisorsAntidiagonal, μ p.1 • (∑ i ∈ p.2.divisors, Gp i))
+      = ∑ d ∈ q.divisors, (μ (q / d) : ℂ) * (d.totient : ℂ) * ↑(Δ_[g](x; d, a.cast)) := by
+    rw [Nat.sum_divisorsAntidiagonal' (f := fun a b => μ a • (∑ i ∈ b.divisors, Gp i))]
+    apply Finset.sum_congr rfl
+    intro d hd
+    have hdq : d ∣ q := Nat.dvd_of_mem_divisors hd
+    have hsum : (∑ i ∈ d.divisors, Gp i)
+        = ∑ i ∈ d.divisors, if i = 1 then 0 else GinnerTerm a g x i := by
+      apply Finset.sum_congr rfl
+      intro i hi
+      have hiq : i ∣ q := (Nat.dvd_of_mem_divisors hi).trans hdq
+      simp only [hGp_def]
+      by_cases h1 : i = 1 <;> simp [h1, hiq]
+    rw [hsum, ← totient_mul_Delta_eq ha hgsupp hdq, zsmul_eq_mul]
+    ring
+  have hRHS : (↑(∑ p ∈ q.divisorsAntidiagonal,
+        ↑(μ p.2) * ↑p.1.totient * Δ_[g](x; p.1, a.cast)) : ℂ)
+      = ∑ d ∈ q.divisors, (μ (q / d) : ℂ) * (d.totient : ℂ) * ↑(Δ_[g](x; d, a.cast)) := by
+    rw [Complex.ofReal_sum, Nat.sum_divisorsAntidiagonal
+      (f := fun d' e' => (↑(↑(μ e') * ↑d'.totient * Δ_[g](x; d', a.cast)) : ℂ))]
+    apply Finset.sum_congr rfl
+    intro d _
+    simp only [Complex.ofReal_mul, Complex.ofReal_intCast, Complex.ofReal_natCast]
+  rw [hLeft, hRHS]
 
 @[blueprint (latexEnv := "lemma") (statement := /--
 $$\left|\Delta_{\Lambda^\flat}(y;\, q,\, a)\right| \le \frac{1}{\varphi(q)} \left|\sum_{\substack{d \mid q \\ 1 < d \le (\log x)^C}} \sum_{s \mid d} \mu(d/s)\,\varphi(s)\,\Delta_{\Lambda^\flat_q}(y;\,s,\,a)\right| + \frac{1}{\varphi(q)} \sum_{\substack{d \mid q \\ d > (\log x)^C}} \sumstar_{\xi \pmod{d}} S_{q/d}(y, \xi)$$
