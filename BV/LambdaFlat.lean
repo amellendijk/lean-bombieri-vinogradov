@@ -502,6 +502,26 @@ theorem log_pow_le_const_mul_sqrt {x : ℝ} (hx : 1 ≤ x) (M : ℕ) :
         congr 2
         field_simp
 
+/-- Divisors pair as `(d, n/d)` around `√n`, so `τ(n) ≤ 2√n`.
+(Mathlib only has `Nat.card_divisors_le_self : τ(n) ≤ n`.) -/
+theorem card_divisors_le_two_mul_sqrt (n : ℕ) :
+    (n.divisors.card : ℝ) ≤ 2 * Real.sqrt n := by
+  sorry
+
+/-- For `x ≥ 1`, `δ > 0`: `(log x)^M ≤ (M/δ)^M · x^δ`. Generalizes
+`log_pow_le_const_mul_sqrt` (the `δ = 1/2` case); we use `δ = 1/4`. -/
+theorem log_pow_le_const_mul_rpow {x : ℝ} (hx : 1 ≤ x) (M : ℕ) {δ : ℝ} (hδ : 0 < δ) :
+    (Real.log x) ^ M ≤ ((M : ℝ) / δ) ^ M * x ^ δ := by
+  sorry
+
+/-- The sharp-term budget: with no constraint on `q` beyond `q ≤ √x`, the divisor factor
+`τ(q)` is absorbed by the `x^{1/4}` headroom, leaving `x/(log x)^K`. -/
+theorem card_divisors_mul_sqrt_mul_log_le_div [ProofData] {q : ℕ}
+    (hq : (q : ℝ) ≤ √x) (K : ℕ) :
+    (q.divisors.card : ℝ) * Real.sqrt x * Real.log x
+      ≤ 2 * (4 * ((K + 1 : ℕ) : ℝ)) ^ (K + 1) * (x / (Real.log x) ^ K) := by
+  sorry
+
 /-- For a pointwise-nonnegative `f`, `|Δ_[f](y; s, a)| ≤ 2 · ∑_{n≤y} f(n)`. -/
 theorem Delta_abs_le_two_summatory [ProofData] {y : ℝ} {s : ℕ} (hs : 0 < s) {a : ZMod s}
     {f : ℕ → ℝ} (hf : ∀ n, 0 ≤ f n) :
@@ -712,7 +732,7 @@ open Classical in
 noncomputable def C_DLF (A C : ℕ) : ℝ :=
   (C_SW (A + 2 * C + 1) (2 * C) + C_SW (A + 2 * C + 1) 0) * 2 ^ (A + 2 * C + 1)
   + 3 * (Real.log 2)⁻¹ * (2 * ((2 + (A + 2 * C + 1) : ℕ) : ℝ)) ^ (2 + (A + 2 * C + 1))
-  + C_DLS
+  + C_DLS * (2 * (4 * ((A + 2 * C + 2 : ℕ) : ℝ)) ^ (A + 2 * C + 2))
   + 2 * (2 * ((1 + (A + 2 * C + 1) : ℕ) : ℝ)) ^ (1 + (A + 2 * C + 1))
 
 /-- The Siegel–Walfisz constant is nonnegative (it bounds an absolute value). -/
@@ -740,12 +760,13 @@ theorem sqrt_mul_log_pow_le_div [ProofData] (j N : ℕ) :
         linear_combination (2 * ((j + N : ℕ) : ℝ)) ^ (j + N) * hsx
 
 /-- Per-term Type-II bound: for a small conductor `s ≤ (log x)^C` and a restriction modulus
-`q ≤ √x/(log x)^{A+2C+2}`, decomposing `Λ♭ = Λ - Λ♯ - Λ_{≤U}` and applying Siegel–Walfisz
-(main term), the sharp bound, and the small bound gives `|Δ_{Λ♭_q}| ≪ x/(log x)^{A+2C+1}`. -/
+`q ≤ √x`, decomposing `Λ♭ = Λ - Λ♯ - Λ_{≤U}` and applying Siegel–Walfisz (main term), the
+sharp bound, and the small bound gives `|Δ_{Λ♭_q}| ≪ x/(log x)^{A+2C+1}`. The divisor factor
+`τ(q)` from the sharp bound is absorbed via `τ(q) ≤ 2√q ≤ 2x^{1/4}`. -/
 theorem Delta_onCoprime_LambdaFlat_pointwise [ProofData] (A C : ℕ) {y : ℝ}
     (hy1 : √x ≤ y) (hyx : y ≤ x)
     {q s : ℕ} (hs0 : 0 < s) (hsq : s ∣ q) (hq0 : 0 < q)
-    (hq : (q:ℝ) ≤ √x / (Real.log x) ^ (A + 2 * C + 2))
+    (hq : (q:ℝ) ≤ √x)
     (hsC : (s:ℝ) ≤ (Real.log x) ^ C) {a : ZMod s} (ha : IsUnit a) :
     |Δ_[onCoprime q ⇑Λ♭](y; s, a)|
       ≤ C_DLF A C * (x / (Real.log x) ^ (A + 2 * C + 1)) := by
@@ -756,8 +777,7 @@ theorem Delta_onCoprime_LambdaFlat_pointwise [ProofData] (A C : ℕ) {y : ℝ}
   have hsqrt_le_x : Real.sqrt x ≤ x := by
     have h1 : 1 ≤ Real.sqrt x := Real.one_le_sqrt.mpr (by linarith [le_x])
     nlinarith [Real.sq_sqrt x_nonneg, h1, Real.sqrt_nonneg x]
-  have hq_sqrt : (q:ℝ) ≤ Real.sqrt x :=
-    le_trans hq (div_le_self (Real.sqrt_nonneg x) (one_le_pow₀ one_le_log_x))
+  have hq_sqrt : (q:ℝ) ≤ Real.sqrt x := hq
   -- 4 ≤ x, 2 ≤ √x ≤ y
   have h4x : (4:ℝ) ≤ x := by
     nlinarith [Real.add_one_le_exp (16:ℝ), Real.exp_log x_pos, Real.exp_le_exp.mpr hlogx16]
@@ -809,31 +829,26 @@ theorem Delta_onCoprime_LambdaFlat_pointwise [ProofData] (A C : ℕ) {y : ℝ}
       nlinarith [mul_le_mul_of_nonneg_left (log_pow_le_div 2 (A + 2 * C + 1))
         (show (0:ℝ) ≤ 3 * (Real.log 2)⁻¹ by positivity)]
     linarith [hb, hconv1, hconv2]
-  -- (ii) sharp term
-  have hSharp : |Δ_[onCoprime q (⇑Λ♯)](y; s, a)| ≤ C_DLS * (x / (Real.log x) ^ (A + 2 * C + 1)) := by
+  -- (ii) sharp term: keep the `τ(q)` factor and absorb it via `τ(q) ≤ 2√q ≤ 2x^{1/4}`
+  have hSharp : |Δ_[onCoprime q (⇑Λ♯)](y; s, a)|
+      ≤ C_DLS * (2 * (4 * ((A + 2 * C + 2 : ℕ) : ℝ)) ^ (A + 2 * C + 2))
+          * (x / (Real.log x) ^ (A + 2 * C + 1)) := by
     have hb := Delta_LambdaSharp_bound (q := s) (r := q) ha (le_trans hq_sqrt hsqrt_le_x) h2y hyx
     refine le_trans hb ?_
-    have hτ : (q.divisors.card : ℝ) ≤ q := by exact_mod_cast Nat.card_divisors_le_self q
     have hCDLS : (0:ℝ) ≤ C_DLS := by norm_num [C_DLS]
-    have hsharp_core : (q:ℝ) * Real.sqrt x * Real.log x ≤ x / (Real.log x) ^ (A + 2 * C + 1) := by
-      have hsx : Real.sqrt x * Real.sqrt x = x := Real.mul_self_sqrt x_nonneg
-      have hq' : (q:ℝ) * (Real.log x) ^ (A + 2 * C + 2) ≤ Real.sqrt x :=
-        (le_div_iff₀ (pow_pos hlogx_pos _)).mp hq
-      rw [le_div_iff₀ (pow_pos hlogx_pos _)]
-      calc (q:ℝ) * Real.sqrt x * Real.log x * (Real.log x) ^ (A + 2 * C + 1)
-          = (q:ℝ) * (Real.log x) ^ (A + 2 * C + 2) * Real.sqrt x := by
-            rw [show A + 2 * C + 2 = (A + 2 * C + 1) + 1 from rfl, pow_succ]; ring
-        _ ≤ Real.sqrt x * Real.sqrt x :=
-            mul_le_mul_of_nonneg_right hq' (Real.sqrt_nonneg x)
-        _ = x := hsx
+    have hcore := card_divisors_mul_sqrt_mul_log_le_div hq_sqrt (A + 2 * C + 1)
+    have hstep : (q.divisors.card : ℝ) * (U * V) * Real.log x
+        ≤ (q.divisors.card : ℝ) * Real.sqrt x * Real.log x :=
+      mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left UV_le (by positivity)) hlogx_pos.le
     calc C_DLS * (q.divisors.card : ℝ) * U * V * Real.log x
         = C_DLS * ((q.divisors.card : ℝ) * (U * V) * Real.log x) := by ring
-      _ ≤ C_DLS * ((q:ℝ) * Real.sqrt x * Real.log x) :=
-          mul_le_mul_of_nonneg_left
-            (mul_le_mul_of_nonneg_right (mul_le_mul hτ UV_le (by positivity) (by positivity))
-              hlogx_pos.le) hCDLS
-      _ ≤ C_DLS * (x / (Real.log x) ^ (A + 2 * C + 1)) :=
-          mul_le_mul_of_nonneg_left hsharp_core hCDLS
+      _ ≤ C_DLS * ((q.divisors.card : ℝ) * Real.sqrt x * Real.log x) :=
+          mul_le_mul_of_nonneg_left hstep hCDLS
+      _ ≤ C_DLS * (2 * (4 * ((A + 2 * C + 2 : ℕ) : ℝ)) ^ (A + 2 * C + 2)
+            * (x / (Real.log x) ^ (A + 2 * C + 1))) :=
+          mul_le_mul_of_nonneg_left hcore hCDLS
+      _ = C_DLS * (2 * (4 * ((A + 2 * C + 2 : ℕ) : ℝ)) ^ (A + 2 * C + 2))
+            * (x / (Real.log x) ^ (A + 2 * C + 1)) := by ring
   -- (iii) small term
   have hSmall : |Δ_[onCoprime q (⇑Λ≤U)](y; s, a)|
       ≤ 2 * (2 * ((1 + (A + 2 * C + 1) : ℕ) : ℝ)) ^ (1 + (A + 2 * C + 1))
@@ -864,7 +879,8 @@ theorem Delta_onCoprime_LambdaFlat_pointwise [ProofData] (A C : ℕ) {y : ℝ}
             * (x / (Real.log x) ^ (A + 2 * C + 1))
           + 3 * (Real.log 2)⁻¹ * (2 * ((2 + (A + 2 * C + 1) : ℕ) : ℝ)) ^ (2 + (A + 2 * C + 1))
             * (x / (Real.log x) ^ (A + 2 * C + 1)))
-        + C_DLS * (x / (Real.log x) ^ (A + 2 * C + 1))
+        + C_DLS * (2 * (4 * ((A + 2 * C + 2 : ℕ) : ℝ)) ^ (A + 2 * C + 2))
+            * (x / (Real.log x) ^ (A + 2 * C + 1))
         + 2 * (2 * ((1 + (A + 2 * C + 1) : ℕ) : ℝ)) ^ (1 + (A + 2 * C + 1))
             * (x / (Real.log x) ^ (A + 2 * C + 1)) := by
     rw [C_DLF]; ring
@@ -884,7 +900,7 @@ Push the absolute values inside, then
 -/) (uses := [Delta_LambdaFlat_decomp, siegel_walfisz])]
 theorem Delta_LambdaFlat_small_conductor [ProofData] (A C : ℕ) {y : ℝ}
     (hy1 : √x ≤ y) (hyx : y ≤ x) (q : ℕ) (hq0 : 0 < q)
-    (hq : (q:ℝ) ≤ √x / (Real.log x) ^ (A + 2 * C + 2)) (a : ZMod q) (ha : IsUnit a) :
+    (hq : (q:ℝ) ≤ √x) (a : ZMod q) (ha : IsUnit a) :
     |∑ d ∈ q.divisors with 1 < (d : ℕ) ∧ ↑d ≤ (Real.log x)^C,
       ∑ p ∈ d.divisorsAntidiagonal, μ p.2 * ↑p.1.totient * Δ_[onCoprime q Λ♭](y; p.1, a.cast)|
     ≤ C_DLF A C * x / (Real.log x) ^ (A + 1) := by
@@ -898,7 +914,9 @@ theorem Delta_LambdaFlat_small_conductor [ProofData] (A C : ℕ) {y : ℝ}
       mul_nonneg (by linarith) (by positivity)
     have t2 : (0:ℝ) ≤ 3 * (Real.log 2)⁻¹
         * (2 * ((2 + (A + 2 * C + 1) : ℕ) : ℝ)) ^ (2 + (A + 2 * C + 1)) := by positivity
-    have t3 : (0:ℝ) ≤ C_DLS := by norm_num [C_DLS]
+    have t3 : (0:ℝ) ≤ C_DLS * (2 * (4 * ((A + 2 * C + 2 : ℕ) : ℝ)) ^ (A + 2 * C + 2)) := by
+      have hC : (0:ℝ) ≤ C_DLS := by norm_num [C_DLS]
+      exact mul_nonneg hC (by positivity)
     have t4 : (0:ℝ) ≤ 2 * (2 * ((1 + (A + 2 * C + 1) : ℕ) : ℝ)) ^ (1 + (A + 2 * C + 1)) := by
       positivity
     linarith
