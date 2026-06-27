@@ -2,6 +2,8 @@ import Mathlib
 import Architect
 import BV.Delta
 import BV.Axioms
+import BV.LambdaSharp
+import BV.LambdaLE
 
 open ArithmeticFunction BV ProofData DirichletCharacter
 open scoped Moebius BV zeta
@@ -480,7 +482,394 @@ theorem Delta_LambdaFlat_decomp [ProofData] {C : ℕ} {y : ℝ} (q : ℕ) (a : Z
         exact add_le_add (le_refl _) hSlargeBound
 
 
-def C_DLF (A C : ℝ) : ℝ := sorry
+/-- A power of `log x` is dominated by `√x`: for `x ≥ 1` and `M : ℕ`,
+`(log x)^M ≤ (2M)^M · √x`. -/
+theorem log_pow_le_const_mul_sqrt {x : ℝ} (hx : 1 ≤ x) (M : ℕ) :
+    (Real.log x) ^ M ≤ (2 * (M:ℝ)) ^ M * Real.sqrt x := by
+  rcases Nat.eq_zero_or_pos M with hM | hM
+  · subst hM
+    simp only [pow_zero, Nat.cast_zero, mul_zero, one_mul]
+    exact Real.one_le_sqrt.mpr hx
+  have hε : (0:ℝ) < 1 / (2 * M) := by positivity
+  have hlog : Real.log x ≤ x ^ ((1:ℝ) / (2 * M)) / (1 / (2 * M)) :=
+    Real.log_le_rpow_div (by linarith) hε
+  field_simp at hlog
+  calc (Real.log x) ^ M ≤ (2 * M * x ^ ((1:ℝ) / (2 * M))) ^ M :=
+        pow_le_pow_left₀ (Real.log_nonneg hx) hlog M
+    _ = (2 * (M:ℝ))^M * Real.sqrt x := by
+        rw [mul_pow, ← Real.rpow_natCast (x ^ _) M, ← Real.rpow_mul (by linarith),
+          Real.sqrt_eq_rpow]
+        congr 2
+        field_simp
+
+/-- For a pointwise-nonnegative `f`, `|Δ_[f](y; s, a)| ≤ 2 · ∑_{n≤y} f(n)`. -/
+theorem Delta_abs_le_two_summatory [ProofData] {y : ℝ} {s : ℕ} (hs : 0 < s) {a : ZMod s}
+    {f : ℕ → ℝ} (hf : ∀ n, 0 ≤ f n) :
+    |Δ_[f](y; s, a)| ≤ 2 * summatory f y := by
+  rw [Delta]
+  have h1le : (1:ℝ) ≤ (s.totient : ℝ) := by exact_mod_cast Nat.totient_pos.mpr hs
+  have htot : (s.totient : ℝ)⁻¹ ≤ 1 := inv_le_one_of_one_le₀ h1le
+  have hc : (0:ℝ) ≤ (s.totient : ℝ)⁻¹ := by positivity
+  have h1 : summatory ((Nat.modEqs a).indicator f) y ≤ summatory f y :=
+    summatory_mono_fun _ _ _ (fun n _ ↦ Set.indicator_apply_le' (fun _ ↦ le_rfl) (fun _ ↦ hf n))
+  have h1' : 0 ≤ summatory ((Nat.modEqs a).indicator f) y :=
+    summatory_nonneg _ y (fun n _ ↦ Set.indicator_nonneg (fun _ _ ↦ hf n) n)
+  have h2 : summatory (onCoprime s f) y ≤ summatory f y :=
+    summatory_mono_fun _ _ _ (fun n _ ↦ onCoprime_le_of_nonneg (hf n))
+  have h2' : 0 ≤ summatory (onCoprime s f) y :=
+    summatory_nonneg _ y (fun n _ ↦ onCoprime_nonneg (hf n))
+  refine (abs_sub _ _).trans ?_
+  rw [abs_of_nonneg h1', abs_of_nonneg (mul_nonneg hc h2')]
+  linarith [mul_le_of_le_one_left h2' htot]
+
+/-- Coprime-restricted version of `Delta_LambdaLEU_bound`. -/
+theorem Delta_onCoprime_LambdaLEU_bound [ProofData] {y : ℝ} {q s : ℕ} (hs : 0 < s)
+    {a : ZMod s} :
+    |Δ_[onCoprime q ⇑Λ≤U](y; s, a)| ≤ 2 * U * Real.log x := by
+  rw [Delta]
+  grw [abs_sub, abs_mul]
+  have htot : (s.totient : ℝ)⁻¹ ≤ 1 := by
+    have : 0 < s.totient := by simp only [Nat.totient_pos, hs]
+    field_simp
+    norm_cast
+  grw [htot, abs_one]
+  rw [abs_of_nonneg, abs_of_nonneg]
+  · have h1 : summatory ((Nat.modEqs a).indicator (onCoprime q ⇑Λ≤U)) y ≤ U * Real.log x := by
+      apply le_trans (summatory_mono_fun ..) sum_LambdaLEU_le
+      intro n hn
+      apply Set.indicator_le' (fun _ _ ↦ onCoprime_le_of_nonneg LambdaLEU_nonneg)
+      simp
+    have h2 : summatory (onCoprime s (onCoprime q ⇑Λ≤U)) y ≤ U * Real.log x := by
+      apply le_trans (summatory_mono_fun ..) sum_LambdaLEU_le
+      intro n hn
+      exact le_trans (onCoprime_le_of_nonneg (onCoprime_nonneg LambdaLEU_nonneg))
+        (onCoprime_le_of_nonneg LambdaLEU_nonneg)
+    linarith
+  · positivity
+  · positivity
+
+/-- Replacing `log y` by `log x` (using `√x ≤ y ≤ x`) costs at most a factor `2^N`. -/
+theorem y_div_logy_le_x_div_logx [ProofData] {y : ℝ} (hy1 : √x ≤ y) (hy2 : y ≤ x) (N : ℕ) :
+    y / (Real.log y) ^ N ≤ 2 ^ N * (x / (Real.log x) ^ N) := by
+  have hlogx : 0 < Real.log x := log_x_pos
+  have hsqrt_pos : 0 < √x := Real.sqrt_pos.mpr x_pos
+  have hlogy_ge : Real.log x / 2 ≤ Real.log y := by
+    calc Real.log x / 2 = Real.log (√x) := (Real.log_sqrt x_nonneg).symm
+      _ ≤ Real.log y := Real.log_le_log hsqrt_pos hy1
+  have hlogy_pos : 0 < Real.log y := lt_of_lt_of_le (by linarith) hlogy_ge
+  have hpow : (Real.log x) ^ N / 2 ^ N ≤ (Real.log y) ^ N := by
+    have h := pow_le_pow_left₀ (by positivity : (0:ℝ) ≤ Real.log x / 2) hlogy_ge N
+    rwa [div_pow] at h
+  have hpowy_pos : 0 < (Real.log y) ^ N := by positivity
+  have hpowx_pos : 0 < (Real.log x) ^ N := by positivity
+  calc y / (Real.log y) ^ N
+      ≤ x / (Real.log y) ^ N := by
+        apply div_le_div_of_nonneg_right hy2 hpowy_pos.le
+    _ ≤ x / ((Real.log x) ^ N / 2 ^ N) :=
+        div_le_div_of_nonneg_left x_nonneg (by positivity) hpow
+    _ = 2 ^ N * (x / (Real.log x) ^ N) := by field_simp
+
+/-- Siegel–Walfisz bound for the coprime-restricted von Mangoldt function.
+The `q`-restriction and the `s`-correction cost only `O((log x)²)`, while the main term
+comes from Siegel–Walfisz applied at modulus `s ≤ (log y)^{C2}`. -/
+theorem Delta_onCoprime_Lambda_bound [ProofData] (A' C2 : ℕ) {y : ℝ}
+    (hy2 : 2 ≤ y) (hyx : y ≤ x)
+    {q s : ℕ} (hs0 : 0 < s) (hsq : s ∣ q) (hq0 : 0 < q) (hqx : (q:ℝ) ≤ Real.sqrt x)
+    (hs : (s:ℝ) ≤ (Real.log y) ^ C2) {a : ZMod s} (ha : IsUnit a) :
+    |Δ_[onCoprime q ⇑Λ](y; s, a)|
+      ≤ (C_SW A' C2 + C_SW A' 0) * (y / (Real.log y) ^ A')
+        + 3 * (Real.log 2)⁻¹ * (Real.log x) ^ 2 := by
+  set Λnc : ℕ → ℝ := fun n ↦ if ¬ q.Coprime n then Λ n else 0 with hΛnc
+  have hΛnc_nonneg : ∀ n, 0 ≤ Λnc n := by
+    intro n; simp only [hΛnc]; split_ifs <;> simp [vonMangoldt_nonneg]
+  have hfun : onCoprime q (⇑Λ) = (⇑Λ : ℕ → ℝ) - Λnc := by
+    funext n
+    simp only [onCoprime_apply, Pi.sub_apply, hΛnc]
+    split_ifs with h <;> simp
+  have hq_pos : (0:ℝ) < q := by exact_mod_cast hq0
+  have hlogq_nonneg : 0 ≤ Real.log q := Real.log_nonneg (by exact_mod_cast hq0)
+  have hlogx_nonneg : 0 ≤ Real.log x := Real.log_nonneg (by linarith [ProofData.le_x])
+  have hlog2 : (0:ℝ) ≤ (Real.log 2)⁻¹ := by positivity
+  have hlogq_le : Real.log q ≤ Real.log x := by
+    calc Real.log q ≤ Real.log (Real.sqrt x) := Real.log_le_log hq_pos hqx
+      _ = Real.log x / 2 := Real.log_sqrt x_nonneg
+      _ ≤ Real.log x := by linarith
+  -- The `q`-non-coprime part is a small error.
+  have hΛnc_bound : |Δ_[Λnc](y; s, a)| ≤ 2 * (Real.log 2)⁻¹ * (Real.log x) ^ 2 := by
+    have step1 : |Δ_[Λnc](y; s, a)| ≤ 2 * summatory Λnc x :=
+      le_trans (Delta_abs_le_two_summatory hs0 hΛnc_nonneg)
+        (mul_le_mul_of_nonneg_left (summatory_mono hyx (fun n _ ↦ hΛnc_nonneg n)) (by norm_num))
+    have t1 := mul_le_mul_of_nonneg_right C_SVNC_le (mul_nonneg hlogq_nonneg hlogx_nonneg)
+    have t2 : (Real.log 2)⁻¹ * (Real.log q * Real.log x)
+        ≤ (Real.log 2)⁻¹ * (Real.log x * Real.log x) :=
+      mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_right hlogq_le hlogx_nonneg) hlog2
+    have t3 := le_trans (le_abs_self (summatory Λnc x))
+        (sum_vonMangoldt_not_coprime_ll_logq (q:=q) hq0)
+    have step2 : summatory Λnc x ≤ (Real.log 2)⁻¹ * (Real.log x * Real.log x) :=
+      le_trans t3 (le_trans t1 t2)
+    calc |Δ_[Λnc](y; s, a)| ≤ 2 * summatory Λnc x := step1
+      _ ≤ 2 * ((Real.log 2)⁻¹ * (Real.log x * Real.log x)) :=
+          mul_le_mul_of_nonneg_left step2 (by norm_num)
+      _ = 2 * (Real.log 2)⁻¹ * (Real.log x) ^ 2 := by ring
+  have hlogs_le : Real.log s ≤ Real.log x :=
+    le_trans (Real.log_le_log (by exact_mod_cast hs0)
+      (by exact_mod_cast Nat.le_of_dvd hq0 hsq)) hlogq_le
+  have hlogs_nonneg : 0 ≤ Real.log s := Real.log_nonneg (by exact_mod_cast hs0)
+  -- The main von Mangoldt `Δ` via Siegel–Walfisz.
+  have hΛ_bound : |Δ_[(⇑Λ : ℕ → ℝ)](y; s, a)|
+      ≤ (C_SW A' C2 + C_SW A' 0) * (y / (Real.log y) ^ A')
+        + (Real.log 2)⁻¹ * (Real.log x) ^ 2 := by
+    rw [Delta]
+    set c : ℝ := ((s.totient : ℝ))⁻¹ with hc_def
+    set T1 : ℝ := summatory ((Nat.modEqs a).indicator (⇑Λ)) y with hT1
+    set T2 : ℝ := summatory (onCoprime s (⇑Λ)) y with hT2
+    have hc0 : (0:ℝ) ≤ c := by rw [hc_def]; positivity
+    have hcle : c ≤ 1 := by
+      rw [hc_def]; exact inv_le_one_of_one_le₀ (by exact_mod_cast Nat.totient_pos.mpr hs0)
+    have hSW : |ψ y a - y / (s.totient : ℝ)| ≤ C_SW A' C2 * (y / Real.log y ^ A') :=
+      siegel_walfisz A' C2 hy2 hs0 hs ha
+    have hPNT : |summatory (fun n ↦ Λ n) y - y| ≤ C_SW A' 0 * (y / Real.log y ^ A') := by
+      have h0 := siegel_walfisz A' 0 hy2 (q:=1) (by norm_num) (by simp) (a:=(1:ZMod 1)) (by simp)
+      rw [ψ_one_one, ← summatory_vonMangoldt] at h0
+      simpa using h0
+    have hT2_eq : T2 = summatory (fun n ↦ if s.Coprime n then (Λ n : ℝ) else 0) y := by
+      rw [hT2]; congr 1
+    have hEs_nonneg : 0 ≤ summatory (fun n ↦ if ¬ s.Coprime n then (Λ n : ℝ) else 0) y :=
+      summatory_nonneg _ _ (fun n _ ↦ by split_ifs <;> simp [vonMangoldt_nonneg])
+    have hsub : summatory (fun n ↦ Λ n) y - T2
+        = summatory (fun n ↦ if ¬ s.Coprime n then (Λ n : ℝ) else 0) y := by
+      rw [hT2_eq]; exact summatory_sub_ite _
+    have hEs_bound : summatory (fun n ↦ if ¬ s.Coprime n then (Λ n : ℝ) else 0) y
+        ≤ (Real.log 2)⁻¹ * (Real.log x * Real.log x) := by
+      have hmono : summatory (fun n ↦ if ¬ s.Coprime n then (Λ n : ℝ) else 0) y
+          ≤ summatory (fun n ↦ if ¬ s.Coprime n then (Λ n : ℝ) else 0) x :=
+        summatory_mono hyx (fun n _ ↦ by split_ifs <;> simp [vonMangoldt_nonneg])
+      have hx_bound := le_trans (le_abs_self _)
+        (sum_vonMangoldt_not_coprime_ll_logq (q:=s) hs0)
+      have u1 := mul_le_mul_of_nonneg_right C_SVNC_le (mul_nonneg hlogs_nonneg hlogx_nonneg)
+      have u2 : (Real.log 2)⁻¹ * (Real.log s * Real.log x)
+          ≤ (Real.log 2)⁻¹ * (Real.log x * Real.log x) :=
+        mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_right hlogs_le hlogx_nonneg) hlog2
+      exact le_trans hmono (le_trans hx_bound (le_trans u1 u2))
+    have hyT2 : |y - T2| ≤ C_SW A' 0 * (y / Real.log y ^ A')
+        + (Real.log 2)⁻¹ * (Real.log x * Real.log x) := by
+      have e : y - T2 = summatory (fun n ↦ if ¬ s.Coprime n then (Λ n : ℝ) else 0) y
+          - (summatory (fun n ↦ Λ n) y - y) := by rw [← hsub]; ring
+      rw [e]
+      refine (abs_sub _ _).trans ?_
+      rw [abs_of_nonneg hEs_nonneg]
+      linarith [hEs_bound, hPNT]
+    -- Assemble.
+    have hT1ψ : T1 = ψ y a := rfl
+    have e1 : T1 - c * T2 = (ψ y a - y / (s.totient : ℝ)) + c * (y - T2) := by
+      rw [hT1ψ, div_eq_mul_inv, ← hc_def]; ring
+    rw [e1]
+    refine (abs_add_le _ _).trans ?_
+    have hpart2 : |c * (y - T2)|
+        ≤ C_SW A' 0 * (y / Real.log y ^ A') + (Real.log 2)⁻¹ * (Real.log x * Real.log x) := by
+      rw [abs_mul, abs_of_nonneg hc0]
+      refine le_trans (mul_le_mul_of_nonneg_left hyT2 hc0) ?_
+      exact mul_le_of_le_one_left (le_trans (abs_nonneg (y - T2)) hyT2) hcle
+    refine le_trans (add_le_add hSW hpart2) (le_of_eq ?_)
+    ring
+  rw [hfun, Delta_sub]
+  calc |Δ_[(⇑Λ : ℕ → ℝ)](y; s, a) - Δ_[Λnc](y; s, a)|
+      ≤ |Δ_[(⇑Λ : ℕ → ℝ)](y; s, a)| + |Δ_[Λnc](y; s, a)| := abs_sub _ _
+    _ ≤ _ := by linarith
+
+/-- Under `ProofData`, the constraints force `log x ≥ 16` (a strengthening of `one_le_log_x`). -/
+theorem sixteen_le_log_x [ProofData] : 16 ≤ Real.log x := by
+  have hlogx : 0 < Real.log x := log_x_pos
+  have hUV : Real.exp (Real.sqrt (Real.log x) + Real.sqrt (Real.log x)) ≤ Real.sqrt x := by
+    rw [Real.exp_add]
+    calc Real.exp (Real.sqrt (Real.log x)) * Real.exp (Real.sqrt (Real.log x))
+        ≤ U * V := mul_le_mul le_U le_V (le_of_lt (Real.exp_pos _)) ProofData.U_nonneg
+      _ ≤ Real.sqrt x := ProofData.UV_le
+  have h1 : Real.sqrt (Real.log x) + Real.sqrt (Real.log x) ≤ Real.log (Real.sqrt x) := by
+    have := Real.log_le_log (Real.exp_pos _) hUV
+    rwa [Real.log_exp] at this
+  rw [Real.log_sqrt ProofData.x_nonneg] at h1
+  have ht : Real.sqrt (Real.log x) ^ 2 = Real.log x := Real.sq_sqrt (le_of_lt hlogx)
+  nlinarith [Real.sqrt_nonneg (Real.log x), hlogx, h1, ht,
+    sq_nonneg (Real.sqrt (Real.log x) - 4)]
+
+/-- A power `(log x)^j` is bounded by `K · x/(log x)^N` (with `K` depending on `j+N`),
+since `(log x)^{j+N} ≤ K·√x ≤ K·x`. -/
+theorem log_pow_le_div [ProofData] (j N : ℕ) :
+    (Real.log x) ^ j ≤ (2 * ((j + N : ℕ) : ℝ)) ^ (j + N) * (x / (Real.log x) ^ N) := by
+  have hlogx : 0 < Real.log x := log_x_pos
+  have hsqrtx : Real.sqrt x ≤ x := by
+    have h1 : 1 ≤ Real.sqrt x := Real.one_le_sqrt.mpr (by linarith [le_x])
+    nlinarith [Real.sq_sqrt x_nonneg, h1, Real.sqrt_nonneg x]
+  have hKx : (Real.log x) ^ (j + N) ≤ (2 * ((j + N : ℕ) : ℝ)) ^ (j + N) * x := by
+    refine le_trans (log_pow_le_const_mul_sqrt (by linarith [le_x]) (j + N)) ?_
+    gcongr
+  rw [← mul_div_assoc, le_div_iff₀ (by positivity : (0:ℝ) < (Real.log x) ^ N), ← pow_add]
+  exact hKx
+
+open Classical in
+/-- The implied constant in `Delta_LambdaFlat_small_conductor` (and the per-term bound). -/
+noncomputable def C_DLF (A C : ℕ) : ℝ :=
+  (C_SW (A + 2 * C + 1) (2 * C) + C_SW (A + 2 * C + 1) 0) * 2 ^ (A + 2 * C + 1)
+  + 3 * (Real.log 2)⁻¹ * (2 * ((2 + (A + 2 * C + 1) : ℕ) : ℝ)) ^ (2 + (A + 2 * C + 1))
+  + C_DLS
+  + 2 * (2 * ((1 + (A + 2 * C + 1) : ℕ) : ℝ)) ^ (1 + (A + 2 * C + 1))
+
+/-- The Siegel–Walfisz constant is nonnegative (it bounds an absolute value). -/
+theorem C_SW_nonneg [ProofData] (A C : ℕ) : 0 ≤ C_SW A C := by
+  have h := siegel_walfisz A C le_x (q := 1) one_pos
+    (by exact_mod_cast one_le_pow₀ one_le_log_x) (a := (1 : ZMod 1)) isUnit_one
+  have hpos : 0 < x / Real.log x ^ A := div_pos x_pos (pow_pos log_x_pos A)
+  have h0 : (0:ℝ) ≤ C_SW A C * (x / Real.log x ^ A) := le_trans (abs_nonneg _) h
+  exact (mul_nonneg_iff_of_pos_right hpos).mp h0
+
+/-- `√x · (log x)^j` is bounded by `K · x/(log x)^N`. -/
+theorem sqrt_mul_log_pow_le_div [ProofData] (j N : ℕ) :
+    Real.sqrt x * (Real.log x) ^ j
+      ≤ (2 * ((j + N : ℕ) : ℝ)) ^ (j + N) * (x / (Real.log x) ^ N) := by
+  have hlogx : 0 < Real.log x := log_x_pos
+  have hsx : Real.sqrt x * Real.sqrt x = x := Real.mul_self_sqrt x_nonneg
+  have hkey : (Real.log x) ^ (j + N) ≤ (2 * ((j + N : ℕ) : ℝ)) ^ (j + N) * Real.sqrt x :=
+    log_pow_le_const_mul_sqrt (by linarith [le_x]) (j + N)
+  rw [← mul_div_assoc, le_div_iff₀ (by positivity : (0:ℝ) < (Real.log x) ^ N)]
+  calc Real.sqrt x * (Real.log x) ^ j * (Real.log x) ^ N
+      = Real.sqrt x * (Real.log x) ^ (j + N) := by rw [mul_assoc, ← pow_add]
+    _ ≤ Real.sqrt x * ((2 * ((j + N : ℕ) : ℝ)) ^ (j + N) * Real.sqrt x) :=
+        mul_le_mul_of_nonneg_left hkey (Real.sqrt_nonneg x)
+    _ = (2 * ((j + N : ℕ) : ℝ)) ^ (j + N) * x := by
+        linear_combination (2 * ((j + N : ℕ) : ℝ)) ^ (j + N) * hsx
+
+/-- Per-term Type-II bound: for a small conductor `s ≤ (log x)^C` and a restriction modulus
+`q ≤ √x/(log x)^{A+2C+2}`, decomposing `Λ♭ = Λ - Λ♯ - Λ_{≤U}` and applying Siegel–Walfisz
+(main term), the sharp bound, and the small bound gives `|Δ_{Λ♭_q}| ≪ x/(log x)^{A+2C+1}`. -/
+theorem Delta_onCoprime_LambdaFlat_pointwise [ProofData] (A C : ℕ) {y : ℝ}
+    (hy1 : √x ≤ y) (hyx : y ≤ x)
+    {q s : ℕ} (hs0 : 0 < s) (hsq : s ∣ q) (hq0 : 0 < q)
+    (hq : (q:ℝ) ≤ √x / (Real.log x) ^ (A + 2 * C + 2))
+    (hsC : (s:ℝ) ≤ (Real.log x) ^ C) {a : ZMod s} (ha : IsUnit a) :
+    |Δ_[onCoprime q ⇑Λ♭](y; s, a)|
+      ≤ C_DLF A C * (x / (Real.log x) ^ (A + 2 * C + 1)) := by
+  haveI : NeZero s := ⟨by omega⟩
+  have hlogx_pos : 0 < Real.log x := log_x_pos
+  have hlogx16 : 16 ≤ Real.log x := sixteen_le_log_x
+  have hWpos : 0 < x / (Real.log x) ^ (A + 2 * C + 1) := div_pos x_pos (pow_pos hlogx_pos _)
+  have hsqrt_le_x : Real.sqrt x ≤ x := by
+    have h1 : 1 ≤ Real.sqrt x := Real.one_le_sqrt.mpr (by linarith [le_x])
+    nlinarith [Real.sq_sqrt x_nonneg, h1, Real.sqrt_nonneg x]
+  have hq_sqrt : (q:ℝ) ≤ Real.sqrt x :=
+    le_trans hq (div_le_self (Real.sqrt_nonneg x) (one_le_pow₀ one_le_log_x))
+  -- 4 ≤ x, 2 ≤ √x ≤ y
+  have h4x : (4:ℝ) ≤ x := by
+    nlinarith [Real.add_one_le_exp (16:ℝ), Real.exp_log x_pos, Real.exp_le_exp.mpr hlogx16]
+  have h2sqrt : (2:ℝ) ≤ Real.sqrt x := by
+    have h := Real.sqrt_le_sqrt (show (4:ℝ) ≤ x from h4x)
+    rwa [show Real.sqrt 4 = 2 by
+      rw [show (4:ℝ) = 2 ^ 2 by norm_num]; exact Real.sqrt_sq (by norm_num)] at h
+  have h2y : 2 ≤ y := le_trans h2sqrt hy1
+  have hlogy_ge : Real.log x / 2 ≤ Real.log y := by
+    calc Real.log x / 2 = Real.log (√x) := (Real.log_sqrt x_nonneg).symm
+      _ ≤ Real.log y := Real.log_le_log (Real.sqrt_pos.mpr x_pos) hy1
+  have hlogy_ge2 : 2 ≤ Real.log y := by linarith
+  -- s ≤ (log y)^{2C}
+  have hs2C : (s:ℝ) ≤ (Real.log y) ^ (2 * C) := by
+    have hlcy : (0:ℝ) ≤ (Real.log y) ^ C := by positivity
+    calc (s:ℝ) ≤ (Real.log x) ^ C := hsC
+      _ ≤ (2 * Real.log y) ^ C := by gcongr; linarith
+      _ = 2 ^ C * (Real.log y) ^ C := by rw [mul_pow]
+      _ ≤ (Real.log y) ^ C * (Real.log y) ^ C :=
+          mul_le_mul_of_nonneg_right (pow_le_pow_left₀ (by norm_num) hlogy_ge2 C) hlcy
+      _ = (Real.log y) ^ (2 * C) := by rw [← pow_add, ← two_mul]
+  -- decompose Λ♭ = Λ - Λ♯ - Λ≤U
+  have hfun2 : onCoprime q (⇑Λ♭)
+      = onCoprime q (⇑Λ) - onCoprime q (⇑Λ♯) - onCoprime q (⇑Λ≤U) := by
+    funext n
+    simp only [onCoprime_apply, Pi.sub_apply]
+    split_ifs with h
+    · have := Lambda_decomp n; linarith
+    · ring
+  -- (i) main term via Siegel–Walfisz
+  have hMain : |Δ_[onCoprime q (⇑Λ)](y; s, a)|
+      ≤ (C_SW (A + 2 * C + 1) (2 * C) + C_SW (A + 2 * C + 1) 0) * 2 ^ (A + 2 * C + 1)
+          * (x / (Real.log x) ^ (A + 2 * C + 1))
+        + 3 * (Real.log 2)⁻¹ * (2 * ((2 + (A + 2 * C + 1) : ℕ) : ℝ)) ^ (2 + (A + 2 * C + 1))
+          * (x / (Real.log x) ^ (A + 2 * C + 1)) := by
+    have hb := Delta_onCoprime_Lambda_bound (A + 2 * C + 1) (2 * C) h2y hyx hs0 hsq hq0 hq_sqrt
+      hs2C ha
+    have hcsw : 0 ≤ C_SW (A + 2 * C + 1) (2 * C) + C_SW (A + 2 * C + 1) 0 :=
+      add_nonneg (C_SW_nonneg _ _) (C_SW_nonneg _ _)
+    have hconv1 : (C_SW (A + 2 * C + 1) (2 * C) + C_SW (A + 2 * C + 1) 0)
+          * (y / (Real.log y) ^ (A + 2 * C + 1))
+        ≤ (C_SW (A + 2 * C + 1) (2 * C) + C_SW (A + 2 * C + 1) 0) * 2 ^ (A + 2 * C + 1)
+          * (x / (Real.log x) ^ (A + 2 * C + 1)) := by
+      rw [mul_assoc]
+      exact mul_le_mul_of_nonneg_left (y_div_logy_le_x_div_logx hy1 hyx (A + 2 * C + 1)) hcsw
+    have hconv2 : 3 * (Real.log 2)⁻¹ * (Real.log x) ^ 2
+        ≤ 3 * (Real.log 2)⁻¹ * (2 * ((2 + (A + 2 * C + 1) : ℕ) : ℝ)) ^ (2 + (A + 2 * C + 1))
+          * (x / (Real.log x) ^ (A + 2 * C + 1)) := by
+      nlinarith [mul_le_mul_of_nonneg_left (log_pow_le_div 2 (A + 2 * C + 1))
+        (show (0:ℝ) ≤ 3 * (Real.log 2)⁻¹ by positivity)]
+    linarith [hb, hconv1, hconv2]
+  -- (ii) sharp term
+  have hSharp : |Δ_[onCoprime q (⇑Λ♯)](y; s, a)| ≤ C_DLS * (x / (Real.log x) ^ (A + 2 * C + 1)) := by
+    have hb := Delta_LambdaSharp_bound (q := s) (r := q) ha (le_trans hq_sqrt hsqrt_le_x) h2y hyx
+    refine le_trans hb ?_
+    have hτ : (q.divisors.card : ℝ) ≤ q := by exact_mod_cast Nat.card_divisors_le_self q
+    have hCDLS : (0:ℝ) ≤ C_DLS := by norm_num [C_DLS]
+    have hsharp_core : (q:ℝ) * Real.sqrt x * Real.log x ≤ x / (Real.log x) ^ (A + 2 * C + 1) := by
+      have hsx : Real.sqrt x * Real.sqrt x = x := Real.mul_self_sqrt x_nonneg
+      have hq' : (q:ℝ) * (Real.log x) ^ (A + 2 * C + 2) ≤ Real.sqrt x :=
+        (le_div_iff₀ (pow_pos hlogx_pos _)).mp hq
+      rw [le_div_iff₀ (pow_pos hlogx_pos _)]
+      calc (q:ℝ) * Real.sqrt x * Real.log x * (Real.log x) ^ (A + 2 * C + 1)
+          = (q:ℝ) * (Real.log x) ^ (A + 2 * C + 2) * Real.sqrt x := by
+            rw [show A + 2 * C + 2 = (A + 2 * C + 1) + 1 from rfl, pow_succ]; ring
+        _ ≤ Real.sqrt x * Real.sqrt x :=
+            mul_le_mul_of_nonneg_right hq' (Real.sqrt_nonneg x)
+        _ = x := hsx
+    calc C_DLS * (q.divisors.card : ℝ) * U * V * Real.log x
+        = C_DLS * ((q.divisors.card : ℝ) * (U * V) * Real.log x) := by ring
+      _ ≤ C_DLS * ((q:ℝ) * Real.sqrt x * Real.log x) :=
+          mul_le_mul_of_nonneg_left
+            (mul_le_mul_of_nonneg_right (mul_le_mul hτ UV_le (by positivity) (by positivity))
+              hlogx_pos.le) hCDLS
+      _ ≤ C_DLS * (x / (Real.log x) ^ (A + 2 * C + 1)) :=
+          mul_le_mul_of_nonneg_left hsharp_core hCDLS
+  -- (iii) small term
+  have hSmall : |Δ_[onCoprime q (⇑Λ≤U)](y; s, a)|
+      ≤ 2 * (2 * ((1 + (A + 2 * C + 1) : ℕ) : ℝ)) ^ (1 + (A + 2 * C + 1))
+          * (x / (Real.log x) ^ (A + 2 * C + 1)) := by
+    refine le_trans (Delta_onCoprime_LambdaLEU_bound hs0) ?_
+    have hconv : Real.sqrt x * (Real.log x) ^ 1
+        ≤ (2 * ((1 + (A + 2 * C + 1) : ℕ) : ℝ)) ^ (1 + (A + 2 * C + 1))
+          * (x / (Real.log x) ^ (A + 2 * C + 1)) := sqrt_mul_log_pow_le_div 1 (A + 2 * C + 1)
+    rw [pow_one] at hconv
+    calc 2 * U * Real.log x
+        ≤ 2 * (Real.sqrt x * Real.log x) := by
+          nlinarith [U_le_sqrt_x, hlogx_pos.le, U_nonneg, Real.sqrt_nonneg x]
+      _ ≤ 2 * ((2 * ((1 + (A + 2 * C + 1) : ℕ) : ℝ)) ^ (1 + (A + 2 * C + 1))
+            * (x / (Real.log x) ^ (A + 2 * C + 1))) := mul_le_mul_of_nonneg_left hconv (by norm_num)
+      _ = 2 * (2 * ((1 + (A + 2 * C + 1) : ℕ) : ℝ)) ^ (1 + (A + 2 * C + 1))
+            * (x / (Real.log x) ^ (A + 2 * C + 1)) := by ring
+  -- assemble
+  rw [hfun2, Delta_sub, Delta_sub]
+  set DΛ := Δ_[onCoprime q ⇑Λ](y; s, a) with hDΛ
+  set DΛs := Δ_[onCoprime q ⇑Λ♯](y; s, a) with hDΛs
+  set DΛU := Δ_[onCoprime q ⇑Λ≤U](y; s, a) with hDΛU
+  have htri : |DΛ - DΛs - DΛU| ≤ |DΛ| + |DΛs| + |DΛU| := by
+    calc |DΛ - DΛs - DΛU| ≤ |DΛ - DΛs| + |DΛU| := abs_sub _ _
+      _ ≤ |DΛ| + |DΛs| + |DΛU| := by gcongr; exact abs_sub _ _
+  refine le_trans htri ?_
+  have hCeq : C_DLF A C * (x / (Real.log x) ^ (A + 2 * C + 1))
+      = ((C_SW (A + 2 * C + 1) (2 * C) + C_SW (A + 2 * C + 1) 0) * 2 ^ (A + 2 * C + 1)
+            * (x / (Real.log x) ^ (A + 2 * C + 1))
+          + 3 * (Real.log 2)⁻¹ * (2 * ((2 + (A + 2 * C + 1) : ℕ) : ℝ)) ^ (2 + (A + 2 * C + 1))
+            * (x / (Real.log x) ^ (A + 2 * C + 1)))
+        + C_DLS * (x / (Real.log x) ^ (A + 2 * C + 1))
+        + 2 * (2 * ((1 + (A + 2 * C + 1) : ℕ) : ℝ)) ^ (1 + (A + 2 * C + 1))
+            * (x / (Real.log x) ^ (A + 2 * C + 1)) := by
+    rw [C_DLF]; ring
+  rw [hCeq]
+  linarith [hMain, hSharp, hSmall]
 
 @[blueprint (statement := /--
 $$\frac{1}{\varphi(q)} \left|\sum_{\substack{d \mid q \\ 1 < d \le (\log x)^C}} \sum_{s \mid d} \mu(d/s)\,\varphi(s)\,\Delta_{\Lambda^\flat_q}(y;\,s,\,a)\right| \ll_{A,C} \frac{x}{\varphi(q)\,(\log x)^{A+1}}$$
@@ -493,10 +882,93 @@ Push the absolute values inside, then
 &\ll \frac{x}{(\log x)^{A+1}}.
 \end{align*}
 -/) (uses := [Delta_LambdaFlat_decomp, siegel_walfisz])]
-theorem Delta_LambdaFlat_small_conductor [ProofData] (A C : ℕ) {y : ℝ} (q : ℕ) (a : ZMod q) (ha : IsUnit a) :
+theorem Delta_LambdaFlat_small_conductor [ProofData] (A C : ℕ) {y : ℝ}
+    (hy1 : √x ≤ y) (hyx : y ≤ x) (q : ℕ) (hq0 : 0 < q)
+    (hq : (q:ℝ) ≤ √x / (Real.log x) ^ (A + 2 * C + 2)) (a : ZMod q) (ha : IsUnit a) :
     |∑ d ∈ q.divisors with 1 < (d : ℕ) ∧ ↑d ≤ (Real.log x)^C,
       ∑ p ∈ d.divisorsAntidiagonal, μ p.2 * ↑p.1.totient * Δ_[onCoprime q Λ♭](y; p.1, a.cast)|
-    ≤ C_DLF A C * x / (Real.log x) ^ (A + 1) := by sorry
+    ≤ C_DLF A C * x / (Real.log x) ^ (A + 1) := by
+  have hlogx_pos : 0 < Real.log x := log_x_pos
+  have hWpos : 0 < x / (Real.log x) ^ (A + 2 * C + 1) := div_pos x_pos (pow_pos hlogx_pos _)
+  have hCDLF_nonneg : 0 ≤ C_DLF A C := by
+    rw [C_DLF]
+    have h1 := C_SW_nonneg (A + 2 * C + 1) (2 * C)
+    have h2 := C_SW_nonneg (A + 2 * C + 1) 0
+    have t1 : (0:ℝ) ≤ (C_SW (A + 2 * C + 1) (2 * C) + C_SW (A + 2 * C + 1) 0) * 2 ^ (A + 2 * C + 1) :=
+      mul_nonneg (by linarith) (by positivity)
+    have t2 : (0:ℝ) ≤ 3 * (Real.log 2)⁻¹
+        * (2 * ((2 + (A + 2 * C + 1) : ℕ) : ℝ)) ^ (2 + (A + 2 * C + 1)) := by positivity
+    have t3 : (0:ℝ) ≤ C_DLS := by norm_num [C_DLS]
+    have t4 : (0:ℝ) ≤ 2 * (2 * ((1 + (A + 2 * C + 1) : ℕ) : ℝ)) ^ (1 + (A + 2 * C + 1)) := by
+      positivity
+    linarith
+  set S := q.divisors.filter (fun d => 1 < (d : ℕ) ∧ (↑d : ℝ) ≤ (Real.log x) ^ C) with hS
+  -- per-`d` bound: `|∑_p …| ≤ C_DLF · W · d`
+  have hfd : ∀ d ∈ S, |∑ p ∈ d.divisorsAntidiagonal,
+        (μ p.2 : ℝ) * ↑p.1.totient * Δ_[onCoprime q Λ♭](y; p.1, a.cast)|
+      ≤ C_DLF A C * (x / (Real.log x) ^ (A + 2 * C + 1)) * (d : ℝ) := by
+    intro d hd
+    rw [hS, Finset.mem_filter, Nat.mem_divisors] at hd
+    obtain ⟨⟨hdq, hqne⟩, hd1, hdlog⟩ := hd
+    have hdpos : 0 < d := by omega
+    refine le_trans (Finset.abs_sum_le_sum_abs _ _) ?_
+    have hbound : ∀ p ∈ d.divisorsAntidiagonal,
+        |(μ p.2 : ℝ) * ↑p.1.totient * Δ_[onCoprime q Λ♭](y; p.1, a.cast)|
+          ≤ (C_DLF A C * (x / (Real.log x) ^ (A + 2 * C + 1))) * (p.1.totient : ℝ) := by
+      intro p hp
+      rw [Nat.mem_divisorsAntidiagonal] at hp
+      obtain ⟨hpd, _⟩ := hp
+      have hp1d : p.1 ∣ d := ⟨p.2, hpd.symm⟩
+      have hp1q : p.1 ∣ q := hp1d.trans hdq
+      have hp1pos : 0 < p.1 := Nat.pos_of_dvd_of_pos hp1d hdpos
+      have hp1le : (p.1 : ℝ) ≤ (Real.log x) ^ C :=
+        le_trans (by exact_mod_cast Nat.le_of_dvd hdpos hp1d) hdlog
+      have hacast : IsUnit (a.cast : ZMod p.1) := isUnit_cast_of_dvd hp1q ha
+      have hpt := Delta_onCoprime_LambdaFlat_pointwise A C hy1 hyx hp1pos hp1q hq0 hq hp1le hacast
+      have hμ : |(μ p.2 : ℝ)| ≤ 1 := by exact_mod_cast abs_moebius_le_one
+      rw [abs_mul, abs_mul, abs_of_nonneg (by positivity : (0:ℝ) ≤ (p.1.totient : ℝ))]
+      calc |(μ p.2 : ℝ)| * (p.1.totient : ℝ) * |Δ_[onCoprime q Λ♭](y; p.1, a.cast)|
+          ≤ 1 * (p.1.totient : ℝ) * (C_DLF A C * (x / (Real.log x) ^ (A + 2 * C + 1))) := by
+            gcongr
+        _ = (C_DLF A C * (x / (Real.log x) ^ (A + 2 * C + 1))) * (p.1.totient : ℝ) := by ring
+    refine le_trans (Finset.sum_le_sum hbound) ?_
+    rw [← Finset.mul_sum]
+    have hsumφ : ∑ p ∈ d.divisorsAntidiagonal, (p.1.totient : ℝ) = (d : ℝ) := by
+      rw [Nat.sum_divisorsAntidiagonal (f := fun a b => ((a.totient : ℝ))), ← Nat.cast_sum]
+      congr 1
+      exact Nat.sum_totient d
+    rw [hsumφ]
+  -- sum over `d`, then `∑_{d∈S} d ≤ (log x)^{2C}`
+  refine le_trans (Finset.abs_sum_le_sum_abs _ _) ?_
+  refine le_trans (Finset.sum_le_sum hfd) ?_
+  rw [← Finset.mul_sum]
+  have hsumd : (∑ d ∈ S, (d : ℝ)) ≤ (Real.log x) ^ (2 * C) := by
+    have hsub : S ⊆ Finset.Icc 1 ⌊(Real.log x) ^ C⌋₊ := by
+      intro d hd
+      rw [hS, Finset.mem_filter] at hd
+      rw [Finset.mem_Icc]
+      refine ⟨by omega, Nat.le_floor hd.2.2⟩
+    have hcardnat : S.card ≤ ⌊(Real.log x) ^ C⌋₊ := by
+      have := Finset.card_le_card hsub
+      rwa [Nat.card_Icc, Nat.add_sub_cancel] at this
+    have hcard : (S.card : ℝ) ≤ (Real.log x) ^ C :=
+      le_trans (by exact_mod_cast hcardnat) (Nat.floor_le (by positivity))
+    have h1 : (∑ d ∈ S, (d : ℝ)) ≤ (S.card : ℝ) * (Real.log x) ^ C := by
+      rw [← nsmul_eq_mul, ← Finset.sum_const]
+      apply Finset.sum_le_sum
+      intro d hd
+      rw [hS, Finset.mem_filter] at hd
+      exact hd.2.2
+    calc (∑ d ∈ S, (d : ℝ)) ≤ (S.card : ℝ) * (Real.log x) ^ C := h1
+      _ ≤ (Real.log x) ^ C * (Real.log x) ^ C :=
+          mul_le_mul_of_nonneg_right hcard (by positivity)
+      _ = (Real.log x) ^ (2 * C) := by rw [← pow_add, ← two_mul]
+  calc C_DLF A C * (x / (Real.log x) ^ (A + 2 * C + 1)) * (∑ d ∈ S, (d : ℝ))
+      ≤ C_DLF A C * (x / (Real.log x) ^ (A + 2 * C + 1)) * (Real.log x) ^ (2 * C) :=
+        mul_le_mul_of_nonneg_left hsumd (mul_nonneg hCDLF_nonneg hWpos.le)
+    _ = C_DLF A C * x / (Real.log x) ^ (A + 1) := by
+        rw [show A + 2 * C + 1 = (A + 1) + 2 * C by ring, pow_add]
+        field_simp
 
 def C_BV_LFT : ℝ := sorry
 
@@ -524,10 +996,11 @@ The proof in the book uses the classical version of Perron's integral formula as
 But we have a different version in PNT+. I haven't worked out how this changes the proof yet.
 -/) (uses := [large_sieve])]
 theorem LargeSieve_convolution {M N : ℕ} (f g : ArithmeticFunction ℝ) (hf : ∀ n > M, f n = 0) (hg : ∀ n > N, g n = 0)
-    {x Q : ℝ} (hx : 1 ≤ x) (hQ : 1 ≤ Q) :
-  open Classical in
+    {x Q : ℝ} (hx : 2 ≤ x) (hQ : 1 ≤ Q) :
+    open Classical in
     summatory (fun q ↦ ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive, q * (q.totient : ℝ)⁻¹ * ⨆ y ∈ Set.Icc 1 x, ‖summatory (fun n ↦ (f * g) n * χ n) y‖) Q
-      ≤ (√(N * M) + √M * Q + √N * Q + Q^2) * √(∑ n ∈ Finset.Icc 1 M, (f n)^2) * √(∑ n ∈ Finset.Icc 1 N, (g n)^2) := by sorry
+      ≤ (√(N * M) + √M * Q + √N * Q + Q^2) * Real.log x * √(∑ n ∈ Finset.Icc 1 M, (f n)^2) * √(∑ n ∈ Finset.Icc 1 N, (g n)^2) := by
+  sorry
 
 
 -- TODO: Figure out if the j-1 -s here are harmful (of course they are) and rewrite the proofs to use j/j+1 instead of j-1/j.
