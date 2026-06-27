@@ -482,31 +482,64 @@ theorem Delta_LambdaFlat_decomp [ProofData] {C : ℕ} {y : ℝ} (q : ℕ) (a : Z
         exact add_le_add (le_refl _) hSlargeBound
 
 
-/-- A power of `log x` is dominated by `√x`: for `x ≥ 1` and `M : ℕ`,
-`(log x)^M ≤ (2M)^M · √x`. -/
-theorem log_pow_le_const_mul_sqrt {x : ℝ} (hx : 1 ≤ x) (M : ℕ) :
-    (Real.log x) ^ M ≤ (2 * (M:ℝ)) ^ M * Real.sqrt x := by
-  rcases Nat.eq_zero_or_pos M with hM | hM
-  · subst hM
-    simp only [pow_zero, Nat.cast_zero, mul_zero, one_mul]
-    exact Real.one_le_sqrt.mpr hx
-  have hε : (0:ℝ) < 1 / (2 * M) := by positivity
-  have hlog : Real.log x ≤ x ^ ((1:ℝ) / (2 * M)) / (1 / (2 * M)) :=
-    Real.log_le_rpow_div (by linarith) hε
-  field_simp at hlog
-  calc (Real.log x) ^ M ≤ (2 * M * x ^ ((1:ℝ) / (2 * M))) ^ M :=
-        pow_le_pow_left₀ (Real.log_nonneg hx) hlog M
-    _ = (2 * (M:ℝ))^M * Real.sqrt x := by
-        rw [mul_pow, ← Real.rpow_natCast (x ^ _) M, ← Real.rpow_mul (by linarith),
-          Real.sqrt_eq_rpow]
-        congr 2
-        field_simp
 
 /-- Divisors pair as `(d, n/d)` around `√n`, so `τ(n) ≤ 2√n`.
 (Mathlib only has `Nat.card_divisors_le_self : τ(n) ≤ n`.) -/
 theorem card_divisors_le_two_mul_sqrt (n : ℕ) :
     (n.divisors.card : ℝ) ≤ 2 * Real.sqrt n := by
-  sorry
+  classical
+  set f : ℕ → ℕ := fun d => if d * d ≤ n then d else n / d with hf
+  -- Each value `b` of `f` has at most two preimages: `b` and `n / b`.
+  have hfib : ∀ b ∈ n.divisors.image f, ({a ∈ n.divisors | f a = b}).card ≤ 2 := by
+    intro b _hb
+    have hsub : {a ∈ n.divisors | f a = b} ⊆ ({b, n / b} : Finset ℕ) := by
+      intro a ha
+      simp only [Finset.mem_filter, Nat.mem_divisors] at ha
+      obtain ⟨⟨hdvd, hn0⟩, hfa⟩ := ha
+      simp only [hf] at hfa
+      rw [Finset.mem_insert, Finset.mem_singleton]
+      split_ifs at hfa with hc
+      · exact Or.inl hfa
+      · right
+        subst hfa
+        exact (Nat.div_div_self hdvd hn0).symm
+    exact (Finset.card_le_card hsub).trans ((Finset.card_insert_le _ _).trans (by simp))
+  have h1 : n.divisors.card ≤ 2 * (n.divisors.image f).card :=
+    Finset.card_le_mul_card_image n.divisors 2 hfib
+  -- Every value of `f` lies in `[1, ⌊√n⌋]`.
+  have h2 : n.divisors.image f ⊆ Finset.Icc 1 (Nat.sqrt n) := by
+    intro b hb
+    rw [Finset.mem_image] at hb
+    obtain ⟨d, hd, rfl⟩ := hb
+    have hd1 : 1 ≤ d := Nat.pos_of_mem_divisors hd
+    rw [Nat.mem_divisors] at hd
+    obtain ⟨hdvd, hn0⟩ := hd
+    have hd0 : 0 < d := hd1
+    have hdle : d ≤ n := Nat.le_of_dvd (Nat.pos_of_ne_zero hn0) hdvd
+    rw [Finset.mem_Icc]
+    simp only [hf]
+    split_ifs with hc
+    · exact ⟨hd1, Nat.le_sqrt.mpr hc⟩
+    · refine ⟨(Nat.one_le_div_iff hd0).mpr hdle, Nat.le_sqrt.mpr ?_⟩
+      have hq : d * (n / d) = n := Nat.mul_div_cancel' hdvd
+      have hlt : n / d ≤ d := by
+        by_contra h
+        push_neg at h
+        have : d * d ≤ d * (n / d) := by gcongr
+        rw [hq] at this
+        exact hc this
+      have : (n / d) * (n / d) ≤ d * (n / d) := by gcongr
+      rwa [hq] at this
+  have h3 : (n.divisors.image f).card ≤ Nat.sqrt n := by
+    calc (n.divisors.image f).card ≤ (Finset.Icc 1 (Nat.sqrt n)).card :=
+          Finset.card_le_card h2
+      _ = Nat.sqrt n := by rw [Nat.card_Icc]; omega
+  have h4 : n.divisors.card ≤ 2 * Nat.sqrt n := by omega
+  calc (n.divisors.card : ℝ) ≤ ((2 * Nat.sqrt n : ℕ) : ℝ) := by exact_mod_cast h4
+    _ = 2 * (Nat.sqrt n : ℝ) := by push_cast; ring
+    _ ≤ 2 * Real.sqrt n := by
+        gcongr
+        exact Real.nat_sqrt_le_real_sqrt
 
 /-- For `x ≥ 1`, `δ > 0`: `(log x)^M ≤ (M/δ)^M · x^δ`. Generalizes
 `log_pow_le_const_mul_sqrt` (the `δ = 1/2` case); we use `δ = 1/4`. -/
