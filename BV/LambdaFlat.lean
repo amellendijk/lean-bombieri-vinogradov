@@ -1092,7 +1092,187 @@ theorem Delta_LambdaFlat_small_conductor [ProofData] (A C : ℕ) {y : ℝ}
         rw [show A + 2 * C + 1 = (A + 1) + 2 * C by ring, pow_add]
         field_simp
 
-def C_BV_LFT : ℝ := sorry
+/-- `maxy` of a function that is nonnegative on `[√x, x]` is nonnegative. -/
+theorem maxy_nonneg [ProofData] {f : ℝ → ℝ}
+    (hf : ∀ y, √x ≤ y → y ≤ x → 0 ≤ f y) : 0 ≤ maxy f := by
+  rw [maxy]
+  refine Real.iSup_nonneg (fun y ↦ Real.iSup_nonneg (fun hy ↦ hf y hy.1 hy.2))
+
+/-- If `f` is bounded above by a nonnegative `B` on `[√x, x]`, then `f y ≤ maxy f`
+for any `y ∈ [√x, x]`. -/
+theorem le_maxy [ProofData] {f : ℝ → ℝ} {y : ℝ} (hy1 : √x ≤ y) (hy2 : y ≤ x)
+    {B : ℝ} (hB : 0 ≤ B) (hbound : ∀ z, √x ≤ z → z ≤ x → f z ≤ B) :
+    f y ≤ maxy f := by
+  rw [maxy]
+  have hbdd : BddAbove (Set.range fun z => ⨆ (_ : z ∈ Set.Icc (√x) x), f z) := by
+    refine ⟨B, ?_⟩
+    rintro _ ⟨z, rfl⟩
+    exact Real.iSup_le (fun hz => hbound z hz.1 hz.2) hB
+  refine le_ciSup_of_le hbdd y (le_of_eq ?_)
+  have hmem : y ∈ Set.Icc (√x) x := Set.mem_Icc.mpr ⟨hy1, hy2⟩
+  simp [hmem]
+
+/-- `S r y ξ` is nonnegative (it is a norm). -/
+theorem S_nonneg [ProofData] {q : ℕ} (r : ℕ) (y : ℝ) (ξ : DirichletCharacter ℂ q) :
+    0 ≤ S r y ξ := norm_nonneg _
+
+/-- `S r y ξ ≤ maxy (S r · ξ)` for `y ∈ [√x, x]`. -/
+theorem S_le_maxy [ProofData] {q : ℕ} (r : ℕ) (ξ : DirichletCharacter ℂ q) {y : ℝ}
+    (hy1 : √x ≤ y) (hy2 : y ≤ x) : S r y ξ ≤ maxy (fun y ↦ S r y ξ) := by
+  refine le_maxy (f := fun y ↦ S r y ξ) hy1 hy2
+    (B := summatory (fun n ↦ ‖onCoprime r Λ♭ n * ξ n‖) x)
+    (summatory_nonneg _ _ (fun n _ ↦ norm_nonneg _)) (fun z hz1 hz2 ↦ ?_)
+  simp only [S]
+  rw [summatory]
+  refine (norm_sum_le _ _).trans ?_
+  rw [summatory]
+  exact Finset.sum_le_sum_of_subset_of_nonneg (Nat.Icc_mono_right hz2)
+    (fun i _ _ ↦ norm_nonneg _)
+
+/-- The implied constant in `Delta_LambdaFlat_small_conductor` is nonnegative. -/
+theorem C_DLF_nonneg [ProofData] (A C : ℕ) : 0 ≤ C_DLF A C := by
+  rw [C_DLF]
+  have h1 := C_SW_nonneg (A + 2 * C + 1) (2 * C)
+  have h2 := C_SW_nonneg (A + 2 * C + 1) 0
+  have t1 : (0:ℝ) ≤ (C_SW (A + 2 * C + 1) (2 * C) + C_SW (A + 2 * C + 1) 0) * 2 ^ (A + 2 * C + 1) :=
+    mul_nonneg (by linarith) (by positivity)
+  have t2 : (0:ℝ) ≤ 3 * (Real.log 2)⁻¹
+      * (2 * ((2 + (A + 2 * C + 1) : ℕ) : ℝ)) ^ (2 + (A + 2 * C + 1)) := by positivity
+  have t3 : (0:ℝ) ≤ C_DLS * (2 * (4 * ((A + 2 * C + 2 : ℕ) : ℝ)) ^ (A + 2 * C + 2)) := by
+    have hC : (0:ℝ) ≤ C_DLS := by norm_num [C_DLS]
+    exact mul_nonneg hC (by positivity)
+  have t4 : (0:ℝ) ≤ 2 * (2 * ((1 + (A + 2 * C + 1) : ℕ) : ℝ)) ^ (1 + (A + 2 * C + 1)) := by
+    positivity
+  linarith
+
+/-! ### The totient bound `∑_{n ≤ Q} 1/φ(n) ≪ log x`
+
+The proof writes `1/φ` as a Dirichlet convolution `fAF * invAF` (Step 3), where
+`fAF d = μ(d)²/(d·φ(d))` and `invAF e = 1/e`.  The hyperbola identity
+`ArithmeticFunction.summatory_mul_eq_summatory` then gives
+`∑_{n≤Q} 1/φ(n) = ∑_{d≤Q} fAF d · ∑_{e≤Q/d} 1/e ≤ (∑_d fAF d)·(1 + log x) ≤ C_tot · log x`,
+using the harmonic bound (Step 6), summability of `fAF` (Steps 4–5), and `1 ≤ log x`.
+-/
+
+/-- `e ↦ 1/e` as an arithmetic function (Dirichlet "harmonic" factor `g`). -/
+noncomputable def invAF : ArithmeticFunction ℝ where
+  toFun n := (n : ℝ)⁻¹
+  map_zero' := by simp
+
+@[simp] theorem invAF_apply (n : ℕ) : invAF n = (n : ℝ)⁻¹ := rfl
+
+/-- `d ↦ μ(d)² / (d · φ(d))`; the Dirichlet factor `f` with `1/φ = fAF * invAF`. -/
+noncomputable def fAF : ArithmeticFunction ℝ where
+  toFun d := ((μ d : ℝ) ^ 2) / (d * d.totient)
+  map_zero' := by simp
+
+@[simp] theorem fAF_apply (d : ℕ) : fAF d = ((μ d : ℝ) ^ 2) / (d * d.totient) := rfl
+
+/-- `n ↦ 1/φ(n)` as an arithmetic function. -/
+noncomputable def invTotientAF : ArithmeticFunction ℝ where
+  toFun n := (n.totient : ℝ)⁻¹
+  map_zero' := by simp
+
+@[simp] theorem invTotientAF_apply (n : ℕ) : invTotientAF n = (n.totient : ℝ)⁻¹ := rfl
+
+theorem fAF_nonneg (d : ℕ) : 0 ≤ fAF d := by
+  rw [fAF_apply]; positivity
+
+/-- **Step 4 (TODO).** `√d ≤ φ(d)` for `d ≥ 7`, in the form needed for the comparison test:
+`fAF d ≤ d^(-3/2)`.  The exceptional `d ∈ {2,6}` are excluded; they are absorbed in Step 5. -/
+theorem fAF_le_rpow {d : ℕ} (hd : 7 ≤ d) : fAF d ≤ (d : ℝ) ^ (-(3/2) : ℝ) := sorry
+
+/-- **Step 5 (TODO).** `fAF` is summable, by comparison with the convergent `3/2`-series
+(`Real.summable_one_div_nat_rpow`), absorbing the finitely many terms `d < 7`. -/
+theorem summable_fAF : Summable (fun d ↦ fAF d) := sorry
+
+/-- **Step 3 (TODO).** The Dirichlet convolution identity `1/φ = fAF * invAF`.
+Both sides are multiplicative; reduce to prime powers via `multiplicative_factorization`,
+where `(fAF * invAF)(pᵏ) = 1/pᵏ + 1/(pᵏ(p-1)) = 1/(pᵏ⁻¹(p-1)) = 1/φ(pᵏ)`. -/
+theorem invTotientAF_eq_mul : invTotientAF = fAF * invAF := sorry
+
+/-- **Step 6 (TODO).** Partial harmonic-sum bound `∑_{e ≤ t} 1/e ≤ 1 + log t` for `t ≥ 1`,
+via `summatory (⇑invAF) t = (harmonic ⌊t⌋ : ℝ)` and `harmonic_le_one_add_log`. -/
+theorem summatory_invAF_le {t : ℝ} (ht : 1 ≤ t) :
+    summatory (⇑invAF) t ≤ 1 + Real.log t := sorry
+
+/-- The Mertens-type constant `∑_d μ(d)²/(d φ(d))`, doubled (the `2` converts `1 + log x`
+into `2 log x` using `1 ≤ log x`). -/
+noncomputable def C_tot : ℝ := 2 * ∑' d, fAF d
+
+/-- The totient bound: `∑_{n ≤ Q} 1/φ(n) ≤ C_tot · log x`. -/
+theorem summatory_totient_inv_le [ProofData] (Q : ℝ) (hQ : Q ≤ x) :
+    summatory (fun n ↦ (n.totient : ℝ)⁻¹) Q ≤ C_tot * Real.log x := by
+  have hlogx : (1 : ℝ) ≤ Real.log x := one_le_log_x
+  have hlog_pos : 0 < Real.log x := by linarith
+  -- Rewrite `1/φ` as the convolution `fAF * invAF`, then apply the hyperbola identity.
+  rw [show (fun n ↦ (n.totient : ℝ)⁻¹) = ⇑(fAF * invAF) from by
+        rw [← invTotientAF_eq_mul]; funext n; rw [invTotientAF_apply],
+      ArithmeticFunction.summatory_mul_eq_summatory]
+  rw [C_tot]
+  calc summatory (fun n ↦ fAF n * summatory (⇑invAF) (Q / n)) Q
+      ≤ summatory (fun n ↦ fAF n * (2 * Real.log x)) Q := by
+        rw [summatory, summatory]
+        refine Finset.sum_le_sum (fun d hd ↦ ?_)
+        rw [Nat.mem_Icc] at hd
+        have hd1 : (1 : ℝ) ≤ d := hd.1
+        have hdpos : (0 : ℝ) < d := by linarith
+        refine mul_le_mul_of_nonneg_left ?_ (fAF_nonneg d)
+        have hQd1 : 1 ≤ Q / d := by
+          rw [le_div_iff₀ hdpos]; linarith [hd.2]
+        have hQdx : Q / d ≤ x := by
+          calc Q / d ≤ Q := by rw [div_le_iff₀ hdpos]; nlinarith [hd.2]
+            _ ≤ x := hQ
+        calc summatory (⇑invAF) (Q / d)
+            ≤ 1 + Real.log (Q / d) := summatory_invAF_le hQd1
+          _ ≤ 1 + Real.log x := by
+                have := Real.log_le_log (by linarith : (0 : ℝ) < Q / d) hQdx
+                linarith
+          _ ≤ 2 * Real.log x := by linarith
+    _ = summatory (fun n ↦ fAF n) Q * (2 * Real.log x) := summatory_mul
+    _ ≤ (∑' d, fAF d) * (2 * Real.log x) := by
+        refine mul_le_mul_of_nonneg_right ?_ (by positivity)
+        rw [summatory]
+        exact summable_fAF.sum_le_tsum _ (fun i _ ↦ fAF_nonneg i)
+    _ = 2 * (∑' d, fAF d) * Real.log x := by ring
+
+/-- The implied constant in `BV_LambdaFlat_via_T`. -/
+noncomputable def C_BV_LFT (A C : ℕ) : ℝ := C_DLF A C * C_tot
+
+/-- Per-`q` bound: combine the conductor decomposition with the small-conductor estimate and
+replace each `S` by its maximum over `y`. -/
+theorem maxya_Delta_LambdaFlat_le [ProofData] (A C : ℕ) {q : ℕ}
+    (hq1 : 1 ≤ q) (hqx : (q : ℝ) ≤ √x) :
+  open Classical in
+    maxya q (fun y a ↦ |Δ_[Λ♭](y; q, a)|)
+      ≤ (q.totient : ℝ)⁻¹ * (C_DLF A C * x / (Real.log x) ^ (A + 1))
+        + (q.totient : ℝ)⁻¹ * ∑ d ∈ q.divisors with (Real.log x) ^ C < (d : ℕ),
+            ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive, maxy (fun y ↦ S (q / d) y ξ) := by
+  classical
+  have hq0 : 0 < q := hq1
+  have hφ : (0 : ℝ) ≤ (q.totient : ℝ)⁻¹ := inv_nonneg.mpr (by positivity)
+  refine maxya_le_unit (fun y hy1 hy2 a ha ↦ ?_) ?_
+  · refine (Delta_LambdaFlat_decomp (C := C) (y := y) q a ha).trans (add_le_add ?_ ?_)
+    · exact mul_le_mul_of_nonneg_left
+        (Delta_LambdaFlat_small_conductor A C hy1 hy2 q hq0 hqx a ha) hφ
+    · refine mul_le_mul_of_nonneg_left ?_ hφ
+      exact Finset.sum_le_sum (fun d _ ↦ Finset.sum_le_sum (fun ξ _ ↦ S_le_maxy _ ξ hy1 hy2))
+  · refine add_nonneg (mul_nonneg hφ ?_) (mul_nonneg hφ ?_)
+    · exact div_nonneg (mul_nonneg (C_DLF_nonneg A C) x_pos.le) (by positivity)
+    · exact Finset.sum_nonneg (fun d _ ↦ Finset.sum_nonneg
+        (fun ξ _ ↦ maxy_nonneg (fun y _ _ ↦ S_nonneg _ _ _)))
+
+/-- The summand of the regrouped main term: `1/(φ(d)φ(r)) · ∑*_{ξ mod d} maxₓ S_r(·, ξ)`. -/
+noncomputable def gLFT [ProofData] (d r : ℕ) : ℝ :=
+  open Classical in
+  (d.totient : ℝ)⁻¹ * (r.totient : ℝ)⁻¹ *
+    ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive, maxy (fun y ↦ S r y ξ)
+
+theorem gLFT_nonneg [ProofData] (d r : ℕ) : 0 ≤ gLFT d r := by
+  classical
+  rw [gLFT]
+  refine mul_nonneg (mul_nonneg (by positivity) (by positivity)) ?_
+  exact Finset.sum_nonneg (fun ξ _ ↦ maxy_nonneg (fun y _ _ ↦ S_nonneg _ _ _))
 
 @[blueprint (statement := /--
 $$\sum_{q \le Q} \max_{\substack{\sqrt{x} \le y \le x \\ a \in (\Z/q\Z)^*}} \left|\Delta_{\Lambda^\flat}(y;\,q,\,a)\right| \le \sum_{r \le Q} \frac{T_r(x,Q)}{\varphi(r)} + O\!\left(\frac{x}{(\log x)^A}\right)$$
@@ -1100,10 +1280,139 @@ $$\sum_{q \le Q} \max_{\substack{\sqrt{x} \le y \le x \\ a \in (\Z/q\Z)^*}} \lef
 Sum the error from \ref{Delta_LambdaFlat_small_conductor} over $q \le Q$ using
 $\sum_{n \le x} 1/\varphi(n) \ll \log x$, then regroup the main sum by $r = q/d$.
 -/) (uses := [Delta_LambdaFlat_decomp, Delta_LambdaFlat_small_conductor, character_sum_Mobius, T])]
-theorem BV_LambdaFlat_via_T (Q : ℝ) (A C : ℕ) [ProofData] :
-  |summatory (fun q ↦ maxya q fun y a ↦ |Δ_[Λ♭](y; q, a)|) Q
-  - summatory (fun r ↦ T C r Q) Q| ≤ C_BV_LFT * x / (Real.log x)^A
- := by sorry
+theorem BV_LambdaFlat_via_T [ProofData] (Q : ℝ) (A C : ℕ) (hQ : Q ≤ √x) :
+    summatory (fun q ↦ maxya q fun y a ↦ |Δ_[Λ♭](y; q, a)|) Q
+      ≤ summatory (fun r ↦ (r.totient : ℝ)⁻¹ * T C r Q) Q
+        + C_BV_LFT A C * x / (Real.log x) ^ A := by
+  classical
+  have hlog_pos : 0 < Real.log x := log_x_pos
+  have hlog_ne : Real.log x ≠ 0 := ne_of_gt hlog_pos
+  have hsx : √x ≤ x := by
+    rw [Real.sqrt_le_iff]
+    exact ⟨ProofData.x_nonneg, le_self_pow₀ (by linarith [ProofData.le_x]) (by norm_num)⟩
+  have hQx : Q ≤ x := le_trans hQ hsx
+  set Kc : ℝ := C_DLF A C * x / (Real.log x) ^ (A + 1) with hKc
+  have hKc_nonneg : 0 ≤ Kc := by
+    rw [hKc]; exact div_nonneg (mul_nonneg (C_DLF_nonneg A C) x_pos.le) (by positivity)
+  -- Rewrite the main bound as a double sum of `gLFT`.
+  have hMB : summatory (fun r ↦ (r.totient : ℝ)⁻¹ * T C r Q) Q
+      = ∑ r ∈ Nat.Icc 1 Q, ∑ d ∈ Nat.Icc ((Real.log x) ^ C) (Q / r), gLFT d r := by
+    rw [summatory]
+    refine Finset.sum_congr rfl (fun r _ ↦ ?_)
+    rw [T, Real.rpow_natCast, Finset.mul_sum]
+    refine Finset.sum_congr rfl (fun d _ ↦ ?_)
+    rw [gLFT]; ring
+  -- Per-`q` bound, summed over `q ≤ Q`.
+  have hkey : summatory (fun q ↦ maxya q fun y a ↦ |Δ_[Λ♭](y; q, a)|) Q
+      ≤ ∑ q ∈ Nat.Icc 1 Q,
+          ((q.totient : ℝ)⁻¹ * Kc
+            + (q.totient : ℝ)⁻¹ * ∑ d ∈ q.divisors with (Real.log x) ^ C < (d : ℕ),
+                ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive, maxy (fun y ↦ S (q / d) y ξ)) := by
+    rw [summatory]
+    refine Finset.sum_le_sum (fun q hq ↦ ?_)
+    rw [Nat.mem_Icc] at hq
+    rw [hKc]
+    exact maxya_Delta_LambdaFlat_le A C (by exact_mod_cast hq.1) (le_trans hq.2 hQ)
+  rw [Finset.sum_add_distrib] at hkey
+  -- Bound the error part using the (assumed) totient bound.
+  have hERR : ∑ q ∈ Nat.Icc 1 Q, (q.totient : ℝ)⁻¹ * Kc
+      ≤ C_BV_LFT A C * x / (Real.log x) ^ A := by
+    rw [← Finset.sum_mul]
+    have htot : ∑ q ∈ Nat.Icc 1 Q, (q.totient : ℝ)⁻¹ ≤ C_tot * Real.log x := by
+      have h := summatory_totient_inv_le Q hQx
+      rwa [summatory] at h
+    calc (∑ q ∈ Nat.Icc 1 Q, (q.totient : ℝ)⁻¹) * Kc
+        ≤ (C_tot * Real.log x) * Kc := mul_le_mul_of_nonneg_right htot hKc_nonneg
+      _ = C_BV_LFT A C * x / (Real.log x) ^ A := by
+          rw [hKc, C_BV_LFT, pow_succ]; field_simp
+  -- Bound the main part by regrouping `q = r·d`.
+  have hMAIN : ∑ q ∈ Nat.Icc 1 Q, (q.totient : ℝ)⁻¹ *
+        ∑ d ∈ q.divisors with (Real.log x) ^ C < (d : ℕ),
+          ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive, maxy (fun y ↦ S (q / d) y ξ)
+      ≤ summatory (fun r ↦ (r.totient : ℝ)⁻¹ * T C r Q) Q := by
+    rw [hMB]
+    -- Step A: distribute `1/φ(q)` and use `φ(d)φ(q/d) ≤ φ(q)` term by term.
+    refine le_trans (b := ∑ q ∈ Nat.Icc 1 Q,
+        ∑ d ∈ q.divisors with (Real.log x) ^ C < (d : ℕ), gLFT d (q / d)) ?_ ?_
+    · refine Finset.sum_le_sum (fun q hq ↦ ?_)
+      rw [Nat.mem_Icc] at hq
+      have hq1 : 1 ≤ q := by exact_mod_cast hq.1
+      have hqpos : 0 < q := hq1
+      rw [Finset.mul_sum]
+      refine Finset.sum_le_sum (fun d hd ↦ ?_)
+      rw [Finset.mem_filter, Nat.mem_divisors] at hd
+      obtain ⟨⟨hdvd, _⟩, _⟩ := hd
+      have hdpos : 0 < d := Nat.pos_of_dvd_of_pos hdvd hqpos
+      have hqdpos : 0 < q / d := Nat.div_pos (Nat.le_of_dvd hqpos hdvd) hdpos
+      have hsm := Nat.totient_super_multiplicative d (q / d)
+      rw [Nat.mul_div_cancel' hdvd] at hsm
+      have hcoef : (q.totient : ℝ)⁻¹ ≤ (d.totient : ℝ)⁻¹ * ((q / d).totient : ℝ)⁻¹ := by
+        rw [← mul_inv]
+        apply inv_anti₀
+        · exact_mod_cast Nat.mul_pos (Nat.totient_pos.mpr hdpos) (Nat.totient_pos.mpr hqdpos)
+        · exact_mod_cast hsm
+      rw [gLFT]
+      exact mul_le_mul_of_nonneg_right hcoef
+        (Finset.sum_nonneg (fun ξ _ ↦ maxy_nonneg (fun y _ _ ↦ S_nonneg _ _ _)))
+    -- Step B: reindex `(q, d) ↦ (q/d, d)`.
+    · rw [Finset.sum_sigma', Finset.sum_sigma']
+      set LHSsig := (Nat.Icc 1 Q).sigma
+        (fun q => q.divisors.filter (fun d => (Real.log x) ^ C < (d : ℕ))) with hLHSsig
+      set RHSsig := (Nat.Icc 1 Q).sigma
+        (fun r => Nat.Icc ((Real.log x) ^ C) (Q / r)) with hRHSsig
+      have hinj : ∀ σ₁ ∈ LHSsig, ∀ σ₂ ∈ LHSsig,
+          (fun σ : Σ _ : ℕ, ℕ => (⟨σ.fst / σ.snd, σ.snd⟩ : Σ _ : ℕ, ℕ)) σ₁
+            = (fun σ : Σ _ : ℕ, ℕ => (⟨σ.fst / σ.snd, σ.snd⟩ : Σ _ : ℕ, ℕ)) σ₂ → σ₁ = σ₂ := by
+        intro σ₁ h₁ σ₂ h₂ heq
+        obtain ⟨q₁, d₁⟩ := σ₁
+        obtain ⟨q₂, d₂⟩ := σ₂
+        simp only [Sigma.mk.injEq, heq_eq_eq] at heq
+        simp only [hLHSsig, Finset.mem_sigma, Finset.mem_filter, Nat.mem_divisors] at h₁ h₂
+        obtain ⟨_, ⟨hdvd1, _⟩, _⟩ := h₁
+        obtain ⟨_, ⟨hdvd2, _⟩, _⟩ := h₂
+        obtain ⟨hdiv, hd⟩ := heq
+        have hq : q₁ = q₂ := by
+          rw [← Nat.mul_div_cancel' hdvd1, ← Nat.mul_div_cancel' hdvd2, hdiv, hd]
+        subst hq; subst hd; rfl
+      calc ∑ σ ∈ LHSsig, gLFT σ.snd (σ.fst / σ.snd)
+          = ∑ τ ∈ LHSsig.image
+              (fun σ : Σ _ : ℕ, ℕ => (⟨σ.fst / σ.snd, σ.snd⟩ : Σ _ : ℕ, ℕ)), gLFT τ.snd τ.fst :=
+            (Finset.sum_image (f := fun τ : Σ _ : ℕ, ℕ => gLFT τ.snd τ.fst) hinj).symm
+        _ ≤ ∑ τ ∈ RHSsig, gLFT τ.snd τ.fst := by
+            refine Finset.sum_le_sum_of_subset_of_nonneg ?_ (fun τ _ _ ↦ gLFT_nonneg τ.snd τ.fst)
+            intro τ hτ
+            rw [Finset.mem_image] at hτ
+            obtain ⟨σ, hσ, rfl⟩ := hτ
+            obtain ⟨q, d⟩ := σ
+            simp only [hLHSsig, Finset.mem_sigma, Finset.mem_filter, Nat.mem_divisors] at hσ
+            obtain ⟨hqmem, ⟨hdvd, _⟩, hdL⟩ := hσ
+            rw [Nat.mem_Icc] at hqmem
+            have hq1 : 1 ≤ q := by exact_mod_cast hqmem.1
+            have hqpos : 0 < q := hq1
+            have hdpos : 0 < d := Nat.pos_of_dvd_of_pos hdvd hqpos
+            have hqdpos : 0 < q / d := Nat.div_pos (Nat.le_of_dvd hqpos hdvd) hdpos
+            rw [hRHSsig, Finset.mem_sigma]
+            refine ⟨?_, ?_⟩
+            · rw [Nat.mem_Icc]
+              refine ⟨by exact_mod_cast hqdpos, ?_⟩
+              calc (↑(q / d) : ℝ) ≤ (q : ℝ) := by exact_mod_cast Nat.div_le_self q d
+                _ ≤ Q := hqmem.2
+            · rw [Nat.mem_Icc]
+              refine ⟨le_of_lt hdL, ?_⟩
+              rw [le_div_iff₀ (by exact_mod_cast hqdpos : (0 : ℝ) < (↑(q / d) : ℝ))]
+              calc (d : ℝ) * (↑(q / d) : ℝ) = ((d * (q / d) : ℕ) : ℝ) := by push_cast; ring
+                _ = (q : ℝ) := by exact_mod_cast Nat.mul_div_cancel' hdvd
+                _ ≤ Q := hqmem.2
+  calc summatory (fun q ↦ maxya q fun y a ↦ |Δ_[Λ♭](y; q, a)|) Q
+      ≤ (∑ q ∈ Nat.Icc 1 Q, (q.totient : ℝ)⁻¹ * Kc)
+        + ∑ q ∈ Nat.Icc 1 Q, (q.totient : ℝ)⁻¹ *
+            ∑ d ∈ q.divisors with (Real.log x) ^ C < (d : ℕ),
+              ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive,
+                maxy (fun y ↦ S (q / d) y ξ) := hkey
+    _ ≤ (C_BV_LFT A C * x / (Real.log x) ^ A)
+        + summatory (fun r ↦ (r.totient : ℝ)⁻¹ * T C r Q) Q := add_le_add hERR hMAIN
+    _ = summatory (fun r ↦ (r.totient : ℝ)⁻¹ * T C r Q) Q
+        + C_BV_LFT A C * x / (Real.log x) ^ A := by ring
 
 /-! ### Large sieve estimates -/
 
