@@ -481,8 +481,6 @@ theorem Delta_LambdaFlat_decomp [ProofData] {C : ℕ} {y : ℝ} (q : ℕ) (a : Z
         rw [hSsmallEq, Complex.norm_real, Real.norm_eq_abs]
         exact add_le_add (le_refl _) hSlargeBound
 
-
-
 /-- Divisors pair as `(d, n/d)` around `√n`, so `τ(n) ≤ 2√n`.
 (Mathlib only has `Nat.card_divisors_le_self : τ(n) ≤ n`.) -/
 theorem card_divisors_le_two_mul_sqrt (n : ℕ) :
@@ -541,11 +539,35 @@ theorem card_divisors_le_two_mul_sqrt (n : ℕ) :
         gcongr
         exact Real.nat_sqrt_le_real_sqrt
 
-/-- For `x ≥ 1`, `δ > 0`: `(log x)^M ≤ (M/δ)^M · x^δ`. Generalizes
-`log_pow_le_const_mul_sqrt` (the `δ = 1/2` case); we use `δ = 1/4`. -/
+/-- For `x ≥ 1`, `δ > 0`: `(log x)^M ≤ (M/δ)^M · x^δ`. The `δ = 1/2` case recovers the
+`√x` bound; we also use `δ = 1/4` to absorb the divisor factor `τ(q) ≤ 2x^{1/4}`. -/
 theorem log_pow_le_const_mul_rpow {x : ℝ} (hx : 1 ≤ x) (M : ℕ) {δ : ℝ} (hδ : 0 < δ) :
     (Real.log x) ^ M ≤ ((M : ℝ) / δ) ^ M * x ^ δ := by
-  sorry
+  have hx0 : 0 < x := by linarith
+  rcases Nat.eq_zero_or_pos M with hM | hM
+  · subst hM
+    simp only [pow_zero, Nat.cast_zero, zero_div, one_mul]
+    calc (1:ℝ) = (1:ℝ) ^ δ := (Real.one_rpow δ).symm
+      _ ≤ x ^ δ := Real.rpow_le_rpow (by norm_num) hx hδ.le
+  · have hlogx : 0 ≤ Real.log x := Real.log_nonneg hx
+    set c : ℝ := δ / (M : ℝ) with hc
+    have hMpos : (0:ℝ) < (M : ℝ) := by exact_mod_cast hM
+    have hcpos : 0 < c := by rw [hc]; positivity
+    have hMδ : (M : ℝ) / δ = c⁻¹ := by rw [hc]; field_simp
+    -- Key pointwise bound: log x ≤ (M/δ) · x^c
+    have key : Real.log x ≤ c⁻¹ * x ^ c := by
+      have h1 : Real.log (x ^ c) = c * Real.log x := Real.log_rpow hx0 c
+      have h2 : Real.log (x ^ c) ≤ x ^ c - 1 :=
+        Real.log_le_sub_one_of_pos (Real.rpow_pos_of_pos hx0 c)
+      have h3 : c * Real.log x ≤ x ^ c := by rw [h1] at h2; linarith
+      rw [inv_mul_eq_div, le_div_iff₀ hcpos, mul_comm]
+      exact h3
+    have hcM : c * (M : ℝ) = δ := by rw [hc]; field_simp
+    calc (Real.log x) ^ M
+        ≤ (c⁻¹ * x ^ c) ^ M := pow_le_pow_left₀ hlogx key M
+      _ = (c⁻¹) ^ M * (x ^ c) ^ M := mul_pow _ _ _
+      _ = ((M : ℝ) / δ) ^ M * x ^ δ := by
+          rw [hMδ, ← Real.rpow_natCast (x ^ c) M, ← Real.rpow_mul hx0.le, hcM]
 
 /-- The sharp-term budget: with no constraint on `q` beyond `q ≤ √x`, the divisor factor
 `τ(q)` is absorbed by the `x^{1/4}` headroom, leaving `x/(log x)^K`. -/
@@ -553,7 +575,45 @@ theorem card_divisors_mul_sqrt_mul_log_le_div [ProofData] {q : ℕ}
     (hq : (q : ℝ) ≤ √x) (K : ℕ) :
     (q.divisors.card : ℝ) * Real.sqrt x * Real.log x
       ≤ 2 * (4 * ((K + 1 : ℕ) : ℝ)) ^ (K + 1) * (x / (Real.log x) ^ K) := by
-  sorry
+  have hx1 : (1:ℝ) ≤ x := by linarith [le_x]
+  have hx0 : (0:ℝ) < x := by linarith [le_x]
+  have hL : (0:ℝ) < Real.log x := log_x_pos
+  have hLK : (0:ℝ) < (Real.log x) ^ K := pow_pos hL K
+  set B : ℝ := (4 * ((K + 1 : ℕ) : ℝ)) ^ (K + 1) with hB
+  have hBpos : 0 < B := by rw [hB]; positivity
+  have hsqrtx : Real.sqrt x = x ^ (1/2 : ℝ) := Real.sqrt_eq_rpow x
+  -- `√(√x) = x^(1/4)`
+  have hsqsq : Real.sqrt (Real.sqrt x) = x ^ (1/4 : ℝ) := by
+    rw [Real.sqrt_eq_rpow, Real.sqrt_eq_rpow, ← Real.rpow_mul hx0.le]
+    norm_num
+  -- divisor bound: `τ(q) ≤ 2·x^(1/4)`
+  have hτ : (q.divisors.card : ℝ) ≤ 2 * x ^ (1/4 : ℝ) := by
+    refine (card_divisors_le_two_mul_sqrt q).trans ?_
+    have hq14 : Real.sqrt (q : ℝ) ≤ x ^ (1/4 : ℝ) := by
+      have := Real.sqrt_le_sqrt hq
+      rwa [hsqsq] at this
+    gcongr
+  -- `(log x)^(K+1) ≤ B · x^(1/4)`
+  have hlog : (Real.log x) ^ (K + 1) ≤ B * x ^ (1/4 : ℝ) := by
+    have h := log_pow_le_const_mul_rpow hx1 (K + 1) (δ := (1/4 : ℝ)) (by norm_num)
+    have hconst : (((K + 1 : ℕ) : ℝ) / (1/4 : ℝ)) = 4 * ((K + 1 : ℕ) : ℝ) := by ring
+    rwa [hconst] at h
+  -- collapse `x^(1/4)·x^(1/2)·x^(1/4) = x`
+  have hxsum : x ^ (1/4 : ℝ) * x ^ (1/2 : ℝ) * x ^ (1/4 : ℝ) = x := by
+    rw [← Real.rpow_add hx0, ← Real.rpow_add hx0,
+      show (1/4 + 1/2 + 1/4 : ℝ) = 1 by norm_num, Real.rpow_one]
+  -- main product inequality
+  have hmain : (q.divisors.card : ℝ) * Real.sqrt x * Real.log x * (Real.log x) ^ K
+      ≤ 2 * B * x := by
+    calc (q.divisors.card : ℝ) * Real.sqrt x * Real.log x * (Real.log x) ^ K
+        = (q.divisors.card : ℝ) * Real.sqrt x * (Real.log x) ^ (K + 1) := by
+          rw [mul_assoc ((q.divisors.card : ℝ) * Real.sqrt x), ← pow_succ']
+      _ ≤ (2 * x ^ (1/4 : ℝ)) * x ^ (1/2 : ℝ) * (B * x ^ (1/4 : ℝ)) := by
+          rw [hsqrtx]; gcongr
+      _ = 2 * B * (x ^ (1/4 : ℝ) * x ^ (1/2 : ℝ) * x ^ (1/4 : ℝ)) := by ring
+      _ = 2 * B * x := by rw [hxsum]
+  rw [← mul_div_assoc, le_div_iff₀ hLK]
+  exact hmain
 
 /-- For a pointwise-nonnegative `f`, `|Δ_[f](y; s, a)| ≤ 2 · ∑_{n≤y} f(n)`. -/
 theorem Delta_abs_le_two_summatory [ProofData] {y : ℝ} {s : ℕ} (hs : 0 < s) {a : ZMod s}
@@ -755,7 +815,15 @@ theorem log_pow_le_div [ProofData] (j N : ℕ) :
     have h1 : 1 ≤ Real.sqrt x := Real.one_le_sqrt.mpr (by linarith [le_x])
     nlinarith [Real.sq_sqrt x_nonneg, h1, Real.sqrt_nonneg x]
   have hKx : (Real.log x) ^ (j + N) ≤ (2 * ((j + N : ℕ) : ℝ)) ^ (j + N) * x := by
-    refine le_trans (log_pow_le_const_mul_sqrt (by linarith [le_x]) (j + N)) ?_
+    have h := log_pow_le_const_mul_rpow (by linarith [le_x] : (1:ℝ) ≤ x) (j + N)
+      (δ := (1/2 : ℝ)) (by norm_num)
+    have hconst : (((j + N : ℕ) : ℝ) / (1/2 : ℝ)) = 2 * ((j + N : ℕ) : ℝ) := by ring
+    rw [hconst] at h
+    refine le_trans h ?_
+    have hxle : x ^ (1/2 : ℝ) ≤ x := by
+      calc x ^ (1/2:ℝ) ≤ x ^ (1:ℝ) :=
+            Real.rpow_le_rpow_of_exponent_le (by linarith [le_x]) (by norm_num)
+        _ = x := Real.rpow_one x
     gcongr
   rw [← mul_div_assoc, le_div_iff₀ (by positivity : (0:ℝ) < (Real.log x) ^ N), ← pow_add]
   exact hKx
@@ -782,8 +850,11 @@ theorem sqrt_mul_log_pow_le_div [ProofData] (j N : ℕ) :
       ≤ (2 * ((j + N : ℕ) : ℝ)) ^ (j + N) * (x / (Real.log x) ^ N) := by
   have hlogx : 0 < Real.log x := log_x_pos
   have hsx : Real.sqrt x * Real.sqrt x = x := Real.mul_self_sqrt x_nonneg
-  have hkey : (Real.log x) ^ (j + N) ≤ (2 * ((j + N : ℕ) : ℝ)) ^ (j + N) * Real.sqrt x :=
-    log_pow_le_const_mul_sqrt (by linarith [le_x]) (j + N)
+  have hkey : (Real.log x) ^ (j + N) ≤ (2 * ((j + N : ℕ) : ℝ)) ^ (j + N) * Real.sqrt x := by
+    have h := log_pow_le_const_mul_rpow (by linarith [le_x] : (1:ℝ) ≤ x) (j + N)
+      (δ := (1/2 : ℝ)) (by norm_num)
+    have hconst : (((j + N : ℕ) : ℝ) / (1/2 : ℝ)) = 2 * ((j + N : ℕ) : ℝ) := by ring
+    rwa [hconst, ← Real.sqrt_eq_rpow] at h
   rw [← mul_div_assoc, le_div_iff₀ (by positivity : (0:ℝ) < (Real.log x) ^ N)]
   calc Real.sqrt x * (Real.log x) ^ j * (Real.log x) ^ N
       = Real.sqrt x * (Real.log x) ^ (j + N) := by rw [mul_assoc, ← pow_add]
