@@ -1178,23 +1178,168 @@ noncomputable def invTotientAF : ArithmeticFunction ℝ where
 theorem fAF_nonneg (d : ℕ) : 0 ≤ fAF d := by
   rw [fAF_apply]; positivity
 
-/-- **Step 4 (TODO).** `√d ≤ φ(d)` for `d ≥ 7`, in the form needed for the comparison test:
-`fAF d ≤ d^(-3/2)`.  The exceptional `d ∈ {2,6}` are excluded; they are absorbed in Step 5. -/
-theorem fAF_le_rpow {d : ℕ} (hd : 7 ≤ d) : fAF d ≤ (d : ℝ) ^ (-(3/2) : ℝ) := sorry
+/-- Termwise bound at a prime power, with a factor `2` that is only required at `p = 2`:
+`p^k ≤ (if p = 2 then 2 else 1) · (φ(p^k))²`. -/
+private theorem primePow_le {p k : ℕ} (hp : p.Prime) (hk : 1 ≤ k) :
+    p ^ k ≤ (if p = 2 then 2 else 1) * ((p ^ k).totient) ^ 2 := by
+  obtain ⟨j, rfl⟩ := Nat.exists_eq_add_of_le hk
+  rw [Nat.totient_prime_pow hp (by omega), show 1 + j - 1 = j by omega]
+  rcases eq_or_ne p 2 with rfl | hp2
+  · rw [if_pos rfl, show (2:ℕ) - 1 = 1 by rfl, mul_one, ← pow_mul, ← pow_succ']
+    exact Nat.pow_le_pow_right (by norm_num) (by omega)
+  · rw [if_neg hp2, one_mul]
+    have hp3 : 3 ≤ p := by
+      have h2 := hp.two_le
+      have := Nat.odd_iff.mp ((hp.eq_two_or_odd').resolve_left hp2)
+      omega
+    have hp1 : 1 ≤ p ^ j := Nat.one_le_pow _ _ (by omega)
+    have hsq : p ≤ (p - 1) ^ 2 := by
+      obtain ⟨m, rfl⟩ : ∃ m, p = m + 1 := ⟨p - 1, by omega⟩
+      have h2m : 2 ≤ m := by omega
+      simp only [Nat.add_sub_cancel]
+      nlinarith [h2m]
+    calc p ^ (1 + j) = p ^ j * p := by rw [pow_add, pow_one, mul_comm]
+      _ ≤ p ^ j * (p ^ j * (p - 1) ^ 2) := by
+            gcongr
+            calc p ≤ (p - 1) ^ 2 := hsq
+              _ ≤ p ^ j * (p - 1) ^ 2 := Nat.le_mul_of_pos_left _ (by omega)
+      _ = (p ^ j * (p - 1)) ^ 2 := by ring
 
-/-- **Step 5 (TODO).** `fAF` is summable, by comparison with the convergent `3/2`-series
-(`Real.summable_one_div_nat_rpow`), absorbing the finitely many terms `d < 7`. -/
-theorem summable_fAF : Summable (fun d ↦ fAF d) := sorry
+/-- A clean lower bound for the totient: `d ≤ 2·φ(d)²` (so `φ(d) ≥ √(d/2)`).  No exceptions. -/
+theorem d_le_two_mul_totient_sq (d : ℕ) : d ≤ 2 * d.totient ^ 2 := by
+  rcases eq_or_ne d 0 with rfl | hd0
+  · simp
+  set S := d.factorization.support with hS
+  -- `c p = if p = 2 then 2 else 1` collects the prime-2 factor; its product is `≤ 2`.
+  have hc : ∏ p ∈ S, (if p = 2 then 2 else 1) ≤ 2 := by
+    rw [Finset.prod_ite, Finset.prod_const, Finset.prod_const_one, mul_one]
+    calc (2:ℕ) ^ (S.filter (· = 2)).card ≤ 2 ^ 1 := by
+          apply Nat.pow_le_pow_right (by norm_num)
+          rw [Finset.filter_eq']
+          split <;> simp
+      _ = 2 := by norm_num
+  -- the totient as a product over prime factors
+  have hφ : d.totient = ∏ p ∈ S, (p ^ (d.factorization p)).totient := by
+    rw [Nat.totient_eq_prod_factorization hd0]
+    refine Finset.prod_congr rfl (fun p hp ↦ ?_)
+    have hpp : p.Prime := Nat.prime_of_mem_primeFactors (by rwa [hS, Nat.support_factorization] at hp)
+    have hk : 1 ≤ d.factorization p := by rw [hS, Finsupp.mem_support_iff] at hp; omega
+    rw [Nat.totient_prime_pow hpp hk]
+  calc d = ∏ p ∈ S, p ^ (d.factorization p) := (Nat.factorization_prod_pow_eq_self hd0).symm
+    _ ≤ ∏ p ∈ S, (if p = 2 then 2 else 1) * ((p ^ (d.factorization p)).totient) ^ 2 := by
+        refine Finset.prod_le_prod' (fun p hp ↦ ?_)
+        have hpp : p.Prime := Nat.prime_of_mem_primeFactors (by rwa [hS, Nat.support_factorization] at hp)
+        have hk : 1 ≤ d.factorization p := by rw [hS, Finsupp.mem_support_iff] at hp; omega
+        exact primePow_le hpp hk
+    _ = (∏ p ∈ S, (if p = 2 then 2 else 1)) *
+          ∏ p ∈ S, ((p ^ (d.factorization p)).totient) ^ 2 := Finset.prod_mul_distrib
+    _ ≤ 2 * ∏ p ∈ S, ((p ^ (d.factorization p)).totient) ^ 2 := by gcongr
+    _ = 2 * d.totient ^ 2 := by rw [hφ, Finset.prod_pow]
+
+/-- **Step 4.** Comparison bound `fAF d ≤ √2 · (1/d^(3/2))`, from `d ≤ 2·φ(d)²`. -/
+theorem fAF_le_rpow (d : ℕ) : fAF d ≤ Real.sqrt 2 * (1 / (d : ℝ) ^ ((3 : ℝ) / 2)) := by
+  rcases eq_or_ne d 0 with rfl | hd0
+  · simp [Real.zero_rpow (by norm_num : (3 : ℝ) / 2 ≠ 0)]
+  have hdR : (0 : ℝ) < d := by exact_mod_cast Nat.pos_of_ne_zero hd0
+  have hφR : (0 : ℝ) < d.totient := by
+    exact_mod_cast Nat.totient_pos.mpr (Nat.pos_of_ne_zero hd0)
+  have hμ : ((μ d : ℝ)) ^ 2 ≤ 1 := by
+    have : ((μ d : ℝ)) ^ 2 = if Squarefree d then 1 else 0 := by
+      rw [← Int.cast_pow, ArithmeticFunction.moebius_sq]; split <;> simp
+    rw [this]; split <;> norm_num
+  have hφsq : (d : ℝ) ≤ 2 * (d.totient : ℝ) ^ 2 := by exact_mod_cast d_le_two_mul_totient_sq d
+  have hpow : (d : ℝ) ^ ((3 : ℝ) / 2) = d * Real.sqrt d := by
+    rw [Real.sqrt_eq_rpow, show ((3 : ℝ) / 2) = 1 + 1 / 2 by norm_num,
+      Real.rpow_add hdR, Real.rpow_one]
+  have hsqrt : Real.sqrt d ≤ Real.sqrt 2 * d.totient := by
+    rw [show Real.sqrt 2 * (d.totient : ℝ) = Real.sqrt (2 * (d.totient) ^ 2) by
+          rw [Real.sqrt_mul (by norm_num), Real.sqrt_sq hφR.le]]
+    exact Real.sqrt_le_sqrt hφsq
+  rw [fAF_apply]
+  calc ((μ d : ℝ)) ^ 2 / ((d : ℝ) * d.totient)
+      ≤ 1 / ((d : ℝ) * d.totient) := by gcongr
+    _ ≤ Real.sqrt 2 * (1 / (d : ℝ) ^ ((3 : ℝ) / 2)) := by
+        rw [mul_one_div, div_le_iff₀ (mul_pos hdR hφR), div_mul_eq_mul_div,
+            le_div_iff₀ (Real.rpow_pos_of_pos hdR _), one_mul, hpow]
+        calc (d : ℝ) * Real.sqrt d
+            ≤ (d : ℝ) * (Real.sqrt 2 * d.totient) := mul_le_mul_of_nonneg_left hsqrt hdR.le
+          _ = Real.sqrt 2 * ((d : ℝ) * d.totient) := by ring
+
+/-- **Step 5.** `fAF` is summable, by comparison with the convergent `3/2`-series. -/
+theorem summable_fAF : Summable (fun d ↦ fAF d) := by
+  apply Summable.of_nonneg_of_le fAF_nonneg fAF_le_rpow
+  apply Summable.mul_left
+  simpa using (Real.summable_one_div_nat_rpow.mpr (by norm_num : (1 : ℝ) < 3 / 2))
 
 /-- **Step 3 (TODO).** The Dirichlet convolution identity `1/φ = fAF * invAF`.
 Both sides are multiplicative; reduce to prime powers via `multiplicative_factorization`,
 where `(fAF * invAF)(pᵏ) = 1/pᵏ + 1/(pᵏ(p-1)) = 1/(pᵏ⁻¹(p-1)) = 1/φ(pᵏ)`. -/
-theorem invTotientAF_eq_mul : invTotientAF = fAF * invAF := sorry
+theorem invAF_isMultiplicative : invAF.IsMultiplicative := by
+  refine ⟨by simp, fun {m n} _ ↦ ?_⟩
+  simp only [invAF_apply, Nat.cast_mul, mul_inv]
+
+theorem fAF_isMultiplicative : fAF.IsMultiplicative := by
+  refine ⟨by simp [fAF_apply], fun {m n} h ↦ ?_⟩
+  simp only [fAF_apply]
+  rw [ArithmeticFunction.isMultiplicative_moebius.map_mul_of_coprime h, Nat.totient_mul h]
+  push_cast
+  ring
+
+theorem invTotientAF_isMultiplicative : invTotientAF.IsMultiplicative := by
+  refine ⟨by simp [invTotientAF_apply], fun {m n} h ↦ ?_⟩
+  simp only [invTotientAF_apply, Nat.totient_mul h, Nat.cast_mul, mul_inv]
+
+theorem invTotientAF_eq_mul : invTotientAF = fAF * invAF := by
+  rw [ArithmeticFunction.IsMultiplicative.eq_iff_eq_on_prime_powers invTotientAF
+        invTotientAF_isMultiplicative (fAF * invAF)
+        (fAF_isMultiplicative.mul invAF_isMultiplicative)]
+  intro p i hp
+  -- `fAF` vanishes at `p^x` for `x ≥ 2` (since `μ(p^x) = 0`).
+  have hvanish : ∀ x, 2 ≤ x → fAF (p ^ x) = 0 := fun x hx => by
+    rw [fAF_apply, ArithmeticFunction.moebius_apply_prime_pow hp (by omega), if_neg (by omega)]
+    simp
+  rcases Nat.eq_zero_or_pos i with rfl | hi
+  · simp [invTotientAF_apply, (fAF_isMultiplicative.mul invAF_isMultiplicative).map_one]
+  -- `i ≥ 1`: expand the convolution as a sum over `range (i+1)`, keeping only `x = 0, 1`.
+  obtain ⟨j, rfl⟩ : ∃ j, i = j + 1 := ⟨i - 1, by omega⟩
+  rw [ArithmeticFunction.mul_apply, Nat.sum_divisorsAntidiagonal (fun a b => fAF a * invAF b),
+      Nat.sum_divisors_prime_pow hp]
+  have hsub : Finset.range 2 ⊆ Finset.range (j + 1 + 1) := by
+    intro a ha; simp only [Finset.mem_range] at *; omega
+  rw [← Finset.sum_subset hsub (fun x _ hx => by
+        rw [Finset.mem_range, not_lt] at hx
+        rw [hvanish x hx, zero_mul]),
+      Finset.sum_range_succ, Finset.sum_range_one]
+  -- two surviving terms; simplify the divisions and arithmetic-function values
+  have d1 : p ^ (j + 1) / p = p ^ j := by
+    rw [pow_succ, Nat.mul_div_cancel _ hp.pos]
+  rw [pow_zero, pow_one, Nat.div_one, d1]
+  simp only [invTotientAF_apply, fAF_apply, invAF_apply, Nat.totient_prime_pow hp hi,
+    Nat.totient_prime hp, Nat.totient_one, ArithmeticFunction.moebius_apply_one,
+    ArithmeticFunction.moebius_apply_prime hp]
+  have hp1 : 1 ≤ p := hp.one_le
+  have hpR : (2 : ℝ) ≤ p := by exact_mod_cast hp.two_le
+  have hpne : (p : ℝ) ≠ 0 := by positivity
+  have hp1ne : (p : ℝ) - 1 ≠ 0 := by linarith
+  have hpjne : (p : ℝ) ^ j ≠ 0 := by positivity
+  push_cast [Nat.cast_sub hp1]
+  field_simp
+  ring
 
 /-- **Step 6 (TODO).** Partial harmonic-sum bound `∑_{e ≤ t} 1/e ≤ 1 + log t` for `t ≥ 1`,
 via `summatory (⇑invAF) t = (harmonic ⌊t⌋ : ℝ)` and `harmonic_le_one_add_log`. -/
 theorem summatory_invAF_le {t : ℝ} (ht : 1 ≤ t) :
-    summatory (⇑invAF) t ≤ 1 + Real.log t := sorry
+    summatory (⇑invAF) t ≤ 1 + Real.log t := by
+  have h0 : (0 : ℝ) ≤ t := by linarith
+  have hset : Nat.Icc (1 : ℝ) t = Finset.Icc 1 ⌊t⌋₊ := by
+    ext n
+    simp only [Nat.mem_Icc, Finset.mem_Icc, Nat.le_floor_iff h0, Nat.one_le_cast]
+  have heq : summatory (⇑invAF) t = (harmonic ⌊t⌋₊ : ℝ) := by
+    rw [summatory, hset, harmonic_eq_sum_Icc]
+    push_cast
+    exact Finset.sum_congr rfl (fun n _ ↦ by rw [invAF_apply])
+  rw [heq]
+  exact harmonic_floor_le_one_add_log t ht
 
 /-- The Mertens-type constant `∑_d μ(d)²/(d φ(d))`, doubled (the `2` converts `1 + log x`
 into `2 log x` using `1 ≤ log x`). -/
