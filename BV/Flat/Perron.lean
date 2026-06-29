@@ -1240,7 +1240,7 @@ theorem FG.summatory_mul_char [fg : FG] {q : ℕ} {χ : DirichletCharacter ℂ q
   simp [← hab.1]
   ring
 
-theorem LargeSieve_convolution [Bump] [fg : FG]
+theorem LargeSieve_convolution_aux [Bump] [fg : FG]
     {x Q : ℝ} (hx : 1 ≤ x) (hQ : 1 ≤ Q) :
   open Classical in
     summatory (fun q ↦ ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,

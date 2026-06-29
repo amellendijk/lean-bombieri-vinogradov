@@ -4,6 +4,7 @@ import BV.Delta
 import BV.Axioms
 import BV.LambdaSharp
 import BV.LambdaLE
+import BV.Flat.Perron
 
 open ArithmeticFunction BV ProofData DirichletCharacter
 open scoped Moebius BV zeta
@@ -1563,6 +1564,20 @@ theorem BV_LambdaFlat_via_T [ProofData] (Q : ℝ) (A C : ℕ) (hQ : Q ≤ √x) 
 
 -- TODO: Decide if we need to define the L2 norm on ArithmeticFunctions explicitly here.
 
+/-- A concrete smooth bump function, obtained from `SmoothExistence`, used to instantiate the
+`Flat.Bump` data needed by `Flat.LargeSieve_convolution_aux`. Kept as a `def` (not a global
+`instance`) so it does not clash with the `Flat.Bump` provided by `ProofData` downstream. -/
+noncomputable def bumpFn : Flat.Bump where
+  ν := SmoothExistence.choose
+  diffν := SmoothExistence.choose_spec.1
+  νpos := SmoothExistence.choose_spec.2.1
+  suppν := SmoothExistence.choose_spec.2.2.1
+  mass_one := SmoothExistence.choose_spec.2.2.2
+
+/-- The implied constant in `LargeSieve_convolution` (twice the Theorem 26.6 constant `C_LSC`,
+the extra factor `2` absorbing `log(x+1) ≤ 2 log x` for `x ≥ 2`). -/
+noncomputable def C_LargeSieve : ℝ := 2 * @Flat.C_LSC bumpFn
+
 @[blueprint (statement := /--
 Let $f$ and $g$ be arithmetic functions supported on $[1, M]$ and $[1, N]$ respectively. For $x, Q \ge 1$,
 $$\sum_{q \le Q} \sumstar_{\chi \pmod{q}} \frac{q}{\varphi(q)} \max_{y \le x}\left|\sum_{n \le y} (f*g)(n)\chi(n)\right| \ll \left(\sqrt{MN} + \sqrt{M}\,Q + \sqrt{N}\,Q + Q^2\right)(\log x)\,\|f\|_2\,\|g\|_2$$
@@ -1575,8 +1590,87 @@ theorem LargeSieve_convolution {M N : ℕ} (f g : ArithmeticFunction ℝ) (hf : 
     {x Q : ℝ} (hx : 2 ≤ x) (hQ : 1 ≤ Q) :
     open Classical in
     summatory (fun q ↦ ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive, q * (q.totient : ℝ)⁻¹ * ⨆ y ∈ Set.Icc 1 x, ‖summatory (fun n ↦ (f * g) n * χ n) y‖) Q
-      ≤ (√(N * M) + √M * Q + √N * Q + Q^2) * Real.log x * √(∑ n ∈ Finset.Icc 1 M, (f n)^2) * √(∑ n ∈ Finset.Icc 1 N, (g n)^2) := by
-  sorry
+      ≤ C_LargeSieve * (√(N * M) + √M * Q + √N * Q + Q^2) * Real.log x * √(∑ n ∈ Finset.Icc 1 M, (f n)^2) * √(∑ n ∈ Finset.Icc 1 N, (g n)^2) := by
+  classical
+  letI : Flat.Bump := bumpFn
+  unfold C_LargeSieve
+  -- Zero cases: if `M = 0` then `f = 0`, if `N = 0` then `g = 0`, and both sides vanish.
+  obtain rfl | hMpos := Nat.eq_zero_or_pos M
+  · have hf0 : f = 0 := by
+      ext n
+      rcases Nat.eq_zero_or_pos n with h | h
+      · subst h; simp
+      · exact hf n h
+    rw [hf0]; simp
+  obtain rfl | hNpos := Nat.eq_zero_or_pos N
+  · have hg0 : g = 0 := by
+      ext n
+      rcases Nat.eq_zero_or_pos n with h | h
+      · subst h; simp
+      · exact hg n h
+    rw [hg0]; simp
+  -- Complexify `f` and `g` to feed the `FG` data of `Flat.LargeSieve_convolution_aux`.
+  let F : ArithmeticFunction ℂ := ⟨fun n => (f n : ℂ), by simp⟩
+  let G : ArithmeticFunction ℂ := ⟨fun n => (g n : ℂ), by simp⟩
+  have hFa : ∀ n, F n = (f n : ℂ) := fun _ => rfl
+  have hGa : ∀ n, G n = (g n : ℂ) := fun _ => rfl
+  let inst : Flat.FG := {
+    f := F, g := G, M := (M : ℝ), N := (N : ℝ)
+    hM_pos := by exact_mod_cast hMpos
+    hN_pos := by exact_mod_cast hNpos
+    hf := by intro n hn; rw [hFa, hf n (by exact_mod_cast hn)]; simp
+    hg := by intro n hn; rw [hGa, hg n (by exact_mod_cast hn)]; simp }
+  have hFG : ∀ n, (F * G) n = ((f * g) n : ℂ) := by
+    intro n
+    simp only [ArithmeticFunction.mul_apply, hFa, hGa]
+    push_cast
+    rfl
+  have key := Flat.LargeSieve_convolution_aux (fg := inst) (show (1:ℝ) ≤ x by linarith) hQ
+  have hIccM : Nat.Icc (1:ℝ) (M:ℝ) = Finset.Icc 1 M := by
+    ext n; simp only [Nat.mem_Icc, Finset.mem_Icc, Nat.one_le_cast, Nat.cast_le]
+  have hIccN : Nat.Icc (1:ℝ) (N:ℝ) = Finset.Icc 1 N := by
+    ext n; simp only [Nat.mem_Icc, Finset.mem_Icc, Nat.one_le_cast, Nat.cast_le]
+  -- The `ℓ²` norms of the complexified functions agree with those of `f`, `g`.
+  have hAm : summatory (fun m => ‖F m‖ ^ 2) (M:ℝ) = ∑ n ∈ Finset.Icc 1 M, f n ^ 2 := by
+    rw [summatory, hIccM]
+    refine Finset.sum_congr rfl fun n _ => ?_
+    rw [hFa, Complex.norm_real, Real.norm_eq_abs, sq_abs]
+  have hAn : summatory (fun m => ‖G m‖ ^ 2) (N:ℝ) = ∑ n ∈ Finset.Icc 1 N, g n ^ 2 := by
+    rw [summatory, hIccN]
+    refine Finset.sum_congr rfl fun n _ => ?_
+    rw [hGa, Complex.norm_real, Real.norm_eq_abs, sq_abs]
+  have hCLSC : 0 ≤ Flat.C_LSC := by
+    have hCJ : 0 ≤ Flat.C_J := by
+      unfold Flat.C_J
+      have hA := Flat.exists_mellin_smooth1_boundA.choose_spec.1
+      have hB := Flat.exists_mellin_smooth1_boundB.choose_spec.1
+      have hlog2 : 0 < Real.log 2 := Real.log_pos (by norm_num)
+      have h1 : (0:ℝ) ≤ 2 * Real.sqrt 2 * (1 + 6 * Real.log 2) * Flat.exists_mellin_smooth1_boundA.choose := by positivity
+      have h2 : (0:ℝ) ≤ 2 * Flat.exists_mellin_smooth1_boundB.choose / Real.log 2 := by positivity
+      linarith
+    have hLS := Flat.C_LS_nonneg
+    unfold Flat.C_LSC
+    exact mul_nonneg (mul_nonneg (by positivity) hLS) hCJ
+  -- `log(x+1) ≤ 2 log x` for `x ≥ 2`, since `x + 1 ≤ x²`.
+  have hlog : Real.log (x + 1) ≤ 2 * Real.log x := by
+    have : x + 1 ≤ x ^ 2 := by nlinarith
+    calc Real.log (x + 1) ≤ Real.log (x ^ 2) := Real.log_le_log (by linarith) this
+      _ = 2 * Real.log x := by rw [Real.log_pow]; push_cast; ring
+  simp_rw [← hFG]
+  refine le_trans key ?_
+  change Flat.C_LSC * (√((N:ℝ) * (M:ℝ)) + √(M:ℝ) * Q + √(N:ℝ) * Q + Q ^ 2)
+      * √(summatory (fun m => ‖F m‖ ^ 2) (M:ℝ)) * √(summatory (fun m => ‖G m‖ ^ 2) (N:ℝ))
+      * Real.log (x + 1) ≤ _
+  rw [hAm, hAn]
+  have hS : (0:ℝ) ≤ √((N:ℝ) * (M:ℝ)) + √(M:ℝ) * Q + √(N:ℝ) * Q + Q ^ 2 := by positivity
+  calc Flat.C_LSC * (√((N:ℝ) * (M:ℝ)) + √(M:ℝ) * Q + √(N:ℝ) * Q + Q ^ 2)
+        * √(∑ n ∈ Finset.Icc 1 M, f n ^ 2) * √(∑ n ∈ Finset.Icc 1 N, g n ^ 2) * Real.log (x + 1)
+      ≤ Flat.C_LSC * (√((N:ℝ) * (M:ℝ)) + √(M:ℝ) * Q + √(N:ℝ) * Q + Q ^ 2)
+        * √(∑ n ∈ Finset.Icc 1 M, f n ^ 2) * √(∑ n ∈ Finset.Icc 1 N, g n ^ 2) * (2 * Real.log x) := by
+        apply mul_le_mul_of_nonneg_left hlog
+        positivity
+    _ = 2 * Flat.C_LSC * (√((N:ℝ) * (M:ℝ)) + √(M:ℝ) * Q + √(N:ℝ) * Q + Q ^ 2) * Real.log x
+        * √(∑ n ∈ Finset.Icc 1 M, f n ^ 2) * √(∑ n ∈ Finset.Icc 1 N, g n ^ 2) := by ring
 
 
 -- TODO: Figure out if the j-1 -s here are harmful (of course they are) and rewrite the proofs to use j/j+1 instead of j-1/j.
