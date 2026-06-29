@@ -1708,13 +1708,142 @@ theorem mem_pows2Ioc (x y : ℝ) (hx : 1 ≤ x) (n : ℕ) :
       grind
 
 
+/-- `((Λ - Λ≤U) * ζ) d = 0` whenever `d ≤ U`: every divisor `m ∣ d` satisfies `m ≤ d ≤ U`,
+so `(Λ - Λ≤U) m = Λ m - Λ m = 0`. -/
+private theorem AFlat_eq_zero_of_le_U [ProofData] {d : ℕ} (hd : (d : ℝ) ≤ U) :
+    ((Λ - Λ≤U) * ζ) d = 0 := by
+  rw [ArithmeticFunction.coe_mul_zeta_apply]
+  apply Finset.sum_eq_zero
+  intro m hm
+  have hmd : m ≤ d :=
+    Nat.le_of_dvd (Nat.pos_of_ne_zero (Nat.mem_divisors.mp hm).2) (Nat.dvd_of_mem_divisors hm)
+  have hmU : (m : ℝ) ≤ U := le_trans (by exact_mod_cast hmd) hd
+  show Λ m - Λ≤U m = 0
+  rw [LambdaLEU_apply_of_le hmU, sub_self]
+
+/-- `(μ - μ≤V) e = 0` whenever `e ≤ V`: then `μ≤V e = μ e`. -/
+private theorem BFlat_eq_zero_of_le_V [ProofData] {e : ℕ} (he : (e : ℝ) ≤ V) :
+    (μ - μ≤V) e = 0 := by
+  show μ e - μ≤V e = 0
+  rcases Nat.eq_zero_or_pos e with rfl | hepos
+  · simp
+  · have hmem : e ∈ Set.Icc 1 (Nat.floor V) := Set.mem_Icc.mpr ⟨hepos, Nat.le_floor he⟩
+    have hval : μ≤V e = μ e := by
+      simp only [moebiusLEV]; exact ArithmeticFunction.on_apply_of_mem _ _ _ hmem
+    rw [hval, sub_self]
+
+/-- `(μ - μ≤V) e = μ e` whenever `V < e`: then `μ≤V e = 0`. -/
+private theorem BFlat_eq_of_gt_V [ProofData] {e : ℕ} (he : V < (e : ℝ)) :
+    (μ - μ≤V) e = μ e := by
+  show μ e - μ≤V e = μ e
+  have hVe : Nat.floor V < e := (Nat.floor_lt V_nonneg).mpr he
+  have hnotmem : e ∉ Set.Icc 1 (Nat.floor V) :=
+    fun hm => absurd (Set.mem_Icc.mp hm).2 (not_le.mpr hVe)
+  have hval : μ≤V e = 0 := by
+    simp only [moebiusLEV]; exact ArithmeticFunction.on_apply_of_not_mem _ _ _ hnotmem
+  rw [hval, sub_zero]
+
 @[blueprint (latexEnv := "lemma") (statement := /--
 $$\Lambda^\flat(n) = \sum_{U < 2^j \le 2x/V} (f_j * g_j)(n) \quad \text{for } n \le x,$$
 where $f_j(k) = (\Lambda_{>U} * 1)(k)\,1_{2^{j-1} < k \le 2^j}$ and $g_j(\ell) = \mu(\ell)\,1_{V < \ell \le x/2^{j-1}}$.
 -/)]
 theorem LambdaFlat_dyadic [ProofData] (n : ℕ) (hn : n ≤ x) :
-    Λ♭ n = ∑ j ∈ pows2Ioc V (2*x/V), (f j * g j) n
-   := by sorry
+    Λ♭ n = ∑ j ∈ pows2Ioc U (2*x/V), (f j * g j) n := by
+  classical
+  have hxpos : (0:ℝ) < x := by linarith [le_x]
+  -- Expand the outer Dirichlet convolution on the left.
+  rw [show Λ♭ n = ((Λ - Λ≤U) * ζ * (μ - μ≤V)) n from rfl, ArithmeticFunction.mul_apply]
+  -- Expand each convolution on the right and swap the order of summation.
+  have hexp : ∀ j, (f j * g j) n
+      = ∑ p ∈ n.divisorsAntidiagonal, f j p.1 * g j p.2 := fun j => ArithmeticFunction.mul_apply
+  rw [Finset.sum_congr rfl (fun j _ => hexp j), Finset.sum_comm]
+  -- Reduce to a per-divisor identity.
+  refine Finset.sum_congr rfl (fun p hp => ?_)
+  rw [Nat.mem_divisorsAntidiagonal] at hp
+  obtain ⟨hde, hn0⟩ := hp
+  set d := p.1 with hd_def
+  set e := p.2 with he_def
+  have hepos : 0 < e := Nat.pos_of_ne_zero (right_ne_zero_of_mul (hde.symm ▸ hn0))
+  -- Pointwise values of `f j` and `g j` as `if`-expressions.
+  have hfval : ∀ j, f j d
+      = if d ∈ Set.Ioc (2^(j-1)) (2^j) then ((Λ - Λ≤U) * ζ) d else 0 := by
+    intro j
+    by_cases hm : d ∈ Set.Ioc (2^(j-1)) (2^j)
+    · rw [show f j d = (((Λ - Λ≤U) * ζ).on (Set.Ioc (2^(j-1)) (2^j))) d from rfl,
+        ArithmeticFunction.on_apply_of_mem _ _ _ hm, if_pos hm]
+    · rw [show f j d = (((Λ - Λ≤U) * ζ).on (Set.Ioc (2^(j-1)) (2^j))) d from rfl,
+        ArithmeticFunction.on_apply_of_not_mem _ _ _ hm, if_neg hm]
+  have hgval : ∀ j, g j e
+      = if (e : ℝ) ∈ Set.Ioc V (x / (2:ℝ)^(j-1)) then (μ e : ℝ) else 0 := by
+    intro j
+    simp only [g]
+    by_cases hm : (e : ℝ) ∈ Set.Ioc V (x / (2:ℝ)^(j-1))
+    · have hmem : e ∈ Nat.cast ⁻¹' (Set.Ioc V (x / (2:ℝ)^(j-1))) := hm
+      rw [ArithmeticFunction.on_apply_of_mem _ _ _ hmem, if_pos hm,
+        ArithmeticFunction.intCoe_apply]
+    · have hmem : e ∉ Nat.cast ⁻¹' (Set.Ioc V (x / (2:ℝ)^(j-1))) := hm
+      rw [ArithmeticFunction.on_apply_of_not_mem _ _ _ hmem, if_neg hm]
+  by_cases hd : U < (d : ℝ)
+  · by_cases he : V < (e : ℝ)
+    · -- Main case: `d > U` and `e > V`.  Exactly one `j` contributes.
+      have hd2 : 1 < d := by
+        have : (1:ℝ) < d := lt_of_le_of_lt one_le_U hd
+        exact_mod_cast this
+      set j₀ := Nat.clog 2 d with hj0def
+      have hj0pos : 0 < j₀ := Nat.clog_pos (by norm_num) hd2
+      have hupper : d ≤ 2 ^ j₀ := Nat.le_pow_clog (by norm_num) d
+      have hlower : 2 ^ (j₀ - 1) < d :=
+        (Nat.lt_clog_iff_pow_lt (by norm_num)).mp (by omega)
+      have hd_le : (d : ℝ) ≤ (2:ℝ) ^ j₀ := by exact_mod_cast hupper
+      have hlow_real : (2:ℝ) ^ (j₀ - 1) < (d : ℝ) := by exact_mod_cast hlower
+      have hpow : (2:ℝ) ^ j₀ = 2 * (2:ℝ) ^ (j₀ - 1) := by
+        rw [← pow_succ', Nat.sub_add_cancel hj0pos]
+      have hde_real : (d : ℝ) * e ≤ x := by rw [← Nat.cast_mul, hde]; exact hn
+      have he_real_pos : (0:ℝ) < (e : ℝ) := by exact_mod_cast hepos
+      have hd_lt : (d : ℝ) < x / V := by
+        have h1 : (d : ℝ) ≤ x / e := (le_div_iff₀ he_real_pos).mpr hde_real
+        have h2 : x / (e : ℝ) < x / V := div_lt_div_of_pos_left hxpos V_pos he
+        exact lt_of_le_of_lt h1 h2
+      have hpowpos : (0:ℝ) < (2:ℝ) ^ (j₀ - 1) := by positivity
+      have hQ2 : (e : ℝ) ≤ x / (2:ℝ) ^ (j₀ - 1) := by
+        rw [le_div_iff₀ hpowpos]
+        nlinarith [mul_lt_mul_of_pos_left hlow_real he_real_pos, hde_real]
+      have hP : d ∈ Set.Ioc (2 ^ (j₀ - 1)) (2 ^ j₀) := Set.mem_Ioc.mpr ⟨hlower, hupper⟩
+      have hQ : (e : ℝ) ∈ Set.Ioc V (x / (2:ℝ) ^ (j₀ - 1)) := Set.mem_Ioc.mpr ⟨he, hQ2⟩
+      have hj0mem : j₀ ∈ pows2Ioc U (2 * x / V) := by
+        rw [mem_pows2Ioc U (2 * x / V) one_le_U]
+        refine ⟨lt_of_lt_of_le hd hd_le, ?_⟩
+        rw [hpow, show 2 * x / V = 2 * (x / V) from by ring]
+        linarith [hlow_real, hd_lt]
+      -- Uniqueness of the dyadic index.
+      have huniq : ∀ j, (2 ^ (j - 1) < d ∧ d ≤ 2 ^ j) → j = j₀ := by
+        rintro j ⟨hj1, hj2⟩
+        have e1 : (2:ℕ) ^ (j₀ - 1) < 2 ^ j := lt_of_lt_of_le hlower hj2
+        have e2 : (2:ℕ) ^ (j - 1) < 2 ^ j₀ := lt_of_lt_of_le hj1 hupper
+        have l1 : j₀ - 1 < j := (Nat.pow_lt_pow_iff_right (by norm_num)).mp e1
+        have l2 : j - 1 < j₀ := (Nat.pow_lt_pow_iff_right (by norm_num)).mp e2
+        omega
+      have hzero : ∀ b ∈ pows2Ioc U (2 * x / V), b ≠ j₀ → f b d * g b e = 0 := by
+        intro j _ hjne
+        have hneg : d ∉ Set.Ioc (2 ^ (j - 1)) (2 ^ j) :=
+          fun hP' => hjne (huniq j (Set.mem_Ioc.mp hP'))
+        rw [hfval j, if_neg hneg, zero_mul]
+      rw [BFlat_eq_of_gt_V he, Finset.sum_eq_single_of_mem j₀ hj0mem hzero,
+        hfval j₀, hgval j₀, if_pos hP, if_pos hQ]
+    · -- `e ≤ V`: the left side vanishes and so does every right-hand term.
+      push_neg at he
+      rw [BFlat_eq_zero_of_le_V he, mul_zero]
+      symm
+      refine Finset.sum_eq_zero (fun j _ => ?_)
+      have hneg : (e : ℝ) ∉ Set.Ioc V (x / (2:ℝ)^(j-1)) :=
+        fun hQ' => absurd (Set.mem_Ioc.mp hQ').1 (not_lt.mpr he)
+      rw [hgval j, if_neg hneg, mul_zero]
+  · -- `d ≤ U`: the left side vanishes and so does every right-hand term.
+    push_neg at hd
+    rw [AFlat_eq_zero_of_le_U hd, zero_mul]
+    symm
+    refine Finset.sum_eq_zero (fun j _ => ?_)
+    rw [hfval j, AFlat_eq_zero_of_le_U hd, ite_self, zero_mul]
 
 def C_BV_char_sum : ℝ := sorry
 
