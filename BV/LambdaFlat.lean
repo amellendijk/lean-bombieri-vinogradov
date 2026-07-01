@@ -2270,16 +2270,299 @@ theorem BV_char_sum_bound [ProofData] (r : ℕ) (Q : ℝ) (hQ : 2 ≤ Q) :
           * (Real.log x) ^ 3 := by
         rw [C_BV_char_sum]; ring
 
-def C_Tr : ℝ := sorry
+noncomputable def C_Tr : ℝ := 8 * C_BV_char_sum
+
+theorem C_BV_char_sum_nonneg : 0 ≤ C_BV_char_sum := by
+  unfold C_BV_char_sum
+  exact mul_nonneg (by norm_num) C_LargeSieve_nonneg
+
+theorem C_Tr_nonneg : 0 ≤ C_Tr := by
+  unfold C_Tr
+  exact mul_nonneg (by norm_num) C_BV_char_sum_nonneg
+
+private theorem sum_Icc_half_le (jL jU : ℕ) (h : jL ≤ jU + 1) :
+    ∑ j ∈ Finset.Icc jL jU, (1/2:ℝ)^j ≤ 2 * (1/2)^jL := by
+  rw [← Finset.Ico_add_one_right_eq_Icc, geom_sum_Ico (by norm_num) h,
+    div_le_iff_of_neg (by norm_num)]
+  nlinarith [pow_nonneg (by norm_num:(0:ℝ)≤1/2) (jU+1), pow_nonneg (by norm_num:(0:ℝ)≤1/2) jL]
+
+private theorem sum_Icc_two_le (jL jU : ℕ) :
+    ∑ j ∈ Finset.Icc jL jU, (2:ℝ)^j ≤ 2 * 2^jU := by
+  calc ∑ j ∈ Finset.Icc jL jU, (2:ℝ)^j
+      ≤ ∑ j ∈ Finset.range (jU+1), (2:ℝ)^j :=
+        Finset.sum_le_sum_of_subset_of_nonneg
+          (by intro j hj; simp only [Finset.mem_Icc] at hj; simp only [Finset.mem_range]; omega)
+          (by intros; positivity)
+    _ = 2^(jU+1)-1 := by rw [geom_sum_eq (by norm_num)]; ring
+    _ ≤ 2 * 2^jU := by ring_nf; nlinarith [pow_nonneg (by norm_num:(0:ℝ)≤2) jU]
 
 @[blueprint (statement := /--
 $$T_r(x,Q) \ll \frac{x}{(\log x)^{C-3}} + \frac{x(\log x)^4}{\sqrt{U}} + \frac{x(\log x)^4}{\sqrt{V}} + \frac{Q\sqrt{x}\,(\log x)^3}{r}$$
 -/) (proof := /--
 Divide the sum defining $T_r$ into dyadic intervals in $d$ and apply \ref{BV_char_sum_bound}.
 -/) (uses := [BV_char_sum_bound, LambdaFlat_dyadic, T])]
-theorem T_r_bound [ProofData] (C : ℕ) (r : ℕ) (Q : ℝ) (hQ : 2 ≤ Q) :
-    T C r Q ≤ C_Tr * (x / (Real.log x)^(C-3) + x * (Real.log x)^4 * √U + x * (Real.log x)^4 * √V + Q * √x * (Real.log x)^3 / r)
- := by sorry
+theorem T_r_bound [ProofData] (C : ℕ) (r : ℕ) (Q : ℝ) (hC : 3 ≤ C) (hQ : 2 ≤ Q) (hQx : Q ≤ x) :
+    T C r Q ≤ C_Tr * (x / (Real.log x)^(C-3) + x * (Real.log x)^4 / √U
+      + x * (Real.log x)^4 / √V + Q * √x * (Real.log x)^3 / r) := by
+  classical
+  have hlogx : (16:ℝ) ≤ Real.log x := sixteen_le_log_x
+  have hlog0 : (0:ℝ) < Real.log x := by linarith
+  have hlne : Real.log x ≠ 0 := ne_of_gt hlog0
+  have hxnn : (0:ℝ) ≤ x := x_nonneg
+  have hsU : (0:ℝ) < √U := by positivity
+  have hsV : (0:ℝ) < √V := by positivity
+  have hsx : (0:ℝ) ≤ √x := Real.sqrt_nonneg x
+  have hCBV : (0:ℝ) ≤ C_BV_char_sum := C_BV_char_sum_nonneg
+  have hQ0 : (0:ℝ) ≤ Q := by linarith
+  -- The character-sum summand.
+  set B : ℕ → ℝ := fun d ↦ ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive,
+      (d:ℝ) * (d.totient:ℝ)⁻¹ * maxy (fun y ↦ S r y ξ) with hBdef
+  have hBnn : ∀ d, 0 ≤ B d := by
+    intro d
+    refine Finset.sum_nonneg fun ξ _ ↦ ?_
+    exact mul_nonneg (mul_nonneg (Nat.cast_nonneg d) (inv_nonneg.mpr (Nat.cast_nonneg _)))
+      (maxy_nonneg fun y _ _ ↦ S_nonneg r y ξ)
+  have hB : ∀ Q' : ℝ, 2 ≤ Q' → summatory B Q'
+      ≤ C_BV_char_sum * (x + Q' * x / √U + Q' * x / √V + Q'^2 * √x) * (Real.log x)^3 :=
+    fun Q' hQ' ↦ BV_char_sum_bound r Q' hQ'
+  -- Rewrite `T` as a sum of `B d / d`.
+  have hTeq : T C r Q = ∑ d ∈ Nat.Icc ((Real.log x)^C) (Q / (r:ℝ)), B d / (d:ℝ) := by
+    rw [T, Real.rpow_natCast]
+    refine Finset.sum_congr rfl fun d hd ↦ ?_
+    rw [Nat.mem_Icc] at hd
+    have hP1 : (1:ℝ) ≤ (Real.log x)^C := one_le_pow₀ (by linarith)
+    have hd1 : (1:ℝ) ≤ (d:ℝ) := le_trans hP1 hd.1
+    have hdne : (d:ℝ) ≠ 0 := by linarith
+    simp only [hBdef]
+    rw [Finset.mul_sum, Finset.sum_div]
+    refine Finset.sum_congr rfl fun ξ _ ↦ ?_
+    rw [eq_div_iff hdne]; ring
+  rw [hTeq]
+  set S : Finset ℕ := Nat.Icc ((Real.log x)^C) (Q / (r:ℝ)) with hSdef
+  rcases S.eq_empty_or_nonempty with hSe | hSne
+  · rw [hSe, Finset.sum_empty]
+    apply mul_nonneg C_Tr_nonneg
+    have h1 : (0:ℝ) ≤ x / (Real.log x)^(C-3) := by positivity
+    have h2 : (0:ℝ) ≤ x * (Real.log x)^4 / √U := by positivity
+    have h3 : (0:ℝ) ≤ x * (Real.log x)^4 / √V := by positivity
+    have h4 : (0:ℝ) ≤ Q * √x * (Real.log x)^3 / (r:ℝ) :=
+      div_nonneg (mul_nonneg (mul_nonneg hQ0 hsx) (by positivity)) (Nat.cast_nonneg r)
+    linarith
+  · obtain ⟨d0, hd0⟩ := hSne
+    have hP1 : (1:ℝ) ≤ (Real.log x)^C := one_le_pow₀ (by linarith)
+    rw [hSdef, Nat.mem_Icc] at hd0
+    have hPW : (Real.log x)^C ≤ Q / (r:ℝ) := le_trans hd0.1 hd0.2
+    have hW1 : (1:ℝ) ≤ Q / (r:ℝ) := le_trans hP1 hPW
+    have hW0 : (0:ℝ) ≤ Q / (r:ℝ) := by linarith
+    have hr1 : (1:ℝ) ≤ (r:ℝ) := by
+      rcases Nat.eq_zero_or_pos r with hr | hr
+      · exfalso; subst hr; simp only [Nat.cast_zero, div_zero] at hW1; linarith
+      · exact_mod_cast hr
+    have hWx : Q / (r:ℝ) ≤ x := le_trans (div_le_self hQ0 hr1) hQx
+    have hPfloor : ⌊(Real.log x)^C⌋₊ ≠ 0 := (Nat.floor_pos.mpr hP1).ne'
+    have hWfloor : ⌊Q / (r:ℝ)⌋₊ ≠ 0 := (Nat.floor_pos.mpr hW1).ne'
+    set jL : ℕ := Nat.log 2 ⌊(Real.log x)^C⌋₊ with hjLdef
+    set jU : ℕ := Nat.log 2 ⌊Q / (r:ℝ)⌋₊ with hjUdef
+    have hjLU : jL ≤ jU := by
+      rw [hjLdef, hjUdef]; exact Nat.log_mono_right (Nat.floor_mono hPW)
+    have hmaps : ∀ d ∈ S, Nat.log 2 d ∈ Finset.Icc jL jU := by
+      intro d hd
+      rw [hSdef, Nat.mem_Icc] at hd
+      rw [Finset.mem_Icc]
+      refine ⟨?_, ?_⟩
+      · rw [hjLdef]
+        apply Nat.log_mono_right
+        have : (⌊(Real.log x)^C⌋₊ : ℝ) ≤ (d:ℝ) :=
+          le_trans (Nat.floor_le (by linarith : (0:ℝ) ≤ (Real.log x)^C)) hd.1
+        exact_mod_cast this
+      · rw [hjUdef]
+        apply Nat.log_mono_right
+        rw [Nat.le_floor_iff hW0]; exact hd.2
+    -- Key numeric facts about `jL, jU`.
+    have hjLP1 : (Real.log x)^C < (2:ℝ)^(jL+1) := by
+      have h1 : ⌊(Real.log x)^C⌋₊ + 1 ≤ 2^(jL+1) := by
+        have := Nat.lt_pow_succ_log_self (b:=2) (by norm_num) ⌊(Real.log x)^C⌋₊
+        rwa [← hjLdef] at this
+      have h2 : (Real.log x)^C < (⌊(Real.log x)^C⌋₊ : ℝ) + 1 := Nat.lt_floor_add_one _
+      have h3 : ((⌊(Real.log x)^C⌋₊ : ℕ):ℝ) + 1 ≤ (2:ℝ)^(jL+1) := by
+        calc ((⌊(Real.log x)^C⌋₊:ℕ):ℝ) + 1 = ((⌊(Real.log x)^C⌋₊ + 1 : ℕ):ℝ) := by push_cast; ring
+          _ ≤ ((2^(jL+1):ℕ):ℝ) := by exact_mod_cast h1
+          _ = (2:ℝ)^(jL+1) := by push_cast; ring
+      linarith
+    have h2jL : (Real.log x)^C < 2 * (2:ℝ)^jL := by
+      have := hjLP1; rw [pow_succ] at this; linarith
+    have h2jUleW : (2:ℝ)^jU ≤ Q / (r:ℝ) := by
+      calc (2:ℝ)^jU = ((2^jU:ℕ):ℝ) := by push_cast; ring
+        _ ≤ ((⌊Q / (r:ℝ)⌋₊:ℕ):ℝ) := by
+            exact_mod_cast (show (2^jU:ℕ) ≤ ⌊Q / (r:ℝ)⌋₊ by
+              rw [hjUdef]; exact Nat.pow_log_le_self 2 hWfloor)
+        _ ≤ Q / (r:ℝ) := Nat.floor_le hW0
+    have h2jUx : (2:ℝ)^jU ≤ x := le_trans h2jUleW hWx
+    -- Geometric/cardinality bounds.
+    have hsumInv : ∑ j ∈ Finset.Icc jL jU, ((2:ℝ)^j)⁻¹ ≤ 4 / (Real.log x)^C := by
+      have hconv : (∑ j ∈ Finset.Icc jL jU, ((2:ℝ)^j)⁻¹) = ∑ j ∈ Finset.Icc jL jU, (1/2:ℝ)^j := by
+        apply Finset.sum_congr rfl; intro j _; rw [one_div, inv_pow]
+      rw [hconv]
+      refine le_trans (sum_Icc_half_le jL jU (by omega)) ?_
+      rw [one_div, inv_pow, le_div_iff₀ (by positivity : (0:ℝ) < (Real.log x)^C)]
+      have hcancel : (2:ℝ)^jL * ((2:ℝ)^jL)⁻¹ = 1 := mul_inv_cancel₀ (by positivity)
+      nlinarith [h2jL, hcancel, inv_nonneg.mpr (le_of_lt (show (0:ℝ) < (2:ℝ)^jL by positivity)),
+        mul_le_mul_of_nonneg_right (le_of_lt h2jL) (inv_nonneg.mpr (le_of_lt (show (0:ℝ) < (2:ℝ)^jL by positivity)))]
+    have hsumPow : ∑ j ∈ Finset.Icc jL jU, (2:ℝ)^j ≤ 2 * (2:ℝ)^jU := sum_Icc_two_le jL jU
+    have hcard : ((Finset.Icc jL jU).card : ℝ) ≤ 3 * Real.log x := by
+      rw [Nat.card_Icc]
+      have hle : ((jU + 1 - jL : ℕ):ℝ) ≤ ((jU + 1 : ℕ):ℝ) := by exact_mod_cast Nat.sub_le _ _
+      have hjU1 : ((jU + 1:ℕ):ℝ) ≤ 3 * Real.log x := by
+        have hjUlog : (jU:ℝ) * Real.log 2 ≤ Real.log x := by
+          have h := Real.log_le_log (show (0:ℝ) < (2:ℝ)^jU by positivity) h2jUx
+          rwa [Real.log_pow] at h
+        have hlog2 : (0.6931471803:ℝ) < Real.log 2 := Real.log_two_gt_d9
+        push_cast
+        nlinarith [hjUlog, hlog2, hlogx, (Nat.cast_nonneg jU : (0:ℝ) ≤ (jU:ℝ)),
+          mul_nonneg (Nat.cast_nonneg jU : (0:ℝ) ≤ (jU:ℝ))
+            (by linarith [hlog2] : (0:ℝ) ≤ Real.log 2 - 0.6931471803)]
+      linarith
+    -- The final numeric combination.
+    have hfinal : ∑ j ∈ Finset.Icc jL jU,
+          ((2:ℝ)^j)⁻¹ * (C_BV_char_sum * (x + (2:ℝ)^(j+1)*x/√U + (2:ℝ)^(j+1)*x/√V
+            + ((2:ℝ)^(j+1))^2*√x) * (Real.log x)^3)
+        ≤ C_Tr * (x / (Real.log x)^(C-3) + x * (Real.log x)^4 / √U
+            + x * (Real.log x)^4 / √V + Q * √x * (Real.log x)^3 / (r:ℝ)) := by
+      have key : ∀ j : ℕ, ((2:ℝ)^j)⁻¹ * (C_BV_char_sum * (x + (2:ℝ)^(j+1)*x/√U + (2:ℝ)^(j+1)*x/√V
+            + ((2:ℝ)^(j+1))^2*√x) * (Real.log x)^3)
+          = C_BV_char_sum*(Real.log x)^3*x*((2:ℝ)^j)⁻¹
+            + C_BV_char_sum*(Real.log x)^3*(2*x/√U)
+            + C_BV_char_sum*(Real.log x)^3*(2*x/√V)
+            + C_BV_char_sum*(Real.log x)^3*(4*√x)*(2:ℝ)^j := by
+        intro j
+        have h2j : (2:ℝ)^j ≠ 0 := by positivity
+        field_simp [ne_of_gt hsU, ne_of_gt hsV, h2j]
+        ring
+      have hA : ∑ j ∈ Finset.Icc jL jU, C_BV_char_sum*(Real.log x)^3*x*((2:ℝ)^j)⁻¹
+          ≤ C_BV_char_sum*(Real.log x)^3*x*(4/(Real.log x)^C) := by
+        rw [← Finset.mul_sum]
+        exact mul_le_mul_of_nonneg_left hsumInv (mul_nonneg (mul_nonneg hCBV (by positivity)) hxnn)
+      have hEc : ∑ j ∈ Finset.Icc jL jU, C_BV_char_sum*(Real.log x)^3*(4*√x)*(2:ℝ)^j
+          ≤ C_BV_char_sum*(Real.log x)^3*(4*√x)*(2*(2:ℝ)^jU) := by
+        rw [← Finset.mul_sum]
+        exact mul_le_mul_of_nonneg_left hsumPow
+          (mul_nonneg (mul_nonneg hCBV (by positivity)) (by positivity))
+      have hBb : ∑ j ∈ Finset.Icc jL jU, C_BV_char_sum*(Real.log x)^3*(2*x/√U)
+          ≤ (3*Real.log x)*(C_BV_char_sum*(Real.log x)^3*(2*x/√U)) := by
+        rw [Finset.sum_const, nsmul_eq_mul]
+        exact mul_le_mul_of_nonneg_right hcard
+          (mul_nonneg (mul_nonneg hCBV (by positivity)) (by positivity))
+      have hCc : ∑ j ∈ Finset.Icc jL jU, C_BV_char_sum*(Real.log x)^3*(2*x/√V)
+          ≤ (3*Real.log x)*(C_BV_char_sum*(Real.log x)^3*(2*x/√V)) := by
+        rw [Finset.sum_const, nsmul_eq_mul]
+        exact mul_le_mul_of_nonneg_right hcard
+          (mul_nonneg (mul_nonneg hCBV (by positivity)) (by positivity))
+      have hbA : C_BV_char_sum*(Real.log x)^3*x*(4/(Real.log x)^C)
+          ≤ 8*C_BV_char_sum*(x/(Real.log x)^(C-3)) := by
+        have hpow : (Real.log x)^C = (Real.log x)^(C-3)*(Real.log x)^3 := by
+          rw [← pow_add]; congr 1; omega
+        have heq : C_BV_char_sum*(Real.log x)^3*x*(4/(Real.log x)^C)
+            = 4*C_BV_char_sum*(x/(Real.log x)^(C-3)) := by
+          rw [hpow]; field_simp
+        rw [heq]
+        have : (0:ℝ) ≤ C_BV_char_sum*(x/(Real.log x)^(C-3)) := mul_nonneg hCBV (by positivity)
+        linarith
+      have hbB : (3*Real.log x)*(C_BV_char_sum*(Real.log x)^3*(2*x/√U))
+          ≤ 8*C_BV_char_sum*(x*(Real.log x)^4/√U) := by
+        have heq : (3*Real.log x)*(C_BV_char_sum*(Real.log x)^3*(2*x/√U))
+            = 6*C_BV_char_sum*(x*(Real.log x)^4/√U) := by
+          field_simp [ne_of_gt hsU]; ring
+        rw [heq]
+        have : (0:ℝ) ≤ C_BV_char_sum*(x*(Real.log x)^4/√U) := mul_nonneg hCBV (by positivity)
+        linarith
+      have hbC : (3*Real.log x)*(C_BV_char_sum*(Real.log x)^3*(2*x/√V))
+          ≤ 8*C_BV_char_sum*(x*(Real.log x)^4/√V) := by
+        have heq : (3*Real.log x)*(C_BV_char_sum*(Real.log x)^3*(2*x/√V))
+            = 6*C_BV_char_sum*(x*(Real.log x)^4/√V) := by
+          field_simp [ne_of_gt hsV]; ring
+        rw [heq]
+        have : (0:ℝ) ≤ C_BV_char_sum*(x*(Real.log x)^4/√V) := mul_nonneg hCBV (by positivity)
+        linarith
+      have hbE : C_BV_char_sum*(Real.log x)^3*(4*√x)*(2*(2:ℝ)^jU)
+          ≤ 8*C_BV_char_sum*(Q*√x*(Real.log x)^3/(r:ℝ)) := by
+        have hcoef : (0:ℝ) ≤ C_BV_char_sum*(Real.log x)^3*√x :=
+          mul_nonneg (mul_nonneg hCBV (by positivity)) hsx
+        calc C_BV_char_sum*(Real.log x)^3*(4*√x)*(2*(2:ℝ)^jU)
+            = 8*(C_BV_char_sum*(Real.log x)^3*√x)*(2:ℝ)^jU := by ring
+          _ ≤ 8*(C_BV_char_sum*(Real.log x)^3*√x)*(Q/(r:ℝ)) :=
+              mul_le_mul_of_nonneg_left h2jUleW (by linarith [hcoef])
+          _ = 8*C_BV_char_sum*(Q*√x*(Real.log x)^3/(r:ℝ)) := by ring
+      calc ∑ j ∈ Finset.Icc jL jU, ((2:ℝ)^j)⁻¹ * (C_BV_char_sum * (x + (2:ℝ)^(j+1)*x/√U
+              + (2:ℝ)^(j+1)*x/√V + ((2:ℝ)^(j+1))^2*√x) * (Real.log x)^3)
+          = (∑ j ∈ Finset.Icc jL jU, C_BV_char_sum*(Real.log x)^3*x*((2:ℝ)^j)⁻¹)
+              + (∑ j ∈ Finset.Icc jL jU, C_BV_char_sum*(Real.log x)^3*(2*x/√U))
+              + (∑ j ∈ Finset.Icc jL jU, C_BV_char_sum*(Real.log x)^3*(2*x/√V))
+              + (∑ j ∈ Finset.Icc jL jU, C_BV_char_sum*(Real.log x)^3*(4*√x)*(2:ℝ)^j) := by
+            rw [Finset.sum_congr rfl (fun j _ ↦ key j), Finset.sum_add_distrib,
+              Finset.sum_add_distrib, Finset.sum_add_distrib]
+        _ ≤ (C_BV_char_sum*(Real.log x)^3*x*(4/(Real.log x)^C))
+              + (3*Real.log x)*(C_BV_char_sum*(Real.log x)^3*(2*x/√U))
+              + (3*Real.log x)*(C_BV_char_sum*(Real.log x)^3*(2*x/√V))
+              + C_BV_char_sum*(Real.log x)^3*(4*√x)*(2*(2:ℝ)^jU) :=
+            add_le_add (add_le_add (add_le_add hA hBb) hCc) hEc
+        _ ≤ 8*C_BV_char_sum*(x/(Real.log x)^(C-3)) + 8*C_BV_char_sum*(x*(Real.log x)^4/√U)
+              + 8*C_BV_char_sum*(x*(Real.log x)^4/√V) + 8*C_BV_char_sum*(Q*√x*(Real.log x)^3/(r:ℝ)) :=
+            add_le_add (add_le_add (add_le_add hbA hbB) hbC) hbE
+        _ = C_Tr * (x / (Real.log x)^(C-3) + x * (Real.log x)^4 / √U
+              + x * (Real.log x)^4 / √V + Q * √x * (Real.log x)^3 / (r:ℝ)) := by
+            rw [C_Tr]; ring
+    -- Assemble the dyadic argument.
+    calc ∑ d ∈ S, B d / (d:ℝ)
+        ≤ ∑ d ∈ S, ((2:ℝ)^(Nat.log 2 d))⁻¹ * B d := by
+          apply Finset.sum_le_sum
+          intro d hd
+          have hd1 : 1 ≤ d := by
+            rw [hSdef, Nat.mem_Icc] at hd
+            have : (1:ℝ) ≤ (d:ℝ) := le_trans hP1 hd.1
+            exact_mod_cast this
+          have hlog_le : (2:ℝ)^(Nat.log 2 d) ≤ (d:ℝ) := by
+            calc (2:ℝ)^(Nat.log 2 d) = ((2^(Nat.log 2 d):ℕ):ℝ) := by push_cast; ring
+              _ ≤ (d:ℝ) := by exact_mod_cast Nat.pow_log_le_self 2 (by omega : d ≠ 0)
+          rw [div_eq_mul_inv, mul_comm ((2:ℝ)^(Nat.log 2 d))⁻¹ (B d)]
+          exact mul_le_mul_of_nonneg_left (inv_anti₀ (by positivity) hlog_le) (hBnn d)
+      _ = ∑ j ∈ Finset.Icc jL jU, ∑ d ∈ S with Nat.log 2 d = j,
+            ((2:ℝ)^(Nat.log 2 d))⁻¹ * B d := (Finset.sum_fiberwise_of_maps_to hmaps _).symm
+      _ = ∑ j ∈ Finset.Icc jL jU, ((2:ℝ)^j)⁻¹ * ∑ d ∈ S with Nat.log 2 d = j, B d := by
+          apply Finset.sum_congr rfl
+          intro j _
+          rw [Finset.mul_sum]
+          apply Finset.sum_congr rfl
+          intro d hd
+          rw [Finset.mem_filter] at hd
+          rw [hd.2]
+      _ ≤ ∑ j ∈ Finset.Icc jL jU, ((2:ℝ)^j)⁻¹ * summatory B ((2:ℝ)^(j+1)) := by
+          apply Finset.sum_le_sum
+          intro j _
+          apply mul_le_mul_of_nonneg_left _ (by positivity)
+          rw [summatory]
+          apply Finset.sum_le_sum_of_subset_of_nonneg
+          · intro d hd
+            rw [Finset.mem_filter] at hd
+            obtain ⟨hdS, hdj⟩ := hd
+            rw [hSdef, Nat.mem_Icc] at hdS
+            rw [Nat.mem_Icc]
+            refine ⟨le_trans hP1 hdS.1, ?_⟩
+            have hlt : d < 2^(Nat.log 2 d + 1) := Nat.lt_pow_succ_log_self (by norm_num) d
+            rw [hdj] at hlt
+            calc (d:ℝ) ≤ ((2^(j+1):ℕ):ℝ) := by exact_mod_cast (le_of_lt hlt)
+              _ = (2:ℝ)^(j+1) := by push_cast; ring
+          · intro d _ _; exact hBnn d
+      _ ≤ ∑ j ∈ Finset.Icc jL jU, ((2:ℝ)^j)⁻¹ *
+            (C_BV_char_sum * (x + (2:ℝ)^(j+1)*x/√U + (2:ℝ)^(j+1)*x/√V
+              + ((2:ℝ)^(j+1))^2*√x) * (Real.log x)^3) := by
+          apply Finset.sum_le_sum
+          intro j _
+          apply mul_le_mul_of_nonneg_left _ (by positivity)
+          exact hB ((2:ℝ)^(j+1)) (by
+            calc (2:ℝ) = (2:ℝ)^1 := (pow_one 2).symm
+              _ ≤ (2:ℝ)^(j+1) := pow_le_pow_right₀ (by norm_num) (by omega))
+      _ ≤ C_Tr * (x / (Real.log x)^(C-3) + x * (Real.log x)^4 / √U
+            + x * (Real.log x)^4 / √V + Q * √x * (Real.log x)^3 / (r:ℝ)) := hfinal
 
 def C_BV_LF (A : ℝ) : ℝ := sorry
 
