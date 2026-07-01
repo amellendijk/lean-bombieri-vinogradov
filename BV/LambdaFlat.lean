@@ -1845,7 +1845,367 @@ theorem LambdaFlat_dyadic [ProofData] (n : ℕ) (hn : n ≤ x) :
     refine Finset.sum_eq_zero (fun j _ => ?_)
     rw [hfval j, AFlat_eq_zero_of_le_U hd, ite_self, zero_mul]
 
-def C_BV_char_sum : ℝ := sorry
+/-- `C_LargeSieve` is nonnegative. (Same computation as inside `LargeSieve_convolution`.) -/
+theorem C_LargeSieve_nonneg : 0 ≤ C_LargeSieve := by
+  letI : Flat.Bump := bumpFn
+  have hCLSC : 0 ≤ @Flat.C_LSC bumpFn := by
+    have hCJ : 0 ≤ Flat.C_J := by
+      unfold Flat.C_J
+      have hA := Flat.exists_mellin_smooth1_boundA.choose_spec.1
+      have hB := Flat.exists_mellin_smooth1_boundB.choose_spec.1
+      have hlog2 : 0 < Real.log 2 := Real.log_pos (by norm_num)
+      have h1 : (0:ℝ) ≤ 2 * Real.sqrt 2 * (1 + 6 * Real.log 2) * Flat.exists_mellin_smooth1_boundA.choose := by positivity
+      have h2 : (0:ℝ) ≤ 2 * Flat.exists_mellin_smooth1_boundB.choose / Real.log 2 := by positivity
+      linarith
+    have hLS := Flat.C_LS_nonneg
+    unfold Flat.C_LSC
+    exact mul_nonneg (mul_nonneg (by positivity) hLS) hCJ
+  rw [C_LargeSieve]
+  exact mul_nonneg (by norm_num) hCLSC
+
+/-- The Type-II coefficient `((Λ - Λ≤U) * ζ) n` lies in `[0, log n]`. -/
+private theorem aflat_bounds [ProofData] (n : ℕ) :
+    0 ≤ ((Λ - Λ≤U) * ζ) n ∧ ((Λ - Λ≤U) * ζ) n ≤ Real.log n := by
+  rw [ArithmeticFunction.coe_mul_zeta_apply]
+  constructor
+  · refine Finset.sum_nonneg fun d _ => ?_
+    simp only [sub_eq_add_neg, ArithmeticFunction.add_apply, ArithmeticFunction.neg_apply]
+    have hle : Λ≤U d ≤ Λ d := by
+      by_cases h : (d : ℝ) ≤ U
+      · rw [LambdaLEU_apply_of_le h]
+      · rw [LambdaLEU_apply_of_gt (not_le.mp h)]; exact ArithmeticFunction.vonMangoldt_nonneg
+    linarith
+  · rw [← ArithmeticFunction.vonMangoldt_sum (n := n)]
+    refine Finset.sum_le_sum fun d _ => ?_
+    simp only [sub_eq_add_neg, ArithmeticFunction.add_apply, ArithmeticFunction.neg_apply]
+    have : (0:ℝ) ≤ Λ≤U d := LambdaLEU_nonneg
+    linarith
+
+/-- `(f j).on {coprime to r}` is supported on `[1, 2^j]`. -/
+private theorem f_on_coprime_supp [ProofData] (r j : ℕ) {n : ℕ} (hn : 2 ^ j < n) :
+    (f j).on {m | r.Coprime m} n = 0 := by
+  by_cases hm : n ∈ {m | r.Coprime m}
+  · rw [on_apply_of_mem _ _ _ hm]
+    show ((Λ - Λ≤U) * ζ).on (Set.Ioc (2 ^ (j - 1)) (2 ^ j)) n = 0
+    exact on_apply_of_not_mem _ _ _ (fun hmem => absurd hmem.2 (not_le.mpr hn))
+  · exact on_apply_of_not_mem _ _ _ hm
+
+/-- `(g j).on {coprime to r}` is supported on `[1, ⌊x/2^{j-1}⌋]`. -/
+private theorem g_on_coprime_supp [ProofData] (r j : ℕ) {n : ℕ}
+    (hn : ⌊x / 2 ^ (j - 1)⌋₊ < n) : (g j).on {m | r.Coprime m} n = 0 := by
+  by_cases hm : n ∈ {m | r.Coprime m}
+  · rw [on_apply_of_mem _ _ _ hm]
+    unfold g
+    apply on_apply_of_not_mem
+    intro hmem
+    have h1 : (n : ℝ) ≤ x / 2 ^ (j - 1) := (Set.mem_preimage.mp hmem).2
+    have h2 : x / 2 ^ (j - 1) < n := (Nat.floor_lt (div_nonneg x_nonneg (by positivity))).mp hn
+    linarith
+  · exact on_apply_of_not_mem _ _ _ hm
+
+/-- `ℓ²` bound for the Type-II factor: `∑_{n ≤ 2^j} (f_j)^2 ≤ 2^j (2 log x)^2`. -/
+private theorem f_on_coprime_l2 [ProofData] (r j : ℕ) (hj2 : (2 : ℝ) ^ j ≤ 2 * x / V) :
+    ∑ n ∈ Finset.Icc 1 (2 ^ j), ((f j).on {m | r.Coprime m} n) ^ 2
+      ≤ (2 : ℝ) ^ j * (2 * Real.log x) ^ 2 := by
+  have hcard : (Finset.Icc 1 (2 ^ j)).card = 2 ^ j := by rw [Nat.card_Icc, Nat.add_sub_cancel]
+  have h2jx : (2 : ℝ) ^ j ≤ x ^ 2 := by
+    have hVx : 2 * x / V ≤ x ^ 2 := by
+      rw [div_le_iff₀ V_pos]
+      nlinarith [le_x, one_le_V, x_nonneg, V_pos]
+    linarith
+  calc ∑ n ∈ Finset.Icc 1 (2 ^ j), ((f j).on {m | r.Coprime m} n) ^ 2
+      ≤ ∑ _n ∈ Finset.Icc 1 (2 ^ j), (2 * Real.log x) ^ 2 := by
+        refine Finset.sum_le_sum fun n hn => ?_
+        rw [Finset.mem_Icc] at hn
+        have hn1 : (1 : ℝ) ≤ n := by exact_mod_cast hn.1
+        have habs : |(f j).on {m | r.Coprime m} n| ≤ Real.log n := by
+          refine le_trans (abs_on_le _ _ _) ?_
+          show |((Λ - Λ≤U) * ζ).on (Set.Ioc (2 ^ (j - 1)) (2 ^ j)) n| ≤ Real.log n
+          refine le_trans (abs_on_le _ _ _) ?_
+          rw [abs_of_nonneg (aflat_bounds n).1]
+          exact (aflat_bounds n).2
+        have hlogn : Real.log n ≤ 2 * Real.log x := by
+          have hnx2 : (n : ℝ) ≤ x ^ 2 := by
+            calc (n : ℝ) ≤ (2 : ℝ) ^ j := by exact_mod_cast hn.2
+              _ ≤ x ^ 2 := h2jx
+          calc Real.log n ≤ Real.log (x ^ 2) := Real.log_le_log (by linarith) hnx2
+            _ = 2 * Real.log x := by rw [Real.log_pow]; push_cast; ring
+        have hb : |(f j).on {m | r.Coprime m} n| ≤ 2 * Real.log x := le_trans habs hlogn
+        calc ((f j).on {m | r.Coprime m} n) ^ 2 = |(f j).on {m | r.Coprime m} n| ^ 2 := (sq_abs _).symm
+          _ ≤ (2 * Real.log x) ^ 2 := by
+              apply pow_le_pow_left₀ (abs_nonneg _) hb
+    _ = (2 : ℝ) ^ j * (2 * Real.log x) ^ 2 := by
+        rw [Finset.sum_const, hcard, nsmul_eq_mul]; push_cast; ring
+
+/-- `ℓ²` bound for the Möbius factor: `∑_{n ≤ N} (g_j)^2 ≤ N`. -/
+private theorem g_on_coprime_l2 [ProofData] (r j : ℕ) :
+    ∑ n ∈ Finset.Icc 1 ⌊x / 2 ^ (j - 1)⌋₊, ((g j).on {m | r.Coprime m} n) ^ 2
+      ≤ (⌊x / 2 ^ (j - 1)⌋₊ : ℝ) := by
+  have hcard : (Finset.Icc 1 ⌊x / 2 ^ (j - 1)⌋₊).card = ⌊x / 2 ^ (j - 1)⌋₊ := by
+    rw [Nat.card_Icc, Nat.add_sub_cancel]
+  calc ∑ n ∈ Finset.Icc 1 ⌊x / 2 ^ (j - 1)⌋₊, ((g j).on {m | r.Coprime m} n) ^ 2
+      ≤ ∑ _n ∈ Finset.Icc 1 ⌊x / 2 ^ (j - 1)⌋₊, (1 : ℝ) := by
+        refine Finset.sum_le_sum fun n _ => ?_
+        have h1 : |(g j).on {m | r.Coprime m} n| ≤ 1 := by
+          refine le_trans (abs_on_le _ _ _) ?_
+          unfold g
+          refine le_trans (abs_on_le _ _ _) ?_
+          rw [ArithmeticFunction.intCoe_apply, ← Int.cast_abs]
+          exact_mod_cast ArithmeticFunction.abs_moebius_le_one
+        calc ((g j).on {m | r.Coprime m} n) ^ 2 = |(g j).on {m | r.Coprime m} n| ^ 2 := (sq_abs _).symm
+          _ ≤ (1 : ℝ) ^ 2 := by apply pow_le_pow_left₀ (abs_nonneg _) h1
+          _ = 1 := one_pow 2
+    _ = (⌊x / 2 ^ (j - 1)⌋₊ : ℝ) := by
+        rw [Finset.sum_const, hcard, nsmul_eq_mul, mul_one]
+
+/-- The number of dyadic intervals is `≤ 3 log x`. -/
+private theorem card_pows2Ioc_le [ProofData] :
+    ((pows2Ioc U (2 * x / V)).card : ℝ) ≤ 3 * Real.log x := by
+  have hlogx : 0 ≤ Real.log x := le_of_lt log_x_pos
+  rw [pows2Ioc]
+  split_ifs with hc
+  · rw [Nat.card_Ioc]
+    have hxV_pos : 0 < 2 * x / V := div_pos (mul_pos two_pos x_pos) V_pos
+    have hb_nonneg : 0 ≤ Real.logb 2 (2 * x / V) := Real.logb_nonneg (by norm_num) hc.1
+    calc ((⌊Real.logb 2 (2 * x / V)⌋₊ - ⌊Real.logb 2 U⌋₊ : ℕ) : ℝ)
+        ≤ (⌊Real.logb 2 (2 * x / V)⌋₊ : ℝ) := by exact_mod_cast Nat.sub_le _ _
+      _ ≤ Real.logb 2 (2 * x / V) := Nat.floor_le hb_nonneg
+      _ ≤ Real.logb 2 (2 * x) := by
+          apply Real.logb_le_logb_of_le (by norm_num) hxV_pos
+          rw [div_le_iff₀ V_pos]; nlinarith [x_nonneg, one_le_V]
+      _ ≤ 3 * Real.log x := by
+          rw [Real.logb, Real.log_mul (by norm_num) (ne_of_gt x_pos)]
+          have hlog2 : 0.6931471803 < Real.log 2 := Real.log_two_gt_d9
+          have hlog2x : Real.log 2 ≤ Real.log x :=
+            Real.log_le_log (by norm_num) (by linarith [le_x])
+          rw [div_le_iff₀ (by linarith)]
+          nlinarith [hlogx, hlog2, hlog2x]
+  · simp only [Finset.card_empty, Nat.cast_zero]; positivity
+
+noncomputable def C_BV_char_sum : ℝ := 12 * C_LargeSieve
+
+/-- The dyadic decomposition of `Λ♭`, restricted to integers coprime to `r`. -/
+private theorem onCoprime_LambdaFlat_dyadic [ProofData] (r n : ℕ) (hn : (n : ℝ) ≤ x) :
+    onCoprime r (Λ♭ : ℕ → ℝ) n
+      = ∑ j ∈ pows2Ioc U (2 * x / V),
+          ((f j).on {m | r.Coprime m} * (g j).on {m | r.Coprime m}) n := by
+  have hsat : ∀ a b, a * b ∈ {m | r.Coprime m} ↔ a ∈ {m | r.Coprime m} ∧ b ∈ {m | r.Coprime m} :=
+    fun a b => Nat.coprime_mul_iff_right
+  by_cases h : r.Coprime n
+  · rw [onCoprime_apply, if_pos h, LambdaFlat_dyadic n hn]
+    refine Finset.sum_congr rfl fun j _ => ?_
+    rw [← ArithmeticFunction.on_mul_of_saturated _ hsat, on_apply_of_mem _ _ _]
+    -- ??
+    simp [h]
+    exact h
+  · rw [onCoprime_apply, if_neg h]
+    refine (Finset.sum_eq_zero fun j _ => ?_).symm
+    rw [← ArithmeticFunction.on_mul_of_saturated _ hsat, on_apply_of_not_mem _ _ _]
+    simp [h]
+
+/-- The per-dyadic-piece supremum over `[1, x]` appearing in the large sieve. -/
+private noncomputable def Gterm [ProofData] (r j : ℕ) {q : ℕ} (ξ : DirichletCharacter ℂ q) : ℝ :=
+  ⨆ y ∈ Set.Icc (1 : ℝ) x,
+    ‖summatory (fun n ↦ ((f j).on {m | r.Coprime m} * (g j).on {m | r.Coprime m}) n * ξ n) y‖
+
+private theorem Gterm_nonneg [ProofData] (r j : ℕ) {q : ℕ} (ξ : DirichletCharacter ℂ q) :
+    0 ≤ Gterm r j ξ :=
+  Real.iSup_nonneg fun _ => Real.iSup_nonneg fun _ => norm_nonneg _
+
+/-- A norm of a partial sum is bounded by the supremum of all such norms over `[1, x]`. -/
+private theorem norm_summatory_le_Gterm [ProofData] (r j : ℕ) {q : ℕ}
+    (ξ : DirichletCharacter ℂ q) {y : ℝ} (hy1 : 1 ≤ y) (hy2 : y ≤ x) :
+    ‖summatory (fun n ↦ ((f j).on {m | r.Coprime m} * (g j).on {m | r.Coprime m}) n * ξ n) y‖
+      ≤ Gterm r j ξ := by
+  set g₀ := fun n ↦ ((f j).on {m | r.Coprime m} * (g j).on {m | r.Coprime m}) n * ξ n with hg₀
+  have hB : ∀ z, 1 ≤ z → z ≤ x → ‖summatory g₀ z‖ ≤ summatory (fun n ↦ ‖g₀ n‖) x := by
+    intro z _ hz2
+    rw [summatory]
+    refine (norm_sum_le _ _).trans ?_
+    rw [summatory]
+    exact Finset.sum_le_sum_of_subset_of_nonneg (Nat.Icc_mono_right hz2) (fun i _ _ ↦ norm_nonneg _)
+  have hbdd : BddAbove (Set.range fun z => ⨆ (_ : z ∈ Set.Icc (1:ℝ) x), ‖summatory g₀ z‖) := by
+    refine ⟨summatory (fun n ↦ ‖g₀ n‖) x, ?_⟩
+    rintro _ ⟨z, rfl⟩
+    exact Real.iSup_le (fun hz => hB z hz.1 hz.2)
+      (summatory_nonneg _ _ (fun n _ ↦ norm_nonneg _))
+  refine le_ciSup_of_le hbdd y (le_of_eq ?_)
+  have hmem : y ∈ Set.Icc (1:ℝ) x := Set.mem_Icc.mpr ⟨hy1, hy2⟩
+  simp [hmem, g₀]
+
+
+/-- The maximum of `S_r` over `y ∈ [√x, x]` is bounded by the sum of the dyadic suprema. -/
+private theorem maxy_S_le_sum [ProofData] (r : ℕ) {q : ℕ} (ξ : DirichletCharacter ℂ q) :
+    maxy (fun y ↦ S r y ξ) ≤ ∑ j ∈ pows2Ioc U (2 * x / V), Gterm r j ξ := by
+  refine maxy_le ?_ (Finset.sum_nonneg fun j _ => Gterm_nonneg r j ξ)
+  intro y hy1 hy2
+  have hx1 : (1 : ℝ) ≤ x := by linarith [le_x]
+  have hsqrt1 : (1 : ℝ) ≤ √x := by
+    rw [show (1:ℝ) = √1 from (Real.sqrt_one).symm]; exact Real.sqrt_le_sqrt hx1
+  have hy1' : (1 : ℝ) ≤ y := le_trans hsqrt1 hy1
+  have hStep : S r y ξ
+      = ‖∑ j ∈ pows2Ioc U (2 * x / V),
+          summatory (fun n ↦ ((f j).on {m | r.Coprime m} * (g j).on {m | r.Coprime m}) n * ξ n) y‖ := by
+    rw [S]
+    congr 1
+    rw [← Finset.summatory_sum_comm]
+    refine summatory_congr_fun fun n _ hnx => ?_
+    rw [onCoprime_LambdaFlat_dyadic r n (le_trans hnx hy2)]
+    push_cast
+    rw [Finset.sum_mul]
+  rw [hStep]
+  refine le_trans (norm_sum_le _ _) ?_
+  exact Finset.sum_le_sum fun j _ => norm_summatory_le_Gterm r j ξ hy1' hy2
+
+/-- The character-sum bound for a single dyadic piece `j`, obtained by applying the large sieve
+convolution bound `LargeSieve_convolution` and the `ℓ²` estimates. The bound is `j`-independent. -/
+private theorem summatory_Gterm_le [ProofData] (r j : ℕ) (Q : ℝ) (hQ : 2 ≤ Q)
+    (hj : j ∈ pows2Ioc U (2 * x / V)) :
+    open Classical in
+    summatory (fun q ↦ ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive,
+        (q : ℝ) * (q.totient : ℝ)⁻¹ * Gterm r j ξ) Q
+      ≤ C_LargeSieve * 4 * (Real.log x) ^ 2 *
+          (x + Q * x / √U + Q * x / √V + Q ^ 2 * √x) := by
+  classical
+  have hQ1 : (1 : ℝ) ≤ Q := by linarith
+  have hQ0 : (0 : ℝ) ≤ Q := by linarith
+  have hLpos : 0 < Real.log x := log_x_pos
+  have hL0 : (0 : ℝ) ≤ Real.log x := le_of_lt hLpos
+  have hx0 : (0 : ℝ) ≤ x := x_nonneg
+  have h2x0 : (0 : ℝ) ≤ 2 * x := by linarith
+  set L := Real.log x with hLdef
+  -- Unpack the dyadic membership.
+  rw [mem_pows2Ioc U (2 * x / V) one_le_U j] at hj
+  obtain ⟨hjU, hj2⟩ := hj
+  have hj1 : 1 ≤ j := by
+    rcases Nat.eq_zero_or_pos j with rfl | h
+    · exact absurd hjU (by simpa using not_lt.mpr one_le_U)
+    · exact h
+  set M := (2 : ℕ) ^ j with hMdef
+  set N := ⌊x / 2 ^ (j - 1)⌋₊ with hNdef
+  have hMcast : (M : ℝ) = (2 : ℝ) ^ j := by rw [hMdef]; push_cast; ring
+  have hMle : (M : ℝ) ≤ 2 * x / V := by rw [hMcast]; exact hj2
+  have hUM : U < (M : ℝ) := by rw [hMcast]; exact hjU
+  -- Apply the large-sieve convolution bound.
+  have hLS := LargeSieve_convolution (M := M) (N := N)
+      ((f j).on {m | r.Coprime m}) ((g j).on {m | r.Coprime m})
+      (fun n hn => f_on_coprime_supp r j hn) (fun n hn => g_on_coprime_supp r j hn)
+      le_x hQ1
+  rw [← hLdef] at hLS
+  refine le_trans hLS ?_
+  set af := Real.sqrt (∑ n ∈ Finset.Icc 1 M, ((f j).on {m | r.Coprime m} n) ^ 2) with hafdef
+  set bg := Real.sqrt (∑ n ∈ Finset.Icc 1 N, ((g j).on {m | r.Coprime m} n) ^ 2) with hbgdef
+  have haf0 : 0 ≤ af := Real.sqrt_nonneg _
+  have hbg0 : 0 ≤ bg := Real.sqrt_nonneg _
+  have hsqM_pos : 0 < Real.sqrt (M : ℝ) := Real.sqrt_pos.mpr (by rw [hMcast]; positivity)
+  have hw2' : Real.sqrt (2 * x) * Real.sqrt (2 * x) = 2 * x := Real.mul_self_sqrt h2x0
+  -- `ℓ²` bound for the `f`-factor: `af ≤ √M · (2 log x)`.
+  have haf : af ≤ Real.sqrt (M : ℝ) * (2 * L) := by
+    rw [hafdef]
+    have h1 : (∑ n ∈ Finset.Icc 1 M, ((f j).on {m | r.Coprime m} n) ^ 2)
+        ≤ (M : ℝ) * (2 * L) ^ 2 := by rw [hMcast]; exact f_on_coprime_l2 r j hj2
+    calc Real.sqrt (∑ n ∈ Finset.Icc 1 M, ((f j).on {m | r.Coprime m} n) ^ 2)
+        ≤ Real.sqrt ((M : ℝ) * (2 * L) ^ 2) := Real.sqrt_le_sqrt h1
+      _ = Real.sqrt (M : ℝ) * (2 * L) := by
+          rw [Real.sqrt_mul (by positivity), Real.sqrt_sq (by positivity)]
+  -- `N ≤ 2x / M`.
+  have hxeq : x / (2 : ℝ) ^ (j - 1) = 2 * x / 2 ^ j := by
+    have hpow : (2 : ℝ) ^ j = 2 * 2 ^ (j - 1) := by
+      rw [← pow_succ', Nat.sub_add_cancel hj1]
+    rw [hpow]; ring
+  have hN2 : (N : ℝ) ≤ 2 * x / (M : ℝ) := by
+    rw [hMcast, ← hxeq]
+    exact Nat.floor_le (div_nonneg hx0 (by positivity))
+  -- `√N ≤ √(2x) / √M`.
+  have hsqrtN : Real.sqrt (N : ℝ) ≤ Real.sqrt (2 * x) / Real.sqrt (M : ℝ) := by
+    refine le_trans (Real.sqrt_le_sqrt hN2) ?_
+    rw [Real.sqrt_div h2x0]
+  -- `ℓ²` bound for the `g`-factor: `bg ≤ √(2x) / √M`.
+  have hbg : bg ≤ Real.sqrt (2 * x) / Real.sqrt (M : ℝ) := by
+    rw [hbgdef]
+    exact le_trans (Real.sqrt_le_sqrt (g_on_coprime_l2 r j)) hsqrtN
+  -- `af · bg ≤ 2 (log x) √(2x)`.
+  have hP : af * bg ≤ 2 * L * Real.sqrt (2 * x) := by
+    have h1 : af * bg ≤ (Real.sqrt (M : ℝ) * (2 * L)) * (Real.sqrt (2 * x) / Real.sqrt (M : ℝ)) :=
+      mul_le_mul haf hbg hbg0 (mul_nonneg (Real.sqrt_nonneg _) (by linarith))
+    refine le_trans h1 (le_of_eq ?_)
+    rw [show (Real.sqrt (M : ℝ) * (2 * L)) * (Real.sqrt (2 * x) / Real.sqrt (M : ℝ))
+        = (2 * L * Real.sqrt (2 * x)) * (Real.sqrt (M : ℝ) / Real.sqrt (M : ℝ)) by ring,
+      div_self (ne_of_gt hsqM_pos), mul_one]
+  -- `√(N·M) ≤ √(2x)`.
+  have hNM : Real.sqrt ((N : ℝ) * (M : ℝ)) ≤ Real.sqrt (2 * x) := by
+    rw [Real.sqrt_mul (by positivity)]
+    calc Real.sqrt (N : ℝ) * Real.sqrt (M : ℝ)
+        ≤ (Real.sqrt (2 * x) / Real.sqrt (M : ℝ)) * Real.sqrt (M : ℝ) := by
+          gcongr
+      _ = Real.sqrt (2 * x) := div_mul_cancel₀ _ (ne_of_gt hsqM_pos)
+  -- `√M · √(2x) ≤ 2x / √V`.
+  have hsw : Real.sqrt (M : ℝ) * Real.sqrt (2 * x) ≤ 2 * x / Real.sqrt V := by
+    rw [← Real.sqrt_mul (by positivity)]
+    rw [show 2 * x / Real.sqrt V = Real.sqrt (4 * x ^ 2 / V) by
+      rw [Real.sqrt_div (by positivity), show (4 : ℝ) * x ^ 2 = (2 * x) ^ 2 by ring,
+        Real.sqrt_sq h2x0]]
+    apply Real.sqrt_le_sqrt
+    calc (M : ℝ) * (2 * x) ≤ (2 * x / V) * (2 * x) := by
+          apply mul_le_mul_of_nonneg_right hMle h2x0
+      _ = 4 * x ^ 2 / V := by ring
+  -- Term `T1`: the `√(NM)` piece.
+  have hT1 : Real.sqrt ((N : ℝ) * (M : ℝ)) * L * af * bg ≤ 4 * L ^ 2 * x := by
+    calc Real.sqrt ((N : ℝ) * (M : ℝ)) * L * af * bg
+        = Real.sqrt ((N : ℝ) * (M : ℝ)) * L * (af * bg) := by ring
+      _ ≤ Real.sqrt (2 * x) * L * (2 * L * Real.sqrt (2 * x)) := by gcongr
+      _ = 4 * L ^ 2 * x := by linear_combination (2 * L ^ 2) * hw2'
+  -- Term `T2`: the `√M · Q` piece.
+  have hT2 : Real.sqrt (M : ℝ) * Q * L * af * bg ≤ 4 * L ^ 2 * (Q * x / Real.sqrt V) := by
+    calc Real.sqrt (M : ℝ) * Q * L * af * bg
+        = Real.sqrt (M : ℝ) * Q * L * (af * bg) := by ring
+      _ ≤ Real.sqrt (M : ℝ) * Q * L * (2 * L * Real.sqrt (2 * x)) := by gcongr
+      _ = 2 * Q * L ^ 2 * (Real.sqrt (M : ℝ) * Real.sqrt (2 * x)) := by ring
+      _ ≤ 2 * Q * L ^ 2 * (2 * x / Real.sqrt V) := by gcongr
+      _ = 4 * L ^ 2 * (Q * x / Real.sqrt V) := by ring
+  -- Term `T3`: the `√N · Q` piece.
+  have hT3 : Real.sqrt (N : ℝ) * Q * L * af * bg ≤ 4 * L ^ 2 * (Q * x / Real.sqrt U) := by
+    calc Real.sqrt (N : ℝ) * Q * L * af * bg
+        = Real.sqrt (N : ℝ) * Q * L * (af * bg) := by ring
+      _ ≤ (Real.sqrt (2 * x) / Real.sqrt U) * Q * L * (2 * L * Real.sqrt (2 * x)) := by
+          have hNU : Real.sqrt (N : ℝ) ≤ Real.sqrt (2 * x) / Real.sqrt U :=
+            hsqrtN.trans (by gcongr)
+          gcongr
+      _ = 4 * L ^ 2 * (Q * x / Real.sqrt U) := by
+          rw [show (Real.sqrt (2 * x) / Real.sqrt U) * Q * L * (2 * L * Real.sqrt (2 * x))
+              = (2 * Q * L ^ 2) * (Real.sqrt (2 * x) * Real.sqrt (2 * x)) / Real.sqrt U by ring,
+            hw2']
+          ring
+  -- Term `T4`: the `Q²` piece.
+  have hT4 : Q ^ 2 * L * af * bg ≤ 4 * L ^ 2 * (Q ^ 2 * Real.sqrt x) := by
+    have hw_le : Real.sqrt (2 * x) ≤ 2 * Real.sqrt x := by
+      nlinarith [Real.sq_sqrt x_nonneg, Real.sqrt_nonneg x,
+        Real.sq_sqrt h2x0, Real.sqrt_nonneg (2 * x), x_nonneg]
+    calc Q ^ 2 * L * af * bg
+        = Q ^ 2 * L * (af * bg) := by ring
+      _ ≤ Q ^ 2 * L * (2 * L * Real.sqrt (2 * x)) := by gcongr
+      _ = 2 * Q ^ 2 * L ^ 2 * Real.sqrt (2 * x) := by ring
+      _ ≤ 2 * Q ^ 2 * L ^ 2 * (2 * Real.sqrt x) := by gcongr
+      _ = 4 * L ^ 2 * (Q ^ 2 * Real.sqrt x) := by ring
+  -- Combine the four terms.
+  have hCLS : 0 ≤ C_LargeSieve := C_LargeSieve_nonneg
+  have hkey : (Real.sqrt ((N : ℝ) * (M : ℝ)) + Real.sqrt (M : ℝ) * Q + Real.sqrt (N : ℝ) * Q + Q ^ 2)
+        * L * af * bg ≤ 4 * L ^ 2 * (x + Q * x / √U + Q * x / √V + Q ^ 2 * √x) := by
+    calc (Real.sqrt ((N : ℝ) * (M : ℝ)) + Real.sqrt (M : ℝ) * Q + Real.sqrt (N : ℝ) * Q + Q ^ 2)
+          * L * af * bg
+        = Real.sqrt ((N : ℝ) * (M : ℝ)) * L * af * bg + Real.sqrt (M : ℝ) * Q * L * af * bg
+          + Real.sqrt (N : ℝ) * Q * L * af * bg + Q ^ 2 * L * af * bg := by ring
+      _ ≤ 4 * L ^ 2 * x + 4 * L ^ 2 * (Q * x / Real.sqrt V) + 4 * L ^ 2 * (Q * x / Real.sqrt U)
+          + 4 * L ^ 2 * (Q ^ 2 * Real.sqrt x) :=
+          add_le_add (add_le_add (add_le_add hT1 hT2) hT3) hT4
+      _ = 4 * L ^ 2 * (x + Q * x / √U + Q * x / √V + Q ^ 2 * √x) := by ring
+  rw [show C_LargeSieve * 4 * L ^ 2 * (x + Q * x / √U + Q * x / √V + Q ^ 2 * √x)
+      = C_LargeSieve * (4 * L ^ 2 * (x + Q * x / √U + Q * x / √V + Q ^ 2 * √x)) by ring,
+    show C_LargeSieve * (Real.sqrt ((N : ℝ) * (M : ℝ)) + Real.sqrt (M : ℝ) * Q
+        + Real.sqrt (N : ℝ) * Q + Q ^ 2) * L * af * bg
+      = C_LargeSieve * ((Real.sqrt ((N : ℝ) * (M : ℝ)) + Real.sqrt (M : ℝ) * Q
+        + Real.sqrt (N : ℝ) * Q + Q ^ 2) * L * af * bg) by ring]
+  exact mul_le_mul_of_nonneg_left hkey hCLS
 
 @[blueprint (statement := /--
 For $x, Q \ge 2$, $U, V \in [1, x]$ and $r \in \N$,
@@ -1859,7 +2219,56 @@ theorem BV_char_sum_bound [ProofData] (r : ℕ) (Q : ℝ) (hQ : 2 ≤ Q) :
   open Classical in
     summatory (fun q ↦ ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive,
       q * (q.totient : ℝ)⁻¹ * maxy (fun y ↦ S r y ξ)) Q
-    ≤ C_BV_char_sum * (x + Q * x / Real.sqrt U + Q * x / Real.sqrt V + Q ^ 2 * Real.sqrt x) * (Real.log x) ^ 3 := by sorry
+    ≤ C_BV_char_sum * (x + Q * x / Real.sqrt U + Q * x / Real.sqrt V + Q ^ 2 * Real.sqrt x) * (Real.log x) ^ 3 := by
+  classical
+  have hQ0 : (0 : ℝ) ≤ Q := by linarith
+  -- Bound `maxy S` by the sum of dyadic suprema, then swap the order of summation.
+  have hstep1 : summatory (fun q ↦ ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive,
+        (q : ℝ) * (q.totient : ℝ)⁻¹ * maxy (fun y ↦ S r y ξ)) Q
+      ≤ summatory (fun q ↦ ∑ j ∈ pows2Ioc U (2 * x / V),
+          ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive,
+            (q : ℝ) * (q.totient : ℝ)⁻¹ * Gterm r j ξ) Q := by
+    apply summatory_le_summatory
+    intro q _ _
+    calc ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive,
+          (q : ℝ) * (q.totient : ℝ)⁻¹ * maxy (fun y ↦ S r y ξ)
+        ≤ ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive,
+            ∑ j ∈ pows2Ioc U (2 * x / V), (q : ℝ) * (q.totient : ℝ)⁻¹ * Gterm r j ξ := by
+          apply Finset.sum_le_sum
+          intro ξ _
+          rw [← Finset.mul_sum]
+          exact mul_le_mul_of_nonneg_left (maxy_S_le_sum r ξ) (by positivity)
+      _ = ∑ j ∈ pows2Ioc U (2 * x / V),
+            ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive,
+              (q : ℝ) * (q.totient : ℝ)⁻¹ * Gterm r j ξ := Finset.sum_comm
+  refine le_trans hstep1 ?_
+  rw [Finset.summatory_sum_comm (fun j q ↦ ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive,
+    (q : ℝ) * (q.totient : ℝ)⁻¹ * Gterm r j ξ)]
+  -- Nonnegativity of the bracket factor.
+  have hbrack : 0 ≤ x + Q * x / Real.sqrt U + Q * x / Real.sqrt V + Q ^ 2 * Real.sqrt x := by
+    have h1 : 0 ≤ Q * x / Real.sqrt U := div_nonneg (mul_nonneg hQ0 x_nonneg) (Real.sqrt_nonneg _)
+    have h2 : 0 ≤ Q * x / Real.sqrt V := div_nonneg (mul_nonneg hQ0 x_nonneg) (Real.sqrt_nonneg _)
+    have h3 : 0 ≤ Q ^ 2 * Real.sqrt x := mul_nonneg (sq_nonneg _) (Real.sqrt_nonneg _)
+    have h4 : 0 ≤ x := x_nonneg
+    linarith
+  have hconst : 0 ≤ C_LargeSieve * 4 * (Real.log x) ^ 2 *
+      (x + Q * x / Real.sqrt U + Q * x / Real.sqrt V + Q ^ 2 * Real.sqrt x) :=
+    mul_nonneg (mul_nonneg (mul_nonneg C_LargeSieve_nonneg (by norm_num)) (by positivity)) hbrack
+  calc ∑ j ∈ pows2Ioc U (2 * x / V),
+        summatory (fun q ↦ ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive,
+          (q : ℝ) * (q.totient : ℝ)⁻¹ * Gterm r j ξ) Q
+      ≤ ∑ _j ∈ pows2Ioc U (2 * x / V), C_LargeSieve * 4 * (Real.log x) ^ 2 *
+          (x + Q * x / Real.sqrt U + Q * x / Real.sqrt V + Q ^ 2 * Real.sqrt x) :=
+        Finset.sum_le_sum fun j hj => summatory_Gterm_le r j Q hQ hj
+    _ = ((pows2Ioc U (2 * x / V)).card : ℝ) * (C_LargeSieve * 4 * (Real.log x) ^ 2 *
+          (x + Q * x / Real.sqrt U + Q * x / Real.sqrt V + Q ^ 2 * Real.sqrt x)) := by
+        rw [Finset.sum_const, nsmul_eq_mul]
+    _ ≤ (3 * Real.log x) * (C_LargeSieve * 4 * (Real.log x) ^ 2 *
+          (x + Q * x / Real.sqrt U + Q * x / Real.sqrt V + Q ^ 2 * Real.sqrt x)) :=
+        mul_le_mul_of_nonneg_right card_pows2Ioc_le hconst
+    _ = C_BV_char_sum * (x + Q * x / Real.sqrt U + Q * x / Real.sqrt V + Q ^ 2 * Real.sqrt x)
+          * (Real.log x) ^ 3 := by
+        rw [C_BV_char_sum]; ring
 
 def C_Tr : ℝ := sorry
 

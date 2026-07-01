@@ -130,7 +130,7 @@ theorem summatory_le_summatory {R : Type*} [AddCommMonoid R] [PartialOrder R] [I
     exact_mod_cast calc n ≤ (⌊x⌋₊ : ℝ) := mod_cast hn.2
       _ ≤ x := Nat.floor_le (by grind)
 
-theorem summatory_congr_fun {R : Type*} [AddCommMonoid R] [PartialOrder R] [IsOrderedAddMonoid R]
+theorem summatory_congr_fun {R : Type*} [AddCommMonoid R]
     {f g : ℕ → R} {x : ℝ} (h : ∀ n : ℕ, 0 < n → n ≤ x → f n = g n) :
     summatory f x = summatory g x := by
   simp [summatory]
