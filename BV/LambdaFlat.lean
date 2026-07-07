@@ -2564,7 +2564,126 @@ theorem T_r_bound [ProofData] (C : ℕ) (r : ℕ) (Q : ℝ) (hC : 3 ≤ C) (hQ :
       _ ≤ C_Tr * (x / (Real.log x)^(C-3) + x * (Real.log x)^4 / √U
             + x * (Real.log x)^4 / √V + Q * √x * (Real.log x)^3 / (r:ℝ)) := hfinal
 
-def C_BV_LF (A : ℝ) : ℝ := sorry
+/-- Uniform triangle bound: `|Δ_[f](z; q, a)| ≤ 2 · ∑_{n≤z} |f n|`, valid for every `q`. -/
+theorem abs_Delta_le_two_summatory_abs (f : ℕ → ℝ) (z : ℝ) (q : ℕ) (a : ZMod q) :
+    |Δ_[f](z; q, a)| ≤ 2 * summatory (fun n ↦ |f n|) z := by
+  classical
+  rw [Delta]
+  have hφ : (q.totient : ℝ)⁻¹ ≤ 1 := by
+    rcases Nat.eq_zero_or_pos q with hq | hq
+    · simp [hq]
+    · exact inv_le_one_of_one_le₀ (by exact_mod_cast Nat.totient_pos.mpr hq)
+  have hφ0 : (0 : ℝ) ≤ (q.totient : ℝ)⁻¹ := by positivity
+  have hInd : summatory (fun n ↦ |(Nat.modEqs a).indicator f n|) z
+      ≤ summatory (fun n ↦ |f n|) z :=
+    summatory_mono_fun _ _ _ (fun n _ ↦ by
+      rw [Set.indicator_apply]; split_ifs <;> simp)
+  have hCop : summatory (fun n ↦ |onCoprime q f n|) z ≤ summatory (fun n ↦ |f n|) z :=
+    summatory_mono_fun _ _ _ (fun n _ ↦ by
+      rw [onCoprime_apply]; split_ifs <;> simp)
+  have hA : |summatory ((Nat.modEqs a).indicator f) z| ≤ summatory (fun n ↦ |f n|) z := by
+    refine le_trans ?_ hInd
+    simpa [Real.norm_eq_abs] using norm_summatory_le ((Nat.modEqs a).indicator f) z
+  have hB : |(q.totient : ℝ)⁻¹ * summatory (onCoprime q f) z| ≤ summatory (fun n ↦ |f n|) z := by
+    rw [abs_mul, abs_of_nonneg hφ0]
+    calc (q.totient : ℝ)⁻¹ * |summatory (onCoprime q f) z|
+        ≤ 1 * |summatory (onCoprime q f) z| :=
+          mul_le_mul_of_nonneg_right hφ (abs_nonneg _)
+      _ = |summatory (onCoprime q f) z| := one_mul _
+      _ ≤ summatory (fun n ↦ |onCoprime q f n|) z := by
+          simpa [Real.norm_eq_abs] using norm_summatory_le (onCoprime q f) z
+      _ ≤ summatory (fun n ↦ |f n|) z := hCop
+  calc |summatory ((Nat.modEqs a).indicator f) z
+          - (q.totient : ℝ)⁻¹ * summatory (onCoprime q f) z|
+      ≤ |summatory ((Nat.modEqs a).indicator f) z|
+          + |(q.totient : ℝ)⁻¹ * summatory (onCoprime q f) z| := abs_sub _ _
+    _ ≤ summatory (fun n ↦ |f n|) z + summatory (fun n ↦ |f n|) z := add_le_add hA hB
+    _ = 2 * summatory (fun n ↦ |f n|) z := by ring
+
+/-- Replacing `Δ_[Λ♭]` by `|Δ_[Λ♭]|` inside `maxya` can only increase the value. -/
+theorem maxya_Delta_le_abs [ProofData] (q : ℕ) :
+    maxya q (fun y a ↦ Δ_[Λ♭](y; q, a)) ≤ maxya q (fun y a ↦ |Δ_[Λ♭](y; q, a)|) := by
+  rw [maxya, maxya]
+  refine ciSup_mono (Finite.bddAbove_range _) (fun a ↦ ?_)
+  refine maxy_le (M := maxy (fun y ↦ |Δ_[Λ♭](y; q, (a : ZMod q))|)) (fun y hy1 hy2 ↦ ?_)
+    (maxy_nonneg (fun y _ _ ↦ abs_nonneg _))
+  refine (le_abs_self _).trans ?_
+  refine le_maxy (f := fun y ↦ |Δ_[Λ♭](y; q, (a : ZMod q))|) hy1 hy2
+    (B := 2 * summatory (fun n ↦ |(Λ♭ : ArithmeticFunction ℝ) n|) x) (by positivity)
+    (fun z hz1 hz2 ↦ ?_)
+  calc |Δ_[Λ♭](z; q, (a : ZMod q))|
+      ≤ 2 * summatory (fun n ↦ |(Λ♭ : ArithmeticFunction ℝ) n|) z :=
+        abs_Delta_le_two_summatory_abs _ _ _ _
+    _ ≤ 2 * summatory (fun n ↦ |(Λ♭ : ArithmeticFunction ℝ) n|) x := by
+        gcongr
+
+/-- For `L ≥ 0` and `W ≥ e^{√L}`: `L^n ≤ (2^{2n} (2n)!) · √W`.  Used with `W = U, V` to absorb
+the divisor factors: `√U, √V ≥ e^{½√log x}` beats every power of `log x`. -/
+theorem log_pow_le_const_mul_sqrt [ProofData] (W : ℝ) (n : ℕ)
+    (hW : Real.exp (Real.sqrt (Real.log x)) ≤ W) :
+    (Real.log x) ^ n ≤ ((2 : ℝ) ^ (2 * n) * (2 * n).factorial) * Real.sqrt W := by
+  have hL : (0 : ℝ) ≤ Real.log x := log_x_pos.le
+  set s : ℝ := Real.sqrt (Real.log x) with hs
+  have hs0 : 0 ≤ s := Real.sqrt_nonneg _
+  have hsL : s ^ 2 = Real.log x := Real.sq_sqrt hL
+  have hLn : (Real.log x) ^ n = s ^ (2 * n) := by rw [← hsL, ← pow_mul]
+  have hfac : (s / 2) ^ (2 * n) / ((2 * n).factorial : ℝ) ≤ Real.exp (s / 2) :=
+    Real.pow_div_factorial_le_exp (s / 2) (by positivity) (2 * n)
+  have hfac' : (s / 2) ^ (2 * n) ≤ ((2 * n).factorial : ℝ) * Real.exp (s / 2) := by
+    rw [← div_le_iff₀' (by positivity : (0 : ℝ) < ((2 * n).factorial : ℝ))]
+    exact hfac
+  have hexp : Real.exp (s / 2) = Real.sqrt (Real.exp s) := Real.exp_half s
+  have hsqrtW : Real.sqrt (Real.exp s) ≤ Real.sqrt W := Real.sqrt_le_sqrt (by rw [hs]; exact hW)
+  have h2n : (0 : ℝ) < (2 : ℝ) ^ (2 * n) := by positivity
+  calc (Real.log x) ^ n = s ^ (2 * n) := hLn
+    _ = (2 : ℝ) ^ (2 * n) * (s / 2) ^ (2 * n) := by rw [div_pow]; field_simp
+    _ ≤ (2 : ℝ) ^ (2 * n) * (((2 * n).factorial : ℝ) * Real.exp (s / 2)) := by
+        exact mul_le_mul_of_nonneg_left hfac' h2n.le
+    _ = ((2 : ℝ) ^ (2 * n) * (2 * n).factorial) * Real.exp (s / 2) := by ring
+    _ ≤ ((2 : ℝ) ^ (2 * n) * (2 * n).factorial) * Real.sqrt W := by
+        refine mul_le_mul_of_nonneg_left ?_ (by positivity)
+        rw [hexp]; exact hsqrtW
+
+/-- Comparison bound `1/(d φ(d)) ≤ √2 · d^{-3/2}`, from `d ≤ 2 φ(d)²`. -/
+theorem rphiInv_le_rpow (d : ℕ) :
+    ((d : ℝ) * d.totient)⁻¹ ≤ Real.sqrt 2 * (1 / (d : ℝ) ^ ((3 : ℝ) / 2)) := by
+  rcases eq_or_ne d 0 with rfl | hd0
+  · simp [Real.zero_rpow (by norm_num : (3 : ℝ) / 2 ≠ 0)]
+  have hdR : (0 : ℝ) < d := by exact_mod_cast Nat.pos_of_ne_zero hd0
+  have hφR : (0 : ℝ) < d.totient := by
+    exact_mod_cast Nat.totient_pos.mpr (Nat.pos_of_ne_zero hd0)
+  have hφsq : (d : ℝ) ≤ 2 * (d.totient : ℝ) ^ 2 := by exact_mod_cast d_le_two_mul_totient_sq d
+  have hpow : (d : ℝ) ^ ((3 : ℝ) / 2) = d * Real.sqrt d := by
+    rw [Real.sqrt_eq_rpow, show ((3 : ℝ) / 2) = 1 + 1 / 2 by norm_num,
+      Real.rpow_add hdR, Real.rpow_one]
+  have hsqrt : Real.sqrt d ≤ Real.sqrt 2 * d.totient := by
+    rw [show Real.sqrt 2 * (d.totient : ℝ) = Real.sqrt (2 * (d.totient) ^ 2) by
+          rw [Real.sqrt_mul (by norm_num), Real.sqrt_sq hφR.le]]
+    exact Real.sqrt_le_sqrt hφsq
+  rw [show ((d : ℝ) * d.totient)⁻¹ = 1 / ((d : ℝ) * d.totient) from (one_div _).symm,
+    mul_one_div, div_le_iff₀ (mul_pos hdR hφR), div_mul_eq_mul_div,
+    le_div_iff₀ (Real.rpow_pos_of_pos hdR _), one_mul, hpow]
+  calc (d : ℝ) * Real.sqrt d
+      ≤ (d : ℝ) * (Real.sqrt 2 * d.totient) := mul_le_mul_of_nonneg_left hsqrt hdR.le
+    _ = Real.sqrt 2 * ((d : ℝ) * d.totient) := by ring
+
+theorem summable_rphiInv : Summable (fun d : ℕ ↦ ((d : ℝ) * d.totient)⁻¹) := by
+  apply Summable.of_nonneg_of_le (fun d ↦ by positivity) rphiInv_le_rpow
+  apply Summable.mul_left
+  simpa using (Real.summable_one_div_nat_rpow.mpr (by norm_num : (1 : ℝ) < 3 / 2))
+
+/-- The convergent constant `∑_d 1/(d φ(d))`, bounding the diagonal term in `T_r`. -/
+noncomputable def C_rphi : ℝ := ∑' d : ℕ, ((d : ℝ) * d.totient)⁻¹
+
+theorem C_rphi_nonneg : 0 ≤ C_rphi := tsum_nonneg (fun d ↦ by positivity)
+
+theorem sum_rphiInv_le (Q : ℝ) : ∑ r ∈ Nat.Icc 1 Q, ((r : ℝ) * r.totient)⁻¹ ≤ C_rphi :=
+  summable_rphiInv.sum_le_tsum _ (fun i _ ↦ by positivity)
+
+/-- The implied constant in `BV_LambdaFlat`. -/
+noncomputable def C_BV_LF (A : ℕ) : ℝ :=
+  C_Tr * (C_tot * (1 + 2 * ((2 : ℝ) ^ (2 * (A + 5)) * (2 * (A + 5)).factorial)) + C_rphi)
+    + C_BV_LFT A (A + 4)
 
 @[blueprint (statement := /--
 For each fixed $A \ge 0$, $x \ge 2$ and $1 \le Q \le \sqrt{x}/(\log x)^{A+3}$,
@@ -2574,6 +2693,173 @@ Plug the bound from \ref{T_r_bound} into \ref{BV_LambdaFlat_via_T},
 then choose $U = V = e^{\sqrt{\log x}}$ and $C = A + 4$.
 -/) (uses := [BV_LambdaFlat_via_T, T_r_bound, Delta_LambdaFlat_small_conductor])]
 theorem BV_LambdaFlat [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q) (hQ : Q ≤ √x / (Real.log x)^(A+3)) :
-    ∑ q ∈ Nat.Icc 0 Q, maxya q (fun y a ↦ Δ_[Λ♭](y; q, a)) ≤
+    ∑ q ∈ Nat.Icc 0 Q, maxya q (fun y a ↦ |Δ_[Λ♭](y; q, a)|) ≤
       C_BV_LF A * x / (Real.log x)^A := by
-  sorry
+  classical
+  have hL16 : (16 : ℝ) ≤ Real.log x := sixteen_le_log_x
+  have hL1 : (1 : ℝ) ≤ Real.log x := by linarith
+  have hLpos : (0 : ℝ) < Real.log x := by linarith
+  have hLne : Real.log x ≠ 0 := hLpos.ne'
+  have hx0 : (0 : ℝ) < x := by linarith [le_x]
+  have hx1 : (1 : ℝ) ≤ x := by linarith [le_x]
+  have hsqrt_nonneg : (0 : ℝ) ≤ √x := Real.sqrt_nonneg x
+  have hsqrt_le_x : √x ≤ x := by
+    rw [Real.sqrt_le_iff]
+    exact ⟨ProofData.x_nonneg, le_self_pow₀ hx1 (by norm_num)⟩
+  have hpowge : (1 : ℝ) ≤ (Real.log x) ^ (A + 3) := one_le_pow₀ hL1
+  have hQ0 : (0 : ℝ) ≤ Q := by linarith
+  have hQ_le_sqrt : Q ≤ √x := by
+    refine hQ.trans ?_
+    rw [div_le_iff₀ (by positivity)]
+    nlinarith [hsqrt_nonneg, hpowge]
+  have hQ_le_x : Q ≤ x := hQ_le_sqrt.trans hsqrt_le_x
+  have hsU : (0 : ℝ) < √U := Real.sqrt_pos.mpr ProofData.U_pos
+  have hsV : (0 : ℝ) < √V := Real.sqrt_pos.mpr ProofData.V_pos
+  have hCtot : (0 : ℝ) ≤ C_tot := by
+    rw [C_tot]; exact mul_nonneg (by norm_num) (tsum_nonneg (fun d ↦ fAF_nonneg d))
+  have hCTr : (0 : ℝ) ≤ C_Tr := C_Tr_nonneg
+  have hCrphi : (0 : ℝ) ≤ C_rphi := C_rphi_nonneg
+  set K : ℝ := (2 : ℝ) ^ (2 * (A + 5)) * (2 * (A + 5)).factorial with hKdef
+  have hK0 : (0 : ℝ) ≤ K := by rw [hKdef]; positivity
+  set Cmain : ℝ := C_Tr * (C_tot * (1 + 2 * K) + C_rphi) with hCmain
+  have hCmain0 : (0 : ℝ) ≤ Cmain :=
+    mul_nonneg hCTr (add_nonneg (mul_nonneg hCtot (by linarith [hK0])) hCrphi)
+  -- Step 1: reduce to the `|Δ|` summatory.
+  have hIcc : Nat.Icc (0 : ℝ) Q = insert 0 (Nat.Icc 1 Q) := by
+    ext n
+    simp only [Nat.mem_Icc, Finset.mem_insert]
+    constructor
+    · rintro ⟨-, hn⟩
+      rcases Nat.eq_zero_or_pos n with h | h
+      · exact Or.inl h
+      · exact Or.inr ⟨by exact_mod_cast h, hn⟩
+    · rintro (rfl | ⟨-, hn⟩)
+      · exact ⟨by norm_num, by exact_mod_cast hQ0⟩
+      · exact ⟨by positivity, hn⟩
+  have h0notin : (0 : ℕ) ∉ Nat.Icc (1 : ℝ) Q := by
+    simp only [Nat.mem_Icc]; intro h; exact absurd h.1 (by norm_num)
+  have hstep1 : ∑ q ∈ Nat.Icc (0 : ℝ) Q, maxya q (fun y a ↦ |Δ_[Λ♭](y; q, a)|)
+      ≤ summatory (fun q ↦ maxya q fun y a ↦ |Δ_[Λ♭](y; q, a)|) Q := by
+    rw [hIcc, Finset.sum_insert h0notin, summatory]
+    have h0 : maxya 0 (fun y a ↦ |Δ_[Λ♭](y; (0 : ℕ), a)|) ≤ 0 := by
+      refine maxya_le_unit (fun y _ _ a ha ↦ ?_) le_rfl
+      rw [Delta_LambdaFlat_zero ha, abs_zero]
+    linarith [h0]
+  refine le_trans hstep1 ?_
+  -- Step 2: conductor decomposition + main-term regrouping.
+  refine le_trans (BV_LambdaFlat_via_T Q A (A + 4) hQ_le_sqrt) ?_
+  -- Step 3: main-term bound.
+  have hmain : summatory (fun r ↦ (r.totient : ℝ)⁻¹ * T ((A + 4 : ℕ)) r Q) Q
+      ≤ Cmain * x / (Real.log x) ^ A := by
+    by_cases hQ2 : 2 ≤ Q
+    · rw [summatory]
+      have htot : ∑ r ∈ Nat.Icc 1 Q, (r.totient : ℝ)⁻¹ ≤ C_tot * Real.log x := by
+        have h := summatory_totient_inv_le Q hQ_le_x; rwa [summatory] at h
+      have hrphi : ∑ r ∈ Nat.Icc 1 Q, ((r : ℝ) * r.totient)⁻¹ ≤ C_rphi := sum_rphiInv_le Q
+      have hU5 : x * (Real.log x) ^ 5 / √U ≤ K * x / (Real.log x) ^ A := by
+        rw [div_le_div_iff₀ hsU (by positivity)]
+        have hlem := log_pow_le_const_mul_sqrt U (A + 5) le_U
+        calc x * (Real.log x) ^ 5 * (Real.log x) ^ A
+            = x * (Real.log x) ^ (A + 5) := by rw [mul_assoc, ← pow_add, Nat.add_comm 5 A]
+          _ ≤ x * (K * √U) := by rw [hKdef]; exact mul_le_mul_of_nonneg_left hlem hx0.le
+          _ = K * x * √U := by ring
+      have hV5 : x * (Real.log x) ^ 5 / √V ≤ K * x / (Real.log x) ^ A := by
+        rw [div_le_div_iff₀ hsV (by positivity)]
+        have hlem := log_pow_le_const_mul_sqrt V (A + 5) le_V
+        calc x * (Real.log x) ^ 5 * (Real.log x) ^ A
+            = x * (Real.log x) ^ (A + 5) := by rw [mul_assoc, ← pow_add, Nat.add_comm 5 A]
+          _ ≤ x * (K * √V) := by rw [hKdef]; exact mul_le_mul_of_nonneg_left hlem hx0.le
+          _ = K * x * √V := by ring
+      have hQ4 : Q * √x * (Real.log x) ^ 3 ≤ x / (Real.log x) ^ A := by
+        have h1 : Q * √x ≤ x / (Real.log x) ^ (A + 3) := by
+          rw [le_div_iff₀ (by positivity)]
+          calc Q * √x * (Real.log x) ^ (A + 3)
+              ≤ (√x / (Real.log x) ^ (A + 3)) * √x * (Real.log x) ^ (A + 3) := by gcongr
+            _ = √x * √x := by field_simp
+            _ = x := Real.mul_self_sqrt hx0.le
+        calc Q * √x * (Real.log x) ^ 3 = (Q * √x) * (Real.log x) ^ 3 := by ring
+          _ ≤ (x / (Real.log x) ^ (A + 3)) * (Real.log x) ^ 3 := by gcongr
+          _ = x / (Real.log x) ^ A := by rw [pow_add]; field_simp
+      set S3 : ℝ := x / (Real.log x) ^ (A + 1) + x * (Real.log x) ^ 4 / √U
+          + x * (Real.log x) ^ 4 / √V with hS3def
+      have hS3nn : (0 : ℝ) ≤ S3 := by rw [hS3def]; positivity
+      have hc4nn : (0 : ℝ) ≤ Q * √x * (Real.log x) ^ 3 := by positivity
+      have hterm : ∀ r ∈ Nat.Icc (1 : ℝ) Q, (r.totient : ℝ)⁻¹ * T ((A + 4 : ℕ)) r Q
+          ≤ C_Tr * (S3 * (r.totient : ℝ)⁻¹
+              + (Q * √x * (Real.log x) ^ 3) * ((r : ℝ) * r.totient)⁻¹) := by
+        intro r hr
+        rw [Nat.mem_Icc] at hr
+        have hr1 : (1 : ℝ) ≤ r := hr.1
+        have hrpos : 0 < r := by exact_mod_cast hr1
+        have hTb := T_r_bound (A + 4) r Q (by omega) hQ2 hQ_le_x
+        have h34 : (A + 4) - 3 = A + 1 := by omega
+        rw [h34] at hTb
+        have hstep : (r.totient : ℝ)⁻¹ * T ((A + 4 : ℕ)) r Q
+            ≤ (r.totient : ℝ)⁻¹ * (C_Tr * (x / (Real.log x) ^ (A + 1)
+                + x * (Real.log x) ^ 4 / √U + x * (Real.log x) ^ 4 / √V
+                + Q * √x * (Real.log x) ^ 3 / r)) :=
+          mul_le_mul_of_nonneg_left hTb (by positivity)
+        refine hstep.trans (le_of_eq ?_)
+        rw [hS3def]; ring
+      have hb1 : S3 * (∑ r ∈ Nat.Icc 1 Q, (r.totient : ℝ)⁻¹) ≤ S3 * (C_tot * Real.log x) :=
+        mul_le_mul_of_nonneg_left htot hS3nn
+      have hb2 : (Q * √x * (Real.log x) ^ 3) * (∑ r ∈ Nat.Icc 1 Q, ((r : ℝ) * r.totient)⁻¹)
+          ≤ (Q * √x * (Real.log x) ^ 3) * C_rphi :=
+        mul_le_mul_of_nonneg_left hrphi hc4nn
+      have hfinal2 : S3 * (C_tot * Real.log x) + (Q * √x * (Real.log x) ^ 3) * C_rphi
+          ≤ (C_tot * (1 + 2 * K) + C_rphi) * x / (Real.log x) ^ A := by
+        have ta : x / (Real.log x) ^ (A + 1) * (C_tot * Real.log x) = C_tot * x / (Real.log x) ^ A := by
+          rw [pow_succ]; field_simp
+        have tb : x * (Real.log x) ^ 4 / √U * (C_tot * Real.log x)
+            = C_tot * (x * (Real.log x) ^ 5 / √U) := by ring
+        have tc : x * (Real.log x) ^ 4 / √V * (C_tot * Real.log x)
+            = C_tot * (x * (Real.log x) ^ 5 / √V) := by ring
+        have hdist : S3 * (C_tot * Real.log x)
+            = x / (Real.log x) ^ (A + 1) * (C_tot * Real.log x)
+              + x * (Real.log x) ^ 4 / √U * (C_tot * Real.log x)
+              + x * (Real.log x) ^ 4 / √V * (C_tot * Real.log x) := by rw [hS3def]; ring
+        rw [hdist, ta, tb, tc]
+        have hb : C_tot * (x * (Real.log x) ^ 5 / √U) ≤ C_tot * (K * x / (Real.log x) ^ A) :=
+          mul_le_mul_of_nonneg_left hU5 hCtot
+        have hc : C_tot * (x * (Real.log x) ^ 5 / √V) ≤ C_tot * (K * x / (Real.log x) ^ A) :=
+          mul_le_mul_of_nonneg_left hV5 hCtot
+        have hd : (Q * √x * (Real.log x) ^ 3) * C_rphi ≤ (x / (Real.log x) ^ A) * C_rphi :=
+          mul_le_mul_of_nonneg_right hQ4 hCrphi
+        have heq : C_tot * x / (Real.log x) ^ A + C_tot * (K * x / (Real.log x) ^ A)
+              + C_tot * (K * x / (Real.log x) ^ A) + (x / (Real.log x) ^ A) * C_rphi
+            = (C_tot * (1 + 2 * K) + C_rphi) * x / (Real.log x) ^ A := by ring
+        linarith [hb, hc, hd, heq]
+      refine le_trans (Finset.sum_le_sum hterm) ?_
+      rw [← Finset.mul_sum, Finset.sum_add_distrib, ← Finset.mul_sum, ← Finset.mul_sum, hCmain,
+        show C_Tr * (C_tot * (1 + 2 * K) + C_rphi) * x / (Real.log x) ^ A
+          = C_Tr * ((C_tot * (1 + 2 * K) + C_rphi) * x / (Real.log x) ^ A) from by ring]
+      apply mul_le_mul_of_nonneg_left _ hCTr
+      exact le_trans (add_le_add hb1 hb2) hfinal2
+    · push_neg at hQ2
+      have hzero : summatory (fun r ↦ (r.totient : ℝ)⁻¹ * T ((A + 4 : ℕ)) r Q) Q = 0 := by
+        rw [summatory]
+        refine Finset.sum_eq_zero (fun r hr ↦ ?_)
+        rw [Nat.mem_Icc] at hr
+        have hr1 : (1 : ℝ) ≤ r := hr.1
+        have hrpos : 0 < r := by exact_mod_cast hr1
+        have hlt : Q / r < (Real.log x) ^ (A + 4) := by
+          have h1 : Q / r ≤ Q := by
+            rw [div_le_iff₀ (by exact_mod_cast hrpos)]; nlinarith [hr1, hQ0]
+          have h2 : (16 : ℝ) ≤ (Real.log x) ^ (A + 4) :=
+            le_trans hL16 (le_self_pow₀ hL1 (by omega))
+          linarith
+        have hTz : T ((A + 4 : ℕ)) r Q = 0 := by
+          rw [T, Real.rpow_natCast, Nat.Icc_eq_empty_of_lt ((Real.log x) ^ (A + 4)) hlt,
+            Finset.sum_empty]
+        rw [hTz, mul_zero]
+      rw [hzero]
+      exact div_nonneg (mul_nonneg hCmain0 hx0.le) (by positivity)
+  -- Step 4: combine main term and error term.
+  have hcombine : Cmain * x / (Real.log x) ^ A + C_BV_LFT A (A + 4) * x / (Real.log x) ^ A
+      = C_BV_LF A * x / (Real.log x) ^ A := by
+    rw [C_BV_LF, hCmain, hKdef]; ring
+  calc summatory (fun r ↦ (r.totient : ℝ)⁻¹ * T ((A + 4 : ℕ)) r Q) Q
+          + C_BV_LFT A (A + 4) * x / (Real.log x) ^ A
+      ≤ Cmain * x / (Real.log x) ^ A + C_BV_LFT A (A + 4) * x / (Real.log x) ^ A :=
+        add_le_add hmain (le_refl _)
+    _ = C_BV_LF A * x / (Real.log x) ^ A := hcombine

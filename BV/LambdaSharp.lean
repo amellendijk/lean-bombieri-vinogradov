@@ -583,7 +583,7 @@ For each fixed $A \ge 0$, $x \ge 2$ and $1 \le Q \le \sqrt{x}/(\log x)^{A+3}$,
 $$\sum_{q \le Q} \max_{\sqrt{x} \le y \le x} \max_{a \in (\Z/q\Z)^*} |\Delta_{\Lambda^\sharp}(y;\, q,\, a)| \ll_A \frac{x}{(\log x)^A}$$
 -/) (uses := [Delta_LambdaSharp_bound, sum_divisors_card_le])]
 theorem BV_LambdaSharp [ProofData] {A : ℕ} (Q : ℝ) (h1Q : 1 ≤ Q) (hQ : Q ≤ √x / (Real.log x)^(A+3)) :
-    ∑ q ∈ Nat.Icc 0 Q, maxya q (fun y a ↦ Δ_[Λ♯](y; q, a)) ≤ C_BVLS * (x / (Real.log x)^A) := by
+    ∑ q ∈ Nat.Icc 0 Q, maxya q (fun y a ↦ |Δ_[Λ♯](y; q, a)|) ≤ C_BVLS * (x / (Real.log x)^A) := by
   have hL1 : 1 ≤ Real.log x := one_le_log_x
   have hLpos : 0 < Real.log x := log_x_pos
   have hUnonneg : (0:ℝ) ≤ U := ProofData.U_nonneg
@@ -610,7 +610,7 @@ theorem BV_LambdaSharp [ProofData] {A : ℕ} (Q : ℝ) (h1Q : 1 ≤ Q) (hQ : Q �
       _ ≤ U := heU
       _ ≤ √x := ProofData.U_le_sqrt_x
   -- Per-term bound: `maxya q (Δ_[Λ♯]) ≤ C_DLS · τ(q) · U · V · log x`.
-  have hterm : ∀ q ∈ Nat.Icc (0:ℝ) Q, maxya q (fun y a ↦ Δ_[Λ♯](y; q, a))
+  have hterm : ∀ q ∈ Nat.Icc (0:ℝ) Q, maxya q (fun y a ↦ |Δ_[Λ♯](y; q, a)|)
       ≤ C_DLS * (q.divisors.card : ℝ) * U * V * Real.log x := by
     intro q hq
     have hqQ : (q:ℝ) ≤ Q := ((Nat.mem_Icc _ _).mp hq).2
@@ -633,7 +633,7 @@ theorem BV_LambdaSharp [ProofData] {A : ℕ} (Q : ℝ) (h1Q : 1 ≤ Q) (hQ : Q �
             simp [ArithmeticFunction.log_apply, LambdaLEU_apply_of_le, ProofData.one_le_U]
           · rfl
         rw [(Delta_onCoprime_self _ y ha).symm, hz]
-        simp [Delta, summatory, onCoprime]
+        simp [Delta, summatory, onCoprime, abs_zero]
       · simp
     · -- `q ≥ 1`: use `Delta_LambdaSharp_bound` with `r = q`.
       haveI : NeZero q := ⟨hqpos.ne'⟩
@@ -642,7 +642,7 @@ theorem BV_LambdaSharp [ProofData] {A : ℕ} (Q : ℝ) (h1Q : 1 ≤ Q) (hQ : Q �
         have h2y : 2 ≤ y := le_trans hsqx2 hy1
         have hbound := Delta_LambdaSharp_bound (q := q) (r := q) ha hqx h2y hy2
         rw [(Delta_onCoprime_self _ y ha).symm]
-        exact (le_abs_self _).trans hbound
+        exact hbound
       · have : (0:ℝ) ≤ (q.divisors.card : ℝ) := by positivity
         have : (0:ℝ) ≤ C_DLS := by rw [C_DLS]; norm_num
         positivity
