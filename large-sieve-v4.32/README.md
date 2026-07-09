@@ -72,15 +72,18 @@ package (it does **not** yet share a toolchain with the surrounding
 Bombieri–Vinogradov project, which pins an earlier Lean):
 
 ```bash
-cd large-sieve
+cd large-sieve-v4.32
 lake exe cache get
 lake build
 ```
 
 ## Relation to `BV/Axioms.lean`
 
-Upstream `BV/Axioms.lean` currently states `large_sieve` as an axiom summing over
-`DirichletCharacter ℚ q` for **all** characters. As noted above that form is not
-provable; the primitive-restricted statement proved here matches the actual
-downstream usage (`LambdaFlat.lean`, `Flat/Perron.lean` already filter on
-`χ.IsPrimitive`).
+This is a standalone v4.32 reference copy. The v4.28 version of the same proof lives at
+the repo root (`LargeSieve/`) and is what actually discharges the `large_sieve` axiom in
+`BV/Axioms.lean` (turning it into a theorem).
+
+Note the original axiom summed over `DirichletCharacter ℚ q` for **all** characters,
+which is not provable; the discharged statement is restricted to **primitive**
+characters and is `ℂ`-valued, matching the actual downstream usage (`LambdaFlat.lean`,
+`Flat/Perron.lean` already filter on `χ.IsPrimitive`).
