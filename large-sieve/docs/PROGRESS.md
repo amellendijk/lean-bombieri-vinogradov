@@ -11,6 +11,29 @@ This has never been formalized in any proof assistant (Lean, Coq, Isabelle, Miza
 
 ---
 
+## Reading note: file names & toolchains
+
+This log is a chronological record of the development. It refers to the working
+files by their original names (`Attempt8.lean` … `Attempt13.lean`, `SumHelper.lean`).
+For the final, cleaned-up submission these were reorganized into a nested library
+(dead-end attempts 1–7 and superseded declarations were dropped). The mapping:
+
+| Log name | Final path |
+|----------|-----------|
+| `Attempt8.lean`  | `LargeSieve/Additive/ExpSum.lean` (Bombieri sieve; the lone Beurling–Selberg sorry lives here, unused) |
+| `Attempt12.lean` | `LargeSieve/Additive/Gallagher.lean` |
+| `Attempt9.lean`  | `LargeSieve/Farey.lean` (superseded declarations removed) |
+| `SumHelper.lean` | `LargeSieve/Character/SumHelper.lean` |
+| `Attempt10.lean` | `LargeSieve/Character/PrimeCase.lean` |
+| `Attempt11.lean` | `LargeSieve/Character/Reduction.lean` (superseded declarations removed) |
+| `Attempt13.lean` | `LargeSieve/Multiplicative.lean` (final theorem) |
+
+The same proof is provided on two toolchains: `large-sieve/` (Lean `v4.32.0-rc1`)
+and `large-sieve-v4.28/` (Lean `v4.28.0` + Mathlib `v4.28.0`, matching this repo).
+Both build sorry-free; the v4.28 copy differs only by Mathlib API renames.
+
+---
+
 ## Final Status: Attempt 8 (1028 lines, 1 sorry)
 
 **Build:** `lake build LargeSieve.Attempt8` -- Build completed successfully (2719 jobs)
