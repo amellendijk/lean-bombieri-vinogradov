@@ -4,15 +4,18 @@
 Building on Attempts 1-7 plus three parallel child sessions, we compile
 all sorry-free results and push toward a minimal sorry count.
 
-Key achievements:
-- packing_bound (R ≤ δ⁻¹): PROVED sorry-free via sorted fractional parts + telescoping
-- large_sieve_bombieri: PROVED sorry-free (Bombieri 1965 version: N·δ⁻¹)
-- gram_quadratic_form_bound: sorry (this IS the sharp Large Sieve content)
+Key achievements (all sorry-free):
+- packing_bound (R ≤ δ⁻¹): via sorted fractional parts + telescoping
+- large_sieve_bombieri: Bombieri 1965 version, N·δ⁻¹
 
-Discovery: The decomposition "diagonal ≤ δ⁻¹ + off-diagonal ≤ (N-1)" is INCORRECT.
-Counterexample: R=2, N=2, δ=0.001, α=(0,0.001), a=(1,1) gives off-diagonal ≈ 4 > 2 = (N-1)·∑|a|².
-The sharp Large Sieve (N-1+δ⁻¹) requires a global argument (Selberg majorant,
-Montgomery-Vaughan duality, or spectral methods) not reducible to diagonal + off-diagonal.
+The sharp Large Sieve constant (N-1+δ⁻¹) is NOT proved here: the naive
+decomposition "diagonal ≤ δ⁻¹ + off-diagonal ≤ (N-1)" is incorrect
+(counterexample: R=2, N=2, δ=0.001, α=(0,0.001), a=(1,1) gives off-diagonal
+≈ 4 > 2 = (N-1)·∑|a|²), and the sharp bound requires a global argument
+(Beurling–Selberg majorant / Montgomery–Vaughan duality) not available in
+Mathlib. The final multiplicative large sieve instead routes through
+Gallagher's 1967 argument (`Additive/Gallagher.lean`), which needs only the
+sorry-free results in this file, so the sharp bound is never used.
 -/
 
 import Mathlib.Analysis.SpecialFunctions.Complex.Circle
@@ -267,9 +270,8 @@ theorem cross_integral (m n : ℤ) :
 /-- **Parseval's identity for trigonometric polynomials**:
     ∫₀¹ conj(T(x))·T(x) dx = ∑_{n∈S} conj(aₙ)·aₙ = ∑ |aₙ|²
 
-    This is currently stated with sorry for the integral manipulation
-    (product expansion + sum interchange + orthogonality). The individual
-    components (cross_integral, integral_e_int) are fully proven. -/
+    Proved sorry-free via product expansion + sum interchange + orthogonality
+    (`cross_integral`, `integral_e_int`). -/
 theorem parseval_trig_poly_complex (a : ℤ → ℂ) (S : Finset ℤ) :
     ∫ x in (0:ℝ)..1,
         starRingEnd ℂ (∑ n ∈ S, a n * e (↑n * x)) *
