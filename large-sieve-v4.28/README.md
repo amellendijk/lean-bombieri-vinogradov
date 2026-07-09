@@ -67,15 +67,18 @@ multiplicative_large_sieve_gallagher            (Multiplicative.lean)
 
 ## Building
 
-Uses Lean `v4.32.0-rc1` (see `lean-toolchain`). This is a standalone Lake
-package (it does **not** yet share a toolchain with the surrounding
-Bombieri–Vinogradov project, which pins an earlier Lean):
+Uses Lean `v4.28.0` + Mathlib `v4.28.0` (see `lean-toolchain`), matching the
+toolchain pinned by the surrounding Bombieri–Vinogradov project. This is a
+standalone Lake package:
 
 ```bash
-cd large-sieve
+cd large-sieve-v4.28
 lake exe cache get
 lake build
 ```
+
+A `v4.32.0-rc1` version of the same proof lives in the sibling `large-sieve/`
+directory; the two are identical modulo Mathlib API renames.
 
 ## Relation to `BV/Axioms.lean`
 
