@@ -548,8 +548,7 @@ lemma sum_Ioc_natCast {R : Type*} [AddCommMonoid R] (k : ℕ) (G : ℤ → R) :
 
 /-- One application of the large sieve to a single Dirichlet polynomial:
 `∑_{q≤Q} ∑*_χ (q/φq) ‖∑_{m≤P} h(m) χ(m) m^{-(σ+it)}‖² ≤ C_LS (P+Q²) ∑_{m≤P} ‖h(m)‖²`,
-using that summing over primitive characters is bounded by summing over all characters, and
-that the `m^{-σ}` factors with `σ > 0`, `m ≥ 1` only shrink the coefficients. -/
+where the `m^{-σ}` factors with `σ > 0`, `m ≥ 1` only shrink the coefficients. -/
 lemma largeSieve_factor {Q : ℝ} (hQ : 1 ≤ Q) {σ : ℝ} (hσ_pos : 0 < σ) (t : ℝ)
     (h : ℕ → ℂ) (P : ℝ) :
     open Classical in
@@ -558,17 +557,6 @@ lemma largeSieve_factor {Q : ℝ} (hQ : 1 ≤ Q) {σ : ℝ} (hσ_pos : 0 < σ) (
       ‖summatory (fun m ↦ h m * χ m * (m : ℂ) ^ (-(σ + t * I))) P‖ ^ 2
     ≤ C_LS * (P + Q ^ 2) * summatory (fun m ↦ ‖h m‖ ^ 2) P := by
   classical
-  -- Step 1: pass from primitive characters to all characters (terms are nonnegative).
-  have step1 : ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
-      (q : ℝ) * (q.totient : ℝ)⁻¹ *
-        ‖summatory (fun m ↦ h m * χ m * (m : ℂ) ^ (-(σ + t * I))) P‖ ^ 2
-      ≤ ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ∑ χ : DirichletCharacter ℂ q,
-        (q : ℝ) * (q.totient : ℝ)⁻¹ *
-        ‖summatory (fun m ↦ h m * χ m * (m : ℂ) ^ (-(σ + t * I))) P‖ ^ 2 := by
-    apply Finset.sum_le_sum; intro q _
-    apply Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _)
-    intro χ _ _; positivity
-  refine step1.trans ?_
   have hSnn : (0 : ℝ) ≤ summatory (fun m ↦ ‖h m‖ ^ 2) P :=
     summatory_nonneg _ _ (fun n _ => by positivity)
   rcases Nat.eq_zero_or_pos ⌊P⌋₊ with hP0 | hPpos
@@ -616,13 +604,17 @@ lemma largeSieve_factor {Q : ℝ} (hQ : 1 ≤ Q) {σ : ℝ} (hσ_pos : 0 < σ) (
       _ = ‖h m‖ ^ 2 := by ring
   -- assemble
   have hCLS := C_LS_nonneg
-  calc ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ∑ χ : DirichletCharacter ℂ q,
+  calc ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
         (q : ℝ) * (q.totient : ℝ)⁻¹ *
         ‖summatory (fun m ↦ h m * χ m * (m : ℂ) ^ (-(σ + t * I))) P‖ ^ 2
-      = ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ∑ χ : DirichletCharacter ℂ q,
+      = ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
         (q : ℝ) * (q.totient : ℝ)⁻¹ *
         ‖∑ n ∈ Finset.Ioc (0 : ℤ) (⌊P⌋₊ : ℤ), c n * χ n‖ ^ 2 := by
-          simp_rw [ha]
+          apply Finset.sum_congr rfl
+          intro q hq
+          apply Finset.sum_congr rfl
+          intro χ hχ
+          rw [ha q χ]
     _ ≤ C_LS * ((⌊P⌋₊ : ℝ) + Q ^ 2) * ∑ n ∈ Finset.Ioc (0 : ℤ) (⌊P⌋₊ : ℤ), ‖c n‖ ^ 2 := hLS
     _ ≤ C_LS * ((⌊P⌋₊ : ℝ) + Q ^ 2) * summatory (fun m ↦ ‖h m‖ ^ 2) P := by
           apply mul_le_mul_of_nonneg_left hb
