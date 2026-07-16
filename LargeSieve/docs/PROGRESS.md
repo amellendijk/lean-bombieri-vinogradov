@@ -28,11 +28,11 @@ For the final, cleaned-up submission these were reorganized into a nested librar
 | `Attempt11.lean` | `LargeSieve/Character/Reduction.lean` (superseded declarations removed) |
 | `Attempt13.lean` | `LargeSieve/Multiplicative.lean` (final theorem) |
 
-The same proof is provided on two toolchains. The Lean `v4.28.0` + Mathlib `v4.28.0`
-version (matching this repo) is integrated directly into the BV package at the repo
-root (`LargeSieve/`) and discharges the `large_sieve` axiom in `BV/Axioms.lean`. A
-standalone copy on Lean `v4.32.0-rc1` is kept at `large-sieve-v4.32/` to show the result also
-builds on the latest Lean. Both build sorry-free; they differ only by Mathlib API renames.
+The proof is integrated directly into the BV package at the repo root (`LargeSieve/`),
+on Lean `v4.28.0` + Mathlib `v4.28.0` (matching this repo), and discharges the
+`large_sieve` axiom in `BV/Axioms.lean`. It builds sorry-free. The proof was also
+developed against Lean `v4.32.0-rc1`; porting between toolchains was mechanical (only
+Mathlib API renames).
 
 ---
 
