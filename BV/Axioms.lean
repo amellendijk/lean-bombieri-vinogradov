@@ -1,12 +1,11 @@
 import Mathlib
 import Architect
 
+import BV.Chebyshev
+
 open ArithmeticFunction
 
 open scoped Nat
-
-noncomputable def chebyPsi (x : ℝ) {q : ℕ} (a : ZMod q) : ℝ :=
-    ∑ n ∈ Finset.Ioc 0 ⌊x⌋₊ with (n : ℕ) = a, Λ n
 
 /-- The implied constant in the Sielgel-Walfisz Theorem -/
 axiom C_SW (A : ℕ) (C : ℕ) : ℝ

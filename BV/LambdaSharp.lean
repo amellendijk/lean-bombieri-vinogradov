@@ -11,55 +11,8 @@ def C_DLS : ℝ := 6
 /-- Constant in the average-order bound `∑_{q ≤ Q} τ(q) ≤ C_tau · Q log Q` (`sum_divisors_card_le`). -/
 def C_tau : ℝ := 3
 
-/-- Constant in the Type I sum bound `BV_LambdaSharp`. -/
+/-- Constant in the Type I sum bound `BV_LambdaSharp_enorm`. -/
 def C_BVLS : ℝ := C_DLS * C_tau
-
-/-! ### Group D: `Δ` is linear in its function argument -/
-
-theorem Delta_sub {R : Type*} [Field R] (f g : ℕ → R) (x : ℝ) (q : ℕ) (a : ZMod q) :
-    Δ_[f - g](x; q, a) = Δ_[f](x; q, a) - Δ_[g](x; q, a) := by
-  have hind : (Nat.modEqs (a : ZMod q)).indicator (f - g)
-      = fun n => (Nat.modEqs (a : ZMod q)).indicator f n
-          - (Nat.modEqs (a : ZMod q)).indicator g n := by
-    funext n; by_cases h : n ∈ Nat.modEqs (a : ZMod q) <;> simp [h]
-  have hcop : onCoprime q (f - g)
-      = fun n => onCoprime q f n - onCoprime q g n := by
-    funext n; simp only [onCoprime, Pi.sub_apply]; split_ifs <;> simp
-  simp only [Delta, hind, hcop, summatory_sub_distrib]
-  ring
-
-theorem Delta_smul {R : Type*} [Field R] (c : R) (f : ℕ → R) (x : ℝ) (q : ℕ) (a : ZMod q) :
-    Δ_[c • f](x; q, a) = c • Δ_[f](x; q, a) := by
-  have hind : (Nat.modEqs (a : ZMod q)).indicator (c • f)
-      = fun n => c • (Nat.modEqs (a : ZMod q)).indicator f n := by
-    funext n; by_cases h : n ∈ Nat.modEqs (a : ZMod q) <;> simp [h]
-  have hcop : onCoprime q (c • f)
-      = fun n => c • onCoprime q f n := by
-    funext n; simp only [onCoprime, Pi.smul_apply]; split_ifs <;> simp
-  simp only [Delta, hind, hcop, smul_eq_mul, summatory, ← Finset.mul_sum]
-  ring
-
-theorem Delta_add {R : Type*} [Field R] (f g : ℕ → R) (x : ℝ) (q : ℕ) (a : ZMod q) :
-    Δ_[f + g](x; q, a) = Δ_[f](x; q, a) + Δ_[g](x; q, a) := by
-  have hind : (Nat.modEqs (a : ZMod q)).indicator (f + g)
-      = fun n => (Nat.modEqs (a : ZMod q)).indicator f n
-          + (Nat.modEqs (a : ZMod q)).indicator g n := by
-    funext n; by_cases h : n ∈ Nat.modEqs (a : ZMod q) <;> simp [h]
-  have hcop : onCoprime q (f + g)
-      = fun n => onCoprime q f n + onCoprime q g n := by
-    funext n; simp only [onCoprime, Pi.add_apply]; split_ifs <;> simp
-  simp only [Delta, hind, hcop, summatory_add_distrib]
-  ring
-
-theorem Delta_finset_sum {R : Type*} [Field R] {ι : Type*} (s : Finset ι) (F : ι → ℕ → R)
-    (x : ℝ) (q : ℕ) (a : ZMod q) :
-    Δ_[∑ i ∈ s, F i](x; q, a) = ∑ i ∈ s, Δ_[F i](x; q, a) := by
-  classical
-  induction s using Finset.induction with
-  | empty =>
-      simp [Delta, summatory, onCoprime]
-  | insert i s hi ih =>
-      rw [Finset.sum_insert hi, Finset.sum_insert hi, Delta_add, ih]
 
 /-! ### Group C: Möbius expansion of the restricted analytic factor
 
@@ -481,6 +434,7 @@ theorem Delta_term2_bound [ProofData] {q r : ℕ} [NeZero q] {a : ZMod q}
 
 -- Note: corrected statement carries a `τ(r) = r.divisors.card` factor (see
 -- `notes/delta_lambda_sharp_bound.md`); the original blueprint `≪ UV log x` is unprovable.
+/-- Canonical `ℝ≥0∞` form of the Type I estimate. -/
 @[blueprint (statement := /--
 For $U, V \ge 1$, $x \ge 2$, $q \in \N$, $r \le x$ and $a \in (\Z/q\Z)^*$,
 $$\max_{y \le x} \max_{a \in (\Z/q\Z)^*} |\Delta_{\Lambda^\sharp_r}(y;\, q,\, a)| \ll \tau(r)\, UV \log x$$
@@ -524,23 +478,9 @@ $$\sum_{q \le Q} \tau(q) \ll Q \log Q,$$
 uniformly for $Q \ge 2$ (where $\tau(q) = $ `q.divisors.card`).
 -/)]
 theorem sum_divisors_card_le {Q : ℝ} (hQ : 2 ≤ Q) :
-    ∑ q ∈ Nat.Icc 0 Q, (q.divisors.card : ℝ) ≤ C_tau * Q * Real.log Q := by
+    ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, (q.divisors.card : ℝ) ≤ C_tau * Q * Real.log Q := by
   set N := ⌊Q⌋₊ with hN
   have hQ0 : (0:ℝ) ≤ Q := by linarith
-  have hIcc : Nat.Icc 0 Q = Finset.Icc 0 N := by
-    rw [Nat.Icc, if_pos ⟨by linarith, by linarith⟩]; simp [hN]
-  rw [hIcc]
-  -- Drop the `q = 0` term (its divisor count is `0`).
-  have hsub : ∑ q ∈ Finset.Icc 0 N, (q.divisors.card : ℝ)
-      = ∑ q ∈ Finset.Ioc 0 N, (q.divisors.card : ℝ) := by
-    refine (Finset.sum_subset Finset.Ioc_subset_Icc_self ?_).symm
-    intro x hx hxni
-    have hx0 : x = 0 := by
-      simp only [Finset.mem_Icc] at hx
-      simp only [Finset.mem_Ioc] at hxni
-      omega
-    simp [hx0]
-  rw [hsub]
   -- `∑_{q ≤ N} τ(q) = ∑_{q ≤ N} ⌊N/q⌋` (over `ℕ`).
   have hkey : (∑ q ∈ Finset.Ioc 0 N, q.divisors.card : ℕ) = ∑ q ∈ Finset.Ioc 0 N, (N / q) := by
     simp_rw [← sigma_zero_apply]
@@ -582,8 +522,11 @@ theorem sum_divisors_card_le {Q : ℝ} (hQ : 2 ≤ Q) :
 For each fixed $A \ge 0$, $x \ge 2$ and $1 \le Q \le \sqrt{x}/(\log x)^{A+3}$,
 $$\sum_{q \le Q} \max_{\sqrt{x} \le y \le x} \max_{a \in (\Z/q\Z)^*} |\Delta_{\Lambda^\sharp}(y;\, q,\, a)| \ll_A \frac{x}{(\log x)^A}$$
 -/) (uses := [Delta_LambdaSharp_bound, sum_divisors_card_le])]
-theorem BV_LambdaSharp [ProofData] {A : ℕ} (Q : ℝ) (h1Q : 1 ≤ Q) (hQ : Q ≤ √x / (Real.log x)^(A+3)) :
-    ∑ q ∈ Nat.Icc 0 Q, maxya q (fun y a ↦ |Δ_[Λ♯](y; q, a)|) ≤ C_BVLS * (x / (Real.log x)^A) := by
+theorem BV_LambdaSharp_enorm [ProofData] {A : ℕ} (Q : ℝ) (h1Q : 1 ≤ Q)
+    (hQ : Q ≤ √x / (Real.log x) ^ (A + 3)) :
+    ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊,
+      maxya q (fun y a ↦ ‖Δ_[Λ♯](y; q, a)‖ₑ) ≤
+        ENNReal.ofReal (C_BVLS * (x / (Real.log x) ^ A)) := by
   have hL1 : 1 ≤ Real.log x := one_le_log_x
   have hLpos : 0 < Real.log x := log_x_pos
   have hUnonneg : (0:ℝ) ≤ U := ProofData.U_nonneg
@@ -610,50 +553,30 @@ theorem BV_LambdaSharp [ProofData] {A : ℕ} (Q : ℝ) (h1Q : 1 ≤ Q) (hQ : Q �
       _ ≤ U := heU
       _ ≤ √x := ProofData.U_le_sqrt_x
   -- Per-term bound: `maxya q (Δ_[Λ♯]) ≤ C_DLS · τ(q) · U · V · log x`.
-  have hterm : ∀ q ∈ Nat.Icc (0:ℝ) Q, maxya q (fun y a ↦ |Δ_[Λ♯](y; q, a)|)
-      ≤ C_DLS * (q.divisors.card : ℝ) * U * V * Real.log x := by
+  have hterm : ∀ q ∈ Finset.Ioc 0 ⌊Q⌋₊,
+      maxya q (fun y a ↦ ‖Δ_[Λ♯](y; q, a)‖ₑ)
+      ≤ ENNReal.ofReal (C_DLS * (q.divisors.card : ℝ) * U * V * Real.log x) := by
     intro q hq
-    have hqQ : (q:ℝ) ≤ Q := ((Nat.mem_Icc _ _).mp hq).2
+    rw [Finset.mem_Ioc] at hq
+    have hqQ : (q:ℝ) ≤ Q := by
+      calc (q : ℝ) ≤ (⌊Q⌋₊ : ℕ) := by exact_mod_cast hq.2
+        _ ≤ Q := Nat.floor_le (by linarith)
     have hqx : (q:ℝ) ≤ x := hqQ.trans hQ_le_x
-    rcases Nat.eq_zero_or_pos q with hq0 | hqpos
-    · -- `q = 0`: `τ(0) = 0` and `Δ_[Λ♯](y; 0, a) = 0` for unit `a`.
-      subst hq0
-      apply maxya_le_unit
-      · intro y _ _ a ha
-        have hz : onCoprime 0 (⇑(Λ♯ : ArithmeticFunction ℝ)) = fun _ => (0:ℝ) := by
-          funext n
-          rw [onCoprime_apply]
-          split_ifs with h
-          · rw [Nat.coprime_zero_left] at h
-            subst h
-            have hsub : (Λ♯ : ArithmeticFunction ℝ) 1
-                = (μ≤V * log) 1 - (Λ≤U * μ≤V * (ζ : ArithmeticFunction ℝ)) 1 := rfl
-            rw [hsub, ArithmeticFunction.mul_apply_one, ArithmeticFunction.mul_apply_one,
-              ArithmeticFunction.mul_apply_one]
-            simp [ArithmeticFunction.log_apply, LambdaLEU_apply_of_le, ProofData.one_le_U]
-          · rfl
-        rw [(Delta_onCoprime_self _ y ha).symm, hz]
-        simp [Delta, summatory, onCoprime, abs_zero]
-      · simp
-    · -- `q ≥ 1`: use `Delta_LambdaSharp_bound` with `r = q`.
-      haveI : NeZero q := ⟨hqpos.ne'⟩
-      apply maxya_le_unit
-      · intro y hy1 hy2 a ha
-        have h2y : 2 ≤ y := le_trans hsqx2 hy1
-        have hbound := Delta_LambdaSharp_bound (q := q) (r := q) ha hqx h2y hy2
-        rw [(Delta_onCoprime_self _ y ha).symm]
-        exact hbound
-      · have : (0:ℝ) ≤ (q.divisors.card : ℝ) := by positivity
-        have : (0:ℝ) ≤ C_DLS := by rw [C_DLS]; norm_num
-        positivity
-  -- Sum the per-term bounds and factor out the constants.
-  have hsum1 := Finset.sum_le_sum hterm
-  have hfactor : ∑ q ∈ Nat.Icc (0:ℝ) Q, C_DLS * (q.divisors.card : ℝ) * U * V * Real.log x
-      = C_DLS * U * V * Real.log x * ∑ q ∈ Nat.Icc (0:ℝ) Q, (q.divisors.card : ℝ) := by
+    have hqpos : 0 < q := hq.1
+    haveI : NeZero q := ⟨hqpos.ne'⟩
+    apply maxya_Delta_enorm_le_of_abs_le
+    intro y hy1 hy2 a ha
+    have h2y : 2 ≤ y := le_trans hsqx2 hy1
+    have hbound := Delta_LambdaSharp_bound (q := q) (r := q) ha hqx h2y hy2
+    rw [(Delta_onCoprime_self _ y ha).symm]
+    exact hbound
+  -- Factor and estimate the real scalar majorant.
+  have hfactor : ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, C_DLS * (q.divisors.card : ℝ) * U * V * Real.log x
+      = C_DLS * U * V * Real.log x * ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, (q.divisors.card : ℝ) := by
     rw [Finset.mul_sum]
     exact Finset.sum_congr rfl (fun q _ => by ring)
   -- Divisor average: `∑_{q ≤ Q} τ(q) ≤ C_tau · Q · log x`.
-  have hS : ∑ q ∈ Nat.Icc (0:ℝ) Q, (q.divisors.card : ℝ) ≤ C_tau * Q * Real.log x := by
+  have hS : ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, (q.divisors.card : ℝ) ≤ C_tau * Q * Real.log x := by
     by_cases hQ2 : 2 ≤ Q
     · refine (sum_divisors_card_le hQ2).trans ?_
       have hlogQ : Real.log Q ≤ Real.log x := Real.log_le_log (by linarith) hQ_le_x
@@ -664,33 +587,46 @@ theorem BV_LambdaSharp [ProofData] {A : ℕ} (Q : ℝ) (h1Q : 1 ≤ Q) (hQ : Q �
       have hfloor : ⌊Q⌋₊ = 1 := by
         rw [Nat.floor_eq_iff h0Q]
         exact ⟨by exact_mod_cast h1Q, by push_cast; linarith⟩
-      have hsum_eq : ∑ q ∈ Nat.Icc (0:ℝ) Q, (q.divisors.card : ℝ) = 1 := by
-        rw [show Nat.Icc (0:ℝ) Q = Finset.Icc 0 1 by
-          rw [Nat.Icc, if_pos ⟨h0Q, h0Q⟩]; simp [hfloor]]
-        simp [Finset.sum_Icc_succ_top]
+      have hsum_eq : ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, (q.divisors.card : ℝ) = 1 := by
+        rw [hfloor]
+        simp
       rw [hsum_eq, C_tau]
       nlinarith [hL1, h1Q]
-  -- Final assembly.
-  refine (hsum1.trans (le_of_eq hfactor)).trans ?_
-  have hcoef : (0:ℝ) ≤ C_DLS * U * V * Real.log x := by
-    have : (0:ℝ) ≤ C_DLS := by rw [C_DLS]; norm_num
-    positivity
-  refine (mul_le_mul_of_nonneg_left hS hcoef).trans ?_
-  -- `C_DLS · U · V · L · (C_tau · Q · L) ≤ C_BVLS · x / L^A`.
-  have hQ3 : Q * (Real.log x)^(A+3) ≤ √x := (le_div_iff₀ (by positivity)).mp hQ
-  have hQpow : (0:ℝ) ≤ Q := by linarith
-  -- `Q · L^(A+2) ≤ Q · L^(A+3) ≤ √x`.
-  have hQ2pow : Q * (Real.log x)^(A+2) ≤ √x :=
-    le_trans (mul_le_mul_of_nonneg_left (pow_le_pow_right₀ hL1 (by omega)) hQpow) hQ3
-  -- `(U·V) · (Q·L^(A+2)) ≤ √x · √x = x`.
-  have hkey : U * V * (Q * (Real.log x)^(A+2)) ≤ x := by
-    calc U * V * (Q * (Real.log x)^(A+2))
-        ≤ √x * √x := mul_le_mul hUVle hQ2pow (by positivity) hsqrt_nonneg
-      _ = x := Real.mul_self_sqrt ProofData.x_nonneg
-  rw [C_BVLS, ← mul_div_assoc, le_div_iff₀ (by positivity : (0:ℝ) < (Real.log x)^A)]
-  have hLA2 : (Real.log x)^(A+2) = (Real.log x)^A * (Real.log x)^2 := by rw [pow_add]
-  calc C_DLS * U * V * Real.log x * (C_tau * Q * Real.log x) * (Real.log x)^A
-      = C_DLS * C_tau * (U * V * (Q * (Real.log x)^(A+2))) := by rw [hLA2]; ring
-    _ ≤ C_DLS * C_tau * x := by
-        apply mul_le_mul_of_nonneg_left hkey
-        rw [C_DLS, C_tau]; norm_num
+  have hreal : ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊,
+      C_DLS * (q.divisors.card : ℝ) * U * V * Real.log x ≤
+        C_BVLS * (x / (Real.log x) ^ A) := by
+    rw [hfactor]
+    have hcoef : (0:ℝ) ≤ C_DLS * U * V * Real.log x := by
+      have : (0:ℝ) ≤ C_DLS := by rw [C_DLS]; norm_num
+      positivity
+    refine (mul_le_mul_of_nonneg_left hS hcoef).trans ?_
+    -- `C_DLS · U · V · L · (C_tau · Q · L) ≤ C_BVLS · x / L^A`.
+    have hQ3 : Q * (Real.log x)^(A+3) ≤ √x := (le_div_iff₀ (by positivity)).mp hQ
+    have hQpow : (0:ℝ) ≤ Q := by linarith
+    have hQ2pow : Q * (Real.log x)^(A+2) ≤ √x :=
+      le_trans (mul_le_mul_of_nonneg_left (pow_le_pow_right₀ hL1 (by omega)) hQpow) hQ3
+    have hkey : U * V * (Q * (Real.log x)^(A+2)) ≤ x := by
+      calc U * V * (Q * (Real.log x)^(A+2))
+          ≤ √x * √x := mul_le_mul hUVle hQ2pow (by positivity) hsqrt_nonneg
+        _ = x := Real.mul_self_sqrt ProofData.x_nonneg
+    rw [C_BVLS, ← mul_div_assoc, le_div_iff₀ (by positivity : (0:ℝ) < (Real.log x)^A)]
+    have hLA2 : (Real.log x)^(A+2) = (Real.log x)^A * (Real.log x)^2 := by rw [pow_add]
+    calc C_DLS * U * V * Real.log x * (C_tau * Q * Real.log x) * (Real.log x)^A
+        = C_DLS * C_tau * (U * V * (Q * (Real.log x)^(A+2))) := by rw [hLA2]; ring
+      _ ≤ C_DLS * C_tau * x := by
+          apply mul_le_mul_of_nonneg_left hkey
+          rw [C_DLS, C_tau]; norm_num
+  calc
+    ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, maxya q (fun y a ↦ ‖Δ_[Λ♯](y; q, a)‖ₑ)
+        ≤ ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊,
+            ENNReal.ofReal (C_DLS * (q.divisors.card : ℝ) * U * V * Real.log x) :=
+          Finset.sum_le_sum hterm
+    _ = ENNReal.ofReal (∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊,
+          C_DLS * (q.divisors.card : ℝ) * U * V * Real.log x) := by
+        rw [ENNReal.ofReal_sum_of_nonneg]
+        intro q _
+        exact mul_nonneg
+          (mul_nonneg (mul_nonneg (mul_nonneg (by rw [C_DLS]; norm_num)
+            (by positivity)) hUnonneg) hVnonneg) hLpos.le
+    _ ≤ ENNReal.ofReal (C_BVLS * (x / (Real.log x) ^ A)) :=
+      ENNReal.ofReal_le_ofReal hreal

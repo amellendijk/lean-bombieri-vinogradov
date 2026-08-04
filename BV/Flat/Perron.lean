@@ -1034,7 +1034,8 @@ theorem summatory_T_ll [Bump] [FG] {ε Q : ℝ} (hε_pos : 0 < ε) (hQ : 1 ≤ Q
             (q : ℝ) * (q.totient : ℝ)⁻¹ * B q χ t) Q
           = ∫ t : ℝ, summatory (fun q => ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
             (q : ℝ) * (q.totient : ℝ)⁻¹ * B q χ t) Q from
-        (MeasureTheory.integral_finset_sum (Nat.Icc 1 Q) (fun q _ => hsum_int q)).symm]
+        (MeasureTheory.integral_finset_sum (Finset.Ioc 0 ⌊Q⌋₊)
+          (fun q _ => hsum_int q)).symm]
     exact MeasureTheory.integral_congr_ae (Filter.Eventually.of_forall hG_eq)
   -- Assemble the chain.
   calc summatory (fun q => ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,

@@ -9,6 +9,8 @@ import BV.ForMathlib.RCLikeToComplex
 
 import BV.Axioms
 import BV.Defs
+import BV.Maximal
+import BV.SiegelWalfisz
 
 open ArithmeticFunction
 open scoped Moebius zeta
@@ -47,6 +49,122 @@ lemma DirichletCharacter.one_natCast_apply {q : ℕ} [NeZero q] (n : ℕ) :
   · exact MulChar.map_nonunit _ (fun hu => h ((ZMod.isUnit_iff_coprime n q).mp hu).symm)
 
 notation3 "Δ_[" f "](" x "; " q ", " a ")" => Delta f x q a
+
+/-! ### Linearity and uniform maximal estimates -/
+
+theorem Delta_sub {R : Type*} [Field R] (f g : ℕ → R) (x : ℝ) (q : ℕ) (a : ZMod q) :
+    Δ_[f - g](x; q, a) = Δ_[f](x; q, a) - Δ_[g](x; q, a) := by
+  have hind : (Nat.modEqs (a : ZMod q)).indicator (f - g)
+      = fun n => (Nat.modEqs (a : ZMod q)).indicator f n
+          - (Nat.modEqs (a : ZMod q)).indicator g n := by
+    funext n; by_cases h : n ∈ Nat.modEqs (a : ZMod q) <;> simp [h]
+  have hcop : onCoprime q (f - g)
+      = fun n => onCoprime q f n - onCoprime q g n := by
+    funext n; simp only [onCoprime, Pi.sub_apply]; split_ifs <;> simp
+  simp only [Delta, hind, hcop, summatory_sub_distrib]
+  ring
+
+theorem Delta_smul {R : Type*} [Field R] (c : R) (f : ℕ → R) (x : ℝ) (q : ℕ)
+    (a : ZMod q) : Δ_[c • f](x; q, a) = c • Δ_[f](x; q, a) := by
+  have hind : (Nat.modEqs (a : ZMod q)).indicator (c • f)
+      = fun n => c • (Nat.modEqs (a : ZMod q)).indicator f n := by
+    funext n; by_cases h : n ∈ Nat.modEqs (a : ZMod q) <;> simp [h]
+  have hcop : onCoprime q (c • f) = fun n => c • onCoprime q f n := by
+    funext n; simp only [onCoprime, Pi.smul_apply]; split_ifs <;> simp
+  simp only [Delta, hind, hcop, smul_eq_mul, summatory, ← Finset.mul_sum]
+  ring
+
+theorem Delta_add {R : Type*} [Field R] (f g : ℕ → R) (x : ℝ) (q : ℕ) (a : ZMod q) :
+    Δ_[f + g](x; q, a) = Δ_[f](x; q, a) + Δ_[g](x; q, a) := by
+  have hind : (Nat.modEqs (a : ZMod q)).indicator (f + g)
+      = fun n => (Nat.modEqs (a : ZMod q)).indicator f n
+          + (Nat.modEqs (a : ZMod q)).indicator g n := by
+    funext n; by_cases h : n ∈ Nat.modEqs (a : ZMod q) <;> simp [h]
+  have hcop : onCoprime q (f + g) = fun n => onCoprime q f n + onCoprime q g n := by
+    funext n; simp only [onCoprime, Pi.add_apply]; split_ifs <;> simp
+  simp only [Delta, hind, hcop, summatory_add_distrib]
+  ring
+
+theorem Delta_finset_sum {R : Type*} [Field R] {ι : Type*} (s : Finset ι) (F : ι → ℕ → R)
+    (x : ℝ) (q : ℕ) (a : ZMod q) :
+    Δ_[∑ i ∈ s, F i](x; q, a) = ∑ i ∈ s, Δ_[F i](x; q, a) := by
+  classical
+  induction s using Finset.induction with
+  | empty => simp [Delta, summatory, onCoprime]
+  | insert i s hi ih => rw [Finset.sum_insert hi, Finset.sum_insert hi, Delta_add, ih]
+
+/-- Uniform triangle bound, valid for every conductor. -/
+theorem abs_Delta_le_two_summatory_abs (f : ℕ → ℝ) (z : ℝ) (q : ℕ) (a : ZMod q) :
+    |Δ_[f](z; q, a)| ≤ 2 * summatory (fun n ↦ |f n|) z := by
+  classical
+  rw [Delta]
+  have hφ : (q.totient : ℝ)⁻¹ ≤ 1 := by
+    rcases Nat.eq_zero_or_pos q with hq | hq
+    · simp [hq]
+    · exact inv_le_one_of_one_le₀ (by exact_mod_cast Nat.totient_pos.mpr hq)
+  have hφ0 : (0 : ℝ) ≤ (q.totient : ℝ)⁻¹ := by positivity
+  have hInd : summatory (fun n ↦ |(Nat.modEqs a).indicator f n|) z
+      ≤ summatory (fun n ↦ |f n|) z :=
+    summatory_le_summatory fun n _ _ ↦ by
+      rw [Set.indicator_apply]; split_ifs <;> simp
+  have hCop : summatory (fun n ↦ |onCoprime q f n|) z
+      ≤ summatory (fun n ↦ |f n|) z :=
+    summatory_le_summatory fun n _ _ ↦ by
+      rw [onCoprime_apply]; split_ifs <;> simp
+  have hA : |summatory ((Nat.modEqs a).indicator f) z|
+      ≤ summatory (fun n ↦ |f n|) z := by
+    refine le_trans ?_ hInd
+    simpa [Real.norm_eq_abs] using norm_summatory_le ((Nat.modEqs a).indicator f) z
+  have hB : |(q.totient : ℝ)⁻¹ * summatory (onCoprime q f) z|
+      ≤ summatory (fun n ↦ |f n|) z := by
+    rw [abs_mul, abs_of_nonneg hφ0]
+    calc (q.totient : ℝ)⁻¹ * |summatory (onCoprime q f) z|
+        ≤ 1 * |summatory (onCoprime q f) z| :=
+          mul_le_mul_of_nonneg_right hφ (abs_nonneg _)
+      _ = |summatory (onCoprime q f) z| := one_mul _
+      _ ≤ summatory (fun n ↦ |onCoprime q f n|) z := by
+          simpa [Real.norm_eq_abs] using norm_summatory_le (onCoprime q f) z
+      _ ≤ summatory (fun n ↦ |f n|) z := hCop
+  calc |summatory ((Nat.modEqs a).indicator f) z
+          - (q.totient : ℝ)⁻¹ * summatory (onCoprime q f) z|
+      ≤ |summatory ((Nat.modEqs a).indicator f) z|
+          + |(q.totient : ℝ)⁻¹ * summatory (onCoprime q f) z| := abs_sub _ _
+    _ ≤ summatory (fun n ↦ |f n|) z + summatory (fun n ↦ |f n|) z := add_le_add hA hB
+    _ = 2 * summatory (fun n ↦ |f n|) z := by ring
+
+/-- A discrepancy is bounded by its canonical unit-class maximum. -/
+theorem Delta_enorm_le_maxya [ProofData] (f : ℕ → ℝ) {q : ℕ} {y : ℝ} {a : ZMod q}
+    (ha : IsUnit a) (hy1 : √(ProofData.x) ≤ y) (hy2 : y ≤ ProofData.x) :
+    ‖Δ_[f](y; q, a)‖ₑ ≤ maxya q (fun z b ↦ ‖Δ_[f](z; q, b)‖ₑ) :=
+  le_maxya ha hy1 hy2
+
+theorem maxya_Delta_enorm_le_of_abs_le [ProofData] (f : ℕ → ℝ) {q : ℕ} {B : ℝ}
+    (h : ∀ y, √(ProofData.x) ≤ y → y ≤ ProofData.x → ∀ a : ZMod q,
+      IsUnit a → |Δ_[f](y; q, a)| ≤ B) :
+    maxya q (fun y a ↦ ‖Δ_[f](y; q, a)‖ₑ) ≤ ENNReal.ofReal B := by
+  refine maxya_le_unit fun y hy1 hy2 a ha ↦ ?_
+  rw [← ofReal_abs_eq_enorm]
+  exact ENNReal.ofReal_le_ofReal (h y hy1 hy2 a ha)
+
+/-- Generic two-function maximal triangle inequality for `Delta`. -/
+theorem maxya_Delta_add_le [ProofData] (f g : ℕ → ℝ) (q : ℕ) :
+    maxya q (fun y a ↦ ‖Δ_[f + g](y; q, a)‖ₑ) ≤
+      maxya q (fun y a ↦ ‖Δ_[f](y; q, a)‖ₑ) +
+        maxya q (fun y a ↦ ‖Δ_[g](y; q, a)‖ₑ) := by
+  refine maxya_le_unit fun y hy1 hy2 a ha ↦ ?_
+  rw [Delta_add]
+  exact (enorm_add_le _ _).trans (add_le_add (Delta_enorm_le_maxya f ha hy1 hy2)
+    (Delta_enorm_le_maxya g ha hy1 hy2))
+
+theorem maxya_Delta_enorm_ne_top [ProofData] (f : ℕ → ℝ) (q : ℕ) :
+    maxya q (fun y a ↦ ‖Δ_[f](y; q, a)‖ₑ) ≠ ⊤ := by
+  let B := 2 * summatory (fun n ↦ |f n|) ProofData.x
+  apply maxya_ne_top_of_le_ofReal
+  apply maxya_Delta_enorm_le_of_abs_le f (B := B)
+  intro y _ hy2 a _
+  exact (abs_Delta_le_two_summatory_abs f y q a).trans
+    (mul_le_mul_of_nonneg_left (monotone_summatory _ (fun _ ↦ abs_nonneg _) hy2)
+      (by norm_num))
 
 /-- For a unit `a`, restricting `f` to integers coprime to `q` does not change `Δ_[f](y; q, a)`,
 since `n ≡ a (mod q)` with `a` a unit forces `q.Coprime n`. -/
@@ -133,16 +251,16 @@ lemma Delta_eq_sum_char {𝕜 : Type*} [Field 𝕜] [Algebra 𝕜 ℂ] {f : ℕ 
     Nat.cast_ne_zero.mpr (Nat.totient_pos.mpr (NeZero.pos q)).ne'
   simp only [Delta, summatory, Nat.modEqs, onCoprime, Set.indicator_apply, Set.mem_setOf_eq]
   -- Suffices to prove the equivalent form with φ cleared
-  suffices h : (q.totient : ℂ) * ∑ i ∈ Nat.Icc 1 y, algebraMap _ _ (if (i : ZMod q) = (a : ZMod q) then f i else 0) -
-      ∑ i ∈ Nat.Icc 1 y, algebraMap _ _ (if q.Coprime i then f i else 0) =
+  suffices h : (q.totient : ℂ) * ∑ i ∈ Finset.Ioc 0 ⌊y⌋₊, algebraMap _ _ (if (i : ZMod q) = (a : ZMod q) then f i else 0) -
+      ∑ i ∈ Finset.Ioc 0 ⌊y⌋₊, algebraMap _ _ (if q.Coprime i then f i else 0) =
       ∑ χ : DirichletCharacter ℂ q, if χ ≠ 1 then
-        star (χ (a : ZMod q)) * ∑ x ∈ Nat.Icc 1 y, algebraMap _ _ (f x) * χ x else 0 by
+        star (χ (a : ZMod q)) * ∑ x ∈ Finset.Ioc 0 ⌊y⌋₊, algebraMap _ _ (f x) * χ x else 0 by
     simp at ⊢ h
     field_simp [hφ]
     linear_combination h
   -- Let F χ = star(χ a') * ∑_n f(n) χ(n)
   set F := fun χ : DirichletCharacter ℂ q =>
-    star (χ (a : ZMod q)) * ∑ x ∈ Nat.Icc 1 y, algebraMap _ _ (f x) * χ x
+    star (χ (a : ZMod q)) * ∑ x ∈ Finset.Ioc 0 ⌊y⌋₊, algebraMap _ _ (f x) * χ x
   -- Step 1: Split off the χ = 1 term: ∑_{χ≠1} F χ = ∑_χ F χ - F 1
   have hsplit : ∑ χ : DirichletCharacter ℂ q, (if χ ≠ 1 then F χ else 0) = ∑ χ, F χ - F 1 := by
     have hadd := Finset.add_sum_erase Finset.univ F (Finset.mem_univ (1 : DirichletCharacter ℂ q))
@@ -153,7 +271,7 @@ lemma Delta_eq_sum_char {𝕜 : Type*} [Field 𝕜] [Algebra 𝕜 ℂ] {f : ℕ 
     grind
   rw [hsplit]
   have hFsum : ∑ χ : DirichletCharacter ℂ q, F χ =
-      (q.totient : ℂ) * ∑ i ∈ Nat.Icc 1 y, algebraMap _ _ (if (i : ZMod q) = (a : ZMod q) then f i else 0) := by
+      (q.totient : ℂ) * ∑ i ∈ Finset.Ioc 0 ⌊y⌋₊, algebraMap _ _ (if (i : ZMod q) = (a : ZMod q) then f i else 0) := by
     have := DirichletCharacter.sum_char_inv_mul_char_eq ℂ ha
     simp only [F, Finset.mul_sum]
     rw [Finset.sum_comm]
@@ -162,7 +280,7 @@ lemma Delta_eq_sum_char {𝕜 : Type*} [Field 𝕜] [Algebra 𝕜 ℂ] {f : ℕ 
       DirichletCharacter.inv_zmod_apply ha, this]
     simp only [eq_comm]
     split_ifs <;> simp
-  have hF1 : F 1 = ∑ i ∈ Nat.Icc 1 y, algebraMap _ _ (if q.Coprime i then f i else 0) := by
+  have hF1 : F 1 = ∑ i ∈ Finset.Ioc 0 ⌊y⌋₊, algebraMap _ _ (if q.Coprime i then f i else 0) := by
     simp only [F, MulChar.one_apply ha, star_one, one_mul, DirichletCharacter.one_natCast_apply]
     congr! 1 with n
     split_ifs <;> simp
@@ -184,127 +302,20 @@ $$\Delta_{\Lambda}(x; q, a) = \psi(x; q,a) - \frac{1}{\varphi(q)} \sum_{n \le x,
 -/
 )]
 theorem Delta_Lambda_eq (x : ℝ) (q : ℕ) (a : ZMod q) :
-    Δ_[Λ](x; q, a) = ψ x a - (q.totient : ℝ)⁻¹ * ∑ n ∈ Nat.Icc 1 x with q.Coprime n, Λ n
+    Δ_[Λ](x; q, a) = ψ x a - (q.totient : ℝ)⁻¹ *
+      ∑ n ∈ Finset.Ioc 0 ⌊x⌋₊ with q.Coprime n, Λ n
    := by
   simp only [Delta, chebyPsi_eq_summatory]
   congr 2
   rw [summatory, Finset.sum_filter]
   congr! 1 with n hn
 
-noncomputable def C_D1 (A : ℕ) : ℝ := C_SW A 0
-
-open ProofData in
-@[blueprint (statement :=
-/--
-For all $A \in \N$,
-$$ \sum_{n \le x} \Lambda{n} = x + O_A(x/\log(x)^A)$$
--/
-)]
-lemma PNT [ProofData] (A : ℕ) :
-    |summatory (fun n ↦ Λ n) x - x| ≤ C_D1 A * (x / Real.log x ^ A) := by
-  have := siegel_walfisz A 0 le_x (q := 1) (by norm_num) (by simp) (a := 1) (by simp)
-  simp [ψ_one_one] at this
-  grw [summatory_vonMangoldt, this]
-  rfl
-
-lemma vonMangoldt_eq_ite_vonMangoldt (n : ℕ) : Λ n = if IsPrimePow n then Λ n else 0 := by
-  simp [vonMangoldt_apply]
-  grind
-
-lemma ArithmeticFunction.mul_coe_zeta_apply (f : ArithmeticFunction ℝ) (n : ℕ) : (f * ζ) n = ∑ d ∈ n.divisors, f d := by
-  rw [ArithmeticFunction.mul_apply, Nat.sum_divisorsAntidiagonal (f := fun i j ↦ f i * (↑ζ : ArithmeticFunction ℝ) j)]
-  congr! with d hd
-  simp only [Nat.mem_divisors, ne_eq] at hd
-  simp only [natCoe_apply, zeta_apply, Nat.div_eq_zero_iff, Nat.cast_ite, CharP.cast_eq_zero,
-    Nat.cast_one, mul_ite, mul_zero, mul_one, ite_eq_right_iff]
-  have : d ≤ n := Nat.le_of_dvd (by grind) hd.1
-  rintro (hd' | hnd)
-  · simp only [zero_dvd_iff, and_not_self, hd'] at hd
-  · grind
-
-open ProofData in
-lemma sum_vonMangoldt_le_log [ProofData] {k : ℕ} (hk : 0 < k) {q : ℕ} (hq : 0 < q) :
-    |∑ p ∈ Finset.Ioc 0 ⌊x ^ ((1:ℝ) / k)⌋₊ with Nat.Prime p, if ¬q.Coprime (p ^ k) then Λ p else 0| ≤ log q := by
-  have {p : ℕ} (hp : p.Prime) : ¬ q.Coprime (p^k) ↔ p ∣ q := by
-    rw [Nat.coprime_comm]
-    simp only [Nat.coprime_pow_left_iff, hk, Nat.Prime.coprime_iff_not_dvd hp, Decidable.not_not]
-  rw [abs_of_nonneg ?A]
-  case A =>
-    -- TODO: Make positivity work.
-    apply Finset.sum_nonneg fun _ _ ↦ ?_
-    split_ifs <;> simp
-  simp +contextual (disch := grind) only [this]
-  simp_rw [← Finset.sum_filter]
-  trans ∑ d ∈ q.divisors, Λ d
-  · gcongr
-    · intro d
-      simp only [Finset.mem_filter, Finset.mem_Ioc, Nat.mem_divisors, ne_eq, and_imp]
-      grind
-  · apply le_of_eq
-    rw [← ArithmeticFunction.vonMangoldt_mul_zeta, ArithmeticFunction.mul_coe_zeta_apply]
-
--- Variant of Chebyshev.sum_PrimePow_eq_sum_sum that's more syntactically general, but with an additional assumption.
-open Finset in
-theorem sum_PrimePow_eq_sum_sum_of_eq_zero {R : Type*} [AddCommMonoid R] (f : ℕ → R) {x : ℝ} (hx : 0 ≤ x) (hf : ∀ n : ℕ, 0 < n → n ≤ x → ¬ IsPrimePow n → f n = 0) :
-    ∑ n ∈ Ioc 0 ⌊x⌋₊, f n
-      = ∑ k ∈ Icc 1 ⌊Real.log x / Real.log 2⌋₊, ∑ p ∈ Ioc 0 ⌊x ^ ((1 : ℝ) / k)⌋₊ with p.Prime, f (p ^ k) := by
-  rw [← Chebyshev.sum_PrimePow_eq_sum_sum, Finset.sum_filter]
-  congr! with n hn
-  · simp only [mem_Ioc, Nat.le_floor_iff, hx] at hn
-    simpa using hf n hn.1 hn.2
-  · exact hx
-
-private noncomputable def C_SVNC : ℝ := (Real.log 2)⁻¹
-
-theorem C_SVNC_le : C_SVNC ≤ (Real.log 2)⁻¹ := le_rfl
-
-open ProofData in
-@[blueprint (statement :=
-/--
-For all $A \in \N$,
-$$ \sum_{n \le x, (q, n) \ne 1} \Lambda{n} \ll \log q \log x$$
--/
-)]
-lemma sum_vonMangoldt_not_coprime_ll_logq [ProofData] {q : ℕ} (hq : 0 < q) :
-  |summatory (fun n ↦ if ¬ q.Coprime n then Λ n else 0) x| ≤ C_SVNC * (Real.log q * Real.log x) := by
-  simp_rw [summatory_apply]
-  rw [sum_PrimePow_eq_sum_sum_of_eq_zero]
-  · grw [Finset.abs_sum_le_sum_abs]
-    simp +contextual (disch := grind) only [ArithmeticFunction.vonMangoldt_apply_pow]
-    trans (∑ x ∈ Finset.Icc 1 ⌊Real.log x / Real.log 2⌋₊, Real.log q)
-    · gcongr with d hd
-      -- TODO: fix bad convert
-      convert sum_vonMangoldt_le_log _ hq
-      · rfl
-      · simp
-      · grind
-    simp only [Finset.sum_const, Nat.card_Icc, add_tsub_cancel_right, nsmul_eq_mul]
-    grw [Nat.floor_le (by positivity), C_SVNC]
-    apply le_of_eq
-    ring
-  · linarith only [le_x]
-  · simp +contextual [vonMangoldt_eq_zero_iff]
-
-lemma summatory_sub_ite {P : ℕ → Prop} [DecidablePred P] (f : ℕ → ℝ) {x : ℝ} :
-    summatory f x - summatory (fun n ↦ if P n then f n else 0) x =
-    summatory (fun x ↦ if ¬ P x then f x else 0) x := by
-  pull summatory
-  congr with n
-  split_ifs <;> ring
-
-open ProofData in
-@[blueprint (statement :=
-/--
-For all $A \in \N$,
-$$ \sum_{n \le x, n \not \mid q} \Lambda{n} = x + O_A(x/\log(x)^A+\log q \log x)$$
--/
-)]
-lemma sum_primes_not_dvd_log_eq_id [ProofData] (A : ℕ) {q : ℕ} (hq : 0 < q) :
-  |summatory (fun n ↦ if q.Coprime n then Λ n else 0) x - x|
-    ≤ C_D1 A * (x / Real.log x ^ A) + C_SVNC * (Real.log q * Real.log x) := by
-  grw [abs_sub_le (b := (summatory (fun n ↦ Λ n) x)), PNT A, abs_sub_comm, summatory_sub_ite,
-    sum_vonMangoldt_not_coprime_ll_logq hq]
-  apply le_of_eq
+/-- Relate the usual modular Chebyshev error to `Delta Λ` and the coprime PNT error. -/
+theorem psi_sub_div_eq_Delta_add (z : ℝ) (q : ℕ) (a : ZMod q) :
+    ψ z a - z / q.totient = Δ_[Λ](z; q, a) +
+      (q.totient : ℝ)⁻¹ *
+        (summatory (fun n ↦ if q.Coprime n then Λ n else 0) z - z) := by
+  rw [Delta_Lambda_eq, summatory, Finset.sum_filter]
   ring
 
 noncomputable def ArithmeticFunction.twist {𝕜 : Type*} [Field 𝕜] [Algebra 𝕜 ℂ] {q : ℕ} (f : ArithmeticFunction 𝕜) (c : DirichletCharacter ℂ q)  : ArithmeticFunction ℂ := ⟨

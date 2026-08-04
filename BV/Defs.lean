@@ -7,37 +7,7 @@ import BV.Summatory
 open ArithmeticFunction
 open scoped Moebius zeta
 
-def Nat.modEqs {q : ℕ} (a : ZMod q) : Set ℕ := {n : ℕ | n = a}
-
-@[simp]
-theorem Nat.modEqs_one_one : Nat.modEqs (1 : ZMod 1) = Set.univ := by
-  have : ∀ n : ZMod 1, n = 1 := fun n ↦ Subsingleton.elim n 1
-  simp [modEqs, this]
-
-@[simp]
-theorem Nat.mem_modEqs {q : ℕ} (a : ZMod q) (n : ℕ) :
-    n ∈ modEqs a ↔ n = a := by
-  rfl
-
-lemma chebyPsi_eq_summatory (x : ℝ) {q : ℕ} (a : ZMod q) :
-    chebyPsi x a = summatory ((Nat.modEqs a).indicator Λ) x := by
-  classical
-  simp [summatory_apply, chebyPsi, Finset.sum_filter]
-  congr! with n hn
-  simp [Set.indicator_apply]
-
-scoped[BV] notation "ψ" => chebyPsi
-
 open BV
-
-lemma summatory_vonMangoldt {x : ℝ} : summatory (fun n ↦ Λ n) x = Chebyshev.psi x := by
-  simp [Chebyshev.psi_eq_sum_Icc]
-  rw [summatory_apply, ← Finset.add_sum_Ioc_eq_sum_Icc]
-  · simp
-  · simp
-
-theorem ψ_one_one {x : ℝ} : ψ x (1 : ZMod 1) = Chebyshev.psi x := by
-  simp [chebyPsi_eq_summatory, Chebyshev.psi_eq_sum_Icc, summatory_vonMangoldt]
 
 @[blueprint (statement :=
 /-- For $f : \N \rightarrow \R$ and $r : \N$ we use $f_r$ to denote $n \mapsto f(n) 1_{(n, r) = 1}$-/
@@ -194,6 +164,22 @@ theorem one_le_log_x : 1 ≤ Real.log x := by
   have ht : Real.sqrt (Real.log x) ^ 2 = Real.log x := Real.sq_sqrt (le_of_lt hlogx)
   nlinarith [Real.sqrt_nonneg (Real.log x), hlogx, h1, ht]
 
+/-- Under `ProofData`, the constraints force `log x ≥ 16`. -/
+theorem sixteen_le_log_x : 16 ≤ Real.log x := by
+  have hlogx : 0 < Real.log x := log_x_pos
+  have hUV : Real.exp (Real.sqrt (Real.log x) + Real.sqrt (Real.log x)) ≤ Real.sqrt x := by
+    rw [Real.exp_add]
+    calc Real.exp (Real.sqrt (Real.log x)) * Real.exp (Real.sqrt (Real.log x))
+        ≤ U * V := mul_le_mul le_U le_V (le_of_lt (Real.exp_pos _)) ProofData.U_nonneg
+      _ ≤ Real.sqrt x := ProofData.UV_le
+  have h1 : Real.sqrt (Real.log x) + Real.sqrt (Real.log x) ≤ Real.log (Real.sqrt x) := by
+    have := Real.log_le_log (Real.exp_pos _) hUV
+    rwa [Real.log_exp] at this
+  rw [Real.log_sqrt ProofData.x_nonneg] at h1
+  have ht : Real.sqrt (Real.log x) ^ 2 = Real.log x := Real.sq_sqrt (le_of_lt hlogx)
+  nlinarith [Real.sqrt_nonneg (Real.log x), hlogx, h1, ht,
+    sq_nonneg (Real.sqrt (Real.log x) - 4)]
+
 open Qq Lean Meta Mathlib.Meta.Positivity in
 @[positivity Real.log x]
 def x_positivity : PositivityExt where eval {u α} _ pα? e :=
@@ -238,42 +224,6 @@ theorem Nat.Icc_sqrt_nonempty : (Nat.Icc (√x) x).Nonempty := by
       linarith
     · exact le_x
 
-
-noncomputable def maxy [ProofData] (f : ℝ → ℝ) : ℝ :=  ⨆ y ∈ Set.Icc (√ x) x, f y
-
-theorem maxy_le {f : ℝ → ℝ} {M : ℝ}
-    (hf : ∀ y, √x ≤ y → y ≤ x → f y ≤ M) (hM : 0 ≤ M) :
-    maxy f ≤ M := by
-  simp [maxy]
-  apply Real.iSup_le _ hM
-  intro y
-  apply Real.iSup_le _ hM
-  intro hy
-  apply hf _ hy.1 hy.2
-
--- TODO : We're taking the maximum over the naturals in [√x, x], but really we should use reals.
-/-- The maximum of $f$ over all $y \in \left[\sqrt{x}, x\right]$ and $a \in (\mathbb{Z} / q\mathbb{Z})^* -/
-noncomputable def maxya [ProofData] (q : ℕ) (f : ℝ → ZMod q → ℝ) : ℝ :=
-  ⨆ a : (ZMod q)ˣ, maxy (fun y ↦ f y a)
-
-theorem maxya_le {q : ℕ} {f : ℝ → ZMod q → ℝ} {M : ℝ} (hf : ∀ y, √x ≤ y → y ≤ x → ∀ a, f y a ≤ M) (hM : 0 ≤ M) :
-    maxya q f ≤ M := by
-  rw [maxya]
-  apply Real.iSup_le _ hM
-  intro a
-  apply maxy_le _ hM
-  grind
-
-/-- Units-only version of `maxya_le`: it suffices to bound `f y a` for unit `a`. -/
-theorem maxya_le_unit {q : ℕ} {f : ℝ → ZMod q → ℝ} {M : ℝ}
-    (hf : ∀ y, √x ≤ y → y ≤ x → ∀ a : ZMod q, IsUnit a → f y a ≤ M) (hM : 0 ≤ M) :
-    maxya q f ≤ M := by
-  rw [maxya]
-  apply Real.iSup_le _ hM
-  intro a
-  apply maxy_le _ hM
-  intro y hy1 hy2
-  exact hf y hy1 hy2 a a.isUnit
 
 /-- Restrict an arithmetic function to a set, setting all values outside the set to zero.
 Like `Set.indicator` but for `ArithmeticFunction`. -/

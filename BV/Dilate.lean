@@ -107,6 +107,16 @@ theorem summatory_abs_dilate_le {e : ℕ} (he : 0 < e) (f : ArithmeticFunction �
     summatory (fun k => |dilate e f k|) x ≤ summatory (fun k => |f k|) x := by
   have he' : (0 : ℝ) < e := by exact_mod_cast he
   simp only [summatory]
+  have hEq (t : ℝ) : Finset.Ioc 0 ⌊t⌋₊ = Nat.Icc 1 t := by
+    ext n
+    by_cases ht : 0 ≤ t
+    · simp only [Finset.mem_Ioc, Nat.mem_Icc, Nat.le_floor_iff ht,
+        Nat.one_le_cast]
+      constructor <;> rintro ⟨h1, h2⟩ <;> exact ⟨by omega, h2⟩
+    · have ht' : t < 0 := lt_of_not_ge ht
+      have hfloor : ⌊t⌋₊ = 0 := Nat.floor_eq_zero.mpr (by linarith)
+      simp [hfloor, Nat.Icc_eq_empty_of_neg _ ht']
+  rw [hEq x]
   calc ∑ k ∈ Nat.Icc 1 x, |dilate e f k|
       = ∑ k ∈ (Nat.Icc 1 x).filter (fun m => e ∣ m), |f (k / e)| := by
         rw [Finset.sum_filter]
@@ -186,6 +196,12 @@ theorem summatory_abs_mul_le (f g : ArithmeticFunction ℝ) {x : ℝ} (_hx : 0 �
     summatory (fun k => |(f * g) k|) x
       ≤ summatory (fun k => |f k|) x * summatory (fun k => |g k|) x := by
   simp only [summatory]
+  have hEq : Finset.Ioc 0 ⌊x⌋₊ = Nat.Icc 1 x := by
+    ext n
+    simp only [Finset.mem_Ioc, Nat.mem_Icc, Nat.le_floor_iff _hx,
+      Nat.one_le_cast]
+    constructor <;> rintro ⟨h1, h2⟩ <;> exact ⟨by omega, h2⟩
+  rw [hEq]
   -- Step 1: triangle inequality on each Dirichlet convolution
   refine le_trans (Finset.sum_le_sum
     (g := fun k => ∑ p ∈ k.divisorsAntidiagonal, |f p.1| * |g p.2|) fun k _ => ?_) ?_

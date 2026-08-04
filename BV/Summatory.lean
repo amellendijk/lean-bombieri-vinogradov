@@ -61,38 +61,45 @@ theorem Nat.Icc_mono_right {x y₁ y₂ : ℝ} (hy : y₁ ≤ y₂) : Nat.Icc x 
   grind
 
 noncomputable def summatory {R : Type*} [AddCommMonoid R] (f : ℕ → R) (x : ℝ) : R :=
-  ∑ i ∈ Nat.Icc 1 x, f i
+  ∑ i ∈ Finset.Ioc 0 ⌊x⌋₊, f i
 
 theorem summatory_nonneg {R : Type*} [AddCommMonoid R] [PartialOrder R] [IsOrderedAddMonoid R]
     (f : ℕ → R) (x : ℝ) (hf : ∀ n : ℕ, n ≤ x → 0 ≤ f n ) : 0 ≤ summatory f x := by
-  simp [summatory]
   apply Finset.sum_nonneg
-  simp only [Nat.mem_Icc]
-  grind
+  intro n hn
+  apply hf
+  rw [← Nat.le_floor_iff]
+  · exact (Finset.mem_Ioc.mp hn).2
+  · by_cases hx : 0 ≤ x
+    · exact hx
+    · have : ⌊x⌋₊ = 0 := Nat.floor_eq_zero.mpr (by linarith)
+      simp [this] at hn
 
 theorem summatory_of_neg {R : Type*} [AddCommMonoid R]
     {f : ℕ → R} {x : ℝ} (hx : x < 0) :
     summatory f x = 0 := by
-  simp [summatory, Nat.Icc_eq_empty_of_neg _ hx]
+  have hfloor : ⌊x⌋₊ = 0 := Nat.floor_eq_zero.mpr (by linarith)
+  simp [summatory, hfloor]
 
 theorem summatory_of_nonpos {R : Type*} [AddCommMonoid R]
     {f : ℕ → R} {x : ℝ} (hx : x ≤ 0) :
     summatory f x = 0 := by
-  simp [summatory]
-  rw [Nat.Icc_eq_empty_of_lt]
-  · simp
-  · grind
+  have hfloor : ⌊x⌋₊ = 0 := Nat.floor_eq_zero.mpr (by linarith)
+  simp [summatory, hfloor]
 
 theorem summatory_apply {R : Type*} [AddCommMonoid R] {f : ℕ → R} {x : ℝ} :
-    summatory f x = ∑ n ∈ Finset.Ioc 0 ⌊x⌋₊, f n := by
+    summatory f x = ∑ n ∈ Finset.Ioc 0 ⌊x⌋₊, f n := rfl
+
+theorem Finset.mem_Ioc_zero_floor (x : ℝ) (n : ℕ) :
+    n ∈ Finset.Ioc 0 ⌊x⌋₊ ↔ (1 : ℝ) ≤ n ∧ (n : ℝ) ≤ x := by
   by_cases hx : 0 ≤ x
-  · simp [summatory]
-    congr 1
-    ext n
-    simp only [Nat.mem_Icc, Nat.one_le_cast, Finset.mem_Ioc, Nat.le_floor_iff hx]
-    grind
-  · have : x < 0 := by linarith
-    simp [Nat.floor_of_nonpos this.le, summatory_of_neg this]
+  · rw [Finset.mem_Ioc, Nat.le_floor_iff hx]
+    constructor <;> rintro ⟨h1, h2⟩ <;> exact ⟨by exact_mod_cast h1, h2⟩
+  · have hx' : x < 0 := lt_of_not_ge hx
+    have hfloor : ⌊x⌋₊ = 0 := Nat.floor_eq_zero.mpr (by linarith)
+    simp [hfloor]
+    intro _
+    linarith
 
 theorem summatory_eq_zero {R : Type*} [AddCommMonoid R]
     {f : ℕ → R} {x : ℝ} (hf : ∀ n : ℕ, 0 < n → n ≤ x → f n = 0) :
@@ -113,10 +120,15 @@ theorem summatory_congr {R : Type*} [AddCommMonoid R]
     {f g : ℕ → R} {x y : ℝ} (hxy : x = y) (h : ∀ n : ℕ, 0 < n → n ≤ x → f n = g n) :
     summatory f x = summatory g y := by
   subst hxy
-  simp [summatory]
   apply Finset.sum_congr rfl fun n hn ↦ ?_
-  simp only [Nat.mem_Icc, Nat.one_le_cast] at hn
-  apply h n (by grind) hn.2
+  rw [Finset.mem_Ioc] at hn
+  apply h n hn.1
+  have hx0 : 0 ≤ x := by
+    by_contra hx
+    have hfloor : ⌊x⌋₊ = 0 := Nat.floor_eq_zero.mpr (by linarith)
+    omega
+  exact_mod_cast calc n ≤ (⌊x⌋₊ : ℝ) := mod_cast hn.2
+    _ ≤ x := Nat.floor_le hx0
 
 @[gcongr]
 theorem summatory_le_summatory {R : Type*} [AddCommMonoid R] [PartialOrder R] [IsOrderedAddMonoid R]
@@ -134,21 +146,40 @@ theorem summatory_le_summatory {R : Type*} [AddCommMonoid R] [PartialOrder R] [I
 theorem summatory_congr_fun {R : Type*} [AddCommMonoid R]
     {f g : ℕ → R} {x : ℝ} (h : ∀ n : ℕ, 0 < n → n ≤ x → f n = g n) :
     summatory f x = summatory g x := by
-  simp [summatory]
   apply Finset.sum_congr rfl fun n hn ↦ ?_
-  simp only [Nat.mem_Icc, Nat.one_le_cast] at hn
-  apply h n (by grind) hn.2
+  rw [Finset.mem_Ioc] at hn
+  apply h n hn.1
+  have hx0 : 0 ≤ x := by
+    by_contra hx
+    have hfloor : ⌊x⌋₊ = 0 := Nat.floor_eq_zero.mpr (by linarith)
+    omega
+  exact_mod_cast calc n ≤ (⌊x⌋₊ : ℝ) := mod_cast hn.2
+    _ ≤ x := Nat.floor_le hx0
 
 @[gcongr]
 theorem summatory_eq_summatory_of_lt_of_eq_zero {R : Type*} [AddCommMonoid R] [PartialOrder R] [IsOrderedAddMonoid R]
     (f : ℕ → R) (x y : ℝ) (hxy : x ≤ y) (hf : ∀ n : ℕ, x < n ∧ n ≤ y → f n = 0) :
     summatory f x = summatory f y := by
-  simp [summatory]
+  simp only [summatory]
   apply Finset.sum_subset
-  · grind
-  simp only [Nat.mem_Icc]
+  · intro n hn
+    rw [Finset.mem_Ioc] at hn ⊢
+    exact ⟨hn.1, hn.2.trans (Nat.floor_mono hxy)⟩
+  simp only [Finset.mem_Ioc]
   intro n hy hx
-  grind
+  apply hf n
+  constructor
+  · by_contra hnx
+    have hnle : (n : ℝ) ≤ x := le_of_not_gt hnx
+    have hx0 : 0 ≤ x := le_trans (by exact_mod_cast hy.1.le) hnle
+    have : n ≤ ⌊x⌋₊ := (Nat.le_floor_iff hx0).mpr hnle
+    exact hx ⟨hy.1, this⟩
+  · have hy0 : 0 ≤ y := by
+      by_contra hny
+      have hfloor : ⌊y⌋₊ = 0 := Nat.floor_eq_zero.mpr (by linarith)
+      omega
+    exact_mod_cast calc n ≤ (⌊y⌋₊ : ℝ) := mod_cast hy.2
+      _ ≤ y := Nat.floor_le hy0
 
 @[push]
 theorem summatory_add_distrib {R : Type*} [AddCommMonoid R] {f g : ℕ → R} {x : ℝ} :
@@ -214,11 +245,12 @@ theorem summatory_le_UB {R : Type*} {f : ℕ → R}
     grw [← hf 0 (mod_cast hx)]
     simp
   grw [summatory, norm_sum_le]
-  trans ∑ i ∈ Nat.Icc 1 x, M
+  trans ∑ i ∈ Finset.Ioc 0 ⌊x⌋₊, M
   · gcongr with n hn
     apply hf
-    simp only [Nat.mem_Icc, Nat.one_le_cast] at hn
-    exact hn.2
+    rw [Finset.mem_Ioc] at hn
+    exact_mod_cast calc n ≤ (⌊x⌋₊ : ℝ) := mod_cast hn.2
+      _ ≤ x := Nat.floor_le hx
   · simp [hx]
     gcongr
     exact Nat.floor_le hx
@@ -330,7 +362,10 @@ theorem summatory_isLocallyBounded
 theorem monotone_summatory (g : ℕ → ℝ) (hg : ∀ n, 0 ≤ g n) : Monotone (summatory g) := by
   intro x y hxy
   simp only [summatory]
-  apply Finset.sum_le_sum_of_subset_of_nonneg (Nat.Icc_mono_right hxy)
+  apply Finset.sum_le_sum_of_subset_of_nonneg
+  · intro n hn
+    rw [Finset.mem_Ioc] at hn ⊢
+    exact ⟨hn.1, hn.2.trans (Nat.floor_mono hxy)⟩
   intros i _ _
   exact hg i
 
