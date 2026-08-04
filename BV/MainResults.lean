@@ -248,12 +248,8 @@ private lemma sum_vonMangoldt_not_coprime_generic {z : ℝ} (hz : 2 ≤ z)
     simp +contextual (disch := grind) only [this]
     simp_rw [← Finset.sum_filter]
     trans ∑ d ∈ q.divisors, Λ d
-    · apply Finset.sum_le_sum_of_subset_of_nonneg
-      · intro d hd
-        simp only [Finset.mem_filter] at hd
-        exact Nat.mem_divisors.mpr ⟨hd.2, hq.ne'⟩
-      · intro d _ _
-        exact ArithmeticFunction.vonMangoldt_nonneg
+    · gcongr
+      grind
     · apply le_of_eq
       exact ArithmeticFunction.vonMangoldt_sum
   simp_rw [summatory_apply]
