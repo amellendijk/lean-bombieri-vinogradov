@@ -14,13 +14,6 @@ variable [TopologicalSpace ε] [ContinuousENorm ε] [TopologicalSpace ε'] [Cont
 namespace MeasureTheory
 section LocallyIntegrableOn
 
-/-- This lemma is in a more recent version of mathlib -/
-@[gcongr]
-axiom LocallyIntegrableOn.congr (h : f =ᵐ[μ.restrict s] g) (hf : LocallyIntegrableOn f s μ) :
-    LocallyIntegrableOn g s μ
-
-
-
 end LocallyIntegrableOn
 
 section RCLike

@@ -11,12 +11,12 @@ name = "BV"
 [[require]]
 name = "LeanArchitect"
 git = "https://github.com/hanwenzhu/LeanArchitect.git"
-rev = "v4.28.0"
+rev = "v4.32.0-rc1"
 
 [[require]]
 name = "mathlib"
 git = "https://github.com/leanprover-community/mathlib4.git"
-rev = "v4.28.0"
+rev = "v4.32.2"
 
 [[require]]
 name = "checkdecls"
@@ -25,11 +25,11 @@ git = "https://github.com/PatrickMassot/checkdecls.git"
 [[require]]
 name = "leancert"
 git = "https://github.com/alerad/leancert"
-rev = "v4.28.1"
+rev = "v4.32.2.2"
 
 [[require]]
 name = "PrimeNumberTheoremAnd"
 git = "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd.git"
-rev = "11265859849c1b7029fa68dfb2e3822596c74c9d"
+rev = "6ea1a1532f758dd27be222d3314e798cb8a0b61c"
 
 

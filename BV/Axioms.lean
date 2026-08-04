@@ -1,11 +1,12 @@
 import Mathlib
 import Architect
 
-import BV.Defs
-
 open ArithmeticFunction
 
 open scoped Nat
+
+noncomputable def chebyPsi (x : ℝ) {q : ℕ} (a : ZMod q) : ℝ :=
+    ∑ n ∈ Finset.Ioc 0 ⌊x⌋₊ with (n : ℕ) = a, Λ n
 
 /-- The implied constant in the Sielgel-Walfisz Theorem -/
 axiom C_SW (A : ℕ) (C : ℕ) : ℝ
@@ -20,11 +21,12 @@ $$
 )]
 axiom siegel_walfisz (A : ℕ) (C : ℕ) {x : ℝ} (hx : 2 ≤ x)
     {q : ℕ} (hq0 : 0 < q) (hq : q ≤ (Real.log x) ^ C) {a : ZMod q} (ha : IsUnit a) :
-  |ψ x a - x / φ q| ≤ C_SW A C * (x / (Real.log x) ^ A)
+  |chebyPsi x a - x / φ q| ≤ C_SW A C * (x / (Real.log x) ^ A)
 
 
 axiom C_LS : ℝ
 
+  open Classical in
 /- Note: We avoid phrasing this axiom in terms of our own definitions (such as summatory) to minimize the chance this axiom
 introduces an inconsistency. -/
 @[blueprint (latexEnv := "assumption") (statement :=
@@ -34,7 +36,6 @@ $$\sum_{q \le Q} \sumstar_{\chi \pmod q} \frac{q}{\varphi(q)} \left| \sum_{H < n
 -/
 )]
 axiom large_sieve (Q : ℝ) (hQ : 1 ≤ Q) (H : ℤ) (N : ℕ) (hN : 0 < N) (c : ℤ → ℂ) :
-  open Classical in
-  ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
+    ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
       q / φ q * ‖∑ n ∈ Finset.Ioc H (H+N), c n * χ n‖^2 ≤
     C_LS * (N+Q^2) * ∑ n ∈ Finset.Ioc H (H+N), ‖c n‖^2

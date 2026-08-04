@@ -40,16 +40,16 @@ lemma conductor_changeLevel_eq {R : Type*} [CommMonoidWithZero R] {n m : ℕ} [N
       ⟨dvd_trans ξ.conductor_dvd_level hm, ξ.primitiveCharacter, by
         rw [changeLevel_trans (χ := ξ.primitiveCharacter) (hm := ξ.conductor_dvd_level) (hd := hm),
           changeLevel_primitiveCharacter]⟩
-    exact (changeLevel hm ξ).conductor_dvd_of_mem_conductorSet (NeZero.ne m) hfac
+    exact (changeLevel hm ξ).conductor_dvd_of_mem_conductorSet hfac
   refine Nat.dvd_antisymm h1 ?_
   set c := (changeLevel hm ξ).conductor with hc
   have hcn : c ∣ n := dvd_trans h1 ξ.conductor_dvd_level
-  obtain ⟨hcm, ψ, hψ⟩ := factorsThrough_conductor (changeLevel hm ξ)
-  have hξeq : ξ = changeLevel hcn ψ := by
+  obtain ⟨hcm, ξ', hξ'⟩ := factorsThrough_conductor (changeLevel hm ξ)
+  have hξeq : ξ = changeLevel hcn ξ' := by
     apply changeLevel_injective hm
     rw [← changeLevel_trans]
-    exact hψ
-  exact ξ.conductor_dvd_of_mem_conductorSet (NeZero.ne n) ⟨hcn, ψ, hξeq⟩
+    exact hξ'
+  exact ξ.conductor_dvd_of_mem_conductorSet ⟨hcn, ξ', hξeq⟩
 
 /-- For `d ∣ q`, the Dirichlet characters mod `q` of conductor exactly `d` are precisely the
 `changeLevel` images of the primitive characters mod `d`.  This is the "intermediate result without
@@ -98,7 +98,7 @@ theorem character_sum_by_conductor {R : Type*} [AddCommMonoid R] {q : ℕ} [NeZe
     intro χ hχ
     simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hχ ⊢
     refine ⟨Nat.mem_divisors.mpr ⟨χ.conductor_dvd_level, NeZero.ne q⟩, ?_⟩
-    exact fun h => hχ ((DirichletCharacter.eq_one_iff_conductor_eq_one (NeZero.ne q)).mpr h)
+    exact fun h => hχ (DirichletCharacter.eq_one_iff_conductor_eq_one.mpr h)
   -- On the fibre over `n ≠ 1`, the constraint `χ ≠ 1` is automatic.
   have hfib : ∀ n : ℕ, n ≠ 1 →
       (Finset.univ.filter (fun χ : DirichletCharacter ℂ q => χ ≠ 1)).filter
@@ -110,7 +110,7 @@ theorem character_sum_by_conductor {R : Type*} [AddCommMonoid R] {q : ℕ} [NeZe
     constructor
     · exact fun h => h.2
     · intro h
-      exact ⟨fun he => hn (h ▸ (DirichletCharacter.eq_one_iff_conductor_eq_one (NeZero.ne q)).mp he),
+      exact ⟨fun he => hn (h ▸ DirichletCharacter.eq_one_iff_conductor_eq_one.mp he),
         h⟩
   -- Group the left-hand sum by conductor.
   have hLHS : ∑ χ : DirichletCharacter ℂ q with χ ≠ 1, f χ =
@@ -327,11 +327,11 @@ theorem Delta_LambdaFlat_zero [ProofData] {y : ℝ} {a : ZMod 0} (ha : IsUnit a)
     rw [Nat.mem_modEqs] at hmem
     have hi1 : i = 1 := by
       rcases Int.isUnit_iff.mp ha with h1 | h1
-      · have : (i : ℤ) = 1 := by exact_mod_cast h1 ▸ hmem
+      · have : (i : ℤ) = 1 := h1 ▸ hmem
         exact_mod_cast this
       · exfalso
         have hnn : (0 : ℤ) ≤ (i : ℤ) := Int.natCast_nonneg i
-        have : (i : ℤ) = -1 := by exact_mod_cast h1 ▸ hmem
+        have : (i : ℤ) = -1 := h1 ▸ hmem
         rw [this] at hnn; norm_num at hnn
     rw [hi1, LambdaFlat_apply_one]
   · rw [Set.indicator_of_notMem hmem]
@@ -774,7 +774,9 @@ theorem Delta_onCoprime_Lambda_bound [ProofData] (A' C2 : ℕ) {y : ℝ}
       rw [abs_of_nonneg hEs_nonneg]
       linarith [hEs_bound, hPNT]
     -- Assemble.
-    have hT1ψ : T1 = ψ y a := rfl
+    have hT1ψ : T1 = ψ y a := by
+      rw [hT1]
+      exact (chebyPsi_eq_summatory y a).symm
     have e1 : T1 - c * T2 = (ψ y a - y / (s.totient : ℝ)) + c * (y - T2) := by
       rw [hT1ψ, div_eq_mul_inv, ← hc_def]; ring
     rw [e1]

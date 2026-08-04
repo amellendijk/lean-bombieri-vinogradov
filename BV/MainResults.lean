@@ -11,6 +11,7 @@ open ArithmeticFunction
 open scoped BV
 
 open ProofData
+open BV
 
 noncomputable section
 
@@ -108,7 +109,7 @@ theorem Delta_LambdaLEU_conductor_zero [ProofData] (y : ℝ) {a : ZMod 0} (ha : 
       -- `(n : ZMod 0) = a`, i.e. `(n : ℤ) = a`
       rcases Int.isUnit_iff.mp ha with h | h
       · -- a = 1, forcing n = 1
-        have : (n : ℤ) = 1 := by rw [hn, h]
+        have : (n : ℤ) = 1 := h ▸ hn
         have hn1 : n = 1 := by exact_mod_cast this
         rw [hn1]
         by_cases hU : (1 : ℝ) ≤ U
@@ -117,7 +118,7 @@ theorem Delta_LambdaLEU_conductor_zero [ProofData] (y : ℝ) {a : ZMod 0} (ha : 
         · rw [LambdaLEU_apply_of_gt (by push_cast; linarith)]
       · -- a = -1, impossible for a cast of a natural
         exfalso
-        have : (n : ℤ) = -1 := by rw [hn, h]
+        have : (n : ℤ) = -1 := h ▸ hn
         omega
     · rfl
   simp only [Delta, hind, summatory, Finset.sum_const_zero, Nat.totient_zero, Nat.cast_zero,
@@ -199,7 +200,7 @@ The proofs that follow were written by GPT-5.6-sol xhigh
 /-- An elementary uniform bound for a single progression Chebyshev function. -/
 lemma psi_le_chebyshev {q : ℕ} (z : ℝ) (a : ZMod q) :
     ψ z a ≤ Chebyshev.psi z := by
-  rw [ψ, ← summatory_vonMangoldt]
+  rw [chebyPsi_eq_summatory, ← summatory_vonMangoldt]
   refine summatory_mono_fun _ _ z fun n _ ↦ ?_
   rw [Set.indicator]
   split_ifs
@@ -211,7 +212,7 @@ lemma abs_psi_sub_div_le {q : ℕ} (hq : 0 < q) {z : ℝ} (hz1 : 1 ≤ z)
     (a : ZMod q) :
     |ψ z a - z / q.totient| ≤ (Real.log 4 + 5) * z := by
   have hψ0 : 0 ≤ ψ z a := by
-    rw [ψ, summatory]
+    rw [chebyPsi_eq_summatory, summatory]
     exact Finset.sum_nonneg fun n _ ↦ by
       rw [Set.indicator]
       split_ifs
@@ -247,11 +248,12 @@ private lemma sum_vonMangoldt_not_coprime_generic {z : ℝ} (hz : 2 ≤ z)
     simp +contextual (disch := grind) only [this]
     simp_rw [← Finset.sum_filter]
     trans ∑ d ∈ q.divisors, Λ d
-    · gcongr
-      · simp
-      · intro d
-        simp only [Finset.mem_filter, Finset.mem_Ioc, Nat.mem_divisors, ne_eq, and_imp]
-        grind
+    · apply Finset.sum_le_sum_of_subset_of_nonneg
+      · intro d hd
+        simp only [Finset.mem_filter] at hd
+        exact Nat.mem_divisors.mpr ⟨hd.2, hq.ne'⟩
+      · intro d _ _
+        exact ArithmeticFunction.vonMangoldt_nonneg
     · apply le_of_eq
       exact ArithmeticFunction.vonMangoldt_sum
   simp_rw [summatory_apply]

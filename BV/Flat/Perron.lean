@@ -16,6 +16,8 @@ Some token numbers from Opus:
  Usage by model:
      claude-haiku-4-5:  1.6k input, 57 output, 0 cache read, 0 cache write ($0.0019)
       claude-opus-4-8:  17.0k input, 379.3k output, 30.2m cache read, 1.1m cache write ($35.38)
+
+Note: There is a sloppish sorry-free version of this file on the branch claude-fable.
 -/
 
 namespace Mathlib.Meta.Positivity
@@ -25,7 +27,8 @@ open Qq Lean Meta
 function `f`, provided each `f i` is nonnegative. This also handles the bounded supremum
 `⨆ i ∈ s, f i`, which unfolds to a nested `iSup`. -/
 @[positivity ⨆ _, _]
-def evalRealiSup : PositivityExt where eval {u α} zα pα e := do
+def evalRealiSup : PositivityExt where eval {u α} zα pα? e :=
+  match pα? with | none => pure .none | some pα => do
   match u, α, e with
   | 0, ~q(ℝ), ~q(@iSup ℝ $ι $instSup $f) =>
     let i : Q($ι) ← mkFreshExprMVarQ q($ι) .syntheticOpaque
@@ -398,7 +401,7 @@ private lemma integral_inv_shift {σ T : ℝ} (hσ : 0 < σ) (hT : 0 ≤ T) :
     have hpos : 0 < σ + t := by linarith [ht.1]
     have := (Real.hasDerivAt_log hpos.ne').comp t
       ((hasDerivAt_const t σ).add (hasDerivAt_id t))
-    simpa using this
+    convert! this using 1 <;> ring
   rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv ?_]
   · simp
   · apply ContinuousOn.intervalIntegrable
@@ -441,7 +444,7 @@ private lemma integral_Icc_inv_abs {σ T : ℝ} (hσ : 0 < σ) (hT : 0 ≤ T) :
       have hpos : 0 < σ - t := by linarith [ht.2]
       have := ((Real.hasDerivAt_log hpos.ne').comp t
         ((hasDerivAt_const t σ).sub (hasDerivAt_id t))).neg
-      simpa using this
+      convert! this using 1 <;> ring
     rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv ?_]
     · simp only [sub_zero, sub_neg_eq_add]; ring
     · apply ContinuousOn.intervalIntegrable
@@ -1223,14 +1226,18 @@ theorem FG.summatory_mul_char [fg : FG] {q : ℕ} {χ : DirichletCharacter ℂ q
     hf := by simp +contextual [hf]
     hg := by simp +contextual [hg]
     }
-  have := inst.summatory_mul (y := y)
-  simp only [ twist_apply, Algebra.algebraMap_self, RingHom.id_apply, inst, ← mul_assoc] at this
-  rw [← this]
-  simp [Finset.sum_mul]
-  congr! 2 with n hn_pos hny ⟨a, b⟩ hab
-  simp only [Nat.mem_divisorsAntidiagonal, ne_eq] at hab
-  simp [← hab.1]
-  ring
+  have := FG.summatory_mul (fg := inst) (y := y)
+  unfold inst at this
+  simp only [twist_apply, Algebra.algebraMap_self, RingHom.id_apply, ← mul_assoc] at this
+  calc
+    summatory (fun n ↦ (@FG.f fg * @FG.g fg) n * χ n) y =
+        summatory (fun n ↦ ((@FG.f fg).twist χ * (@FG.g fg).twist χ) n) y := by
+      simp [Finset.sum_mul]
+      congr! 2 with n hn_pos hny ⟨a, b⟩ hab
+      simp only [Nat.mem_divisorsAntidiagonal, ne_eq] at hab
+      simp [← hab.1]
+      ring
+    _ = _ := this
 
 theorem LargeSieve_convolution_aux [Bump] [fg : FG]
     {x Q : ℝ} (hx : 1 ≤ x) (hQ : 1 ≤ Q) :

@@ -186,7 +186,7 @@ $$\Delta_{\Lambda}(x; q, a) = \psi(x; q,a) - \frac{1}{\varphi(q)} \sum_{n \le x,
 theorem Delta_Lambda_eq (x : ℝ) (q : ℕ) (a : ZMod q) :
     Δ_[Λ](x; q, a) = ψ x a - (q.totient : ℝ)⁻¹ * ∑ n ∈ Nat.Icc 1 x with q.Coprime n, Λ n
    := by
-  simp only [Delta, ψ]
+  simp only [Delta, chebyPsi_eq_summatory]
   congr 2
   rw [summatory, Finset.sum_filter]
   congr! 1 with n hn
@@ -237,7 +237,6 @@ lemma sum_vonMangoldt_le_log [ProofData] {k : ℕ} (hk : 0 < k) {q : ℕ} (hq : 
   simp_rw [← Finset.sum_filter]
   trans ∑ d ∈ q.divisors, Λ d
   · gcongr
-    · simp
     · intro d
       simp only [Finset.mem_filter, Finset.mem_Ioc, Nat.mem_divisors, ne_eq, and_imp]
       grind
@@ -274,7 +273,10 @@ lemma sum_vonMangoldt_not_coprime_ll_logq [ProofData] {q : ℕ} (hq : 0 < q) :
     simp +contextual (disch := grind) only [ArithmeticFunction.vonMangoldt_apply_pow]
     trans (∑ x ∈ Finset.Icc 1 ⌊Real.log x / Real.log 2⌋₊, Real.log q)
     · gcongr with d hd
+      -- TODO: fix bad convert
       convert sum_vonMangoldt_le_log _ hq
+      · rfl
+      · simp
       · grind
     simp only [Finset.sum_const, Nat.card_Icc, add_tsub_cancel_right, nsmul_eq_mul]
     grw [Nat.floor_le (by positivity), C_SVNC]
@@ -305,7 +307,7 @@ lemma sum_primes_not_dvd_log_eq_id [ProofData] (A : ℕ) {q : ℕ} (hq : 0 < q) 
   apply le_of_eq
   ring
 
-def ArithmeticFunction.twist {𝕜 : Type*} [Field 𝕜] [Algebra 𝕜 ℂ] {q : ℕ} (f : ArithmeticFunction 𝕜) (c : DirichletCharacter ℂ q)  : ArithmeticFunction ℂ := ⟨
+noncomputable def ArithmeticFunction.twist {𝕜 : Type*} [Field 𝕜] [Algebra 𝕜 ℂ] {q : ℕ} (f : ArithmeticFunction 𝕜) (c : DirichletCharacter ℂ q)  : ArithmeticFunction ℂ := ⟨
   fun n ↦ algebraMap _ _ (f n) * c n,
   by simp
 ⟩
@@ -667,7 +669,7 @@ theorem Delta_abel_summation {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit
   simp only [Algebra.algebraMap_self, RingHom.id_apply] at test
   simp_rw [test]
   simp_rw [← Finset.sum_filter, Finset.mul_sum, Finset.sum_mul]
-  rw [MeasureTheory.integral_finset_sum _ ?A, ← Finset.sum_sub_distrib]
+  rw [MeasureTheory.integral_finsetSum _ ?A, ← Finset.sum_sub_distrib]
   case A =>
     intro χ hχ
     rw [← IntegrableOn]
@@ -803,11 +805,6 @@ theorem Delta_monotone_bound {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit
   apply Delta_monotone_bound_aux (g' := deriv g) ha g hx ?deriv hg_int hg_mono hg1
   case deriv => apply fun t ht ↦ (hg t ht).hasDerivAt
 
-
-open MeasureTheory in
-lemma _root_.Set.EqOn.aeEq {α β : Type*} [MeasureSpace α] {s : Set α} {f g : α → β} (h : s.EqOn f g) (h2 : volume sᶜ = 0) : f =ᵐ[volume] g :=
-  Set.EqOn.eventuallyEq_of_mem h h2
-
 open MeasureTheory in
 @[blueprint (statement := /--
 Let $v \ge 0$ and let $f$ be an arithmetic function supported on $[1, x]$. For $x \ge 2$, $q \in \N$ and $a \in (\Z/q\Z)^*$,
@@ -836,7 +833,7 @@ theorem Delta_flog_bound {v : ℕ} {f : ArithmeticFunction ℝ} {x : ℝ} (hx : 
       ext n
       simp [hv]
     grw [norm_mul, this, Delta_monotone_bound (g := fun x ↦ (Real.log x)^v)]
-    · simp only [Real.norm_eq_abs, ge_iff_le]
+    · simp only [Real.norm_eq_abs]
       ring_nf
       gcongr
       · apply Real.log_nonneg

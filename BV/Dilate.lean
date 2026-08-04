@@ -72,7 +72,7 @@ theorem mul_dilate {e : ℕ} (he : 0 < e) (f g : ArithmeticFunction ℝ) :
 @[simp] theorem dilate_add (e : ℕ) (f g : ArithmeticFunction ℝ) :
     dilate e (f + g) = dilate e f + dilate e g := by
   ext n
-  simp only [dilate_apply, add_apply]
+  simp only [dilate_apply, ArithmeticFunction.add_apply]
   split <;> simp
 
 /-- Dividing the `e`-multiples of `{1, …, x}` by `e` gives exactly `{1, …, x/e}`. -/
