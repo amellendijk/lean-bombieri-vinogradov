@@ -168,7 +168,7 @@ $$\Delta_{\Lambda}(x; q, a) = \psi(x; q,a) - \frac{1}{\varphi(q)} \sum_{n \le x,
 theorem Delta_Lambda_eq (x : ℝ) (q : ℕ) (a : ZMod q) :
     Δ_[Λ](x; q, a) = ψ x a - (q.totient : ℝ)⁻¹ * ∑ n ∈ Nat.Icc 1 x with q.Coprime n, Λ n
    := by
-  simp only [Delta, ψ]
+  simp only [Delta, chebyPsi_eq_summatory]
   congr 2
   rw [summatory, Finset.sum_filter]
   congr! 1 with n hn

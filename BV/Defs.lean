@@ -1,6 +1,7 @@
 import Mathlib
 import Architect
 
+import BV.Axioms
 import BV.Summatory
 
 open ArithmeticFunction
@@ -18,8 +19,16 @@ theorem Nat.mem_modEqs {q : ℕ} (a : ZMod q) (n : ℕ) :
     n ∈ modEqs a ↔ n = a := by
   rfl
 
-noncomputable def ψ (x : ℝ) {q : ℕ} (a : ZMod q) : ℝ :=
-    summatory ((Nat.modEqs a).indicator Λ) x
+lemma chebyPsi_eq_summatory (x : ℝ) {q : ℕ} (a : ZMod q) :
+    chebyPsi x a = summatory ((Nat.modEqs a).indicator Λ) x := by
+  classical
+  simp [summatory_apply, chebyPsi, Finset.sum_filter]
+  congr! with n hn
+  simp [Set.indicator_apply]
+
+scoped[BV] notation "ψ" => chebyPsi
+
+open BV
 
 lemma summatory_vonMangoldt {x : ℝ} : summatory (fun n ↦ Λ n) x = Chebyshev.psi x := by
   simp [Chebyshev.psi_eq_sum_Icc]
@@ -28,7 +37,7 @@ lemma summatory_vonMangoldt {x : ℝ} : summatory (fun n ↦ Λ n) x = Chebyshev
   · simp
 
 theorem ψ_one_one {x : ℝ} : ψ x (1 : ZMod 1) = Chebyshev.psi x := by
-  simp [ψ, Chebyshev.psi_eq_sum_Icc, summatory_vonMangoldt]
+  simp [chebyPsi_eq_summatory, Chebyshev.psi_eq_sum_Icc, summatory_vonMangoldt]
 
 @[blueprint (statement :=
 /-- For $f : \N \rightarrow \R$ and $r : \N$ we use $f_r$ to denote $n \mapsto f(n) 1_{(n, r) = 1}$-/
