@@ -64,7 +64,6 @@ lemma MellinOfPsi_better {σ₁ σ₂ : ℝ} (hσ₂ : 0 ≤ σ₂) {ν : ℝ �
           by_cases hx' : 1 ≤ x
           · left
             grw [hs₂, hx.2]
-            · exact hx'
           · push Not at hx' hs_pn
             right
             trans ((1 / 2) ^ s.re)
@@ -77,7 +76,11 @@ lemma MellinOfPsi_better {σ₁ σ₂ : ℝ} (hσ₂ : 0 ≤ σ₂) {ν : ℝ �
               · norm_num
               · exact hσ₁s
               · simp
-        convert mul_le_mul f_bound pow_bound (norm_nonneg _) ?_ using 1 <;> simp [f]
+        rw [norm_mul]
+        convert mul_le_mul f_bound pow_bound (norm_nonneg _) ?_ using 1
+        · rfl
+        · simp [f]
+        · simp [f]
   have Cnonneg : 0 ≤ C := by
     simp [C, f]
     positivity
