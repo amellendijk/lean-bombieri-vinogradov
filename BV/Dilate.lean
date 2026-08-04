@@ -75,28 +75,31 @@ theorem mul_dilate {e : ℕ} (he : 0 < e) (f g : ArithmeticFunction ℝ) :
   simp only [dilate_apply, ArithmeticFunction.add_apply]
   split <;> simp
 
+private theorem mem_Ioc_floor (x : ℝ) (n : ℕ) :
+    n ∈ Finset.Ioc 0 ⌊x⌋₊ ↔ 0 < n ∧ n ≤ x := by
+  simp +contextual [Nat.pos_iff_ne_zero, Nat.le_floor_iff']
+
 /-- Dividing the `e`-multiples of `{1, …, x}` by `e` gives exactly `{1, …, x/e}`. -/
 theorem image_div_filter_dvd {e : ℕ} (he : 0 < e) (x : ℝ) :
-    ((Nat.Icc 1 x).filter (fun m => e ∣ m)).image (fun k => k / e) = Nat.Icc 1 (x / e) := by
+    ((Finset.Ioc 0 ⌊x⌋₊).filter (fun m => e ∣ m)).image (fun k => k / e) =
+      Finset.Ioc 0 ⌊x / e⌋₊ := by
   have he' : (0 : ℝ) < e := by exact_mod_cast he
   ext m
-  simp only [Finset.mem_image, Finset.mem_filter, Nat.mem_Icc]
+  simp only [Finset.mem_image, Finset.mem_filter, mem_Ioc_floor]
   constructor
   · rintro ⟨k, ⟨⟨h1, h2⟩, c, rfl⟩, rfl⟩
     rw [Nat.mul_div_cancel_left _ he]
-    have hec : 1 ≤ e * c := by exact_mod_cast h1
     have hc : 0 < c := by
       rcases Nat.eq_zero_or_pos c with h | h
-      · subst h; simp at hec
+      · subst h; simp at h1
       · exact h
-    refine ⟨by exact_mod_cast hc, ?_⟩
+    refine ⟨hc, ?_⟩
     rw [le_div_iff₀ he']
     calc (c : ℝ) * e = ((e * c : ℕ) : ℝ) := by push_cast; ring
       _ ≤ x := h2
   · rintro ⟨h1, h2⟩
-    have hm : 0 < m := by exact_mod_cast h1
     refine ⟨e * m, ⟨⟨?_, ?_⟩, ⟨m, rfl⟩⟩, Nat.mul_div_cancel_left _ he⟩
-    · exact_mod_cast Nat.mul_pos he hm
+    · exact Nat.mul_pos he h1
     · push_cast
       rw [mul_comm, ← le_div_iff₀ he']
       exact h2
@@ -107,23 +110,13 @@ theorem summatory_abs_dilate_le {e : ℕ} (he : 0 < e) (f : ArithmeticFunction �
     summatory (fun k => |dilate e f k|) x ≤ summatory (fun k => |f k|) x := by
   have he' : (0 : ℝ) < e := by exact_mod_cast he
   simp only [summatory]
-  have hEq (t : ℝ) : Finset.Ioc 0 ⌊t⌋₊ = Nat.Icc 1 t := by
-    ext n
-    by_cases ht : 0 ≤ t
-    · simp only [Finset.mem_Ioc, Nat.mem_Icc, Nat.le_floor_iff ht,
-        Nat.one_le_cast]
-      constructor <;> rintro ⟨h1, h2⟩ <;> exact ⟨by omega, h2⟩
-    · have ht' : t < 0 := lt_of_not_ge ht
-      have hfloor : ⌊t⌋₊ = 0 := Nat.floor_eq_zero.mpr (by linarith)
-      simp [hfloor, Nat.Icc_eq_empty_of_neg _ ht']
-  rw [hEq x]
-  calc ∑ k ∈ Nat.Icc 1 x, |dilate e f k|
-      = ∑ k ∈ (Nat.Icc 1 x).filter (fun m => e ∣ m), |f (k / e)| := by
+  calc ∑ k ∈ Finset.Ioc 0 ⌊x⌋₊, |dilate e f k|
+      = ∑ k ∈ (Finset.Ioc 0 ⌊x⌋₊).filter (fun m => e ∣ m), |f (k / e)| := by
         rw [Finset.sum_filter]
         refine Finset.sum_congr rfl fun k _ => ?_
         rw [dilate_apply]
         split <;> simp_all
-    _ = ∑ m ∈ Nat.Icc 1 (x / e), |f m| := by
+    _ = ∑ m ∈ Finset.Ioc 0 ⌊x / e⌋₊, |f m| := by
         rw [← image_div_filter_dvd he x, Finset.sum_image]
         rintro a ha b hb hab
         simp only [Finset.mem_coe, Finset.mem_filter] at ha hb
@@ -131,14 +124,14 @@ theorem summatory_abs_dilate_le {e : ℕ} (he : 0 < e) (f : ArithmeticFunction �
         obtain ⟨d, rfl⟩ := hb.2
         simp only [Nat.mul_div_cancel_left _ he] at hab
         rw [hab]
-    _ ≤ ∑ m ∈ Nat.Icc 1 x, |f m| := by
+    _ ≤ ∑ m ∈ Finset.Ioc 0 ⌊x⌋₊, |f m| := by
         apply Finset.sum_le_sum_of_subset_of_nonneg
         · intro m hm
-          rw [Nat.mem_Icc] at hm ⊢
+          rw [mem_Ioc_floor] at hm ⊢
           refine ⟨hm.1, ?_⟩
           by_cases hx : 0 ≤ x
           · exact hm.2.trans (div_le_self hx (by exact_mod_cast he))
-          · push_neg at hx
+          · push Not at hx
             have : x / e < 0 := div_neg_of_neg_of_pos hx he'
             linarith [hm.1, hm.2]
         · intro m _ _; positivity
@@ -196,12 +189,6 @@ theorem summatory_abs_mul_le (f g : ArithmeticFunction ℝ) {x : ℝ} (_hx : 0 �
     summatory (fun k => |(f * g) k|) x
       ≤ summatory (fun k => |f k|) x * summatory (fun k => |g k|) x := by
   simp only [summatory]
-  have hEq : Finset.Ioc 0 ⌊x⌋₊ = Nat.Icc 1 x := by
-    ext n
-    simp only [Finset.mem_Ioc, Nat.mem_Icc, Nat.le_floor_iff _hx,
-      Nat.one_le_cast]
-    constructor <;> rintro ⟨h1, h2⟩ <;> exact ⟨by omega, h2⟩
-  rw [hEq]
   -- Step 1: triangle inequality on each Dirichlet convolution
   refine le_trans (Finset.sum_le_sum
     (g := fun k => ∑ p ∈ k.divisorsAntidiagonal, |f p.1| * |g p.2|) fun k _ => ?_) ?_
@@ -209,7 +196,7 @@ theorem summatory_abs_mul_le (f g : ArithmeticFunction ℝ) {x : ℝ} (_hx : 0 �
     refine (Finset.abs_sum_le_sum_abs _ _).trans (le_of_eq ?_)
     exact Finset.sum_congr rfl fun p _ => abs_mul _ _
   -- Step 2: regroup the double sum and bound it by the product of marginals
-  have hdisj : (↑(Nat.Icc 1 x) : Set ℕ).PairwiseDisjoint
+  have hdisj : (↑(Finset.Ioc 0 ⌊x⌋₊) : Set ℕ).PairwiseDisjoint
       (fun k => k.divisorsAntidiagonal) := by
     intro k₁ _ k₂ _ hne
     simp only [Function.onFun, Finset.disjoint_left, Nat.mem_divisorsAntidiagonal]
@@ -222,13 +209,10 @@ theorem summatory_abs_mul_le (f g : ArithmeticFunction ℝ) {x : ℝ} (_hx : 0 �
     obtain ⟨k, hk, hpk, hk0⟩ := hp
     subst hpk
     obtain ⟨hp1, hp2⟩ := Nat.mul_ne_zero_iff.mp hk0
-    rw [Nat.mem_Icc] at hk
-    rw [Finset.mem_product, Nat.mem_Icc, Nat.mem_Icc]
-    have hle1 : (p.1 : ℝ) ≤ (p.1 * p.2 : ℕ) := by
-      exact_mod_cast Nat.le_mul_of_pos_right _ (Nat.pos_of_ne_zero hp2)
-    have hle2 : (p.2 : ℝ) ≤ (p.1 * p.2 : ℕ) := by
-      exact_mod_cast Nat.le_mul_of_pos_left _ (Nat.pos_of_ne_zero hp1)
-    refine ⟨⟨by exact_mod_cast Nat.one_le_iff_ne_zero.2 hp1, hle1.trans hk.2⟩,
-      ⟨by exact_mod_cast Nat.one_le_iff_ne_zero.2 hp2, hle2.trans hk.2⟩⟩
+    rw [Finset.mem_Ioc] at hk
+    rw [Finset.mem_product, Finset.mem_Ioc, Finset.mem_Ioc]
+    refine ⟨⟨Nat.pos_of_ne_zero hp1, ?_⟩, ⟨Nat.pos_of_ne_zero hp2, ?_⟩⟩
+    · exact (Nat.le_mul_of_pos_right _ (Nat.pos_of_ne_zero hp2)).trans hk.2
+    · exact (Nat.le_mul_of_pos_left _ (Nat.pos_of_ne_zero hp1)).trans hk.2
   · intro p _ _
     positivity
