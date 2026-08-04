@@ -1,12 +1,15 @@
 name = "BV"
 version = "0.1.0"
-defaultTargets = ["BV"]
+defaultTargets = ["BV", "LargeSieve"]
 
 [leanOptions]
 autoImplicit = false
 
 [[lean_lib]]
 name = "BV"
+
+[[lean_lib]]
+name = "LargeSieve"
 
 [[require]]
 name = "LeanArchitect"
