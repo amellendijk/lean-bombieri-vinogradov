@@ -1,12 +1,13 @@
 import Mathlib
 import Architect
 
-import BV.Defs
 import LargeSieve.Multiplicative
-
 open ArithmeticFunction
 
 open scoped Nat
+
+noncomputable def chebyPsi (x : ℝ) {q : ℕ} (a : ZMod q) : ℝ :=
+    ∑ n ∈ Finset.Ioc 0 ⌊x⌋₊ with (n : ℕ) = a, Λ n
 
 /-- The implied constant in the Sielgel-Walfisz Theorem -/
 axiom C_SW (A : ℕ) (C : ℕ) : ℝ
@@ -21,7 +22,7 @@ $$
 )]
 axiom siegel_walfisz (A : ℕ) (C : ℕ) {x : ℝ} (hx : 2 ≤ x)
     {q : ℕ} (hq0 : 0 < q) (hq : q ≤ (Real.log x) ^ C) {a : ZMod q} (ha : IsUnit a) :
-  |ψ x a - x / φ q| ≤ C_SW A C * (x / (Real.log x) ^ A)
+  |chebyPsi x a - x / φ q| ≤ C_SW A C * (x / (Real.log x) ^ A)
 
 
 /-- The large sieve constant, made explicit via Gallagher's 1967 additive large sieve

@@ -30,7 +30,7 @@ theorem card_natIcc (x : ℝ) {y : ℝ} (hy : 0 ≤ y):
   · simp [Nat.Icc, hxy]
     rw [eq_comm, Nat.sub_eq_zero_iff_le]
     simp only [Order.add_one_le_iff]
-    push_neg at hxy
+    push Not at hxy
     grw [Nat.floor_lt hy]
     calc _ < x := hxy
     _ ≤ _ := Nat.le_ceil x
@@ -104,7 +104,8 @@ theorem summatory_eq_zero {R : Type*} [AddCommMonoid R]
   simp only [Finset.mem_Ioc, and_imp]
   intro n hn hnx
   apply hf n hn
-  rw [← Nat.le_floor_iff (by lia)]
+  -- lia now fails here.
+  rw [← Nat.le_floor_iff (by linarith)]
   exact hnx
 
 @[congr]
@@ -191,7 +192,8 @@ theorem norm_summatory_le {M : Type*} [SeminormedAddCommGroup M] (f : ℕ → M)
 /- This positivity extension was written by an LLM. -/
 open Qq Lean Meta Mathlib.Meta.Positivity in
 @[positivity summatory _ _]
-def summatory_positivity : PositivityExt where eval {u α} zα pα e := do
+def summatory_positivity : PositivityExt where eval {u α} zα pα? e :=
+  match pα? with | none => pure .none | some pα => do
   match u, α, e with
   | 0, ~q(ℝ), ~q(summatory $f $x) =>
     let i : Q(ℕ) ← mkFreshExprMVarQ q(ℕ) .syntheticOpaque
@@ -233,12 +235,12 @@ theorem summatory_le_support_mul_UB {R : Type*} {f : ℕ → R}
   · rw [summatory_of_neg hx]
     simp only [norm_zero, ge_iff_le]
     positivity
-  push_neg at hx
+  push Not at hx
   by_cases hyS : x ≤ S
   · apply le_trans <| summatory_le_UB x (by gcongr) M _
     · gcongr
     · grind
-  · push_neg at hyS
+  · push Not at hyS
     calc _ = ‖summatory f S‖ := ?A
      _ ≤ _ := summatory_le_UB S hS M hf
     congr 1

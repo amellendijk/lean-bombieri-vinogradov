@@ -43,8 +43,7 @@ theorem isPrimitive_of_prime_ne_one (p : ℕ) [hp : Fact (Nat.Prime p)]
   rw [DirichletCharacter.isPrimitive_def]
   have hcond := DirichletCharacter.conductor_dvd_level χ
   rcases (Fact.out : Nat.Prime p).eq_one_or_self_of_dvd _ hcond with h | h
-  · exact absurd ((DirichletCharacter.eq_one_iff_conductor_eq_one
-      (Fact.out : Nat.Prime p).ne_zero).mpr h) hχ
+  · exact absurd (DirichletCharacter.eq_one_iff_conductor_eq_one.mpr h) hχ
   · exact h
 
 -- ============================================================

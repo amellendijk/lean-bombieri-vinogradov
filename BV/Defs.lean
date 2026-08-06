@@ -1,6 +1,7 @@
 import Mathlib
 import Architect
 
+import BV.Axioms
 import BV.Summatory
 
 open ArithmeticFunction
@@ -18,8 +19,16 @@ theorem Nat.mem_modEqs {q : ℕ} (a : ZMod q) (n : ℕ) :
     n ∈ modEqs a ↔ n = a := by
   rfl
 
-noncomputable def ψ (x : ℝ) {q : ℕ} (a : ZMod q) : ℝ :=
-    summatory ((Nat.modEqs a).indicator Λ) x
+lemma chebyPsi_eq_summatory (x : ℝ) {q : ℕ} (a : ZMod q) :
+    chebyPsi x a = summatory ((Nat.modEqs a).indicator Λ) x := by
+  classical
+  simp [summatory_apply, chebyPsi, Finset.sum_filter]
+  congr! with n hn
+  simp [Set.indicator_apply]
+
+scoped[BV] notation "ψ" => chebyPsi
+
+open BV
 
 lemma summatory_vonMangoldt {x : ℝ} : summatory (fun n ↦ Λ n) x = Chebyshev.psi x := by
   simp [Chebyshev.psi_eq_sum_Icc]
@@ -28,7 +37,7 @@ lemma summatory_vonMangoldt {x : ℝ} : summatory (fun n ↦ Λ n) x = Chebyshev
   · simp
 
 theorem ψ_one_one {x : ℝ} : ψ x (1 : ZMod 1) = Chebyshev.psi x := by
-  simp [ψ, Chebyshev.psi_eq_sum_Icc, summatory_vonMangoldt]
+  simp [chebyPsi_eq_summatory, Chebyshev.psi_eq_sum_Icc, summatory_vonMangoldt]
 
 @[blueprint (statement :=
 /-- For $f : \N \rightarrow \R$ and $r : \N$ we use $f_r$ to denote $n \mapsto f(n) 1_{(n, r) = 1}$-/
@@ -59,7 +68,8 @@ theorem onCoprime_nonneg {R : Type*} [Zero R] [Preorder R] {r : ℕ} {f : ℕ �
 /- This positivity extension was written by an LLM -/
 open Qq Lean Meta Mathlib.Meta.Positivity in
 @[positivity onCoprime _ _ _]
-def onCoprime_positivity : PositivityExt where eval {u α} zα pα e := do
+def onCoprime_positivity : PositivityExt where eval {u α} zα pα? e :=
+  match pα? with | none => pure .none | some pα => do
   match u, α, e with
   | 0, ~q(ℝ), ~q(@onCoprime ℝ _ $r $f $n) =>
     let i : Q(ℕ) ← mkFreshExprMVarQ q(ℕ) .syntheticOpaque
@@ -84,8 +94,8 @@ class ProofData where
   x : ℝ
   le_x : 2 ≤ x
   UV_le : U * V ≤ Real.sqrt x
-  le_U : Real.exp (Real.sqrt x) ≤ U
-  le_V : Real.exp (Real.sqrt x) ≤ V
+  le_U : Real.exp (Real.sqrt (Real.log x)) ≤ U
+  le_V : Real.exp (Real.sqrt (Real.log x)) ≤ V
 
 open ProofData
 
@@ -98,7 +108,7 @@ theorem ProofData.x_pos : 0 < x := by
 
 @[grind .]
 theorem ProofData.U_pos : 0 < U := by
-  calc 0 < Real.exp (√x) := ?A
+  calc 0 < Real.exp (√ (Real.log x)) := ?A
     _ ≤ U := le_U
   positivity
 
@@ -112,7 +122,7 @@ theorem ProofData.one_le_U : 1 ≤ U := by
 
 @[grind .]
 theorem ProofData.V_pos : 0 < V := by
-  calc 0 < Real.exp (√x) := ?A
+  calc 0 < Real.exp (√(Real.log x)) := ?A
     _ ≤ V := le_V
   positivity
 
@@ -144,7 +154,8 @@ theorem ProofData.U_le_x : U ≤ x := by
 
 open Qq Lean Meta Mathlib.Meta.Positivity in
 @[positivity @U _]
-def U_positivity : PositivityExt where eval {u α} _ _ e := do
+def U_positivity : PositivityExt where eval {u α} _ pα? e :=
+  match pα? with | none => pure .none | some _ => do
   match u, α, e with
   | 0, ~q(ℝ), ~q(@U $inst) =>
     assumeInstancesCommute
@@ -153,7 +164,8 @@ def U_positivity : PositivityExt where eval {u α} _ _ e := do
 
 open Qq Lean Meta Mathlib.Meta.Positivity in
 @[positivity @V _]
-def V_positivity : PositivityExt where eval {u α} _ _ e := do
+def V_positivity : PositivityExt where eval {u α} _ pα? e :=
+  match pα? with | none => pure .none | some _ => do
   match u, α, e with
   | 0, ~q(ℝ), ~q(@V $inst) =>
     assumeInstancesCommute
@@ -166,7 +178,8 @@ lemma log_x_pos : 0 < Real.log x := by
 
 open Qq Lean Meta Mathlib.Meta.Positivity in
 @[positivity Real.log x]
-def x_positivity : PositivityExt where eval {u α} _ _ e := do
+def x_positivity : PositivityExt where eval {u α} _ pα? e :=
+  match pα? with | none => pure .none | some _ => do
   match u, α, e with
   | 0, ~q(ℝ), ~q(@x $inst) =>
     assumeInstancesCommute
@@ -175,7 +188,8 @@ def x_positivity : PositivityExt where eval {u α} _ _ e := do
 
 open Qq Lean Meta Mathlib.Meta.Positivity in
 @[positivity Real.log x]
-def log_x_positivity : PositivityExt where eval {u α} _ _ e := do
+def log_x_positivity : PositivityExt where eval {u α} _ pα? e :=
+  match pα? with | none => pure .none | some _ => do
   match u, α, e with
   | 0, ~q(ℝ), ~q(Real.log (@x $inst)) =>
     assumeInstancesCommute
@@ -312,7 +326,8 @@ theorem LambdaLEU_nonneg {n : ℕ} : 0 ≤ Λ≤U n := by
 /- This positivity extension was written by an LLM. -/
 open Qq Lean Meta Mathlib.Meta.Positivity in
 @[positivity DFunLike.coe LambdaLEU _]
-def LambdaLEU_positivity : PositivityExt where eval {u α} _ _ e := do
+def LambdaLEU_positivity : PositivityExt where eval {u α} _ pα? e :=
+  match pα? with | none => pure .none | some _ => do
   match u, α, e with
   | 0, ~q(ℝ), ~q(@DFunLike.coe _ _ _ _ (@LambdaLEU $inst) $n) =>
     assumeInstancesCommute
@@ -351,7 +366,7 @@ scoped[BV] notation3 "Λ♭" => LambdaFlat
 /-- Decompose $\Lambda = \Lambda^\sharp + \Lambda^\flat + \Lambda_{\le U}$  -/
 )]
 theorem Lambda_decomp (n : ℕ) : Λ n = Λ♯ n + Λ♭ n + Λ≤U n := by
-  simp_rw [← add_apply]
+  simp_rw [← ArithmeticFunction.add_apply]
   congr 1
   simp [LambdaFlat, LambdaSharp, LambdaLEU, ← ArithmeticFunction.vonMangoldt_mul_zeta]
   have : (ζ * μ) = (1 : ArithmeticFunction ℝ) := coe_zeta_mul_coe_moebius
