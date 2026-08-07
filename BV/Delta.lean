@@ -848,15 +848,8 @@ theorem Delta_flog_bound {v : ℕ} {f : ArithmeticFunction ℝ} {x : ℝ} (hx : 
       apply LocallyIntegrableOn.congr this.symm _ |>.mono_set
       · simp
       apply ContinuousOn.locallyIntegrableOn
-      · apply ContinuousOn.mul
-        · apply ContinuousOn.mul
-          · fun_prop
-          · apply ContinuousOn.pow
-            apply Real.continuousOn_log.mono
-            simp
-        · apply continuousOn_inv₀.mono
-          simp
-      simp
+      · fun_prop (disch := grind)
+      · simp
     · apply MonotoneOn.comp (t := Set.Ici 0) (g := (· ^ v))
       · apply zpow_left_monoOn₀  (n := v)
         grind
