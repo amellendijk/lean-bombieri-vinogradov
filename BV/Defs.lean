@@ -24,16 +24,12 @@ theorem onCoprime_congr {R : Type*} [Zero R] (r s : ℕ) (f g : ℕ → R) (n m 
     onCoprime r f n = onCoprime s g m := by
   subst_vars
   simp [onCoprime]
-  split_ifs with h
-  · exact hfg _ rfl h
-  · rfl
+  grind
 
 theorem onCoprime_nonneg {R : Type*} [Zero R] [Preorder R] {r : ℕ} {f : ℕ → R} {n : ℕ}
     (hf : 0 ≤ f n) : 0 ≤ onCoprime r f n := by
   unfold onCoprime
-  split
-  · exact hf
-  · exact le_refl 0
+  grind
 
 /- This positivity extension was written by an LLM -/
 open Qq Lean Meta Mathlib.Meta.Positivity in
@@ -56,7 +52,7 @@ def onCoprime_positivity : PositivityExt where eval {u α} zα pα? e :=
 theorem onCoprime_le_of_nonneg {R : Type*} [Zero R] [Preorder R] {r : ℕ} {f : ℕ → R} {n : ℕ} (hf : 0 ≤ f n):
     onCoprime r f n ≤ f n := by
   rw [onCoprime]
-  split_ifs <;> simp [hf]
+  grind
 
 class ProofData where
   U : ℝ
@@ -220,8 +216,7 @@ theorem Nat.Icc_sqrt_nonempty : (Nat.Icc (√x) x).Nonempty := by
     simp only [mem_Icc, cast_ofNat]
     constructor
     · rw [Real.sqrt_le_iff]
-      norm_num
-      linarith
+      grind
     · exact le_x
 
 

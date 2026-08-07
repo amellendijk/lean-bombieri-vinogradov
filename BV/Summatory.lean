@@ -97,9 +97,7 @@ theorem Finset.mem_Ioc_zero_floor (x : ℝ) (n : ℕ) :
     constructor <;> rintro ⟨h1, h2⟩ <;> exact ⟨by exact_mod_cast h1, h2⟩
   · have hx' : x < 0 := lt_of_not_ge hx
     have hfloor : ⌊x⌋₊ = 0 := Nat.floor_eq_zero.mpr (by linarith)
-    simp [hfloor]
-    intro _
-    linarith
+    grind
 
 theorem summatory_eq_zero {R : Type*} [AddCommMonoid R]
     {f : ℕ → R} {x : ℝ} (hf : ∀ n : ℕ, 0 < n → n ≤ x → f n = 0) :
@@ -315,7 +313,7 @@ theorem summatory_tendsTo_right
   simp only [summatory_apply]
   congr 1; congr 1
   apply le_antisymm
-  · exact Nat.lt_succ_iff.mp ((Nat.floor_lt' (Nat.succ_ne_zero _)).mpr (by push_cast; exact hy.2))
+  · exact Nat.lt_succ_iff.mp ((Nat.floor_lt' (Nat.succ_ne_zero _)).mpr (by grind))
   · exact Nat.floor_le_floor hy.1
 
 theorem summatory_tendsTo_left
@@ -366,8 +364,7 @@ theorem monotone_summatory (g : ℕ → ℝ) (hg : ∀ n, 0 ≤ g n) : Monotone 
   · intro n hn
     rw [Finset.mem_Ioc] at hn ⊢
     exact ⟨hn.1, hn.2.trans (Nat.floor_mono hxy)⟩
-  intros i _ _
-  exact hg i
+  grind
 
 open MeasureTheory in
 theorem summatory_locallyIntegrable (f : ℕ → ℝ) :
@@ -381,10 +378,7 @@ theorem summatory_locallyIntegrable (f : ℕ → ℝ) :
     funext x
     rw [Pi.sub_apply, ← summatory_sub_distrib]
     apply summatory_congr_fun
-    intro n _ _
-    rcases le_total 0 (f n) with h | h
-    · rw [max_eq_left h, max_eq_right (neg_nonpos_of_nonneg h)]; ring
-    · rw [max_eq_right h, max_eq_left (neg_nonneg.mpr h)]; ring
+    grind
   rw [heq]
   exact (monotone_summatory _ (fun _ => le_max_right _ _)).locallyIntegrable.sub
     (monotone_summatory _ (fun _ => le_max_right _ _)).locallyIntegrable

@@ -131,8 +131,7 @@ theorem character_sum_by_conductor {R : Type*} [AddCommMonoid R] {q : ℕ} [NeZe
       (Nat.dvd_of_mem_divisors (Finset.mem_filter.mp d.2).1)).symm)]
     rw [Finset.sum_attach (q.divisors.filter (· ≠ 1))
       (fun n => ∑ χ : DirichletCharacter ℂ q with χ.conductor = n, f χ)]
-  rw [hLHS]
-  exact hRHS.symm
+  grind
 
 /-- If `q` is coprime to `n`, restricting to coprimality with `r` or with `r * q` agree at `n`. -/
 lemma onCoprime_mul_right_eq {R : Type*} [Zero R] {f : ℕ → R} {r q n : ℕ} (h : q.Coprime n) :
@@ -204,7 +203,7 @@ lemma totient_mul_Delta_eq {q : ℕ} [NeZero q] {a : ZMod q} (ha : IsUnit a) {g 
   have horder : ∀ χ : DirichletCharacter ℂ d,
       summatory (fun n : ℕ => (↑(g n) : ℂ) * χ ↑n) x
         = summatory (fun n : ℕ => χ ↑n * ↑(g n)) x := by
-    intro χ; congr 1; funext n; rw [mul_comm]
+    grind
   simp_rw [horder]
   rw [← Finset.sum_filter]
   rw [character_sum_by_conductor (q := d)
@@ -222,9 +221,7 @@ lemma totient_mul_Delta_eq {q : ℕ} [NeZero q] {a : ZMod q} (ha : IsUnit a) {g 
   trans (∑ e ∈ d.divisors.filter (· ≠ 1), GinnerTerm a g x e)
   · exact Finset.sum_attach _ _
   rw [Finset.sum_filter]
-  apply Finset.sum_congr rfl
-  intro i _
-  by_cases h : i = 1 <;> simp [h]
+  grind
 
 @[blueprint (latexEnv := "lemma") (statement := /--
 Let $f$ be an arithmetic function. For $r \le x$, $q > 1$ and $(a, q) = 1$,
@@ -291,8 +288,7 @@ theorem character_sum_Mobius (f : ArithmeticFunction ℝ) {r q : ℕ} {x : ℝ} 
       apply Finset.sum_congr rfl
       intro i hi
       have hiq : i ∣ q := (Nat.dvd_of_mem_divisors hi).trans hdq
-      simp only [hGp_def]
-      by_cases h1 : i = 1 <;> simp [h1, hiq]
+      grind
     rw [hsum, ← totient_mul_Delta_eq ha hgsupp hdq, zsmul_eq_mul]
     ring
   have hRHS : (↑(∑ p ∈ q.divisorsAntidiagonal,
@@ -328,9 +324,7 @@ theorem Delta_LambdaFlat_decomp [ProofData] {C : ℕ} {y : ℝ} (q : ℕ) (hqpos
   have hg : ∀ n, onCoprime q ⇑Λ♭ n ≠ 0 → q.Coprime n := by
     intro n hn
     rw [onCoprime_apply] at hn
-    split_ifs at hn with h
-    · exact h
-    · exact absurd rfl hn
+    grind
   have hφ : (q.totient : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.totient_pos.mpr hqpos).ne'
   -- Master identity: write `Δ` as a sum of `GinnerTerm`s over the nontrivial divisors of `q`.
   have hΔg : Δ_[onCoprime q ⇑Λ♭](y; q, a) = Δ_[Λ♭](y; q, a) := Delta_onCoprime_self _ _ ha
@@ -341,11 +335,8 @@ theorem Delta_LambdaFlat_decomp [ProofData] {C : ℕ} {y : ℝ} (q : ℕ) (hqpos
     have hfilt : (∑ i ∈ q.divisors, if i = 1 then 0 else GinnerTerm a (onCoprime q ⇑Λ♭) y i)
         = ∑ i ∈ q.divisors with i ≠ 1, GinnerTerm a (onCoprime q ⇑Λ♭) y i := by
       rw [Finset.sum_filter]
-      apply Finset.sum_congr rfl
-      intro i _
-      by_cases h : i = 1 <;> simp [h]
-    rw [hfilt] at hkey
-    rw [← hkey, ← mul_assoc, inv_mul_cancel₀ hφ, one_mul]
+      grind
+    grind
   -- On the small conductors, each `GinnerTerm` is the (real) Möbius/totient/Δ sum.
   have hGsmall : ∀ d ∈ q.divisors.filter (fun d : ℕ => 1 < d ∧ (↑d : ℝ) ≤ L),
       GinnerTerm a (onCoprime q ⇑Λ♭) y d = ↑(∑ p ∈ d.divisorsAntidiagonal,
@@ -374,18 +365,16 @@ theorem Delta_LambdaFlat_decomp [ProofData] {C : ℕ} {y : ℝ} (q : ℕ) (hqpos
       apply Finset.filter_congr
       intro d hd
       have hd0 : d ≠ 0 := (Nat.pos_of_mem_divisors hd).ne'
-      constructor
-      · rintro ⟨hne, hle⟩; exact ⟨by omega, hle⟩
-      · rintro ⟨hlt, hle⟩; exact ⟨by omega, hle⟩
+      grind
     · apply Finset.sum_congr _ (fun _ _ => rfl)
       rw [Finset.filter_filter]
       apply Finset.filter_congr
       intro d hd
       have hd0 : d ≠ 0 := (Nat.pos_of_mem_divisors hd).ne'
       constructor
-      · rintro ⟨_, hnle⟩; push_neg at hnle; exact hnle
+      · grind
       · intro hlt
-        refine ⟨?_, by push_neg; exact hlt⟩
+        refine ⟨?_, by grind⟩
         have : (1:ℝ) < (d:ℝ) := lt_of_le_of_lt hL1 hlt
         have : 1 < d := by exact_mod_cast this
         omega
@@ -491,8 +480,7 @@ theorem card_divisors_le_two_mul_sqrt (n : ℕ) :
         by_contra h
         push_neg at h
         have : d * d ≤ d * (n / d) := by gcongr
-        rw [hq] at this
-        exact hc this
+        grind
       have : (n / d) * (n / d) ≤ d * (n / d) := by gcongr
       rwa [hq] at this
   have h3 : (n.divisors.image f).card ≤ Nat.sqrt n := by
@@ -501,7 +489,7 @@ theorem card_divisors_le_two_mul_sqrt (n : ℕ) :
       _ = Nat.sqrt n := by rw [Nat.card_Icc]; omega
   have h4 : n.divisors.card ≤ 2 * Nat.sqrt n := by omega
   calc (n.divisors.card : ℝ) ≤ ((2 * Nat.sqrt n : ℕ) : ℝ) := by exact_mod_cast h4
-    _ = 2 * (Nat.sqrt n : ℝ) := by push_cast; ring
+    _ = 2 * (Nat.sqrt n : ℝ) := by grind
     _ ≤ 2 * Real.sqrt n := by
         gcongr
         exact Real.nat_sqrt_le_real_sqrt
@@ -520,16 +508,16 @@ theorem log_pow_le_const_mul_rpow {x : ℝ} (hx : 1 ≤ x) (M : ℕ) {δ : ℝ} 
     set c : ℝ := δ / (M : ℝ) with hc
     have hMpos : (0:ℝ) < (M : ℝ) := by exact_mod_cast hM
     have hcpos : 0 < c := by rw [hc]; positivity
-    have hMδ : (M : ℝ) / δ = c⁻¹ := by rw [hc]; field_simp
+    have hMδ : (M : ℝ) / δ = c⁻¹ := by grind
     -- Key pointwise bound: log x ≤ (M/δ) · x^c
     have key : Real.log x ≤ c⁻¹ * x ^ c := by
       have h1 : Real.log (x ^ c) = c * Real.log x := Real.log_rpow hx0 c
       have h2 : Real.log (x ^ c) ≤ x ^ c - 1 :=
         Real.log_le_sub_one_of_pos (Real.rpow_pos_of_pos hx0 c)
-      have h3 : c * Real.log x ≤ x ^ c := by rw [h1] at h2; linarith
+      have h3 : c * Real.log x ≤ x ^ c := by grind
       rw [inv_mul_eq_div, le_div_iff₀ hcpos, mul_comm]
       exact h3
-    have hcM : c * (M : ℝ) = δ := by rw [hc]; field_simp
+    have hcM : c * (M : ℝ) = δ := by grind
     calc (Real.log x) ^ M
         ≤ (c⁻¹ * x ^ c) ^ M := pow_le_pow_left₀ hlogx key M
       _ = (c⁻¹) ^ M * (x ^ c) ^ M := mul_pow _ _ _
@@ -563,12 +551,10 @@ theorem card_divisors_mul_sqrt_mul_log_le_div [ProofData] {q : ℕ}
   -- `(log x)^(K+1) ≤ B · x^(1/4)`
   have hlog : (Real.log x) ^ (K + 1) ≤ B * x ^ (1/4 : ℝ) := by
     have h := log_pow_le_const_mul_rpow hx1 (K + 1) (δ := (1/4 : ℝ)) (by norm_num)
-    have hconst : (((K + 1 : ℕ) : ℝ) / (1/4 : ℝ)) = 4 * ((K + 1 : ℕ) : ℝ) := by ring
-    rwa [hconst] at h
+    grind
   -- collapse `x^(1/4)·x^(1/2)·x^(1/4) = x`
   have hxsum : x ^ (1/4 : ℝ) * x ^ (1/2 : ℝ) * x ^ (1/4 : ℝ) = x := by
-    rw [← Real.rpow_add hx0, ← Real.rpow_add hx0,
-      show (1/4 + 1/2 + 1/4 : ℝ) = 1 by norm_num, Real.rpow_one]
+    grind
   -- main product inequality
   have hmain : (q.divisors.card : ℝ) * Real.sqrt x * Real.log x * (Real.log x) ^ K
       ≤ 2 * B * x := by
@@ -665,7 +651,7 @@ theorem Delta_onCoprime_Lambda_bound [ProofData] (A' C2 : ℕ) {y : ℝ}
   have hfun : onCoprime q (⇑Λ) = (⇑Λ : ℕ → ℝ) - Λnc := by
     funext n
     simp only [onCoprime_apply, Pi.sub_apply, hΛnc]
-    split_ifs with h <;> simp
+    grind
   have hq_pos : (0:ℝ) < q := by exact_mod_cast hq0
   have hlogq_nonneg : 0 ≤ Real.log q := Real.log_nonneg (by exact_mod_cast hq0)
   have hlogx_nonneg : 0 ≤ Real.log x := Real.log_nonneg (by linarith [ProofData.le_x])
@@ -685,12 +671,7 @@ theorem Delta_onCoprime_Lambda_bound [ProofData] (A' C2 : ℕ) {y : ℝ}
       mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_right hlogq_le hlogx_nonneg) hlog2
     have t3 := le_trans (le_abs_self (summatory Λnc x))
         (sum_vonMangoldt_not_coprime_ll_logq le_x (q:=q) hq0)
-    have step2 : summatory Λnc x ≤ (Real.log 2)⁻¹ * (Real.log x * Real.log x) :=
-      le_trans t3 (le_trans t1 t2)
-    calc |Δ_[Λnc](y; s, a)| ≤ 2 * summatory Λnc x := step1
-      _ ≤ 2 * ((Real.log 2)⁻¹ * (Real.log x * Real.log x)) :=
-          mul_le_mul_of_nonneg_left step2 (by norm_num)
-      _ = 2 * (Real.log 2)⁻¹ * (Real.log x) ^ 2 := by ring
+    grind
   have hlogs_le : Real.log s ≤ Real.log x :=
     le_trans (Real.log_le_log (by exact_mod_cast hs0)
       (by exact_mod_cast Nat.le_of_dvd hq0 hsq)) hlogq_le
@@ -731,18 +712,13 @@ theorem Delta_onCoprime_Lambda_bound [ProofData] (A' C2 : ℕ) {y : ℝ}
       exact le_trans hmono (le_trans hx_bound (le_trans u1 u2))
     have hyT2 : |y - T2| ≤ C_SW A' 0 * (y / Real.log y ^ A')
         + (Real.log 2)⁻¹ * (Real.log x * Real.log x) := by
-      have e : y - T2 = summatory (fun n ↦ if ¬ s.Coprime n then (Λ n : ℝ) else 0) y
-          - (summatory (fun n ↦ Λ n) y - y) := by rw [← hsub]; ring
-      rw [e]
-      refine (abs_sub _ _).trans ?_
-      rw [abs_of_nonneg hEs_nonneg]
-      linarith [hEs_bound, hPNT]
+      grind
     -- Assemble.
     have hT1ψ : T1 = ψ y a := by
       rw [hT1]
       exact (chebyPsi_eq_summatory y a).symm
     have e1 : T1 - c * T2 = (ψ y a - y / (s.totient : ℝ)) + c * (y - T2) := by
-      rw [hT1ψ, div_eq_mul_inv, ← hc_def]; ring
+      grind
     rw [e1]
     refine (abs_add_le _ _).trans ?_
     have hpart2 : |c * (y - T2)|
@@ -750,12 +726,9 @@ theorem Delta_onCoprime_Lambda_bound [ProofData] (A' C2 : ℕ) {y : ℝ}
       rw [abs_mul, abs_of_nonneg hc0]
       refine le_trans (mul_le_mul_of_nonneg_left hyT2 hc0) ?_
       exact mul_le_of_le_one_left (le_trans (abs_nonneg (y - T2)) hyT2) hcle
-    refine le_trans (add_le_add hSW hpart2) (le_of_eq ?_)
-    ring
+    grind
   rw [hfun, Delta_sub]
-  calc |Δ_[(⇑Λ : ℕ → ℝ)](y; s, a) - Δ_[Λnc](y; s, a)|
-      ≤ |Δ_[(⇑Λ : ℕ → ℝ)](y; s, a)| + |Δ_[Λnc](y; s, a)| := abs_sub _ _
-    _ ≤ _ := by linarith
+  grind
 
 /-- A power `(log x)^j` is bounded by `K · x/(log x)^N` (with `K` depending on `j+N`),
 since `(log x)^{j+N} ≤ K·√x ≤ K·x`. -/
@@ -830,8 +803,7 @@ theorem Delta_onCoprime_LambdaFlat_pointwise [ProofData] (A C : ℕ) {y : ℝ}
   have hlogx16 : 16 ≤ Real.log x := sixteen_le_log_x
   have hWpos : 0 < x / (Real.log x) ^ (A + 2 * C + 1) := div_pos x_pos (pow_pos hlogx_pos _)
   have hsqrt_le_x : Real.sqrt x ≤ x := by
-    have h1 : 1 ≤ Real.sqrt x := Real.one_le_sqrt.mpr (by linarith [le_x])
-    nlinarith [Real.sq_sqrt x_nonneg, h1, Real.sqrt_nonneg x]
+    grind
   have hq_sqrt : (q:ℝ) ≤ Real.sqrt x := hq
   -- 4 ≤ x, 2 ≤ √x ≤ y
   have h4x : (4:ℝ) ≤ x := by
@@ -926,8 +898,7 @@ theorem Delta_onCoprime_LambdaFlat_pointwise [ProofData] (A C : ℕ) {y : ℝ}
   set DΛs := Δ_[onCoprime q ⇑Λ♯](y; s, a) with hDΛs
   set DΛU := Δ_[onCoprime q ⇑Λ≤U](y; s, a) with hDΛU
   have htri : |DΛ - DΛs - DΛU| ≤ |DΛ| + |DΛs| + |DΛU| := by
-    calc |DΛ - DΛs - DΛU| ≤ |DΛ - DΛs| + |DΛU| := abs_sub _ _
-      _ ≤ |DΛ| + |DΛs| + |DΛU| := by gcongr; exact abs_sub _ _
+    grind
   refine le_trans htri ?_
   have hCeq : C_DLF A C * (x / (Real.log x) ^ (A + 2 * C + 1))
       = ((C_SW (A + 2 * C + 1) (2 * C) + C_SW (A + 2 * C + 1) 0) * 2 ^ (A + 2 * C + 1)
@@ -939,8 +910,7 @@ theorem Delta_onCoprime_LambdaFlat_pointwise [ProofData] (A C : ℕ) {y : ℝ}
         + 2 * (2 * ((1 + (A + 2 * C + 1) : ℕ) : ℝ)) ^ (1 + (A + 2 * C + 1))
             * (x / (Real.log x) ^ (A + 2 * C + 1)) := by
     rw [C_DLF]; ring
-  rw [hCeq]
-  linarith [hMain, hSharp, hSmall]
+  grind
 
 @[blueprint (statement := /--
 $$\frac{1}{\varphi(q)} \left|\sum_{\substack{d \mid q \\ 1 < d \le (\log x)^C}} \sum_{s \mid d} \mu(d/s)\,\varphi(s)\,\Delta_{\Lambda^\flat_q}(y;\,s,\,a)\right| \ll_{A,C} \frac{x}{\varphi(q)\,(\log x)^{A+1}}$$
@@ -1029,9 +999,7 @@ theorem Delta_LambdaFlat_small_conductor [ProofData] (A C : ℕ) {y : ℝ}
     have h1 : (∑ d ∈ S, (d : ℝ)) ≤ (S.card : ℝ) * (Real.log x) ^ C := by
       rw [← nsmul_eq_mul, ← Finset.sum_const]
       apply Finset.sum_le_sum
-      intro d hd
-      rw [hS, Finset.mem_filter] at hd
-      exact hd.2.2
+      grind
     calc (∑ d ∈ S, (d : ℝ)) ≤ (S.card : ℝ) * (Real.log x) ^ C := h1
       _ ≤ (Real.log x) ^ C * (Real.log x) ^ C :=
           mul_le_mul_of_nonneg_right hcard (by positivity)
@@ -1040,8 +1008,7 @@ theorem Delta_LambdaFlat_small_conductor [ProofData] (A C : ℕ) {y : ℝ}
       ≤ C_DLF A C * (x / (Real.log x) ^ (A + 2 * C + 1)) * (Real.log x) ^ (2 * C) :=
         mul_le_mul_of_nonneg_left hsumd (mul_nonneg hCDLF_nonneg hWpos.le)
     _ = C_DLF A C * x / (Real.log x) ^ (A + 1) := by
-        rw [show A + 2 * C + 1 = (A + 1) + 2 * C by ring, pow_add]
-        field_simp
+        grind
 
 /-- `S r y ξ` is nonnegative (it is a norm). -/
 theorem S_nonneg [ProofData] {q : ℕ} (r : ℕ) (y : ℝ) (ξ : DirichletCharacter ℂ q) :
@@ -1125,8 +1092,7 @@ private theorem primePow_le {p k : ℕ} (hp : p.Prime) (hk : 1 ≤ k) :
   · rw [if_neg hp2, one_mul]
     have hp3 : 3 ≤ p := by
       have h2 := hp.two_le
-      have := Nat.odd_iff.mp ((hp.eq_two_or_odd').resolve_left hp2)
-      omega
+      grind
     have hp1 : 1 ≤ p ^ j := Nat.one_le_pow _ _ (by omega)
     have hsq : p ≤ (p - 1) ^ 2 := by
       obtain ⟨m, rfl⟩ : ∃ m, p = m + 1 := ⟨p - 1, by omega⟩
@@ -1151,20 +1117,20 @@ theorem d_le_two_mul_totient_sq (d : ℕ) : d ≤ 2 * d.totient ^ 2 := by
     calc (2:ℕ) ^ (S.filter (· = 2)).card ≤ 2 ^ 1 := by
           apply Nat.pow_le_pow_right (by norm_num)
           rw [Finset.filter_eq']
-          split <;> simp
+          grind
       _ = 2 := by norm_num
   -- the totient as a product over prime factors
   have hφ : d.totient = ∏ p ∈ S, (p ^ (d.factorization p)).totient := by
     rw [Nat.totient_eq_prod_factorization hd0]
     refine Finset.prod_congr rfl (fun p hp ↦ ?_)
     have hpp : p.Prime := Nat.prime_of_mem_primeFactors (by rwa [hS, Nat.support_factorization] at hp)
-    have hk : 1 ≤ d.factorization p := by rw [hS, Finsupp.mem_support_iff] at hp; omega
+    have hk : 1 ≤ d.factorization p := by grind
     rw [Nat.totient_prime_pow hpp hk]
   calc d = ∏ p ∈ S, p ^ (d.factorization p) := (Nat.factorization_prod_pow_eq_self hd0).symm
     _ ≤ ∏ p ∈ S, (if p = 2 then 2 else 1) * ((p ^ (d.factorization p)).totient) ^ 2 := by
         refine Finset.prod_le_prod' (fun p hp ↦ ?_)
         have hpp : p.Prime := Nat.prime_of_mem_primeFactors (by rwa [hS, Nat.support_factorization] at hp)
-        have hk : 1 ≤ d.factorization p := by rw [hS, Finsupp.mem_support_iff] at hp; omega
+        have hk : 1 ≤ d.factorization p := by grind
         exact primePow_le hpp hk
     _ = (∏ p ∈ S, (if p = 2 then 2 else 1)) *
           ∏ p ∈ S, ((p ^ (d.factorization p)).totient) ^ 2 := Finset.prod_mul_distrib
@@ -1181,7 +1147,7 @@ theorem fAF_le_rpow (d : ℕ) : fAF d ≤ Real.sqrt 2 * (1 / (d : ℝ) ^ ((3 : �
   have hμ : ((μ d : ℝ)) ^ 2 ≤ 1 := by
     have : ((μ d : ℝ)) ^ 2 = if Squarefree d then 1 else 0 := by
       rw [← Int.cast_pow, ArithmeticFunction.moebius_sq]; split <;> simp
-    rw [this]; split <;> norm_num
+    grind
   have hφsq : (d : ℝ) ≤ 2 * (d.totient : ℝ) ^ 2 := by exact_mod_cast d_le_two_mul_totient_sq d
   have hpow : (d : ℝ) ^ ((3 : ℝ) / 2) = d * Real.sqrt d := by
     rw [Real.sqrt_eq_rpow, show ((3 : ℝ) / 2) = 1 + 1 / 2 by norm_num,
@@ -1217,8 +1183,7 @@ theorem fAF_isMultiplicative : fAF.IsMultiplicative := by
   refine ⟨by simp [fAF_apply], fun {m n} h ↦ ?_⟩
   simp only [fAF_apply]
   rw [ArithmeticFunction.isMultiplicative_moebius.map_mul_of_coprime h, Nat.totient_mul h]
-  push_cast
-  ring
+  grind
 
 theorem invTotientAF_isMultiplicative : invTotientAF.IsMultiplicative := by
   refine ⟨by simp [invTotientAF_apply], fun {m n} h ↦ ?_⟩
@@ -1240,10 +1205,9 @@ theorem invTotientAF_eq_mul : invTotientAF = fAF * invAF := by
   rw [ArithmeticFunction.mul_apply, Nat.sum_divisorsAntidiagonal (fun a b => fAF a * invAF b),
       Nat.sum_divisors_prime_pow hp]
   have hsub : Finset.range 2 ⊆ Finset.range (j + 1 + 1) := by
-    intro a ha; simp only [Finset.mem_range] at *; omega
+    grind
   rw [← Finset.sum_subset hsub (fun x _ hx => by
-        rw [Finset.mem_range, not_lt] at hx
-        rw [hvanish x hx, zero_mul]),
+        grind),
       Finset.sum_range_succ, Finset.sum_range_one]
   -- two surviving terms; simplify the divisions and arithmetic-function values
   have d1 : p ^ (j + 1) / p = p ^ j := by
@@ -1258,8 +1222,7 @@ theorem invTotientAF_eq_mul : invTotientAF = fAF * invAF := by
   have hp1ne : (p : ℝ) - 1 ≠ 0 := by linarith
   have hpjne : (p : ℝ) ^ j ≠ 0 := by positivity
   push_cast [Nat.cast_sub hp1]
-  field_simp
-  ring
+  grind
 
 /-- **Step 6 (TODO).** Partial harmonic-sum bound `∑_{e ≤ t} 1/e ≤ 1 + log t` for `t ≥ 1`,
 via `summatory (⇑invAF) t = (harmonic ⌊t⌋ : ℝ)` and `harmonic_le_one_add_log`. -/
@@ -1458,7 +1421,7 @@ theorem BV_LambdaFlat_via_T [ProofData] (Q : ℝ) (A C : ℕ) (hQ : Q ≤ √x) 
         obtain ⟨hdiv, hd⟩ := heq
         have hq : q₁ = q₂ := by
           rw [← Nat.mul_div_cancel' hdvd1, ← Nat.mul_div_cancel' hdvd2, hdiv, hd]
-        subst hq; subst hd; rfl
+        grind
       calc ∑ σ ∈ LHSsig, gLFT σ.snd (σ.fst / σ.snd)
           = ∑ τ ∈ LHSsig.image
               (fun σ : Σ _ : ℕ, ℕ => (⟨σ.fst / σ.snd, σ.snd⟩ : Σ _ : ℕ, ℕ)), gLFT τ.snd τ.fst :=
@@ -1491,7 +1454,7 @@ theorem BV_LambdaFlat_via_T [ProofData] (Q : ℝ) (A C : ℕ) (hQ : Q ≤ √x) 
               apply (Nat.le_floor_iff
                 (div_nonneg (by linarith [hqmem.2]) (by exact_mod_cast hqdpos.le))).mpr
               rw [le_div_iff₀ (by exact_mod_cast hqdpos : (0 : ℝ) < (↑(q / d) : ℝ))]
-              calc (d : ℝ) * (↑(q / d) : ℝ) = ((d * (q / d) : ℕ) : ℝ) := by push_cast; ring
+              calc (d : ℝ) * (↑(q / d) : ℝ) = ((d * (q / d) : ℕ) : ℝ) := by grind
                 _ = (q : ℝ) := by exact_mod_cast Nat.mul_div_cancel' hdvd
                 _ ≤ Q := hqmem.2
   let Bq (q : ℕ) : ℝ := (q.totient : ℝ)⁻¹ * Kc +
@@ -1510,23 +1473,12 @@ theorem BV_LambdaFlat_via_T [ProofData] (Q : ℝ) (A C : ℕ) (hQ : Q ≤ √x) 
         + C_BV_LFT A C * x / (Real.log x) ^ A := by
     dsimp [Bq]
     rw [Finset.sum_add_distrib]
-    calc
-      (∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, (q.totient : ℝ)⁻¹ * Kc) +
-          ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, (q.totient : ℝ)⁻¹ *
-            ∑ d ∈ q.divisors with (Real.log x) ^ C < (d : ℕ),
-              ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive,
-                maxyReal (fun y ↦ ENNReal.ofReal (S (q / d) y ξ))
-        ≤ (C_BV_LFT A C * x / (Real.log x) ^ A)
-        + (∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊, (r.totient : ℝ)⁻¹ * T C r Q) :=
-          add_le_add hERR hMAIN
-      _ = (∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊, (r.totient : ℝ)⁻¹ * T C r Q)
-          + C_BV_LFT A C * x / (Real.log x) ^ A := by ring
+    grind
   calc
     ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, maxya q (fun y a ↦ ‖Δ_[Λ♭](y; q, a)‖ₑ)
         ≤ ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ENNReal.ofReal (Bq q) := by
           apply Finset.sum_le_sum
-          intro q hq
-          simpa [Bq] using hterm q hq
+          grind
     _ = ENNReal.ofReal (∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, Bq q) := by
       rw [ENNReal.ofReal_sum_of_nonneg (fun q _ ↦ hBq q)]
     _ ≤ ENNReal.ofReal ((∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊,
@@ -1630,7 +1582,7 @@ theorem LargeSieve_convolution {M N : ℕ} (f g : ArithmeticFunction ℝ) (hf : 
   have hlog : Real.log (x + 1) ≤ 2 * Real.log x := by
     have : x + 1 ≤ x ^ 2 := by nlinarith
     calc Real.log (x + 1) ≤ Real.log (x ^ 2) := Real.log_le_log (by linarith) this
-      _ = 2 * Real.log x := by rw [Real.log_pow]; push_cast; ring
+      _ = 2 * Real.log x := by rw [Real.log_pow]; grind
   simp_rw [← hFG]
   refine le_trans key ?_
   change Flat.C_LSC * (√((N:ℝ) * (M:ℝ)) + √(M:ℝ) * Q + √(N:ℝ) * Q + Q ^ 2)
@@ -1671,16 +1623,7 @@ theorem mem_pows2Ioc (x y : ℝ) (hx : 1 ≤ x) (n : ℕ) :
       norm_cast
     · apply Real.logb_nonneg (by norm_num) hxy.1
     · apply Real.logb_nonneg (by norm_num) hx
-  · simp only [Finset.notMem_empty, false_iff, not_and, not_le]
-    simp only [not_and, not_lt] at hxy
-    by_cases hy : 1 ≤ y
-    · grind [hxy hy]
-    · intro hxn
-      have : (1:ℝ) ≤ 2^n := by
-        norm_cast
-        apply Nat.one_le_pow
-        norm_num
-      grind
+  · grind
 
 
 /-- `((Λ - Λ≤U) * ζ) d = 0` whenever `d ≤ U`: every divisor `m ∣ d` satisfies `m ≤ d ≤ U`,
@@ -1787,9 +1730,7 @@ theorem LambdaFlat_dyadic [ProofData] (n : ℕ) (hn : n ≤ x) :
       have hQ : (e : ℝ) ∈ Set.Ioc V (x / (2:ℝ) ^ (j₀ - 1)) := Set.mem_Ioc.mpr ⟨he, hQ2⟩
       have hj0mem : j₀ ∈ pows2Ioc U (2 * x / V) := by
         rw [mem_pows2Ioc U (2 * x / V) one_le_U]
-        refine ⟨lt_of_lt_of_le hd hd_le, ?_⟩
-        rw [hpow, show 2 * x / V = 2 * (x / V) from by ring]
-        linarith [hlow_real, hd_lt]
+        grind
       -- Uniqueness of the dyadic index.
       have huniq : ∀ j, (2 ^ (j - 1) < d ∧ d ≤ 2 ^ j) → j = j₀ := by
         rintro j ⟨hj1, hj2⟩
@@ -1799,10 +1740,7 @@ theorem LambdaFlat_dyadic [ProofData] (n : ℕ) (hn : n ≤ x) :
         have l2 : j - 1 < j₀ := (Nat.pow_lt_pow_iff_right (by norm_num)).mp e2
         omega
       have hzero : ∀ b ∈ pows2Ioc U (2 * x / V), b ≠ j₀ → f b d * g b e = 0 := by
-        intro j _ hjne
-        have hneg : d ∉ Set.Ioc (2 ^ (j - 1)) (2 ^ j) :=
-          fun hP' => hjne (huniq j (Set.mem_Ioc.mp hP'))
-        rw [hfval j, if_neg hneg, zero_mul]
+        grind
       rw [BFlat_eq_of_gt_V he, Finset.sum_eq_single_of_mem j₀ hj0mem hzero,
         hfval j₀, hgval j₀, if_pos hP, if_pos hQ]
     · -- `e ≤ V`: the left side vanishes and so does every right-hand term.
@@ -1810,9 +1748,7 @@ theorem LambdaFlat_dyadic [ProofData] (n : ℕ) (hn : n ≤ x) :
       rw [BFlat_eq_zero_of_le_V he, mul_zero]
       symm
       refine Finset.sum_eq_zero (fun j _ => ?_)
-      have hneg : (e : ℝ) ∉ Set.Ioc V (x / (2:ℝ)^(j-1)) :=
-        fun hQ' => absurd (Set.mem_Ioc.mp hQ').1 (not_lt.mpr he)
-      rw [hgval j, if_neg hneg, mul_zero]
+      grind
   · -- `d ≤ U`: the left side vanishes and so does every right-hand term.
     push_neg at hd
     rw [AFlat_eq_zero_of_le_U hd, zero_mul]
@@ -1836,7 +1772,7 @@ theorem C_LargeSieve_nonneg : 0 ≤ C_LargeSieve := by
     unfold Flat.C_LSC
     exact mul_nonneg (mul_nonneg (by positivity) hLS) hCJ
   rw [C_LargeSieve]
-  exact mul_nonneg (by norm_num) hCLSC
+  grind
 
 /-- The Type-II coefficient `((Λ - Λ≤U) * ζ) n` lies in `[0, log n]`. -/
 private theorem aflat_bounds [ProofData] (n : ℕ) :
@@ -1904,13 +1840,13 @@ private theorem f_on_coprime_l2 [ProofData] (r j : ℕ) (hj2 : (2 : ℝ) ^ j ≤
             calc (n : ℝ) ≤ (2 : ℝ) ^ j := by exact_mod_cast hn.2
               _ ≤ x ^ 2 := h2jx
           calc Real.log n ≤ Real.log (x ^ 2) := Real.log_le_log (by linarith) hnx2
-            _ = 2 * Real.log x := by rw [Real.log_pow]; push_cast; ring
+            _ = 2 * Real.log x := by rw [Real.log_pow]; grind
         have hb : |(f j).on {m | r.Coprime m} n| ≤ 2 * Real.log x := le_trans habs hlogn
         calc ((f j).on {m | r.Coprime m} n) ^ 2 = |(f j).on {m | r.Coprime m} n| ^ 2 := (sq_abs _).symm
           _ ≤ (2 * Real.log x) ^ 2 := by
               apply pow_le_pow_left₀ (abs_nonneg _) hb
     _ = (2 : ℝ) ^ j * (2 * Real.log x) ^ 2 := by
-        rw [Finset.sum_const, hcard, nsmul_eq_mul]; push_cast; ring
+        rw [Finset.sum_const, hcard, nsmul_eq_mul]; grind
 
 /-- `ℓ²` bound for the Möbius factor: `∑_{n ≤ N} (g_j)^2 ≤ N`. -/
 private theorem g_on_coprime_l2 [ProofData] (r j : ℕ) :
@@ -1971,8 +1907,7 @@ private theorem onCoprime_LambdaFlat_dyadic [ProofData] (r n : ℕ) (hn : (n : �
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [← ArithmeticFunction.on_mul_of_saturated _ hsat, on_apply_of_mem _ _ _]
     -- ??
-    simp [h]
-    exact h
+    grind
   · rw [onCoprime_apply, if_neg h]
     refine (Finset.sum_eq_zero fun j _ => ?_).symm
     rw [← ArithmeticFunction.on_mul_of_saturated _ hsat, on_apply_of_not_mem _ _ _]
@@ -2063,9 +1998,9 @@ private theorem summatory_Gterm_le [ProofData] (r j : ℕ) (Q : ℝ) (hQ : 2 ≤
     · exact h
   set M := (2 : ℕ) ^ j with hMdef
   set N := ⌊x / 2 ^ (j - 1)⌋₊ with hNdef
-  have hMcast : (M : ℝ) = (2 : ℝ) ^ j := by rw [hMdef]; push_cast; ring
-  have hMle : (M : ℝ) ≤ 2 * x / V := by rw [hMcast]; exact hj2
-  have hUM : U < (M : ℝ) := by rw [hMcast]; exact hjU
+  have hMcast : (M : ℝ) = (2 : ℝ) ^ j := by grind
+  have hMle : (M : ℝ) ≤ 2 * x / V := by grind
+  have hUM : U < (M : ℝ) := by grind
   -- Apply the large-sieve convolution bound.
   have hLS := LargeSieve_convolution (M := M) (N := N)
       ((f j).on {m | r.Coprime m}) ((g j).on {m | r.Coprime m})
@@ -2092,7 +2027,7 @@ private theorem summatory_Gterm_le [ProofData] (r j : ℕ) (Q : ℝ) (hQ : 2 ≤
   have hxeq : x / (2 : ℝ) ^ (j - 1) = 2 * x / 2 ^ j := by
     have hpow : (2 : ℝ) ^ j = 2 * 2 ^ (j - 1) := by
       rw [← pow_succ', Nat.sub_add_cancel hj1]
-    rw [hpow]; ring
+    grind
   have hN2 : (N : ℝ) ≤ 2 * x / (M : ℝ) := by
     rw [hMcast, ← hxeq]
     exact Nat.floor_le (div_nonneg hx0 (by positivity))
@@ -2109,9 +2044,7 @@ private theorem summatory_Gterm_le [ProofData] (r j : ℕ) (Q : ℝ) (hQ : 2 ≤
     have h1 : af * bg ≤ (Real.sqrt (M : ℝ) * (2 * L)) * (Real.sqrt (2 * x) / Real.sqrt (M : ℝ)) :=
       mul_le_mul haf hbg hbg0 (mul_nonneg (Real.sqrt_nonneg _) (by linarith))
     refine le_trans h1 (le_of_eq ?_)
-    rw [show (Real.sqrt (M : ℝ) * (2 * L)) * (Real.sqrt (2 * x) / Real.sqrt (M : ℝ))
-        = (2 * L * Real.sqrt (2 * x)) * (Real.sqrt (M : ℝ) / Real.sqrt (M : ℝ)) by ring,
-      div_self (ne_of_gt hsqM_pos), mul_one]
+    grind
   -- `√(N·M) ≤ √(2x)`.
   have hNM : Real.sqrt ((N : ℝ) * (M : ℝ)) ≤ Real.sqrt (2 * x) := by
     rw [Real.sqrt_mul (by positivity)]
@@ -2152,10 +2085,7 @@ private theorem summatory_Gterm_le [ProofData] (r j : ℕ) (Q : ℝ) (hQ : 2 ≤
             hsqrtN.trans (by gcongr)
           gcongr
       _ = 4 * L ^ 2 * (Q * x / Real.sqrt U) := by
-          rw [show (Real.sqrt (2 * x) / Real.sqrt U) * Q * L * (2 * L * Real.sqrt (2 * x))
-              = (2 * Q * L ^ 2) * (Real.sqrt (2 * x) * Real.sqrt (2 * x)) / Real.sqrt U by ring,
-            hw2']
-          ring
+          grind
   -- Term `T4`: the `Q²` piece.
   have hT4 : Q ^ 2 * L * af * bg ≤ 4 * L ^ 2 * (Q ^ 2 * Real.sqrt x) := by
     have hw_le : Real.sqrt (2 * x) ≤ 2 * Real.sqrt x := by
@@ -2171,14 +2101,7 @@ private theorem summatory_Gterm_le [ProofData] (r j : ℕ) (Q : ℝ) (hQ : 2 ≤
   have hCLS : 0 ≤ C_LargeSieve := C_LargeSieve_nonneg
   have hkey : (Real.sqrt ((N : ℝ) * (M : ℝ)) + Real.sqrt (M : ℝ) * Q + Real.sqrt (N : ℝ) * Q + Q ^ 2)
         * L * af * bg ≤ 4 * L ^ 2 * (x + Q * x / √U + Q * x / √V + Q ^ 2 * √x) := by
-    calc (Real.sqrt ((N : ℝ) * (M : ℝ)) + Real.sqrt (M : ℝ) * Q + Real.sqrt (N : ℝ) * Q + Q ^ 2)
-          * L * af * bg
-        = Real.sqrt ((N : ℝ) * (M : ℝ)) * L * af * bg + Real.sqrt (M : ℝ) * Q * L * af * bg
-          + Real.sqrt (N : ℝ) * Q * L * af * bg + Q ^ 2 * L * af * bg := by ring
-      _ ≤ 4 * L ^ 2 * x + 4 * L ^ 2 * (Q * x / Real.sqrt V) + 4 * L ^ 2 * (Q * x / Real.sqrt U)
-          + 4 * L ^ 2 * (Q ^ 2 * Real.sqrt x) :=
-          add_le_add (add_le_add (add_le_add hT1 hT2) hT3) hT4
-      _ = 4 * L ^ 2 * (x + Q * x / √U + Q * x / √V + Q ^ 2 * √x) := by ring
+    grind
   rw [show C_LargeSieve * 4 * L ^ 2 * (x + Q * x / √U + Q * x / √V + Q ^ 2 * √x)
       = C_LargeSieve * (4 * L ^ 2 * (x + Q * x / √U + Q * x / √V + Q ^ 2 * √x)) by ring,
     show C_LargeSieve * (Real.sqrt ((N : ℝ) * (M : ℝ)) + Real.sqrt (M : ℝ) * Q
@@ -2272,10 +2195,10 @@ private theorem sum_Icc_two_le (jL jU : ℕ) :
   calc ∑ j ∈ Finset.Icc jL jU, (2:ℝ)^j
       ≤ ∑ j ∈ Finset.range (jU+1), (2:ℝ)^j :=
         Finset.sum_le_sum_of_subset_of_nonneg
-          (by intro j hj; simp only [Finset.mem_Icc] at hj; simp only [Finset.mem_range]; omega)
+          (by grind)
           (by intros; positivity)
     _ = 2^(jU+1)-1 := by rw [geom_sum_eq (by norm_num)]; ring
-    _ ≤ 2 * 2^jU := by ring_nf; nlinarith [pow_nonneg (by norm_num:(0:ℝ)≤2) jU]
+    _ ≤ 2 * 2^jU := by ring_nf; grind
 
 @[blueprint (statement := /--
 $$T_r(x,Q) \ll \frac{x}{(\log x)^{C-3}} + \frac{x(\log x)^4}{\sqrt{U}} + \frac{x(\log x)^4}{\sqrt{V}} + \frac{Q\sqrt{x}\,(\log x)^3}{r}$$
@@ -2321,8 +2244,7 @@ theorem T_r_bound [ProofData] (C : ℕ) (r : ℕ) (Q : ℝ) (hC : 3 ≤ C) (hQ :
     have hdne : (d:ℝ) ≠ 0 := by linarith
     simp only [hBdef]
     rw [Finset.mul_sum, Finset.sum_div]
-    refine Finset.sum_congr rfl fun ξ _ ↦ ?_
-    rw [eq_div_iff hdne]; ring
+    grind
   rw [hTeq]
   set S : Finset ℕ := Finset.Ioc ⌊(Real.log x)^C⌋₊ ⌊Q / (r:ℝ)⌋₊ with hSdef
   rcases S.eq_empty_or_nonempty with hSe | hSne
@@ -2350,7 +2272,7 @@ theorem T_r_bound [ProofData] (C : ℕ) (r : ℕ) (Q : ℝ) (hC : 3 ≤ C) (hQ :
     have hW1 : (1:ℝ) ≤ Q / (r:ℝ) := le_trans hP1 hPW
     have hr1 : (1:ℝ) ≤ (r:ℝ) := by
       rcases Nat.eq_zero_or_pos r with hr | hr
-      · exfalso; subst hr; simp only [Nat.cast_zero, div_zero] at hW1; linarith
+      · exfalso; subst hr; grind
       · exact_mod_cast hr
     have hWx : Q / (r:ℝ) ≤ x := le_trans (div_le_self hQ0 hr1) hQx
     have hPfloor : ⌊(Real.log x)^C⌋₊ ≠ 0 := (Nat.floor_pos.mpr hP1).ne'
@@ -2377,14 +2299,14 @@ theorem T_r_bound [ProofData] (C : ℕ) (r : ℕ) (Q : ℝ) (hC : 3 ≤ C) (hQ :
         rwa [← hjLdef] at this
       have h2 : (Real.log x)^C < (⌊(Real.log x)^C⌋₊ : ℝ) + 1 := Nat.lt_floor_add_one _
       have h3 : ((⌊(Real.log x)^C⌋₊ : ℕ):ℝ) + 1 ≤ (2:ℝ)^(jL+1) := by
-        calc ((⌊(Real.log x)^C⌋₊:ℕ):ℝ) + 1 = ((⌊(Real.log x)^C⌋₊ + 1 : ℕ):ℝ) := by push_cast; ring
+        calc ((⌊(Real.log x)^C⌋₊:ℕ):ℝ) + 1 = ((⌊(Real.log x)^C⌋₊ + 1 : ℕ):ℝ) := by grind
           _ ≤ ((2^(jL+1):ℕ):ℝ) := by exact_mod_cast h1
-          _ = (2:ℝ)^(jL+1) := by push_cast; ring
+          _ = (2:ℝ)^(jL+1) := by grind
       linarith
     have h2jL : (Real.log x)^C < 2 * (2:ℝ)^jL := by
       have := hjLP1; rw [pow_succ] at this; linarith
     have h2jUleW : (2:ℝ)^jU ≤ Q / (r:ℝ) := by
-      calc (2:ℝ)^jU = ((2^jU:ℕ):ℝ) := by push_cast; ring
+      calc (2:ℝ)^jU = ((2^jU:ℕ):ℝ) := by grind
         _ ≤ ((⌊Q / (r:ℝ)⌋₊:ℕ):ℝ) := by
             exact_mod_cast (show (2^jU:ℕ) ≤ ⌊Q / (r:ℝ)⌋₊ by
               rw [hjUdef]; exact Nat.pow_log_le_self 2 hWfloor)
@@ -2428,8 +2350,7 @@ theorem T_r_bound [ProofData] (C : ℕ) (r : ℕ) (Q : ℝ) (hC : 3 ≤ C) (hQ :
             + C_BV_char_sum*(Real.log x)^3*(4*√x)*(2:ℝ)^j := by
         intro j
         have h2j : (2:ℝ)^j ≠ 0 := by positivity
-        field_simp [ne_of_gt hsU, ne_of_gt hsV, h2j]
-        ring
+        grind
       have hA : ∑ j ∈ Finset.Icc jL jU, C_BV_char_sum*(Real.log x)^3*x*((2:ℝ)^j)⁻¹
           ≤ C_BV_char_sum*(Real.log x)^3*x*(4/(Real.log x)^C) := by
         rw [← Finset.mul_sum]
@@ -2452,7 +2373,7 @@ theorem T_r_bound [ProofData] (C : ℕ) (r : ℕ) (Q : ℝ) (hC : 3 ≤ C) (hQ :
       have hbA : C_BV_char_sum*(Real.log x)^3*x*(4/(Real.log x)^C)
           ≤ 8*C_BV_char_sum*(x/(Real.log x)^(C-3)) := by
         have hpow : (Real.log x)^C = (Real.log x)^(C-3)*(Real.log x)^3 := by
-          rw [← pow_add]; congr 1; omega
+          rw [← pow_add]; grind
         have heq : C_BV_char_sum*(Real.log x)^3*x*(4/(Real.log x)^C)
             = 4*C_BV_char_sum*(x/(Real.log x)^(C-3)) := by
           rw [hpow]; field_simp
@@ -2463,7 +2384,7 @@ theorem T_r_bound [ProofData] (C : ℕ) (r : ℕ) (Q : ℝ) (hC : 3 ≤ C) (hQ :
           ≤ 8*C_BV_char_sum*(x*(Real.log x)^4/√U) := by
         have heq : (3*Real.log x)*(C_BV_char_sum*(Real.log x)^3*(2*x/√U))
             = 6*C_BV_char_sum*(x*(Real.log x)^4/√U) := by
-          field_simp [ne_of_gt hsU]; ring
+          grind
         rw [heq]
         have : (0:ℝ) ≤ C_BV_char_sum*(x*(Real.log x)^4/√U) := mul_nonneg hCBV (by positivity)
         linarith
@@ -2471,7 +2392,7 @@ theorem T_r_bound [ProofData] (C : ℕ) (r : ℕ) (Q : ℝ) (hC : 3 ≤ C) (hQ :
           ≤ 8*C_BV_char_sum*(x*(Real.log x)^4/√V) := by
         have heq : (3*Real.log x)*(C_BV_char_sum*(Real.log x)^3*(2*x/√V))
             = 6*C_BV_char_sum*(x*(Real.log x)^4/√V) := by
-          field_simp [ne_of_gt hsV]; ring
+          grind
         rw [heq]
         have : (0:ℝ) ≤ C_BV_char_sum*(x*(Real.log x)^4/√V) := mul_nonneg hCBV (by positivity)
         linarith
@@ -2509,11 +2430,9 @@ theorem T_r_bound [ProofData] (C : ℕ) (r : ℕ) (Q : ℝ) (hC : 3 ≤ C) (hQ :
           apply Finset.sum_le_sum
           intro d hd
           have hd1 : 1 ≤ d := by
-            rw [hSdef, Finset.mem_Ioc] at hd
-            have hfloorpos : 0 < ⌊(Real.log x)^C⌋₊ := Nat.pos_of_ne_zero hPfloor
-            omega
+            grind
           have hlog_le : (2:ℝ)^(Nat.log 2 d) ≤ (d:ℝ) := by
-            calc (2:ℝ)^(Nat.log 2 d) = ((2^(Nat.log 2 d):ℕ):ℝ) := by push_cast; ring
+            calc (2:ℝ)^(Nat.log 2 d) = ((2^(Nat.log 2 d):ℕ):ℝ) := by grind
               _ ≤ (d:ℝ) := by exact_mod_cast Nat.pow_log_le_self 2 (by omega : d ≠ 0)
           rw [div_eq_mul_inv, mul_comm ((2:ℝ)^(Nat.log 2 d))⁻¹ (B d)]
           exact mul_le_mul_of_nonneg_left (inv_anti₀ (by positivity) hlog_le) (hBnn d)
@@ -2524,9 +2443,7 @@ theorem T_r_bound [ProofData] (C : ℕ) (r : ℕ) (Q : ℝ) (hC : 3 ≤ C) (hQ :
           intro j _
           rw [Finset.mul_sum]
           apply Finset.sum_congr rfl
-          intro d hd
-          rw [Finset.mem_filter] at hd
-          rw [hd.2]
+          grind
       _ ≤ ∑ j ∈ Finset.Icc jL jU, ((2:ℝ)^j)⁻¹ * summatory B ((2:ℝ)^(j+1)) := by
           apply Finset.sum_le_sum
           intro j _
@@ -2539,13 +2456,12 @@ theorem T_r_bound [ProofData] (C : ℕ) (r : ℕ) (Q : ℝ) (hC : 3 ≤ C) (hQ :
             rw [hSdef, Finset.mem_Ioc] at hdS
             rw [Finset.mem_Ioc]
             refine ⟨by
-              have hfloorpos : 0 < ⌊(Real.log x)^C⌋₊ := Nat.pos_of_ne_zero hPfloor
-              omega, ?_⟩
+              grind, ?_⟩
             have hlt : d < 2^(Nat.log 2 d + 1) := Nat.lt_pow_succ_log_self (by norm_num) d
             rw [hdj] at hlt
             apply (Nat.le_floor_iff (by positivity : (0 : ℝ) ≤ (2 : ℝ)^(j+1))).mpr
             calc (d:ℝ) ≤ ((2^(j+1):ℕ):ℝ) := by exact_mod_cast (le_of_lt hlt)
-              _ = (2:ℝ)^(j+1) := by push_cast; ring
+              _ = (2:ℝ)^(j+1) := by grind
           · intro d _ _; exact hBnn d
       _ ≤ ∑ j ∈ Finset.Icc jL jU, ((2:ℝ)^j)⁻¹ *
             (C_BV_char_sum * (x + (2:ℝ)^(j+1)*x/√U + (2:ℝ)^(j+1)*x/√V
@@ -2575,7 +2491,7 @@ theorem log_pow_le_const_mul_sqrt [ProofData] (W : ℝ) (n : ℕ)
     rw [← div_le_iff₀' (by positivity : (0 : ℝ) < ((2 * n).factorial : ℝ))]
     exact hfac
   have hexp : Real.exp (s / 2) = Real.sqrt (Real.exp s) := Real.exp_half s
-  have hsqrtW : Real.sqrt (Real.exp s) ≤ Real.sqrt W := Real.sqrt_le_sqrt (by rw [hs]; exact hW)
+  have hsqrtW : Real.sqrt (Real.exp s) ≤ Real.sqrt W := Real.sqrt_le_sqrt (by grind)
   have h2n : (0 : ℝ) < (2 : ℝ) ^ (2 * n) := by positivity
   calc (Real.log x) ^ n = s ^ (2 * n) := hLn
     _ = (2 : ℝ) ^ (2 * n) * (s / 2) ^ (2 * n) := by rw [div_pow]; field_simp
@@ -2584,7 +2500,7 @@ theorem log_pow_le_const_mul_sqrt [ProofData] (W : ℝ) (n : ℕ)
     _ = ((2 : ℝ) ^ (2 * n) * (2 * n).factorial) * Real.exp (s / 2) := by ring
     _ ≤ ((2 : ℝ) ^ (2 * n) * (2 * n).factorial) * Real.sqrt W := by
         refine mul_le_mul_of_nonneg_left ?_ (by positivity)
-        rw [hexp]; exact hsqrtW
+        grind
 
 /-- Comparison bound `1/(d φ(d)) ≤ √2 · d^{-3/2}`, from `d ≤ 2 φ(d)²`. -/
 theorem rphiInv_le_rpow (d : ℕ) :
@@ -2712,7 +2628,7 @@ theorem BV_LambdaFlat_enorm [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q)
             _ = x := Real.mul_self_sqrt hx0.le
         calc Q * √x * (Real.log x) ^ 3 = (Q * √x) * (Real.log x) ^ 3 := by ring
           _ ≤ (x / (Real.log x) ^ (A + 3)) * (Real.log x) ^ 3 := by gcongr
-          _ = x / (Real.log x) ^ A := by rw [pow_add]; field_simp
+          _ = x / (Real.log x) ^ A := by grind
       set S3 : ℝ := x / (Real.log x) ^ (A + 1) + x * (Real.log x) ^ 4 / √U
           + x * (Real.log x) ^ 4 / √V with hS3def
       have hS3nn : (0 : ℝ) ≤ S3 := by rw [hS3def]; positivity
@@ -2733,7 +2649,7 @@ theorem BV_LambdaFlat_enorm [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q)
                 + Q * √x * (Real.log x) ^ 3 / r)) :=
           mul_le_mul_of_nonneg_left hTb (by positivity)
         refine hstep.trans (le_of_eq ?_)
-        rw [hS3def]; ring
+        grind
       have hb1 : S3 * (∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊, (r.totient : ℝ)⁻¹) ≤ S3 * (C_tot * Real.log x) :=
         mul_le_mul_of_nonneg_left htot hS3nn
       have hb2 : (Q * √x * (Real.log x) ^ 3) * (∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊, ((r : ℝ) * r.totient)⁻¹)
@@ -2742,7 +2658,7 @@ theorem BV_LambdaFlat_enorm [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q)
       have hfinal2 : S3 * (C_tot * Real.log x) + (Q * √x * (Real.log x) ^ 3) * C_rphi
           ≤ (C_tot * (1 + 2 * K) + C_rphi) * x / (Real.log x) ^ A := by
         have ta : x / (Real.log x) ^ (A + 1) * (C_tot * Real.log x) = C_tot * x / (Real.log x) ^ A := by
-          rw [pow_succ]; field_simp
+          grind
         have tb : x * (Real.log x) ^ 4 / √U * (C_tot * Real.log x)
             = C_tot * (x * (Real.log x) ^ 5 / √U) := by ring
         have tc : x * (Real.log x) ^ 4 / √V * (C_tot * Real.log x)
@@ -2750,7 +2666,7 @@ theorem BV_LambdaFlat_enorm [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q)
         have hdist : S3 * (C_tot * Real.log x)
             = x / (Real.log x) ^ (A + 1) * (C_tot * Real.log x)
               + x * (Real.log x) ^ 4 / √U * (C_tot * Real.log x)
-              + x * (Real.log x) ^ 4 / √V * (C_tot * Real.log x) := by rw [hS3def]; ring
+              + x * (Real.log x) ^ 4 / √V * (C_tot * Real.log x) := by grind
         rw [hdist, ta, tb, tc]
         have hb : C_tot * (x * (Real.log x) ^ 5 / √U) ≤ C_tot * (K * x / (Real.log x) ^ A) :=
           mul_le_mul_of_nonneg_left hU5 hCtot
@@ -2758,10 +2674,7 @@ theorem BV_LambdaFlat_enorm [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q)
           mul_le_mul_of_nonneg_left hV5 hCtot
         have hd : (Q * √x * (Real.log x) ^ 3) * C_rphi ≤ (x / (Real.log x) ^ A) * C_rphi :=
           mul_le_mul_of_nonneg_right hQ4 hCrphi
-        have heq : C_tot * x / (Real.log x) ^ A + C_tot * (K * x / (Real.log x) ^ A)
-              + C_tot * (K * x / (Real.log x) ^ A) + (x / (Real.log x) ^ A) * C_rphi
-            = (C_tot * (1 + 2 * K) + C_rphi) * x / (Real.log x) ^ A := by ring
-        linarith [hb, hc, hd, heq]
+        grind
       refine le_trans (Finset.sum_le_sum hterm) ?_
       rw [← Finset.mul_sum, Finset.sum_add_distrib, ← Finset.mul_sum, ← Finset.mul_sum, hCmain,
         show C_Tr * (C_tot * (1 + 2 * K) + C_rphi) * x / (Real.log x) ^ A
@@ -2797,9 +2710,5 @@ theorem BV_LambdaFlat_enorm [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q)
       (r.totient : ℝ)⁻¹ * T ((A + 4 : ℕ)) r Q)
         + C_BV_LFT A (A + 4) * x / (Real.log x) ^ A ≤
       C_BV_LF A * x / (Real.log x) ^ A := by
-    calc (∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊, (r.totient : ℝ)⁻¹ * T ((A + 4 : ℕ)) r Q)
-          + C_BV_LFT A (A + 4) * x / (Real.log x) ^ A
-        ≤ Cmain * x / (Real.log x) ^ A + C_BV_LFT A (A + 4) * x / (Real.log x) ^ A :=
-          add_le_add hmain (le_refl _)
-      _ = C_BV_LF A * x / (Real.log x) ^ A := hcombine
+    grind
   exact hvia.trans (ENNReal.ofReal_le_ofReal hreal)

@@ -33,8 +33,7 @@ theorem le_maxya [ProofData] {q : ℕ} {f : ℝ → ZMod q → ℝ≥0∞}
 theorem maxya_le [ProofData] {q : ℕ} {f : ℝ → ZMod q → ℝ≥0∞} {M : ℝ≥0∞}
     (hf : ∀ y, √x ≤ y → y ≤ x → ∀ a, f y a ≤ M) : maxya q f ≤ M := by
   refine iSup_le fun a ↦ maxy_le ?_
-  intro y hy1 hy2
-  exact hf y hy1 hy2 a
+  grind
 
 /-- Units-only version of `maxya_le`. -/
 theorem maxya_le_unit [ProofData] {q : ℕ} {f : ℝ → ZMod q → ℝ≥0∞} {M : ℝ≥0∞}

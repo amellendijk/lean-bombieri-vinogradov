@@ -70,10 +70,7 @@ theorem abs_psiMod_sub_div_le {q : ℕ} (hq : 0 < q) {z : ℝ} (hz : 0 ≤ z)
   have hzφ : z / q.totient ≤ z := by
     rw [div_le_iff₀ hφ0]
     nlinarith
-  rw [abs_sub_le_iff]
-  constructor
-  · nlinarith [Chebyshev.psi_nonneg z]
-  · nlinarith
+  grind
 
 /-- Explicit compact-range consequence of `abs_psiMod_sub_div_le`. -/
 theorem abs_psiMod_sub_div_le_const {q : ℕ} (hq : 0 < q) {z : ℝ} (hz : 1 ≤ z)
@@ -82,7 +79,7 @@ theorem abs_psiMod_sub_div_le_const {q : ℕ} (hq : 0 < q) {z : ℝ} (hz : 1 ≤
   refine (abs_psiMod_sub_div_le hq (zero_le_one.trans hz) a).trans ?_
   have hψ := psiMod_le_psi z a
   have hCheb := Chebyshev.psi_le_const_mul_self (show 0 ≤ z by positivity)
-  nlinarith [Real.log_nonneg (by norm_num : (1 : ℝ) ≤ 4)]
+  grind
 
 end Chebyshev
 

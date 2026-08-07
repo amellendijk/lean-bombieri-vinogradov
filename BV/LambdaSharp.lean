@@ -38,8 +38,7 @@ theorem moebius_coprime_indicator {r : ℕ} (hr : r ≠ 0) (b : ℕ) :
   have hset : r.divisors.filter (· ∣ b) = (Nat.gcd r b).divisors := by
     ext e
     simp only [Finset.mem_filter, Nat.mem_divisors, Nat.dvd_gcd_iff]
-    have hg : Nat.gcd r b ≠ 0 := by simp [Nat.gcd_eq_zero_iff, hr]
-    tauto
+    grind
   rw [hset]
   have hone : ∑ i ∈ (Nat.gcd r b).divisors, (μ i : ℝ)
       = (1 : ArithmeticFunction ℝ) (Nat.gcd r b) := by
@@ -113,7 +112,7 @@ theorem mul_log_on_coprime_coe (r : ℕ) (H : ArithmeticFunction ℝ) :
         dilate_mul_left he0 H (log : ArithmeticFunction ℝ),
         ArithmeticFunction.mul_apply, ArithmeticFunction.mul_apply,
         Finset.mul_sum, Finset.mul_sum, ← Finset.sum_add_distrib]
-    exact Finset.sum_congr rfl (fun x _ => by ring)
+    grind
   rw [Finset.sum_congr rfl key, Finset.sum_comm]
   refine Finset.sum_congr rfl (fun x _ => ?_)
   rw [← Finset.mul_sum, ← log_on_coprime_apply r x.2]
@@ -160,7 +159,7 @@ theorem mul_zeta_on_coprime_coe {r : ℕ} (hr : r ≠ 0) (H : ArithmeticFunction
     have he0 : 0 < e := Nat.pos_of_mem_divisors he
     rw [dilate_mul_left he0 H (ζ : ArithmeticFunction ℝ), ArithmeticFunction.mul_apply,
         Finset.mul_sum]
-    exact Finset.sum_congr rfl (fun x _ => by ring)
+    grind
   rw [Finset.sum_congr rfl key, Finset.sum_comm]
   refine Finset.sum_congr rfl (fun x _ => ?_)
   rw [← Finset.mul_sum, ← zeta_on_coprime_apply hr x.2]
@@ -234,7 +233,7 @@ theorem summatory_abs_LambdaLEU_le [ProofData] {x : ℝ} (hx : 2 ≤ x) :
           rcases Nat.eq_zero_or_pos n with hn0 | hn0
           · simpa [hn0] using hx0
           · exact Real.log_le_log (by exact_mod_cast hn0) hn
-    · rw [LambdaLEU_apply_of_gt (lt_of_not_ge hnU)]; exact hx0
+    · grind
 
 /-! ### Group F: the two term bounds -/
 
@@ -295,10 +294,7 @@ theorem Delta_term1_bound [ProofData] {q r : ℕ} [NeZero q] {a : ZMod q}
           rw [show (ζ : ArithmeticFunction ℝ) = log.ppow 0 from ppow_zero.symm]
           have hflog := Delta_dilate_flog_bound (v := 0) he'
             ((μ≤V).on {n | r.Coprime n}) h2y a ha
-          rw [pow_zero, mul_one] at hflog
-          calc |Δ_[⇑(dilate e ((μ≤V).on {n | r.Coprime n}) * log.ppow 0)](y; q, a)|
-              ≤ 2 * summatory (fun k => |((μ≤V).on {n | r.Coprime n}) k|) y := hflog
-            _ ≤ 2 * V := by linarith
+          grind
         -- `log`-part bound (`v = 1`)
         have hΔlog : |Δ_[⇑(dilate e ((μ≤V).on {n | r.Coprime n})
             * (log : ArithmeticFunction ℝ))](y; q, a)| ≤ 2 * Real.log x * V := by
@@ -466,7 +462,7 @@ theorem Delta_LambdaSharp_bound [ProofData] {q r : ℕ} [NeZero q] {a : ZMod q} 
         - Δ_[onCoprime r ⇑(Λ≤U * μ≤V * (ζ : ArithmeticFunction ℝ))](y; q, a)|
       ≤ |Δ_[onCoprime r ⇑(μ≤V * log)](y; q, a)|
         + |Δ_[onCoprime r ⇑(Λ≤U * μ≤V * (ζ : ArithmeticFunction ℝ))](y; q, a)| := by
-    rw [sub_eq_add_neg]; exact (abs_add_le _ _).trans_eq (by rw [abs_neg])
+    grind
   refine habs.trans ?_
   refine (add_le_add hT1 hT2).trans ?_
   simp only [C_DLS]
@@ -574,7 +570,7 @@ theorem BV_LambdaSharp_enorm [ProofData] {A : ℕ} (Q : ℝ) (h1Q : 1 ≤ Q)
   have hfactor : ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, C_DLS * (q.divisors.card : ℝ) * U * V * Real.log x
       = C_DLS * U * V * Real.log x * ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, (q.divisors.card : ℝ) := by
     rw [Finset.mul_sum]
-    exact Finset.sum_congr rfl (fun q _ => by ring)
+    grind
   -- Divisor average: `∑_{q ≤ Q} τ(q) ≤ C_tau · Q · log x`.
   have hS : ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, (q.divisors.card : ℝ) ≤ C_tau * Q * Real.log x := by
     by_cases hQ2 : 2 ≤ Q
@@ -586,7 +582,7 @@ theorem BV_LambdaSharp_enorm [ProofData] {A : ℕ} (Q : ℝ) (h1Q : 1 ≤ Q)
       have h0Q : (0:ℝ) ≤ Q := by linarith
       have hfloor : ⌊Q⌋₊ = 1 := by
         rw [Nat.floor_eq_iff h0Q]
-        exact ⟨by exact_mod_cast h1Q, by push_cast; linarith⟩
+        grind
       have hsum_eq : ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, (q.divisors.card : ℝ) = 1 := by
         rw [hfloor]
         simp
@@ -612,7 +608,7 @@ theorem BV_LambdaSharp_enorm [ProofData] {A : ℕ} (Q : ℝ) (h1Q : 1 ≤ Q)
     rw [C_BVLS, ← mul_div_assoc, le_div_iff₀ (by positivity : (0:ℝ) < (Real.log x)^A)]
     have hLA2 : (Real.log x)^(A+2) = (Real.log x)^A * (Real.log x)^2 := by rw [pow_add]
     calc C_DLS * U * V * Real.log x * (C_tau * Q * Real.log x) * (Real.log x)^A
-        = C_DLS * C_tau * (U * V * (Q * (Real.log x)^(A+2))) := by rw [hLA2]; ring
+        = C_DLS * C_tau * (U * V * (Q * (Real.log x)^(A+2))) := by grind
       _ ≤ C_DLS * C_tau * x := by
           apply mul_le_mul_of_nonneg_left hkey
           rw [C_DLS, C_tau]; norm_num

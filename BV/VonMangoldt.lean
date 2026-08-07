@@ -49,8 +49,6 @@ lemma sum_vonMangoldt_prime_pow_not_coprime_le_log {z : ℝ} {k : ℕ} (hk : 0 <
   simp_rw [← Finset.sum_filter]
   trans ∑ d ∈ q.divisors, Λ d
   · gcongr
-    intro d
-    simp only [Finset.mem_filter, Finset.mem_Ioc, Nat.mem_divisors, ne_eq, and_imp]
     grind
   · exact le_of_eq ArithmeticFunction.vonMangoldt_sum
 
@@ -72,8 +70,7 @@ theorem sum_vonMangoldt_not_coprime_le {z : ℝ} (hz : 2 ≤ z) {q : ℕ} (hq : 
     simp only [Finset.sum_const, Nat.card_Icc, add_tsub_cancel_right, nsmul_eq_mul]
     grw [Nat.floor_le (div_nonneg (Real.log_nonneg (by linarith))
       (Real.log_nonneg (by norm_num)))]
-    ring_nf
-    exact le_rfl
+    grind
   · linarith
   · simp +contextual [vonMangoldt_eq_zero_iff]
 
@@ -81,5 +78,4 @@ lemma summatory_sub_ite {P : ℕ → Prop} [DecidablePred P] (f : ℕ → ℝ) {
     summatory f x - summatory (fun n ↦ if P n then f n else 0) x =
     summatory (fun n ↦ if ¬P n then f n else 0) x := by
   pull summatory
-  congr with n
-  split_ifs <;> ring
+  grind

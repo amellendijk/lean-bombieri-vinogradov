@@ -44,7 +44,7 @@ lemma MellinOfPsi_better {σ₁ σ₂ : ℝ} (hσ₂ : 0 ≤ σ₂) {ν : ℝ �
     · apply SetIntegral.integral_eq_integral_inter_of_support_subset_Icc
       · simp only [Function.support_abs, Function.support_mul, Function.support_ofReal]
         apply subset_trans (by apply inter_subset_left) <| Function.support_deriv_subset_Icc suppν
-      · exact (Icc_subset_Ioi_iff (by norm_num)).mpr (by norm_num)
+      · grind
     · have := intervalIntegral.norm_integral_le_of_norm_le_const' (C := f a * (2 ^ σ₂ ⊔ (1 / 2)^σ₁))
         (f := fun x ↦ f x * ‖(x : ℂ) ^ s‖) (a := (1 / 2 : ℝ)) ( b := 2) (by norm_num) ?_
       · simp only [Real.norm_eq_abs, norm_real, norm_mul] at this ⊢
@@ -249,10 +249,7 @@ lemma Smooth1_verticalIntegrable
   have hg : Integrable (fun t : ℝ ↦ (σ ^ 2 + t ^ 2)⁻¹) := by
     have key : Integrable (fun t : ℝ ↦ (σ ^ 2)⁻¹ * (1 + (σ⁻¹ * t) ^ 2)⁻¹) :=
       (integrable_inv_one_add_sq.comp_mul_left' (inv_ne_zero hσ)).const_mul _
-    refine key.congr (Filter.Eventually.of_forall fun t ↦ ?_)
-    have h1 : σ ^ 2 + t ^ 2 ≠ 0 := by positivity
-    have h2 : (1 : ℝ) + (σ⁻¹ * t) ^ 2 ≠ 0 := by positivity
-    field_simp
+    grind
   refine Integrable.mono' (hg.const_mul (c / ε)) ?_ (Filter.Eventually.of_forall fun t ↦ ?_)
   · -- Strong measurability via continuity (`𝓜 …` is differentiable on `re > 0`).
     apply Continuous.aestronglyMeasurable
@@ -261,11 +258,11 @@ lemma Smooth1_verticalIntegrable
     exact ContinuousAt.comp (g := fun s : ℂ ↦ 𝓜 (fun x ↦ (Smooth1 ν ε x : ℂ)) s)
       (f := fun y : ℝ ↦ (σ : ℂ) + y * I)
       (Smooth1MellinDifferentiable diffν suppν ⟨εpos, ε_lt_one⟩ νpos mass_one
-        (s := σ + t * I) (by rw [hre]; exact σ_pos)).continuousAt hline
+        (s := σ + t * I) (by grind)).continuousAt hline
   · -- Pointwise `O(1/(σ² + t²))` bound from `MellinOfSmooth1b`.
     calc ‖𝓜 (fun x ↦ (Smooth1 ν ε x : ℂ)) (σ + t * I)‖
         ≤ c * (ε * ‖(σ : ℂ) + t * I‖ ^ 2)⁻¹ :=
-          hc (σ / 2) (by linarith) (σ + t * I) (by rw [hre]; linarith) (by rw [hre]; linarith)
+          hc (σ / 2) (by linarith) (σ + t * I) (by grind) (by grind)
             ε εpos ε_lt_one
       _ = c / ε * (σ ^ 2 + t ^ 2)⁻¹ := by
           rw [Complex.sq_norm, Complex.normSq_add_mul_I, mul_inv]; ring

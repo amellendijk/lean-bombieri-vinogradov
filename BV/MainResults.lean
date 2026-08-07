@@ -91,13 +91,7 @@ theorem BV_Delta_Lambda_enorm [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q)
       + 2 * x / (Real.log x)^A = C_BV_L A * x / (Real.log x)^A := by
     rw [C_BV_L]; ring
   have hreal : Bs + Bf + Ble ≤ C_BV_L A * x / (Real.log x) ^ A := by
-    dsimp [Bs, Bf, Ble]
-    calc
-      C_BVLS * (x / Real.log x ^ A) + C_BV_LF A * x / Real.log x ^ A +
-          2 * x / Real.log x ^ (A + 2)
-        ≤ C_BVLS * (x / Real.log x ^ A) + C_BV_LF A * x / Real.log x ^ A +
-          2 * x / Real.log x ^ A := by gcongr
-      _ = C_BV_L A * x / Real.log x ^ A := hcollect
+    grind
   calc ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊,
       maxya q (fun y a ↦ ‖Δ_[Λ](y; q, a)‖ₑ)
       ≤ _ := hstep
@@ -255,8 +249,7 @@ private lemma BV_large_enorm [ProofData] (A : ℕ) {Q : ℝ} (hQ0 : 1 ≤ Q)
     rw [Real.le_sqrt (by norm_num) hx0]
     calc (2 : ℝ) ^ 2 ≤ Real.exp 16 := by
           have he := Real.add_one_le_exp (16 : ℝ)
-          norm_num at he ⊢
-          linarith
+          grind
       _ ≤ x := hx16
   have hqterm (q : ℕ) (hqmem : q ∈ Finset.Ioc 0 ⌊Q⌋₊) :
       psiMaxEnorm x q ≤
@@ -358,8 +351,7 @@ private lemma BV_large_enorm [ProofData] (A : ℕ) {Q : ℝ} (hQ0 : 1 ≤ Q)
           mul_le_mul_of_nonneg_right (by simpa [L] using hQ)
             (mul_nonneg hK (Real.sqrt_nonneg _))
         _ = K * x / L ^ (A + 3) := by
-          field_simp
-          nlinarith [Real.sq_sqrt hx0]
+          grind
     have hphiE : ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊,
         ENNReal.ofReal ((q.totient : ℝ)⁻¹ * R) ≤
           ENNReal.ofReal (R * (|C_tot| * L)) := by
@@ -409,9 +401,7 @@ private lemma BV_large_enorm [ProofData] (A : ℕ) {Q : ℝ} (hQ0 : 1 ≤ Q)
             (|C_tot| * L) =
           (|C_SW (A + 2) 0| * 2 ^ (A + 2) * |C_tot|) *
             (x / L ^ (A + 1)) := by
-      rw [pow_succ]
-      field_simp [ne_of_gt hL0]
-      ring
+      grind
     rw [heq]
     calc
       (|C_SW (A + 2) 0| * 2 ^ (A + 2) * |C_tot|) * (x / L ^ (A + 1))
@@ -425,8 +415,7 @@ private lemma BV_large_enorm [ProofData] (A : ℕ) {Q : ℝ} (hQ0 : 1 ≤ Q)
     simpa [mul_comm] using he
   have hthree : L ^ 3 ≤ ((A + 3).factorial : ℝ) * x / L ^ A := by
     rw [le_div_iff₀ (pow_pos hL0 _)]
-    rw [← pow_add]
-    simpa [add_comm] using hfac
+    grind
   have hn : ((Real.log 2)⁻¹ * L ^ 2) * (|C_tot| * L) ≤
       ((Real.log 2)⁻¹ * |C_tot| * (A + 3).factorial) * x / L ^ A := by
     calc
@@ -439,20 +428,7 @@ private lemma BV_large_enorm [ProofData] (A : ℕ) {Q : ℝ} (hQ0 : 1 ≤ Q)
   have hk : K * x / L ^ (A + 3) ≤ K * x / L ^ A := by
     apply div_le_div_of_nonneg_left (mul_nonneg hK hx0) (pow_pos hL0 _)
     exact pow_le_pow_right₀ hL (by omega)
-  dsimp [R]
-  calc
-    |C_BV_L A| * x / L ^ A +
-          (|C_SW (A + 2) 0| * 2 ^ (A + 2) * x / L ^ (A + 2) +
-            (Real.log 2)⁻¹ * L ^ 2) * (|C_tot| * L) + K * x / L ^ (A + 3)
-        ≤ |C_BV_L A| * x / L ^ A +
-            ((|C_SW (A + 2) 0| * 2 ^ (A + 2) * |C_tot|) * x / L ^ A +
-              ((Real.log 2)⁻¹ * |C_tot| * (A + 3).factorial) * x / L ^ A) +
-                K * x / L ^ A := by
-          rw [add_mul]
-          gcongr
-    _ = (|C_BV_L A| + K +
-          |C_SW (A + 2) 0| * 2 ^ (A + 2) * |C_tot| +
-          (Real.log 2)⁻¹ * |C_tot| * (A + 3).factorial) * x / L ^ A := by ring
+  grind
 
 open Nat
 

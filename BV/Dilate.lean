@@ -45,9 +45,9 @@ theorem mul_dilate {e : ℕ} (he : 0 < e) (f g : ArithmeticFunction ℝ) :
       · subst hc
         show a * (e * c / e) = m
         rw [Nat.mul_div_cancel_left _ he]
-        have h2 : e * (a * c) = e * m := by rw [← hab]; ring
+        have h2 : e * (a * c) = e * m := by grind
         exact Nat.eq_of_mul_eq_mul_left he h2
-      · exact fun h => hne (by rw [h, mul_zero])
+      · grind
     · rintro ⟨a, c⟩ hx
       simp only [Nat.mem_divisorsAntidiagonal] at hx
       obtain ⟨hac, hne⟩ := hx
@@ -60,8 +60,7 @@ theorem mul_dilate {e : ℕ} (he : 0 < e) (f g : ArithmeticFunction ℝ) :
       simp [hc, Nat.mul_div_cancel_left _ he]
     · rintro ⟨a, c⟩ _
       simp [Nat.mul_div_cancel_left _ he]
-    · rintro ⟨a, b⟩ _
-      rfl
+    · grind
   · rw [if_neg hn, mul_apply]
     apply Finset.sum_eq_zero
     rintro ⟨a, b⟩ hx
@@ -73,7 +72,7 @@ theorem mul_dilate {e : ℕ} (he : 0 < e) (f g : ArithmeticFunction ℝ) :
     dilate e (f + g) = dilate e f + dilate e g := by
   ext n
   simp only [dilate_apply, ArithmeticFunction.add_apply]
-  split <;> simp
+  grind
 
 private theorem mem_Ioc_floor (x : ℝ) (n : ℕ) :
     n ∈ Finset.Ioc 0 ⌊x⌋₊ ↔ 0 < n ∧ n ≤ x := by
@@ -90,13 +89,10 @@ theorem image_div_filter_dvd {e : ℕ} (he : 0 < e) (x : ℝ) :
   · rintro ⟨k, ⟨⟨h1, h2⟩, c, rfl⟩, rfl⟩
     rw [Nat.mul_div_cancel_left _ he]
     have hc : 0 < c := by
-      rcases Nat.eq_zero_or_pos c with h | h
-      · subst h; simp at h1
-      · exact h
+      grind
     refine ⟨hc, ?_⟩
     rw [le_div_iff₀ he']
-    calc (c : ℝ) * e = ((e * c : ℕ) : ℝ) := by push_cast; ring
-      _ ≤ x := h2
+    grind
   · rintro ⟨h1, h2⟩
     refine ⟨e * m, ⟨⟨?_, ?_⟩, ⟨m, rfl⟩⟩, Nat.mul_div_cancel_left _ he⟩
     · exact Nat.mul_pos he h1
@@ -115,7 +111,7 @@ theorem summatory_abs_dilate_le {e : ℕ} (he : 0 < e) (f : ArithmeticFunction �
         rw [Finset.sum_filter]
         refine Finset.sum_congr rfl fun k _ => ?_
         rw [dilate_apply]
-        split <;> simp_all
+        grind
     _ = ∑ m ∈ Finset.Ioc 0 ⌊x / e⌋₊, |f m| := by
         rw [← image_div_filter_dvd he x, Finset.sum_image]
         rintro a ha b hb hab
@@ -134,7 +130,7 @@ theorem summatory_abs_dilate_le {e : ℕ} (he : 0 < e) (f : ArithmeticFunction �
           · push Not at hx
             have : x / e < 0 := div_neg_of_neg_of_pos hx he'
             linarith [hm.1, hm.2]
-        · intro m _ _; positivity
+        · grind
 
 /-- `.on` is additive (the `sub` form is what the `Λ♯` decomposition needs). -/
 theorem ArithmeticFunction.on_sub {R : Type*} [Ring R] (S : Set ℕ) (f g : ArithmeticFunction R) :
@@ -200,8 +196,7 @@ theorem summatory_abs_mul_le (f g : ArithmeticFunction ℝ) {x : ℝ} (_hx : 0 �
       (fun k => k.divisorsAntidiagonal) := by
     intro k₁ _ k₂ _ hne
     simp only [Function.onFun, Finset.disjoint_left, Nat.mem_divisorsAntidiagonal]
-    rintro p ⟨h1, -⟩ ⟨h2, -⟩
-    exact hne (h1.symm.trans h2)
+    grind
   rw [← Finset.sum_biUnion hdisj, Finset.sum_mul_sum, ← Finset.sum_product']
   apply Finset.sum_le_sum_of_subset_of_nonneg
   · intro p hp

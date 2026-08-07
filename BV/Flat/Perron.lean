@@ -264,7 +264,7 @@ theorem sup_summatory_eq_sup_nat {f : ℕ → ℂ}
         (by positivity) ?_
       intro K hK
       simp only [Finset.coe_Icc, mem_Icc] at hK
-      exact norm_summatory_le (by rw [hfloor_add_half]; exact hK.2)
+      exact norm_summatory_le (by grind)
   · apply Real.iSup_le _ (by positivity)
     intro K
     apply Real.iSup_le _ (by positivity)
@@ -329,7 +329,7 @@ theorem T_norm_le_integral [Bump] [FG] {q : ℕ} {ε : ℝ} (hε_pos : 0 < ε) (
           simp only [neg_re, add_re, ofReal_re, mul_re, I_re, mul_zero, ofReal_im, I_im, mul_one,
             sub_zero, add_zero]
           rw [one_div, Real.inv_rpow hy0.le, ← Real.rpow_neg hy0.le, neg_neg]
-        rw [hcpow]; ring
+        grind
     _ = y ^ σ * ∫ t : ℝ, _ := MeasureTheory.integral_const_mul _ _
 
 /-! ### Auxiliary real-analysis lemmas for the `J`-integral (Step 4) -/
@@ -364,7 +364,7 @@ private lemma integrableOn_Iio_inv_sq {T : ℝ} (hT : 0 < T) :
   rw [Measure.map_neg_eq_self] at key
   apply key
   have hset : (fun x : ℝ => -x) ⁻¹' Set.Iio (-T) = Set.Ioi T := by
-    ext x; simp [Set.mem_Ioi]
+    grind
   rw [hset]
   apply (integrableOn_Ioi_inv_sq hT).congr_fun ?_ measurableSet_Ioi
   intro x hx; simp [Function.comp]
@@ -381,16 +381,11 @@ private lemma integral_Iio_inv_sq {T : ℝ} (hT : 0 < T) :
 private lemma integral_compl_Icc_inv_sq {T : ℝ} (hT : 0 < T) :
     ∫ t in (Set.Icc (-T) T)ᶜ, (t ^ 2)⁻¹ = 2 * T⁻¹ := by
   have hcompl : (Set.Icc (-T) T)ᶜ = Set.Iio (-T) ∪ Set.Ioi T := by
-    ext t
-    simp only [Set.mem_compl_iff, Set.mem_Icc, not_and_or, not_le, Set.mem_union, Set.mem_Iio,
-      Set.mem_Ioi]
+    grind
   rw [hcompl, setIntegral_union ?_ measurableSet_Ioi (integrableOn_Iio_inv_sq hT)
       (integrableOn_Ioi_inv_sq hT), integral_Iio_inv_sq hT, integral_Ioi_inv_sq hT]
   · ring
-  · rw [Set.disjoint_left]
-    intro a ha hb
-    simp only [Set.mem_Iio, Set.mem_Ioi] at ha hb
-    linarith
+  · grind
 
 /-- `∫_{0}^{T} (σ+t)⁻¹ = log(σ+T) - log σ` for `σ > 0`, `T ≥ 0`. -/
 private lemma integral_inv_shift {σ T : ℝ} (hσ : 0 < σ) (hT : 0 ≤ T) :
@@ -409,8 +404,7 @@ private lemma integral_inv_shift {σ T : ℝ} (hσ : 0 < σ) (hT : 0 ≤ T) :
     · fun_prop
     · intro t ht
       rw [Set.uIcc_of_le hT, Set.mem_Icc] at ht
-      have : 0 < σ + t := by linarith [ht.1]
-      exact this.ne'
+      grind
 
 /-- `∫_{[-T,T]} (σ+|t|)⁻¹ = 2(log(σ+T) - log σ)` for `σ > 0`, `T ≥ 0`. -/
 private lemma integral_Icc_inv_abs {σ T : ℝ} (hσ : 0 < σ) (hT : 0 ≤ T) :
@@ -418,7 +412,7 @@ private lemma integral_Icc_inv_abs {σ T : ℝ} (hσ : 0 < σ) (hT : 0 ≤ T) :
   have hcont : Continuous (fun t : ℝ => (σ + |t|)⁻¹) := by
     apply Continuous.inv₀
     · fun_prop
-    · intro t; exact (by positivity : (0 : ℝ) < σ + |t|).ne'
+    · grind
   rw [integral_Icc_eq_integral_Ioc, ← intervalIntegral.integral_of_le (by linarith : -T ≤ T),
     ← intervalIntegral.integral_add_adjacent_intervals (b := 0)
       (hcont.intervalIntegrable _ _) (hcont.intervalIntegrable _ _)]
@@ -434,8 +428,7 @@ private lemma integral_Icc_inv_abs {σ T : ℝ} (hσ : 0 < σ) (hT : 0 ≤ T) :
       apply intervalIntegral.integral_congr
       intro t ht
       rw [Set.uIcc_of_le (by linarith : -T ≤ (0 : ℝ)), Set.mem_Icc] at ht
-      show (σ + |t|)⁻¹ = (σ - t)⁻¹
-      rw [abs_of_nonpos ht.2, ← sub_eq_add_neg]
+      grind
     rw [hcongr]
     have hderiv : ∀ t ∈ Set.uIcc (-T : ℝ) 0,
         HasDerivAt (fun s => -Real.log (σ - s)) (σ - t)⁻¹ t := by
@@ -446,14 +439,14 @@ private lemma integral_Icc_inv_abs {σ T : ℝ} (hσ : 0 < σ) (hT : 0 ≤ T) :
         ((hasDerivAt_const t σ).sub (hasDerivAt_id t))).neg
       convert! this using 1 <;> ring
     rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv ?_]
-    · simp only [sub_zero, sub_neg_eq_add]; ring
+    · grind
     · apply ContinuousOn.intervalIntegrable
       apply ContinuousOn.inv₀
       · fun_prop
       · intro t ht
         rw [Set.uIcc_of_le (by linarith : -T ≤ (0 : ℝ)), Set.mem_Icc] at ht
-        exact (by linarith [ht.2] : (0 : ℝ) < σ - t).ne'
-  rw [hleft, hright]; ring
+        grind
+  grind
 
 /-- Bound A of Step 4: on the vertical line `Re s = σ` with `0 < σ ≤ 2` and `0 < ε < 1`, the
 Mellin transform of `Smooth1 ν ε` decays like `1/‖s‖`, with a constant depending only on `ν`.
@@ -469,7 +462,7 @@ lemma exists_mellin_smooth1_boundA [Bump] :
   have hCnonneg : 0 ≤ C := le_trans (norm_nonneg _) (hC (1 : ℂ) (by simp))
   refine ⟨C, hCnonneg, fun ε σ t hε hε1 hσ hσ2 ↦ ?_⟩
   have hsre : ((σ : ℂ) + t * I).re = σ := by simp
-  rw [MellinOfSmooth1a (diffν.of_le (by simp)) suppν hε (by rw [hsre]; exact hσ),
+  rw [MellinOfSmooth1a (diffν.of_le (by simp)) suppν hε (by grind),
     norm_mul, norm_inv, mul_comm]
   apply mul_le_mul_of_nonneg_right _ (by positivity)
   apply hC
@@ -505,10 +498,7 @@ lemma log_one_add_le {x L : ℝ} (hx : 1 ≤ x) (hL : L = Real.log (x + 1)) :
   have h3 : Real.log (1 + 6 * Real.log 2 * L) ≤ 6 * Real.log 2 * L := by
     have := Real.log_le_sub_one_of_pos (show (0 : ℝ) < 1 + 6 * Real.log 2 * L by positivity)
     linarith
-  calc Real.log (1 + 6 * Real.log 2 * x * L)
-      ≤ Real.log (1 + x) + Real.log (1 + 6 * Real.log 2 * L) := h1
-    _ ≤ L + 6 * Real.log 2 * L := by rw [h2]; linarith
-    _ = (1 + 6 * Real.log 2) * L := by ring
+  grind
 
 /-- The constant in the `J`-integral estimate `∫ ‖𝓜(σ+tI)‖ dt ≤ C_J · log(x+1)`
 (Step 4 of `notes/theorem26_6_smooth.md`), assembled from the bump-decay constants `CA`
@@ -543,11 +533,11 @@ interval `(0, k]` via the cast `ℕ → ℤ`. -/
 lemma sum_Ioc_natCast {R : Type*} [AddCommMonoid R] (k : ℕ) (G : ℤ → R) :
     ∑ n ∈ Finset.Ioc (0 : ℤ) (k : ℤ), G n = ∑ m ∈ Finset.Ioc (0 : ℕ) k, G (m : ℤ) := by
   apply Finset.sum_nbij' (i := fun n : ℤ => n.toNat) (j := fun m : ℕ => (m : ℤ))
-  · intro a ha; simp only [Finset.mem_Ioc] at ha ⊢; omega
-  · intro a ha; simp only [Finset.mem_Ioc] at ha ⊢; omega
-  · intro a ha; simp only [Finset.mem_Ioc] at ha; omega
-  · intro a ha; simp only [Finset.mem_Ioc] at ha; omega
-  · intro a ha; simp only [Finset.mem_Ioc] at ha; congr 1; omega
+  · grind
+  · grind
+  · grind
+  · grind
+  · grind
 
 /-- One application of the large sieve to a single Dirichlet polynomial:
 `∑_{q≤Q} ∑*_χ (q/φq) ‖∑_{m≤P} h(m) χ(m) m^{-(σ+it)}‖² ≤ C_LS (P+Q²) ∑_{m≤P} ‖h(m)‖²`,
@@ -782,11 +772,7 @@ theorem mellin_J_bound [Bump] {ε : ℝ} (hε_pos : 0 < ε) (hε_one : ε < 1) {
   have hcenter_log : Real.log (σ + T) - Real.log σ ≤ (1 + 6 * Real.log 2) * L := by
     rw [← Real.log_div (by positivity) hσ_pos.ne']
     have hTσ : (σ + T) / σ = 1 + 6 * Real.log 2 * x * L := by
-      have hx0 : x ≠ 0 := by linarith
-      have hl2 : Real.log 2 ≠ 0 := hlog2.ne'
-      have hL0 : L ≠ 0 := hL_pos.ne'
-      rw [hTdef, hσx, hε]
-      field_simp
+      grind
     rw [hTσ]
     exact log_one_add_le hx hL
   have hcenter : ∫ t in Set.Icc (-T) T, ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)‖
@@ -795,7 +781,7 @@ theorem mellin_J_bound [Bump] {ε : ℝ} (hε_pos : 0 < ε) (hε_one : ε < 1) {
       apply Continuous.mul continuous_const
       apply Continuous.inv₀
       · fun_prop
-      · intro t; exact (by positivity : (0 : ℝ) < σ + |t|).ne'
+      · grind
     calc ∫ t in Set.Icc (-T) T, ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)‖
         ≤ ∫ t in Set.Icc (-T) T, (Real.sqrt 2 * CA) * (σ + |t|)⁻¹ := by
           apply setIntegral_mono_on hInt.integrableOn
@@ -812,15 +798,14 @@ theorem mellin_J_bound [Bump] {ε : ℝ} (hε_pos : 0 < ε) (hε_one : ε < 1) {
           rw [integral_Icc_inv_abs hσ_pos hT_pos.le]
       _ ≤ (Real.sqrt 2 * CA) * (2 * ((1 + 6 * Real.log 2) * L)) := by
           apply mul_le_mul_of_nonneg_left _ (mul_nonneg (Real.sqrt_nonneg 2) hCA_nonneg)
-          exact mul_le_mul_of_nonneg_left hcenter_log (by norm_num)
+          grind
       _ = 2 * Real.sqrt 2 * (1 + 6 * Real.log 2) * CA * L := by ring
   -- tail estimate `∫_{|t|>T} ≤ 2 CB ≤ (2 CB / log 2) · L`
   have htail : ∫ t in (Set.Icc (-T) T)ᶜ, ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)‖
       ≤ 2 * CB / Real.log 2 * L := by
     have hmaj_compl : MeasureTheory.IntegrableOn (fun t : ℝ => (t ^ 2)⁻¹) (Set.Icc (-T) T)ᶜ := by
       have hcompl : (Set.Icc (-T) T)ᶜ = Set.Iio (-T) ∪ Set.Ioi T := by
-        ext t; simp only [Set.mem_compl_iff, Set.mem_Icc, not_and_or, not_le, Set.mem_union,
-          Set.mem_Iio, Set.mem_Ioi]
+        grind
       rw [hcompl]
       exact (integrableOn_Iio_inv_sq hT_pos).union (integrableOn_Ioi_inv_sq hT_pos)
     calc ∫ t in (Set.Icc (-T) T)ᶜ, ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)‖
@@ -829,12 +814,9 @@ theorem mellin_J_bound [Bump] {ε : ℝ} (hε_pos : 0 < ε) (hε_one : ε < 1) {
             measurableSet_Icc.compl
           intro t ht
           have htabs : T < |t| := by
-            simp only [Set.mem_compl_iff, Set.mem_Icc, not_and_or, not_le] at ht
-            rcases ht with h | h
-            · rw [abs_of_neg (by linarith)]; linarith
-            · rw [abs_of_pos (by linarith)]; linarith
+            grind
           have htne : t ≠ 0 := by
-            intro h; rw [h, abs_zero] at htabs; linarith
+            grind
           have ht2 : 0 < t ^ 2 := by positivity
           have hzsq : ‖(σ : ℂ) + t * I‖ ^ 2 = σ ^ 2 + t ^ 2 := by
             rw [Complex.sq_norm, Complex.normSq_add_mul_I]
@@ -847,10 +829,10 @@ theorem mellin_J_bound [Bump] {ε : ℝ} (hε_pos : 0 < ε) (hε_one : ε < 1) {
                 have hinv : (ε * ‖(σ : ℂ) + t * I‖ ^ 2)⁻¹ ≤ (ε * t ^ 2)⁻¹ := by
                   simpa only [one_div] using one_div_le_one_div_of_le (mul_pos hε_pos ht2) hle
                 exact mul_le_mul_of_nonneg_left hinv hCB_pos.le
-            _ = (CB / ε) * (t ^ 2)⁻¹ := by rw [mul_inv]; ring
+            _ = (CB / ε) * (t ^ 2)⁻¹ := by grind
       _ = (CB / ε) * ∫ t in (Set.Icc (-T) T)ᶜ, (t ^ 2)⁻¹ := MeasureTheory.integral_const_mul _ _
       _ = (CB / ε) * (2 * T⁻¹) := by rw [integral_compl_Icc_inv_sq hT_pos]
-      _ = 2 * CB := by rw [hTdef, inv_inv]; field_simp
+      _ = 2 * CB := by grind
       _ ≤ 2 * CB / Real.log 2 * L := by
           have hLratio : 1 ≤ L / Real.log 2 := by
             rw [le_div_iff₀ hlog2]; linarith
@@ -860,8 +842,7 @@ theorem mellin_J_bound [Bump] {ε : ℝ} (hε_pos : 0 < ε) (hε_one : ε < 1) {
             _ = 2 * CB / Real.log 2 * L := by ring
   -- assemble
   rw [← MeasureTheory.integral_add_compl (measurableSet_Icc (a := -T) (b := T)) hInt]
-  refine le_trans (add_le_add hcenter htail) (le_of_eq ?_)
-  ring
+  grind
 
 /-- For each `q`, `χ` and each `t`, the integrand
 `t ↦ ‖F_{σ+tI}(χ)‖·‖G_{σ+tI}(χ)‖·‖𝓜(σ+tI)‖` is integrable: the two partial-sum norms are
@@ -973,7 +954,7 @@ theorem summatory_T_ll [Bump] [FG] {ε Q : ℝ} (hε_pos : 0 < ε) (hQ : 1 ≤ Q
       (‖summatory (fun m ↦ f m * χ m * (m : ℂ) ^ (-(σ + t * I))) M‖ *
        ‖summatory (fun n ↦ g n * χ n * (n : ℂ) ^ (-(σ + t * I))) N‖) *
       ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)‖ := fun q χ t => by
-    show _ * _ * _ = _ * _ * _; ring
+    grind
   -- `D t` is the large-sieve double sum at parameter `t` (without the Mellin factor).
   set D : ℝ → ℝ := fun t => summatory (fun q =>
     ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
@@ -1116,8 +1097,7 @@ theorem Nat.le_of_add_real_le {m n : ℕ} {x : ℝ} (hx_pos : 0 < x) (hx : x ≤
   apply_fun Nat.ceil (α := ℝ) at h
   · simp only [Nat.ceil_natCast] at h
     rw [add_comm, Nat.ceil_add_natCast] at h
-    · rw [this, add_comm] at h
-      apply h
+    · grind
     · exact hx_pos.le
   exact Nat.ceil_mono
 
@@ -1191,8 +1171,7 @@ theorem FG.summatory_mul [fg : FG] {y : ℝ} :
               (if_pos ((key m n hm0).mpr (Finset.mem_Ioc.mp hn).2)).symm]
         refine Finset.sum_subset (Finset.Ioc_subset_Ioc le_rfl
           (le_trans (Nat.div_le_self _ _) (by omega))) fun n hn hn' => ?_
-        simp only [Finset.mem_Ioc] at hn hn'
-        exact if_neg fun h => hn' ⟨hn.1, (key m n hm0).mp h⟩
+        grind
     _ = ∑ m ∈ Finset.Ioc 0 K, ∑ n ∈ Finset.Ioc 0 K,
           if (↑m * ↑n : ℝ) ≤ y then f m * g n else 0 := by
         refine Finset.sum_subset (Finset.Ioc_subset_Ioc le_rfl (by omega)) fun m hm hm' => ?_

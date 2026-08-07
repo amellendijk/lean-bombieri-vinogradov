@@ -60,7 +60,7 @@ theorem Delta_sub {R : Type*} [Field R] (f g : ℕ → R) (x : ℝ) (q : ℕ) (a
     funext n; by_cases h : n ∈ Nat.modEqs (a : ZMod q) <;> simp [h]
   have hcop : onCoprime q (f - g)
       = fun n => onCoprime q f n - onCoprime q g n := by
-    funext n; simp only [onCoprime, Pi.sub_apply]; split_ifs <;> simp
+    funext n; simp only [onCoprime, Pi.sub_apply]; grind
   simp only [Delta, hind, hcop, summatory_sub_distrib]
   ring
 
@@ -81,7 +81,7 @@ theorem Delta_add {R : Type*} [Field R] (f g : ℕ → R) (x : ℝ) (q : ℕ) (a
           + (Nat.modEqs (a : ZMod q)).indicator g n := by
     funext n; by_cases h : n ∈ Nat.modEqs (a : ZMod q) <;> simp [h]
   have hcop : onCoprime q (f + g) = fun n => onCoprime q f n + onCoprime q g n := by
-    funext n; simp only [onCoprime, Pi.add_apply]; split_ifs <;> simp
+    funext n; simp only [onCoprime, Pi.add_apply]; grind
   simp only [Delta, hind, hcop, summatory_add_distrib]
   ring
 
@@ -106,11 +106,11 @@ theorem abs_Delta_le_two_summatory_abs (f : ℕ → ℝ) (z : ℝ) (q : ℕ) (a 
   have hInd : summatory (fun n ↦ |(Nat.modEqs a).indicator f n|) z
       ≤ summatory (fun n ↦ |f n|) z :=
     summatory_le_summatory fun n _ _ ↦ by
-      rw [Set.indicator_apply]; split_ifs <;> simp
+      rw [Set.indicator_apply]; grind
   have hCop : summatory (fun n ↦ |onCoprime q f n|) z
       ≤ summatory (fun n ↦ |f n|) z :=
     summatory_le_summatory fun n _ _ ↦ by
-      rw [onCoprime_apply]; split_ifs <;> simp
+      rw [onCoprime_apply]; grind
   have hA : |summatory ((Nat.modEqs a).indicator f) z|
       ≤ summatory (fun n ↦ |f n|) z := by
     refine le_trans ?_ hInd
@@ -181,7 +181,7 @@ theorem Delta_onCoprime_self {R : Type*} [Field R] (f : ℕ → R) (y : ℝ) {q 
       exact ((ZMod.isUnit_iff_coprime n q).mp hu).symm
     · rw [Set.indicator_of_notMem h, Set.indicator_of_notMem h]
   have hcop : onCoprime q (onCoprime q f) = onCoprime q f := by
-    funext n; simp only [onCoprime_apply]; split_ifs <;> rfl
+    funext n; simp only [onCoprime_apply]; grind
   simp only [Delta, hind, hcop]
 
 @[fun_prop]
@@ -256,8 +256,7 @@ lemma Delta_eq_sum_char {𝕜 : Type*} [Field 𝕜] [Algebra 𝕜 ℂ] {f : ℕ 
       ∑ χ : DirichletCharacter ℂ q, if χ ≠ 1 then
         star (χ (a : ZMod q)) * ∑ x ∈ Finset.Ioc 0 ⌊y⌋₊, algebraMap _ _ (f x) * χ x else 0 by
     simp at ⊢ h
-    field_simp [hφ]
-    linear_combination h
+    grind
   -- Let F χ = star(χ a') * ∑_n f(n) χ(n)
   set F := fun χ : DirichletCharacter ℂ q =>
     star (χ (a : ZMod q)) * ∑ x ∈ Finset.Ioc 0 ⌊y⌋₊, algebraMap _ _ (f x) * χ x
@@ -278,12 +277,10 @@ lemma Delta_eq_sum_char {𝕜 : Type*} [Field 𝕜] [Algebra 𝕜 ℂ] {f : ℕ 
     refine Finset.sum_congr rfl (fun y hy ↦ ?_)
     simp_rw [mul_comm <| algebraMap _ _ (f y), ← mul_assoc, ← Finset.sum_mul, MulChar.star_apply',
       DirichletCharacter.inv_zmod_apply ha, this]
-    simp only [eq_comm]
-    split_ifs <;> simp
+    grind
   have hF1 : F 1 = ∑ i ∈ Finset.Ioc 0 ⌊y⌋₊, algebraMap _ _ (if q.Coprime i then f i else 0) := by
     simp only [F, MulChar.one_apply ha, star_one, one_mul, DirichletCharacter.one_natCast_apply]
-    congr! 1 with n
-    split_ifs <;> simp
+    grind
   rw [hFsum, hF1]
 
 -- theorem Delta_eq_summatory {f : ℕ → ℂ} {y : ℝ} {q : ℕ} [NeZero q] {a : ZMod q}
@@ -334,8 +331,7 @@ theorem ArithmeticFunction.mul_twist {𝕜 : Type*} [Field 𝕜] [Algebra 𝕜 �
   congr! 1 with ⟨a, b⟩ hab
   simp only [Nat.mem_divisorsAntidiagonal, ne_eq] at hab
   rw [← hab.1]
-  simp only [Nat.cast_mul, map_mul]
-  ring
+  grind
 
 theorem ArithmeticFunction.summatory_mul_eq_summatory {R : Type*} [Semiring R] (f g : ArithmeticFunction R) (x : ℝ) :
     summatory (f * g) x  = summatory (fun n ↦ f n * summatory g (x/n)) x := by
@@ -501,7 +497,7 @@ theorem sum_range_of_periodic_full_eq_add {R : Type*} [AddCommMonoid R] {a q : �
       rw [abs_of_nonneg]
       · grw [Int.mod_modEq]
         simp
-      · apply Int.emod_nonneg _ (by positivity)
+      · grind
   · simp [hf.map_mod_nat]
 
 -- TODO: Consider other proof: use a-1 instead of constructing bijection.
@@ -643,7 +639,7 @@ theorem abel_summation_summatory {𝕜 : Type*} [RCLike 𝕜] (c : ℕ → 𝕜)
   trans ∑ k ∈ Finset.Ioc ⌊a⌋₊ ⌊b⌋₊, f k * c k
   · rw [eq_comm]
     apply Finset.sum_subset
-    · gcongr; simp
+    · grind
     · simp only [Finset.mem_Ioc, not_and, not_le, and_imp, mul_comm]
       intro k hk_pos hkb habk
       apply hac k hk_pos
@@ -654,7 +650,6 @@ theorem abel_summation_summatory {𝕜 : Type*} [RCLike 𝕜] (c : ℕ → 𝕜)
       rw [eq_comm]
       apply Finset.sum_subset
       · exact Finset.Ioc_subset_Icc_self
-      simp only [Finset.mem_Icc, zero_le, true_and, Finset.mem_Ioc, not_and, not_le]
       grind
     simp [this]
 
@@ -701,11 +696,7 @@ theorem Delta_abel_summation {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit
     intro n _ hn
     norm_cast at hn
     simp [hg_one, show n = 1 by lia]
-  rw [this]
-  congr! 1
-  · simp [hg_one, c, mul_comm]
-  congr! 2 with x
-  simp [mul_comm, c]
+  grind
 
 -- There really ought to be an RCLike version.
 theorem Delta_abel_summation_real {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit a) (g g' : ℝ → ℝ) {x : ℝ} (hx : 1 ≤ x)
@@ -766,8 +757,7 @@ theorem Delta_monotone_bound_aux {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : Is
   grw [Delta_abel_summation_real ha g g' hx hg hg_int hg_one, norm_sub_le, two_mul, norm_mul, Delta_one_bound _ hq.pos]
   gcongr
   · simp only [Real.norm_eq_abs, one_mul]
-    rw [abs_of_nonneg]
-    apply hg_nonneg hx le_rfl
+    grind
   · grw [norm_integral_le_integral_norm]
     trans ∫ x in Set.Ioc 1 x, g' x
     · simp_rw [MeasureTheory.integral_Ioc_eq_integral_Ioo]
@@ -836,8 +826,7 @@ theorem Delta_flog_bound {v : ℕ} {f : ArithmeticFunction ℝ} {x : ℝ} (hx : 
       simp only [ppow_zero, Delta_zeta_eq_Delta_one, norm_mul, pow_zero, mul_one]
       grw [Delta_one_bound]
       · simp
-        have : 0 ≤ |f n| := abs_nonneg _
-        linarith only [this]
+        grind
       · exact NeZero.pos _
     replace hv : 0 < v := by grind
     have : ⇑(log.ppow v) = (fun n : ℕ ↦ (Real.log n)^v) := by

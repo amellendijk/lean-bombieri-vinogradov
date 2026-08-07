@@ -45,16 +45,13 @@ example [ProofData] :
   have hdiv : d / t ≤ d := by
     rw [div_le_iff₀ ht]
     nlinarith
-  have hy1 : √x ≤ y := by dsimp [y, d] at hdiv ⊢; linarith
+  have hy1 : √x ≤ y := by grind
   have hy2 : y ≤ x := by dsimp [y]; exact sub_le_self _ (div_nonneg hd.le ht.le)
   have heval : (x - √x) / (x - y) = t := by
-    have hxy : x - y = d / t := by dsimp [y]; ring
-    rw [hxy, div_div_eq_mul_div]
-    dsimp [d] at hd ⊢
-    field_simp [ne_of_gt hd]
+    grind
   calc
     (r : ℝ≥0∞) = ENNReal.ofReal (r : ℝ) := by simp
-    _ ≤ ENNReal.ofReal t := ENNReal.ofReal_le_ofReal (by dsimp [t]; linarith)
+    _ ≤ ENNReal.ofReal t := ENNReal.ofReal_le_ofReal (by grind)
     _ = ENNReal.ofReal ((x - √x) / (x - y)) := by rw [heval]
     _ ≤ maxy (fun z ↦ ENNReal.ofReal ((x - √x) / (x - z))) := le_maxy hy1 hy2
 
