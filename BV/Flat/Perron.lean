@@ -954,7 +954,7 @@ theorem summatory_T_ll [Bump] [FG] {ε Q : ℝ} (hε_pos : 0 < ε) (hQ : 1 ≤ Q
       (‖summatory (fun m ↦ f m * χ m * (m : ℂ) ^ (-(σ + t * I))) M‖ *
        ‖summatory (fun n ↦ g n * χ n * (n : ℂ) ^ (-(σ + t * I))) N‖) *
       ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)‖ := fun q χ t => by
-    grind
+    rfl
   -- `D t` is the large-sieve double sum at parameter `t` (without the Mellin factor).
   set D : ℝ → ℝ := fun t => summatory (fun q =>
     ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,

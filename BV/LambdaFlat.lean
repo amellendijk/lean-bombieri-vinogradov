@@ -1183,7 +1183,8 @@ theorem fAF_isMultiplicative : fAF.IsMultiplicative := by
   refine ⟨by simp [fAF_apply], fun {m n} h ↦ ?_⟩
   simp only [fAF_apply]
   rw [ArithmeticFunction.isMultiplicative_moebius.map_mul_of_coprime h, Nat.totient_mul h]
-  grind
+  push_cast
+  ring
 
 theorem invTotientAF_isMultiplicative : invTotientAF.IsMultiplicative := by
   refine ⟨by simp [invTotientAF_apply], fun {m n} h ↦ ?_⟩
@@ -2628,7 +2629,7 @@ theorem BV_LambdaFlat_enorm [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q)
             _ = x := Real.mul_self_sqrt hx0.le
         calc Q * √x * (Real.log x) ^ 3 = (Q * √x) * (Real.log x) ^ 3 := by ring
           _ ≤ (x / (Real.log x) ^ (A + 3)) * (Real.log x) ^ 3 := by gcongr
-          _ = x / (Real.log x) ^ A := by grind
+          _ = x / (Real.log x) ^ A := by rw [pow_add]; field_simp
       set S3 : ℝ := x / (Real.log x) ^ (A + 1) + x * (Real.log x) ^ 4 / √U
           + x * (Real.log x) ^ 4 / √V with hS3def
       have hS3nn : (0 : ℝ) ≤ S3 := by rw [hS3def]; positivity

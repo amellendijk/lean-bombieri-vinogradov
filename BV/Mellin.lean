@@ -249,7 +249,8 @@ lemma Smooth1_verticalIntegrable
   have hg : Integrable (fun t : ℝ ↦ (σ ^ 2 + t ^ 2)⁻¹) := by
     have key : Integrable (fun t : ℝ ↦ (σ ^ 2)⁻¹ * (1 + (σ⁻¹ * t) ^ 2)⁻¹) :=
       (integrable_inv_one_add_sq.comp_mul_left' (inv_ne_zero hσ)).const_mul _
-    grind
+    field_simp at key ⊢
+    exact key
   refine Integrable.mono' (hg.const_mul (c / ε)) ?_ (Filter.Eventually.of_forall fun t ↦ ?_)
   · -- Strong measurability via continuity (`𝓜 …` is differentiable on `re > 0`).
     apply Continuous.aestronglyMeasurable
@@ -258,11 +259,11 @@ lemma Smooth1_verticalIntegrable
     exact ContinuousAt.comp (g := fun s : ℂ ↦ 𝓜 (fun x ↦ (Smooth1 ν ε x : ℂ)) s)
       (f := fun y : ℝ ↦ (σ : ℂ) + y * I)
       (Smooth1MellinDifferentiable diffν suppν ⟨εpos, ε_lt_one⟩ νpos mass_one
-        (s := σ + t * I) (by grind)).continuousAt hline
+        (s := σ + t * I) (by simpa)).continuousAt hline
   · -- Pointwise `O(1/(σ² + t²))` bound from `MellinOfSmooth1b`.
     calc ‖𝓜 (fun x ↦ (Smooth1 ν ε x : ℂ)) (σ + t * I)‖
         ≤ c * (ε * ‖(σ : ℂ) + t * I‖ ^ 2)⁻¹ :=
-          hc (σ / 2) (by linarith) (σ + t * I) (by grind) (by grind)
+          hc (σ / 2) (by linarith) (σ + t * I) (by grind) (by simp [σ_le])
             ε εpos ε_lt_one
       _ = c / ε * (σ ^ 2 + t ^ 2)⁻¹ := by
           rw [Complex.sq_norm, Complex.normSq_add_mul_I, mul_inv]; ring
