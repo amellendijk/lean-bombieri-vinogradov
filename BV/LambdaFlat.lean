@@ -2569,8 +2569,6 @@ theorem BV_LambdaFlat_enorm [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q)
   classical
   have hL16 : (16 : ℝ) ≤ Real.log x := sixteen_le_log_x
   have hL1 : (1 : ℝ) ≤ Real.log x := by linarith
-  have hLpos : (0 : ℝ) < Real.log x := by linarith
-  have hLne : Real.log x ≠ 0 := hLpos.ne'
   have hx0 : (0 : ℝ) < x := by linarith [le_x]
   have hx1 : (1 : ℝ) ≤ x := by linarith [le_x]
   have hsqrt_nonneg : (0 : ℝ) ≤ √x := Real.sqrt_nonneg x
@@ -2582,10 +2580,8 @@ theorem BV_LambdaFlat_enorm [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q)
   have hQ_le_sqrt : Q ≤ √x := by
     refine hQ.trans ?_
     rw [div_le_iff₀ (by positivity)]
-    nlinarith [hsqrt_nonneg, hpowge]
+    nlinarith only [hsqrt_nonneg, hpowge]
   have hQ_le_x : Q ≤ x := hQ_le_sqrt.trans hsqrt_le_x
-  have hsU : (0 : ℝ) < √U := Real.sqrt_pos.mpr ProofData.U_pos
-  have hsV : (0 : ℝ) < √V := Real.sqrt_pos.mpr ProofData.V_pos
   have hCtot : (0 : ℝ) ≤ C_tot := by
     rw [C_tot]; exact mul_nonneg (by norm_num) (tsum_nonneg (fun d ↦ fAF_nonneg d))
   have hCTr : (0 : ℝ) ≤ C_Tr := C_Tr_nonneg
@@ -2594,7 +2590,7 @@ theorem BV_LambdaFlat_enorm [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q)
   have hK0 : (0 : ℝ) ≤ K := by rw [hKdef]; positivity
   set Cmain : ℝ := C_Tr * (C_tot * (1 + 2 * K) + C_rphi) with hCmain
   have hCmain0 : (0 : ℝ) ≤ Cmain :=
-    mul_nonneg hCTr (add_nonneg (mul_nonneg hCtot (by linarith [hK0])) hCrphi)
+    mul_nonneg hCTr (add_nonneg (mul_nonneg hCtot (by linarith only [hK0])) hCrphi)
   -- Step 1: conductor decomposition + main-term regrouping.
   have hvia := BV_LambdaFlat_via_T Q A (A + 4) hQ_le_sqrt
   -- Step 2: main-term bound.
@@ -2607,14 +2603,14 @@ theorem BV_LambdaFlat_enorm [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q)
         have h := summatory_totient_inv_le Q hQ_le_x; rwa [summatory] at h
       have hrphi : ∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊, ((r : ℝ) * r.totient)⁻¹ ≤ C_rphi := sum_rphiInv_le Q
       have hU5 : x * (Real.log x) ^ 5 / √U ≤ K * x / (Real.log x) ^ A := by
-        rw [div_le_div_iff₀ hsU (by positivity)]
+        rw [div_le_div_iff₀ (by positivity) (by positivity)]
         have hlem := log_pow_le_const_mul_sqrt U (A + 5) le_U
         calc x * (Real.log x) ^ 5 * (Real.log x) ^ A
             = x * (Real.log x) ^ (A + 5) := by rw [mul_assoc, ← pow_add, Nat.add_comm 5 A]
           _ ≤ x * (K * √U) := by rw [hKdef]; exact mul_le_mul_of_nonneg_left hlem hx0.le
           _ = K * x * √U := by ring
       have hV5 : x * (Real.log x) ^ 5 / √V ≤ K * x / (Real.log x) ^ A := by
-        rw [div_le_div_iff₀ hsV (by positivity)]
+        rw [div_le_div_iff₀ (by positivity) (by positivity)]
         have hlem := log_pow_le_const_mul_sqrt V (A + 5) le_V
         calc x * (Real.log x) ^ 5 * (Real.log x) ^ A
             = x * (Real.log x) ^ (A + 5) := by rw [mul_assoc, ← pow_add, Nat.add_comm 5 A]
@@ -2682,7 +2678,7 @@ theorem BV_LambdaFlat_enorm [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q)
           = C_Tr * ((C_tot * (1 + 2 * K) + C_rphi) * x / (Real.log x) ^ A) from by ring]
       apply mul_le_mul_of_nonneg_left _ hCTr
       exact le_trans (add_le_add hb1 hb2) hfinal2
-    · push_neg at hQ2
+    · push Not at hQ2
       have hzero : (∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊,
           (r.totient : ℝ)⁻¹ * T ((A + 4 : ℕ)) r Q) = 0 := by
         refine Finset.sum_eq_zero (fun r hr ↦ ?_)
@@ -2691,10 +2687,11 @@ theorem BV_LambdaFlat_enorm [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q)
         have hrpos : 0 < r := by exact_mod_cast hr1
         have hlt : Q / r < (Real.log x) ^ (A + 4) := by
           have h1 : Q / r ≤ Q := by
-            rw [div_le_iff₀ (by exact_mod_cast hrpos)]; nlinarith [hr1, hQ0]
+            rw [div_le_iff₀ (by exact_mod_cast hrpos)]; nlinarith only [hr1, hQ0]
           have h2 : (16 : ℝ) ≤ (Real.log x) ^ (A + 4) :=
             le_trans hL16 (le_self_pow₀ hL1 (by omega))
-          linarith
+          grw [h1, hQ2, ←h2]
+          norm_num
         have hTz : T ((A + 4 : ℕ)) r Q = 0 := by
           have hfloor : ⌊Q / (r : ℝ)⌋₊ ≤ ⌊(Real.log x) ^ (A + 4)⌋₊ :=
             Nat.floor_mono hlt.le
@@ -2702,7 +2699,7 @@ theorem BV_LambdaFlat_enorm [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q)
             Finset.sum_empty]
         rw [hTz, mul_zero]
       rw [hzero]
-      exact div_nonneg (mul_nonneg hCmain0 hx0.le) (by positivity)
+      positivity
   -- Step 3: combine main term and error term.
   have hcombine : Cmain * x / (Real.log x) ^ A + C_BV_LFT A (A + 4) * x / (Real.log x) ^ A
       = C_BV_LF A * x / (Real.log x) ^ A := by
