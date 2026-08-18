@@ -58,6 +58,20 @@ theorem maxy_ofReal_le [ProofData] {f : ℝ → ℝ} {B : ℝ}
     maxy (fun y ↦ ENNReal.ofReal (f y)) ≤ ENNReal.ofReal B :=
   maxy_le fun y hy1 hy2 ↦ ENNReal.ofReal_le_ofReal (hf y hy1 hy2)
 
+/-- Bound an `ℝ≥0∞`-valued sum termwise by `ENNReal.ofReal` of a real sum. -/
+theorem sum_le_ofReal_sum {ι : Type*} {s : Finset ι} {f : ι → ℝ≥0∞} {g : ι → ℝ}
+    (hg : ∀ i ∈ s, 0 ≤ g i) (h : ∀ i ∈ s, f i ≤ ENNReal.ofReal (g i)) :
+    ∑ i ∈ s, f i ≤ ENNReal.ofReal (∑ i ∈ s, g i) := by
+  rw [ENNReal.ofReal_sum_of_nonneg hg]
+  exact Finset.sum_le_sum h
+
+/-- Bound `ENNReal.ofReal` of a real sum termwise by an `ℝ≥0∞`-valued sum. -/
+theorem ofReal_sum_le_sum {ι : Type*} {s : Finset ι} {f : ι → ℝ≥0∞} {g : ι → ℝ}
+    (hg : ∀ i ∈ s, 0 ≤ g i) (h : ∀ i ∈ s, ENNReal.ofReal (g i) ≤ f i) :
+    ENNReal.ofReal (∑ i ∈ s, g i) ≤ ∑ i ∈ s, f i := by
+  rw [ENNReal.ofReal_sum_of_nonneg hg]
+  exact Finset.sum_le_sum h
+
 /-! ### `ℝ≥0∞`-cast bridging lemmas
 
 These push `ENNReal.ofReal` through the coefficient patterns `(n : ℝ≥0∞)⁻¹ * _` and
@@ -92,9 +106,6 @@ theorem natCast_mul_inv (m n : ℕ) :
 theorem natCast_inv_le_natCast_inv {m n : ℕ} (h : m ≤ n) :
     (n : ℝ≥0∞)⁻¹ ≤ (m : ℝ≥0∞)⁻¹ :=
   ENNReal.inv_le_inv' (by exact_mod_cast h)
-
-theorem toReal_iSup_of_finite {ι : Sort*} {f : ι → ℝ≥0∞} (hf : ∀ i, f i ≠ ⊤) :
-    (⨆ i, f i).toReal = ⨆ i, (f i).toReal := ENNReal.toReal_iSup hf
 
 theorem toReal_finset_sum {ι : Type*} (s : Finset ι) (f : ι → ℝ≥0∞)
     (hf : ∀ i ∈ s, f i ≠ ⊤) :
