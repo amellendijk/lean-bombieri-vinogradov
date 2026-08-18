@@ -7,7 +7,7 @@ import BV.LambdaLE
 import BV.Flat.Perron
 
 open ArithmeticFunction BV ProofData DirichletCharacter
-open scoped Moebius BV zeta
+open scoped Moebius BV zeta ENNReal
 
 /-! ## Type II sums: the flat part $\Lambda^\flat$ -/
 
@@ -24,11 +24,11 @@ noncomputable def S [ProofData] {q : ℕ} (r : ℕ) (y : ℝ) (ξ : DirichletCha
 @[blueprint (latexEnv := "definition") (statement := /--
 $$T_r(x, Q) := \sum_{(\log x)^C < d \le Q/r} \frac{1}{\varphi(d)} \sumstar_{\xi \pmod{d}} \max_{\sqrt{x} \le y \le x} S_r(y, \xi)$$
 -/) (uses := [S])]
-noncomputable def T [ProofData] (C : ℝ) (r : ℕ) (Q : ℝ) : ℝ :=
+noncomputable def T [ProofData] (C : ℝ) (r : ℕ) (Q : ℝ) : ℝ≥0∞ :=
   open Classical in
-    ∑ d ∈ Finset.Ioc ⌊(Real.log x)^C⌋₊ ⌊Q/r⌋₊, (d.totient : ℝ)⁻¹ *
+    ∑ d ∈ Finset.Ioc ⌊(Real.log x)^C⌋₊ ⌊Q/r⌋₊, (d.totient : ℝ≥0∞)⁻¹ *
       ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive,
-        maxyReal (fun y ↦ ENNReal.ofReal (S r y ξ))
+        maxy (fun y ↦ ENNReal.ofReal (S r y ξ))
 
 /-! ### Reduction to character sums -/
 
@@ -1015,19 +1015,8 @@ theorem S_nonneg [ProofData] {q : ℕ} (r : ℕ) (y : ℝ) (ξ : DirichletCharac
 /-- `S r y ξ ≤ maxy (S r · ξ)` for `y ∈ [√x, x]`. -/
 theorem S_le_maxy [ProofData] {q : ℕ} (r : ℕ) (ξ : DirichletCharacter ℂ q) {y : ℝ}
     (hy1 : √x ≤ y) (hy2 : y ≤ x) :
-    S r y ξ ≤ maxyReal (fun y ↦ ENNReal.ofReal (S r y ξ)) := by
-  refine le_maxyReal_ofReal (f := fun z ↦ S r z ξ) hy1 hy2
-    (B := summatory (fun n ↦ ‖onCoprime r Λ♭ n * ξ n‖) x)
-    (S_nonneg r y ξ) (fun z hz1 hz2 ↦ ?_)
-  simp only [S]
-  rw [summatory]
-  refine (norm_sum_le _ _).trans ?_
-  rw [summatory]
-  apply Finset.sum_le_sum_of_subset_of_nonneg
-  · intro n hn
-    rw [Finset.mem_Ioc] at hn ⊢
-    exact ⟨hn.1, hn.2.trans (Nat.floor_mono hz2)⟩
-  · exact fun i _ _ ↦ norm_nonneg _
+    ENNReal.ofReal (S r y ξ) ≤ maxy (fun y ↦ ENNReal.ofReal (S r y ξ)) :=
+  le_maxy hy1 hy2
 
 /-- The implied constant in `Delta_LambdaFlat_small_conductor` is nonnegative. -/
 theorem C_DLF_nonneg [ProofData] (A C : ℕ) : 0 ≤ C_DLF A C := by
@@ -1291,33 +1280,33 @@ theorem maxya_Delta_LambdaFlat_enorm_le [ProofData] (A C : ℕ) {q : ℕ}
     (hq1 : 1 ≤ q) (hqx : (q : ℝ) ≤ √x) :
   open Classical in
     maxya q (fun y a ↦ ‖Δ_[Λ♭](y; q, a)‖ₑ)
-      ≤ ENNReal.ofReal ((q.totient : ℝ)⁻¹ * (C_DLF A C * x / (Real.log x) ^ (A + 1))
-        + (q.totient : ℝ)⁻¹ * ∑ d ∈ q.divisors with (Real.log x) ^ C < (d : ℕ),
+      ≤ ENNReal.ofReal ((q.totient : ℝ)⁻¹ * (C_DLF A C * x / (Real.log x) ^ (A + 1)))
+        + (q.totient : ℝ≥0∞)⁻¹ * ∑ d ∈ q.divisors with (Real.log x) ^ C < (d : ℕ),
             ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive,
-              maxyReal (fun y ↦ ENNReal.ofReal (S (q / d) y ξ))) := by
+              maxy (fun y ↦ ENNReal.ofReal (S (q / d) y ξ)) := by
   classical
   have hq0 : 0 < q := hq1
+  have hφ0 : q.totient ≠ 0 := (Nat.totient_pos.mpr hq0).ne'
   have hφ : (0 : ℝ) ≤ (q.totient : ℝ)⁻¹ := inv_nonneg.mpr (by positivity)
-  apply maxya_Delta_enorm_le_of_abs_le
-  intro y hy1 hy2 a ha
-  refine (Delta_LambdaFlat_decomp (C := C) (y := y) q hq0 a ha).trans (add_le_add ?_ ?_)
-  · exact mul_le_mul_of_nonneg_left
-      (Delta_LambdaFlat_small_conductor A C hy1 hy2 q hq0 hqx a ha) hφ
-  · refine mul_le_mul_of_nonneg_left ?_ hφ
-    exact Finset.sum_le_sum (fun d _ ↦ Finset.sum_le_sum (fun ξ _ ↦ S_le_maxy _ ξ hy1 hy2))
+  refine maxya_le_unit fun y hy1 hy2 a ha ↦ ?_
+  rw [← ofReal_abs_eq_enorm]
+  refine (ENNReal.ofReal_le_ofReal
+    (Delta_LambdaFlat_decomp (C := C) (y := y) q hq0 a ha)).trans ?_
+  refine ENNReal.ofReal_add_le.trans (add_le_add ?_ ?_)
+  · exact ENNReal.ofReal_le_ofReal (mul_le_mul_of_nonneg_left
+      (Delta_LambdaFlat_small_conductor A C hy1 hy2 q hq0 hqx a ha) hφ)
+  · rw [ENNReal.ofReal_mul hφ, ← natCast_inv_eq_ofReal hφ0,
+      ENNReal.ofReal_sum_of_nonneg (fun d _ ↦ Finset.sum_nonneg fun ξ _ ↦ S_nonneg _ _ ξ)]
+    refine mul_le_mul_right (Finset.sum_le_sum fun d _ ↦ ?_) _
+    rw [ENNReal.ofReal_sum_of_nonneg (fun ξ _ ↦ S_nonneg _ _ ξ)]
+    exact Finset.sum_le_sum fun ξ _ ↦ S_le_maxy _ ξ hy1 hy2
 
 /-- The summand of the regrouped main term: `1/(φ(d)φ(r)) · ∑*_{ξ mod d} maxₓ S_r(·, ξ)`. -/
-noncomputable def gLFT [ProofData] (d r : ℕ) : ℝ :=
+noncomputable def gLFT [ProofData] (d r : ℕ) : ℝ≥0∞ :=
   open Classical in
-  (d.totient : ℝ)⁻¹ * (r.totient : ℝ)⁻¹ *
+  (d.totient : ℝ≥0∞)⁻¹ * (r.totient : ℝ≥0∞)⁻¹ *
     ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive,
-      maxyReal (fun y ↦ ENNReal.ofReal (S r y ξ))
-
-theorem gLFT_nonneg [ProofData] (d r : ℕ) : 0 ≤ gLFT d r := by
-  classical
-  rw [gLFT]
-  refine mul_nonneg (mul_nonneg (by positivity) (by positivity)) ?_
-  exact Finset.sum_nonneg (fun ξ _ ↦ ENNReal.toReal_nonneg)
+      maxy (fun y ↦ ENNReal.ofReal (S r y ξ))
 
 @[blueprint (statement := /--
 $$\sum_{q \le Q} \max_{\substack{\sqrt{x} \le y \le x \\ a \in (\Z/q\Z)^*}} \left|\Delta_{\Lambda^\flat}(y;\,q,\,a)\right| \le \sum_{r \le Q} \frac{T_r(x,Q)}{\varphi(r)} + O\!\left(\frac{x}{(\log x)^A}\right)$$
@@ -1327,8 +1316,8 @@ $\sum_{n \le x} 1/\varphi(n) \ll \log x$, then regroup the main sum by $r = q/d$
 -/) (uses := [Delta_LambdaFlat_decomp, Delta_LambdaFlat_small_conductor, character_sum_Mobius, T])]
 theorem BV_LambdaFlat_via_T [ProofData] (Q : ℝ) (A C : ℕ) (hQ : Q ≤ √x) :
     (∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, maxya q fun y a ↦ ‖Δ_[Λ♭](y; q, a)‖ₑ)
-      ≤ ENNReal.ofReal ((∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊, (r.totient : ℝ)⁻¹ * T C r Q)
-        + C_BV_LFT A C * x / (Real.log x) ^ A) := by
+      ≤ (∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊, (r.totient : ℝ≥0∞)⁻¹ * T C r Q)
+        + ENNReal.ofReal (C_BV_LFT A C * x / (Real.log x) ^ A) := by
   classical
   have hlog_pos : 0 < Real.log x := log_x_pos
   have hlog_ne : Real.log x ≠ 0 := ne_of_gt hlog_pos
@@ -1340,7 +1329,7 @@ theorem BV_LambdaFlat_via_T [ProofData] (Q : ℝ) (A C : ℕ) (hQ : Q ≤ √x) 
   have hKc_nonneg : 0 ≤ Kc := by
     rw [hKc]; exact div_nonneg (mul_nonneg (C_DLF_nonneg A C) x_pos.le) (by positivity)
   -- Rewrite the main bound as a double sum of `gLFT`.
-  have hMB : (∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊, (r.totient : ℝ)⁻¹ * T C r Q)
+  have hMB : (∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊, (r.totient : ℝ≥0∞)⁻¹ * T C r Q)
       = ∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊,
           ∑ d ∈ Finset.Ioc ⌊(Real.log x) ^ C⌋₊ ⌊Q / r⌋₊, gLFT d r := by
     refine Finset.sum_congr rfl (fun r _ ↦ ?_)
@@ -1350,17 +1339,20 @@ theorem BV_LambdaFlat_via_T [ProofData] (Q : ℝ) (A C : ℕ) (hQ : Q ≤ √x) 
   -- Per-`q` canonical bound.
   have hterm : ∀ q ∈ Finset.Ioc 0 ⌊Q⌋₊,
       maxya q (fun y a ↦ ‖Δ_[Λ♭](y; q, a)‖ₑ) ≤
-        ENNReal.ofReal ((q.totient : ℝ)⁻¹ * Kc
-            + (q.totient : ℝ)⁻¹ * ∑ d ∈ q.divisors with (Real.log x) ^ C < (d : ℕ),
-                ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive,
-                  maxyReal (fun y ↦ ENNReal.ofReal (S (q / d) y ξ))) := by
+        ENNReal.ofReal ((q.totient : ℝ)⁻¹ * Kc)
+          + (q.totient : ℝ≥0∞)⁻¹ * ∑ d ∈ q.divisors with (Real.log x) ^ C < (d : ℕ),
+              ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive,
+                maxy (fun y ↦ ENNReal.ofReal (S (q / d) y ξ)) := by
     intro q hq
     rw [Finset.mem_Ioc_zero_floor] at hq
     rw [hKc]
     exact maxya_Delta_LambdaFlat_enorm_le A C (by exact_mod_cast hq.1) (le_trans hq.2 hQ)
   -- Bound the error part using the (assumed) totient bound.
-  have hERR : ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, (q.totient : ℝ)⁻¹ * Kc
-      ≤ C_BV_LFT A C * x / (Real.log x) ^ A := by
+  have hERR : ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ENNReal.ofReal ((q.totient : ℝ)⁻¹ * Kc)
+      ≤ ENNReal.ofReal (C_BV_LFT A C * x / (Real.log x) ^ A) := by
+    rw [← ENNReal.ofReal_sum_of_nonneg
+      (fun q _ ↦ mul_nonneg (by positivity) hKc_nonneg)]
+    refine ENNReal.ofReal_le_ofReal ?_
     rw [← Finset.sum_mul]
     have htot : ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, (q.totient : ℝ)⁻¹ ≤ C_tot * Real.log x := by
       have h := summatory_totient_inv_le Q hQx
@@ -1370,11 +1362,11 @@ theorem BV_LambdaFlat_via_T [ProofData] (Q : ℝ) (A C : ℕ) (hQ : Q ≤ √x) 
       _ = C_BV_LFT A C * x / (Real.log x) ^ A := by
           rw [hKc, C_BV_LFT, pow_succ]; field_simp
   -- Bound the main part by regrouping `q = r·d`.
-  have hMAIN : ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, (q.totient : ℝ)⁻¹ *
+  have hMAIN : ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, (q.totient : ℝ≥0∞)⁻¹ *
         ∑ d ∈ q.divisors with (Real.log x) ^ C < (d : ℕ),
           ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive,
-            maxyReal (fun y ↦ ENNReal.ofReal (S (q / d) y ξ))
-      ≤ ∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊, (r.totient : ℝ)⁻¹ * T C r Q := by
+            maxy (fun y ↦ ENNReal.ofReal (S (q / d) y ξ))
+      ≤ ∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊, (r.totient : ℝ≥0∞)⁻¹ * T C r Q := by
     rw [hMB]
     -- Step A: distribute `1/φ(q)` and use `φ(d)φ(q/d) ≤ φ(q)` term by term.
     refine le_trans (b := ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊,
@@ -1387,18 +1379,14 @@ theorem BV_LambdaFlat_via_T [ProofData] (Q : ℝ) (A C : ℕ) (hQ : Q ≤ √x) 
       refine Finset.sum_le_sum (fun d hd ↦ ?_)
       rw [Finset.mem_filter, Nat.mem_divisors] at hd
       obtain ⟨⟨hdvd, _⟩, _⟩ := hd
-      have hdpos : 0 < d := Nat.pos_of_dvd_of_pos hdvd hqpos
-      have hqdpos : 0 < q / d := Nat.div_pos (Nat.le_of_dvd hqpos hdvd) hdpos
       have hsm := Nat.totient_super_multiplicative d (q / d)
       rw [Nat.mul_div_cancel' hdvd] at hsm
-      have hcoef : (q.totient : ℝ)⁻¹ ≤ (d.totient : ℝ)⁻¹ * ((q / d).totient : ℝ)⁻¹ := by
-        rw [← mul_inv]
-        apply inv_anti₀
-        · positivity
-        · exact_mod_cast hsm
+      have hcoef : (q.totient : ℝ≥0∞)⁻¹
+          ≤ (d.totient : ℝ≥0∞)⁻¹ * ((q / d).totient : ℝ≥0∞)⁻¹ := by
+        rw [← natCast_mul_inv]
+        exact natCast_inv_le_natCast_inv hsm
       rw [gLFT]
-      exact mul_le_mul_of_nonneg_right hcoef
-        (Finset.sum_nonneg (fun ξ _ ↦ ENNReal.toReal_nonneg))
+      exact mul_le_mul_left hcoef _
     -- Step B: reindex `(q, d) ↦ (q/d, d)`.
     · rw [Finset.sum_sigma', Finset.sum_sigma']
       set LHSsig := (Finset.Ioc 0 ⌊Q⌋₊).sigma
@@ -1424,7 +1412,7 @@ theorem BV_LambdaFlat_via_T [ProofData] (Q : ℝ) (A C : ℕ) (hQ : Q ≤ √x) 
               (fun σ : Σ _ : ℕ, ℕ => (⟨σ.fst / σ.snd, σ.snd⟩ : Σ _ : ℕ, ℕ)), gLFT τ.snd τ.fst :=
             (Finset.sum_image (f := fun τ : Σ _ : ℕ, ℕ => gLFT τ.snd τ.fst) hinj).symm
         _ ≤ ∑ τ ∈ RHSsig, gLFT τ.snd τ.fst := by
-            refine Finset.sum_le_sum_of_subset_of_nonneg ?_ (fun τ _ _ ↦ gLFT_nonneg τ.snd τ.fst)
+            refine Finset.sum_le_sum_of_subset ?_
             intro τ hτ
             rw [Finset.mem_image] at hτ
             obtain ⟨σ, hσ, rfl⟩ := hτ
@@ -1454,33 +1442,23 @@ theorem BV_LambdaFlat_via_T [ProofData] (Q : ℝ) (A C : ℕ) (hQ : Q ≤ √x) 
               calc (d : ℝ) * (↑(q / d) : ℝ) = ((d * (q / d) : ℕ) : ℝ) := by grind
                 _ = (q : ℝ) := by exact_mod_cast Nat.mul_div_cancel' hdvd
                 _ ≤ Q := hqmem.2
-  let Bq (q : ℕ) : ℝ := (q.totient : ℝ)⁻¹ * Kc +
-    (q.totient : ℝ)⁻¹ *
-            ∑ d ∈ q.divisors with (Real.log x) ^ C < (d : ℕ),
-              ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive,
-                maxyReal (fun y ↦ ENNReal.ofReal (S (q / d) y ξ))
-  have hBq : ∀ q, 0 ≤ Bq q := by
-    intro q
-    dsimp [Bq]
-    exact add_nonneg (mul_nonneg (by positivity) hKc_nonneg)
-      (mul_nonneg (by positivity) (Finset.sum_nonneg fun _ _ ↦
-        Finset.sum_nonneg fun _ _ ↦ ENNReal.toReal_nonneg))
-  have hreal : ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, Bq q ≤
-      (∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊, (r.totient : ℝ)⁻¹ * T C r Q)
-        + C_BV_LFT A C * x / (Real.log x) ^ A := by
-    dsimp [Bq]
-    rw [Finset.sum_add_distrib]
-    grind
   calc
     ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, maxya q (fun y a ↦ ‖Δ_[Λ♭](y; q, a)‖ₑ)
-        ≤ ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ENNReal.ofReal (Bq q) := by
-          apply Finset.sum_le_sum
-          grind
-    _ = ENNReal.ofReal (∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, Bq q) := by
-      rw [ENNReal.ofReal_sum_of_nonneg (fun q _ ↦ hBq q)]
-    _ ≤ ENNReal.ofReal ((∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊,
-        (r.totient : ℝ)⁻¹ * T C r Q) + C_BV_LFT A C * x / (Real.log x) ^ A) :=
-      ENNReal.ofReal_le_ofReal hreal
+        ≤ ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, (ENNReal.ofReal ((q.totient : ℝ)⁻¹ * Kc)
+            + (q.totient : ℝ≥0∞)⁻¹ * ∑ d ∈ q.divisors with (Real.log x) ^ C < (d : ℕ),
+                ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive,
+                  maxy (fun y ↦ ENNReal.ofReal (S (q / d) y ξ))) :=
+          Finset.sum_le_sum hterm
+    _ = (∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ENNReal.ofReal ((q.totient : ℝ)⁻¹ * Kc))
+          + ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, (q.totient : ℝ≥0∞)⁻¹ *
+              ∑ d ∈ q.divisors with (Real.log x) ^ C < (d : ℕ),
+                ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive,
+                  maxy (fun y ↦ ENNReal.ofReal (S (q / d) y ξ)) :=
+        Finset.sum_add_distrib
+    _ ≤ ENNReal.ofReal (C_BV_LFT A C * x / (Real.log x) ^ A)
+          + ∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊, (r.totient : ℝ≥0∞)⁻¹ * T C r Q :=
+        add_le_add hERR hMAIN
+    _ = _ := add_comm _ _
 
 /-! ### Large sieve estimates -/
 
@@ -1941,9 +1919,9 @@ private theorem norm_summatory_le_Gterm [ProofData] (r j : ℕ) {q : ℕ}
 
 /-- The maximum of `S_r` over `y ∈ [√x, x]` is bounded by the sum of the dyadic suprema. -/
 private theorem maxy_S_le_sum [ProofData] (r : ℕ) {q : ℕ} (ξ : DirichletCharacter ℂ q) :
-    maxyReal (fun y ↦ ENNReal.ofReal (S r y ξ)) ≤
-      ∑ j ∈ pows2Ioc U (2 * x / V), Gterm r j ξ := by
-  refine maxyReal_ofReal_le (Finset.sum_nonneg fun j _ => Gterm_nonneg r j ξ) ?_
+    maxy (fun y ↦ ENNReal.ofReal (S r y ξ)) ≤
+      ENNReal.ofReal (∑ j ∈ pows2Ioc U (2 * x / V), Gterm r j ξ) := by
+  refine maxy_ofReal_le ?_
   intro y hy1 hy2
   have hx1 : (1 : ℝ) ≤ x := by linarith [le_x]
   have hsqrt1 : (1 : ℝ) ≤ √x := by
@@ -2112,31 +2090,38 @@ When summing over $j$ note $U \le 2^j$, so $\sum_{U \le 2^j} 2^{-j/2} \ll 1/\sqr
 theorem BV_char_sum_bound [ProofData] (r : ℕ) (Q : ℝ) (hQ : 2 ≤ Q) :
   open Classical in
     summatory (fun q ↦ ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive,
-      q * (q.totient : ℝ)⁻¹ * maxyReal (fun y ↦ ENNReal.ofReal (S r y ξ))) Q
-    ≤ C_BV_char_sum * (x + Q * x / Real.sqrt U + Q * x / Real.sqrt V + Q ^ 2 * Real.sqrt x) * (Real.log x) ^ 3 := by
+      (q : ℝ≥0∞) * (q.totient : ℝ≥0∞)⁻¹ * maxy (fun y ↦ ENNReal.ofReal (S r y ξ))) Q
+    ≤ ENNReal.ofReal (C_BV_char_sum
+        * (x + Q * x / Real.sqrt U + Q * x / Real.sqrt V + Q ^ 2 * Real.sqrt x)
+        * (Real.log x) ^ 3) := by
   classical
   have hQ0 : (0 : ℝ) ≤ Q := by positivity
-  -- Bound `maxy S` by the sum of dyadic suprema, then swap the order of summation.
-  have hstep1 : summatory (fun q ↦ ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive,
-        (q : ℝ) * (q.totient : ℝ)⁻¹ *
-          maxyReal (fun y ↦ ENNReal.ofReal (S r y ξ))) Q
-      ≤ summatory (fun q ↦ ∑ j ∈ pows2Ioc U (2 * x / V),
-          ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive,
-            (q : ℝ) * (q.totient : ℝ)⁻¹ * Gterm r j ξ) Q := by
-    apply summatory_le_summatory
-    intro q _ _
-    calc ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive,
-          (q : ℝ) * (q.totient : ℝ)⁻¹ * maxyReal (fun y ↦ ENNReal.ofReal (S r y ξ))
-        ≤ ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive,
-            ∑ j ∈ pows2Ioc U (2 * x / V), (q : ℝ) * (q.totient : ℝ)⁻¹ * Gterm r j ξ := by
-          apply Finset.sum_le_sum
-          intro ξ _
-          rw [← Finset.mul_sum]
-          exact mul_le_mul_of_nonneg_left (maxy_S_le_sum r ξ) (by positivity)
-      _ = ∑ j ∈ pows2Ioc U (2 * x / V),
-            ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive,
-              (q : ℝ) * (q.totient : ℝ)⁻¹ * Gterm r j ξ := Finset.sum_comm
-  refine le_trans hstep1 ?_
+  -- Bound each `maxy S` by the sum of dyadic suprema and pull `ENNReal.ofReal` out.
+  have hstep0 : summatory (fun q ↦ ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive,
+        (q : ℝ≥0∞) * (q.totient : ℝ≥0∞)⁻¹ * maxy (fun y ↦ ENNReal.ofReal (S r y ξ))) Q
+      ≤ ENNReal.ofReal (summatory (fun q ↦ ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive,
+          (q : ℝ) * (q.totient : ℝ)⁻¹ * ∑ j ∈ pows2Ioc U (2 * x / V), Gterm r j ξ) Q) := by
+    rw [summatory, summatory, ENNReal.ofReal_sum_of_nonneg (fun q _ ↦
+      Finset.sum_nonneg fun ξ _ ↦ mul_nonneg (by positivity)
+        (Finset.sum_nonneg fun j _ ↦ Gterm_nonneg r j ξ))]
+    refine Finset.sum_le_sum fun q hq ↦ ?_
+    have hq0 : 0 < q := (Finset.mem_Ioc.mp hq).1
+    have hφ0 : q.totient ≠ 0 := (Nat.totient_pos.mpr hq0).ne'
+    rw [ENNReal.ofReal_sum_of_nonneg (fun ξ _ ↦ mul_nonneg (by positivity)
+      (Finset.sum_nonneg fun j _ ↦ Gterm_nonneg r j ξ))]
+    refine Finset.sum_le_sum fun ξ _ ↦ ?_
+    rw [← natCast_mul_natCast_inv_mul_ofReal q hφ0]
+    exact mul_le_mul_right (maxy_S_le_sum r ξ) _
+  refine hstep0.trans (ENNReal.ofReal_le_ofReal ?_)
+  -- Swap the order of summation.
+  have hswap : ∀ q : ℕ, (∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive,
+        (q : ℝ) * (q.totient : ℝ)⁻¹ * ∑ j ∈ pows2Ioc U (2 * x / V), Gterm r j ξ)
+      = ∑ j ∈ pows2Ioc U (2 * x / V), ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive,
+          (q : ℝ) * (q.totient : ℝ)⁻¹ * Gterm r j ξ := by
+    intro q
+    rw [← Finset.sum_comm]
+    exact Finset.sum_congr rfl fun ξ _ ↦ Finset.mul_sum _ _ _
+  simp only [hswap]
   rw [Finset.summatory_sum_comm (fun j q ↦ ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive,
     (q : ℝ) * (q.totient : ℝ)⁻¹ * Gterm r j ξ)]
   -- Nonnegativity of the bracket factor.
@@ -2197,8 +2182,8 @@ $$T_r(x,Q) \ll \frac{x}{(\log x)^{C-3}} + \frac{x(\log x)^4}{\sqrt{U}} + \frac{x
 Divide the sum defining $T_r$ into dyadic intervals in $d$ and apply \ref{BV_char_sum_bound}.
 -/) (uses := [BV_char_sum_bound, LambdaFlat_dyadic, T])]
 theorem T_r_bound [ProofData] (C : ℕ) (r : ℕ) (Q : ℝ) (hC : 3 ≤ C) (hQ : 2 ≤ Q) (hQx : Q ≤ x) :
-    T C r Q ≤ C_Tr * (x / (Real.log x)^(C-3) + x * (Real.log x)^4 / √U
-      + x * (Real.log x)^4 / √V + Q * √x * (Real.log x)^3 / r) := by
+    T C r Q ≤ ENNReal.ofReal (C_Tr * (x / (Real.log x)^(C-3) + x * (Real.log x)^4 / √U
+      + x * (Real.log x)^4 / √V + Q * √x * (Real.log x)^3 / r)) := by
   classical
   have hlogx : (16:ℝ) ≤ Real.log x := sixteen_le_log_x
   have hlog0 : (0:ℝ) < Real.log x := by positivity
@@ -2210,38 +2195,34 @@ theorem T_r_bound [ProofData] (C : ℕ) (r : ℕ) (Q : ℝ) (hC : 3 ≤ C) (hQ :
   have hCBV : (0:ℝ) ≤ C_BV_char_sum := C_BV_char_sum_nonneg
   have hQ0 : (0:ℝ) ≤ Q := by positivity
   -- The character-sum summand.
-  set B : ℕ → ℝ := fun d ↦ ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive,
-      (d:ℝ) * (d.totient:ℝ)⁻¹ *
-        maxyReal (fun y ↦ ENNReal.ofReal (S r y ξ)) with hBdef
-  have hBnn : ∀ d, 0 ≤ B d := by
-    intro d
-    refine Finset.sum_nonneg fun ξ _ ↦ ?_
-    exact mul_nonneg (mul_nonneg (Nat.cast_nonneg d) (inv_nonneg.mpr (Nat.cast_nonneg _)))
-      ENNReal.toReal_nonneg
+  set B : ℕ → ℝ≥0∞ := fun d ↦ ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive,
+      (d : ℝ≥0∞) * (d.totient : ℝ≥0∞)⁻¹ *
+        maxy (fun y ↦ ENNReal.ofReal (S r y ξ)) with hBdef
   have hB : ∀ Q' : ℝ, 2 ≤ Q' → summatory B Q'
-      ≤ C_BV_char_sum * (x + Q' * x / √U + Q' * x / √V + Q'^2 * √x) * (Real.log x)^3 :=
+      ≤ ENNReal.ofReal (C_BV_char_sum * (x + Q' * x / √U + Q' * x / √V + Q'^2 * √x)
+          * (Real.log x)^3) :=
     fun Q' hQ' ↦ BV_char_sum_bound r Q' hQ'
-  -- Rewrite `T` as a sum of `B d / d`.
+  -- Rewrite `T` as a sum of `d⁻¹ * B d`.
   have hTeq : T C r Q =
-      ∑ d ∈ Finset.Ioc ⌊(Real.log x)^C⌋₊ ⌊Q / (r:ℝ)⌋₊, B d / (d:ℝ) := by
+      ∑ d ∈ Finset.Ioc ⌊(Real.log x)^C⌋₊ ⌊Q / (r:ℝ)⌋₊, (d : ℝ≥0∞)⁻¹ * B d := by
     rw [T, Real.rpow_natCast]
     refine Finset.sum_congr rfl fun d hd ↦ ?_
     rw [Finset.mem_Ioc] at hd
     have hP1 : (1:ℝ) ≤ (Real.log x)^C := one_le_pow₀ (by linarith)
-    have hdLower : (Real.log x)^C < (d : ℝ) := by
-      rw [← Nat.floor_lt (by positivity : 0 ≤ (Real.log x)^C)]
-      exact hd.1
-    have hd1 : (1:ℝ) ≤ (d:ℝ) := le_trans hP1 hdLower.le
-    have hdne : (d:ℝ) ≠ 0 := by positivity
+    have hd0 : d ≠ 0 := by
+      have : 0 < ⌊(Real.log x)^C⌋₊ := Nat.floor_pos.mpr hP1
+      omega
+    have hdne : (d : ℝ≥0∞) ≠ 0 := Nat.cast_ne_zero.mpr hd0
     simp only [hBdef]
-    rw [Finset.mul_sum, Finset.sum_div]
-    grind
+    rw [Finset.mul_sum, Finset.mul_sum]
+    refine Finset.sum_congr rfl fun ξ _ ↦ ?_
+    rw [← mul_assoc, ← mul_assoc, ENNReal.inv_mul_cancel hdne (ENNReal.natCast_ne_top d),
+      one_mul]
   rw [hTeq]
   set S : Finset ℕ := Finset.Ioc ⌊(Real.log x)^C⌋₊ ⌊Q / (r:ℝ)⌋₊ with hSdef
   rcases S.eq_empty_or_nonempty with hSe | hSne
   · rw [hSe, Finset.sum_empty]
-    apply mul_nonneg C_Tr_nonneg
-    positivity
+    exact zero_le
   · obtain ⟨d0, hd0⟩ := hSne
     have hP1 : (1:ℝ) ≤ (Real.log x)^C := one_le_pow₀ (by linarith)
     rw [hSdef, Finset.mem_Ioc] at hd0
@@ -2409,55 +2390,56 @@ theorem T_r_bound [ProofData] (C : ℕ) (r : ℕ) (Q : ℝ) (hC : 3 ≤ C) (hQ :
               + x * (Real.log x)^4 / √V + Q * √x * (Real.log x)^3 / (r:ℝ)) := by
             rw [C_Tr]; ring
     -- Assemble the dyadic argument.
-    calc ∑ d ∈ S, B d / (d:ℝ)
-        ≤ ∑ d ∈ S, ((2:ℝ)^(Nat.log 2 d))⁻¹ * B d := by
-          apply Finset.sum_le_sum
-          intro d hd
+    calc ∑ d ∈ S, (d : ℝ≥0∞)⁻¹ * B d
+        ≤ ∑ d ∈ S, ((2:ℝ≥0∞)^(Nat.log 2 d))⁻¹ * B d := by
+          refine Finset.sum_le_sum fun d hd ↦ ?_
           have hd1 : 1 ≤ d := by
             grind
-          have hlog_le : (2:ℝ)^(Nat.log 2 d) ≤ (d:ℝ) := by
-            calc (2:ℝ)^(Nat.log 2 d) = ((2^(Nat.log 2 d):ℕ):ℝ) := by grind
-              _ ≤ (d:ℝ) := by exact_mod_cast Nat.pow_log_le_self 2 (by positivity : d ≠ 0)
-          rw [div_eq_mul_inv, mul_comm ((2:ℝ)^(Nat.log 2 d))⁻¹ (B d)]
-          exact mul_le_mul_of_nonneg_left (inv_anti₀ (by positivity) hlog_le) (hBnn d)
+          have hlog_le : (2:ℝ≥0∞)^(Nat.log 2 d) ≤ (d : ℝ≥0∞) := by
+            calc (2:ℝ≥0∞)^(Nat.log 2 d) = ((2^(Nat.log 2 d):ℕ) : ℝ≥0∞) := by norm_cast
+              _ ≤ (d : ℝ≥0∞) := Nat.cast_le.mpr (Nat.pow_log_le_self 2 (by omega))
+          exact mul_le_mul_left (ENNReal.inv_le_inv' hlog_le) _
       _ = ∑ j ∈ Finset.Icc jL jU, ∑ d ∈ S with Nat.log 2 d = j,
-            ((2:ℝ)^(Nat.log 2 d))⁻¹ * B d := (Finset.sum_fiberwise_of_maps_to hmaps _).symm
-      _ = ∑ j ∈ Finset.Icc jL jU, ((2:ℝ)^j)⁻¹ * ∑ d ∈ S with Nat.log 2 d = j, B d := by
+            ((2:ℝ≥0∞)^(Nat.log 2 d))⁻¹ * B d := (Finset.sum_fiberwise_of_maps_to hmaps _).symm
+      _ = ∑ j ∈ Finset.Icc jL jU, ((2:ℝ≥0∞)^j)⁻¹ * ∑ d ∈ S with Nat.log 2 d = j, B d := by
           apply Finset.sum_congr rfl
           intro j _
           rw [Finset.mul_sum]
           apply Finset.sum_congr rfl
           grind
-      _ ≤ ∑ j ∈ Finset.Icc jL jU, ((2:ℝ)^j)⁻¹ * summatory B ((2:ℝ)^(j+1)) := by
-          apply Finset.sum_le_sum
-          intro j _
-          apply mul_le_mul_of_nonneg_left _ (by positivity)
+      _ ≤ ∑ j ∈ Finset.Icc jL jU, ((2:ℝ≥0∞)^j)⁻¹ * summatory B ((2:ℝ)^(j+1)) := by
+          refine Finset.sum_le_sum fun j _ ↦ ?_
+          refine mul_le_mul_right ?_ _
           rw [summatory]
-          apply Finset.sum_le_sum_of_subset_of_nonneg
-          · intro d hd
-            rw [Finset.mem_filter] at hd
-            obtain ⟨hdS, hdj⟩ := hd
-            rw [hSdef, Finset.mem_Ioc] at hdS
-            rw [Finset.mem_Ioc]
-            refine ⟨by
-              grind, ?_⟩
-            have hlt : d < 2^(Nat.log 2 d + 1) := Nat.lt_pow_succ_log_self (by norm_num) d
-            rw [hdj] at hlt
-            apply (Nat.le_floor_iff (by positivity : (0 : ℝ) ≤ (2 : ℝ)^(j+1))).mpr
-            calc (d:ℝ) ≤ ((2^(j+1):ℕ):ℝ) := by exact_mod_cast (le_of_lt hlt)
-              _ = (2:ℝ)^(j+1) := by grind
-          · intro d _ _; exact hBnn d
-      _ ≤ ∑ j ∈ Finset.Icc jL jU, ((2:ℝ)^j)⁻¹ *
-            (C_BV_char_sum * (x + (2:ℝ)^(j+1)*x/√U + (2:ℝ)^(j+1)*x/√V
+          refine Finset.sum_le_sum_of_subset ?_
+          intro d hd
+          rw [Finset.mem_filter] at hd
+          obtain ⟨hdS, hdj⟩ := hd
+          rw [hSdef, Finset.mem_Ioc] at hdS
+          rw [Finset.mem_Ioc]
+          refine ⟨by
+            grind, ?_⟩
+          have hlt : d < 2^(Nat.log 2 d + 1) := Nat.lt_pow_succ_log_self (by norm_num) d
+          rw [hdj] at hlt
+          apply (Nat.le_floor_iff (by positivity : (0 : ℝ) ≤ (2 : ℝ)^(j+1))).mpr
+          calc (d:ℝ) ≤ ((2^(j+1):ℕ):ℝ) := by exact_mod_cast (le_of_lt hlt)
+            _ = (2:ℝ)^(j+1) := by grind
+      _ ≤ ∑ j ∈ Finset.Icc jL jU, ((2:ℝ≥0∞)^j)⁻¹ *
+            ENNReal.ofReal (C_BV_char_sum * (x + (2:ℝ)^(j+1)*x/√U + (2:ℝ)^(j+1)*x/√V
               + ((2:ℝ)^(j+1))^2*√x) * (Real.log x)^3) := by
-          apply Finset.sum_le_sum
-          intro j _
-          apply mul_le_mul_of_nonneg_left _ (by positivity)
-          exact hB ((2:ℝ)^(j+1)) (by
-            calc (2:ℝ) = (2:ℝ)^1 := (pow_one 2).symm
-              _ ≤ (2:ℝ)^(j+1) := pow_le_pow_right₀ (by norm_num) (by omega))
-      _ ≤ C_Tr * (x / (Real.log x)^(C-3) + x * (Real.log x)^4 / √U
-            + x * (Real.log x)^4 / √V + Q * √x * (Real.log x)^3 / (r:ℝ)) := hfinal
+          refine Finset.sum_le_sum fun j _ ↦ ?_
+          refine mul_le_mul_right (hB ((2:ℝ)^(j+1)) ?_) _
+          calc (2:ℝ) = (2:ℝ)^1 := (pow_one 2).symm
+            _ ≤ (2:ℝ)^(j+1) := pow_le_pow_right₀ (by norm_num) (by omega)
+      _ = ENNReal.ofReal (∑ j ∈ Finset.Icc jL jU, ((2:ℝ)^j)⁻¹ *
+            (C_BV_char_sum * (x + (2:ℝ)^(j+1)*x/√U + (2:ℝ)^(j+1)*x/√V
+              + ((2:ℝ)^(j+1))^2*√x) * (Real.log x)^3)) := by
+          rw [ENNReal.ofReal_sum_of_nonneg (fun j _ ↦ mul_nonneg (by positivity)
+            (mul_nonneg (mul_nonneg hCBV (by positivity)) (by positivity)))]
+          exact Finset.sum_congr rfl fun j _ ↦ pow_two_inv_mul_ofReal j _
+      _ ≤ ENNReal.ofReal (C_Tr * (x / (Real.log x)^(C-3) + x * (Real.log x)^4 / √U
+            + x * (Real.log x)^4 / √V + Q * √x * (Real.log x)^3 / (r:ℝ))) :=
+          ENNReal.ofReal_le_ofReal hfinal
 
 /-- For `L ≥ 0` and `W ≥ e^{√L}`: `L^n ≤ (2^{2n} (2n)!) · √W`.  Used with `W = U, V` to absorb
 the divisor factors: `√U, √V ≥ e^{½√log x}` beats every power of `log x`. -/
@@ -2578,8 +2560,8 @@ theorem BV_LambdaFlat_enorm [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q)
   have hvia := BV_LambdaFlat_via_T Q A (A + 4) hQ_le_sqrt
   -- Step 2: main-term bound.
   have hmain : (∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊,
-      (r.totient : ℝ)⁻¹ * T ((A + 4 : ℕ)) r Q)
-      ≤ Cmain * x / (Real.log x) ^ A := by
+      (r.totient : ℝ≥0∞)⁻¹ * T ((A + 4 : ℕ)) r Q)
+      ≤ ENNReal.ofReal (Cmain * x / (Real.log x) ^ A) := by
     by_cases hQ2 : 2 ≤ Q
     ·
       have htot : ∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊, (r.totient : ℝ)⁻¹ ≤ C_tot * Real.log x := by
@@ -2613,22 +2595,17 @@ theorem BV_LambdaFlat_enorm [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q)
           + x * (Real.log x) ^ 4 / √V with hS3def
       have hS3nn : (0 : ℝ) ≤ S3 := by positivity
       have hc4nn : (0 : ℝ) ≤ Q * √x * (Real.log x) ^ 3 := by positivity
-      have hterm : ∀ r ∈ Finset.Ioc 0 ⌊Q⌋₊, (r.totient : ℝ)⁻¹ * T ((A + 4 : ℕ)) r Q
+      have hterm : ∀ r ∈ Finset.Ioc 0 ⌊Q⌋₊,
+          (r.totient : ℝ)⁻¹ * (C_Tr * (x / (Real.log x) ^ (A + 1)
+              + x * (Real.log x) ^ 4 / √U + x * (Real.log x) ^ 4 / √V
+              + Q * √x * (Real.log x) ^ 3 / r))
           ≤ C_Tr * (S3 * (r.totient : ℝ)⁻¹
               + (Q * √x * (Real.log x) ^ 3) * ((r : ℝ) * r.totient)⁻¹) := by
         intro r hr
         rw [Finset.mem_Ioc_zero_floor] at hr
         have hr1 : (1 : ℝ) ≤ r := hr.1
         have hrpos : 0 < r := by exact_mod_cast hr1
-        have hTb := T_r_bound (A + 4) r Q (by omega) hQ2 hQ_le_x
-        have h34 : (A + 4) - 3 = A + 1 := by omega
-        rw [h34] at hTb
-        have hstep : (r.totient : ℝ)⁻¹ * T ((A + 4 : ℕ)) r Q
-            ≤ (r.totient : ℝ)⁻¹ * (C_Tr * (x / (Real.log x) ^ (A + 1)
-                + x * (Real.log x) ^ 4 / √U + x * (Real.log x) ^ 4 / √V
-                + Q * √x * (Real.log x) ^ 3 / r)) :=
-          mul_le_mul_of_nonneg_left hTb (by positivity)
-        refine hstep.trans (le_of_eq ?_)
+        refine le_of_eq ?_
         grind
       have hb1 : S3 * (∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊, (r.totient : ℝ)⁻¹) ≤ S3 * (C_tot * Real.log x) :=
         mul_le_mul_of_nonneg_left htot hS3nn
@@ -2655,15 +2632,37 @@ theorem BV_LambdaFlat_enorm [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q)
         have hd : (Q * √x * (Real.log x) ^ 3) * C_rphi ≤ (x / (Real.log x) ^ A) * C_rphi :=
           mul_le_mul_of_nonneg_right hQ4 hCrphi
         grind
-      refine le_trans (Finset.sum_le_sum hterm) ?_
-      rw [← Finset.mul_sum, Finset.sum_add_distrib, ← Finset.mul_sum, ← Finset.mul_sum, hCmain,
-        show C_Tr * (C_tot * (1 + 2 * K) + C_rphi) * x / (Real.log x) ^ A
-          = C_Tr * ((C_tot * (1 + 2 * K) + C_rphi) * x / (Real.log x) ^ A) from by ring]
-      apply mul_le_mul_of_nonneg_left _ hCTr
-      exact le_trans (add_le_add hb1 hb2) hfinal2
+      have hreal : ∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊, (r.totient : ℝ)⁻¹
+            * (C_Tr * (x / (Real.log x) ^ (A + 1) + x * (Real.log x) ^ 4 / √U
+                + x * (Real.log x) ^ 4 / √V + Q * √x * (Real.log x) ^ 3 / r))
+          ≤ Cmain * x / (Real.log x) ^ A := by
+        refine le_trans (Finset.sum_le_sum hterm) ?_
+        rw [← Finset.mul_sum, Finset.sum_add_distrib, ← Finset.mul_sum, ← Finset.mul_sum, hCmain,
+          show C_Tr * (C_tot * (1 + 2 * K) + C_rphi) * x / (Real.log x) ^ A
+            = C_Tr * ((C_tot * (1 + 2 * K) + C_rphi) * x / (Real.log x) ^ A) from by ring]
+        apply mul_le_mul_of_nonneg_left _ hCTr
+        exact le_trans (add_le_add hb1 hb2) hfinal2
+      calc ∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊, (r.totient : ℝ≥0∞)⁻¹ * T ((A + 4 : ℕ)) r Q
+          ≤ ∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊, ENNReal.ofReal ((r.totient : ℝ)⁻¹
+              * (C_Tr * (x / (Real.log x) ^ (A + 1) + x * (Real.log x) ^ 4 / √U
+                  + x * (Real.log x) ^ 4 / √V + Q * √x * (Real.log x) ^ 3 / r))) := by
+            refine Finset.sum_le_sum fun r hr ↦ ?_
+            rw [Finset.mem_Ioc] at hr
+            have hφ0 : r.totient ≠ 0 := (Nat.totient_pos.mpr hr.1).ne'
+            have hTb := T_r_bound (A + 4) r Q (by omega) hQ2 hQ_le_x
+            have h34 : (A + 4) - 3 = A + 1 := by omega
+            rw [h34] at hTb
+            rw [← natCast_inv_mul_ofReal hφ0]
+            exact mul_le_mul_right hTb _
+        _ = ENNReal.ofReal (∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊, (r.totient : ℝ)⁻¹
+              * (C_Tr * (x / (Real.log x) ^ (A + 1) + x * (Real.log x) ^ 4 / √U
+                  + x * (Real.log x) ^ 4 / √V + Q * √x * (Real.log x) ^ 3 / r))) :=
+            (ENNReal.ofReal_sum_of_nonneg (fun r _ ↦ mul_nonneg (by positivity)
+              (mul_nonneg hCTr (by positivity)))).symm
+        _ ≤ ENNReal.ofReal (Cmain * x / (Real.log x) ^ A) := ENNReal.ofReal_le_ofReal hreal
     · push Not at hQ2
       have hzero : (∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊,
-          (r.totient : ℝ)⁻¹ * T ((A + 4 : ℕ)) r Q) = 0 := by
+          (r.totient : ℝ≥0∞)⁻¹ * T ((A + 4 : ℕ)) r Q) = 0 := by
         refine Finset.sum_eq_zero (fun r hr ↦ ?_)
         rw [Finset.mem_Ioc_zero_floor] at hr
         have hr1 : (1 : ℝ) ≤ r := hr.1
@@ -2682,14 +2681,22 @@ theorem BV_LambdaFlat_enorm [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q)
             Finset.sum_empty]
         rw [hTz, mul_zero]
       rw [hzero]
-      positivity
+      exact zero_le
   -- Step 3: combine main term and error term.
   have hcombine : Cmain * x / (Real.log x) ^ A + C_BV_LFT A (A + 4) * x / (Real.log x) ^ A
       = C_BV_LF A * x / (Real.log x) ^ A := by
     rw [C_BV_LF, hCmain, hKdef]; ring
-  have hreal : (∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊,
-      (r.totient : ℝ)⁻¹ * T ((A + 4 : ℕ)) r Q)
-        + C_BV_LFT A (A + 4) * x / (Real.log x) ^ A ≤
-      C_BV_LF A * x / (Real.log x) ^ A := by
-    grind
-  exact hvia.trans (ENNReal.ofReal_le_ofReal hreal)
+  have hLFT_nn : 0 ≤ C_BV_LFT A (A + 4) * x / (Real.log x) ^ A := by
+    rw [C_BV_LFT]
+    have hDLF := C_DLF_nonneg A (A + 4)
+    positivity
+  calc ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, maxya q (fun y a ↦ ‖Δ_[Λ♭](y; q, a)‖ₑ)
+      ≤ (∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊, (r.totient : ℝ≥0∞)⁻¹ * T ((A + 4 : ℕ)) r Q)
+          + ENNReal.ofReal (C_BV_LFT A (A + 4) * x / (Real.log x) ^ A) := hvia
+    _ ≤ ENNReal.ofReal (Cmain * x / (Real.log x) ^ A)
+          + ENNReal.ofReal (C_BV_LFT A (A + 4) * x / (Real.log x) ^ A) :=
+        add_le_add hmain le_rfl
+    _ = ENNReal.ofReal (Cmain * x / (Real.log x) ^ A
+          + C_BV_LFT A (A + 4) * x / (Real.log x) ^ A) :=
+        (ENNReal.ofReal_add (by positivity) hLFT_nn).symm
+    _ = ENNReal.ofReal (C_BV_LF A * x / (Real.log x) ^ A) := by rw [hcombine]
