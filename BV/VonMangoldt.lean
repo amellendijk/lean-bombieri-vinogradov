@@ -55,7 +55,7 @@ lemma sum_vonMangoldt_prime_pow_not_coprime_le_log {z : ℝ} {k : ℕ} (hk : 0 <
 /-- The non-coprime von Mangoldt sum is nonnegative. -/
 theorem sum_vonMangoldt_not_coprime_nonneg (z : ℝ) (q : ℕ) :
     0 ≤ ∑ n ∈ Finset.Ioc 0 ⌊z⌋₊, if ¬q.Coprime n then Λ n else 0 := by
-  exact Finset.sum_nonneg fun _ _ ↦ by split_ifs <;> simp
+  positivity
 
 /-- Explicit endpoint estimate for the von Mangoldt mass on integers not
 coprime to `q`, stated entirely using standard Mathlib finsets. -/
@@ -71,7 +71,7 @@ theorem sum_vonMangoldt_not_coprime_le {z : ℝ} (hz : 2 ≤ z) {q : ℕ} (hq : 
     grw [Nat.floor_le (div_nonneg (Real.log_nonneg (by linarith))
       (Real.log_nonneg (by norm_num)))]
     grind
-  · linarith
+  · positivity
   · simp +contextual [vonMangoldt_eq_zero_iff]
 
 lemma summatory_sub_ite {P : ℕ → Prop} [DecidablePred P] (f : ℕ → ℝ) {x : ℝ} :

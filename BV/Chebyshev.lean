@@ -32,7 +32,7 @@ theorem summatory_vonMangoldt {x : ℝ} :
   simp [Chebyshev.psi_eq_sum_Icc]
   rw [summatory_apply, ← Finset.add_sum_Ioc_eq_sum_Icc]
   · simp
-  · simp
+  · positivity
 
 @[simp]
 theorem psiMod_one_one {x : ℝ} : psiMod x (1 : ZMod 1) = Chebyshev.psi x := by
@@ -43,9 +43,7 @@ theorem psiMod_nonneg {q : ℕ} (z : ℝ) (a : ZMod q) : 0 ≤ psiMod z a := by
   rw [psiMod_eq_summatory]
   exact summatory_nonneg _ _ fun n _ ↦ by
     rw [Set.indicator_apply]
-    split_ifs
-    · exact ArithmeticFunction.vonMangoldt_nonneg
-    · exact le_rfl
+    positivity
 
 /-- Restricting the von Mangoldt sum to one residue class can only decrease it. -/
 theorem psiMod_le_psi {q : ℕ} (z : ℝ) (a : ZMod q) :

@@ -27,8 +27,8 @@ theorem Real.log_locallyIntegrableOn :
 theorem pnt_ratio_bound (x z : ℝ) (B : ℕ) (hz : 1 < z) (hzx : z ≤ x)
     (hsqrt : √x ≤ z) :
     z / (Real.log z) ^ B ≤ 2 ^ B * x / (Real.log x) ^ B := by
-  have hx0 : 0 ≤ x := le_trans (by linarith : 0 ≤ z) hzx
-  have hxpos : 0 < x := lt_of_lt_of_le (by linarith : 0 < z) hzx
+  have hx0 : 0 ≤ x := le_trans (by positivity : 0 ≤ z) hzx
+  have hxpos : 0 < x := lt_of_lt_of_le (by positivity : 0 < z) hzx
   have hsx : 0 < √x := Real.sqrt_pos.2 hxpos
   have hlogz : 0 < Real.log z := Real.log_pos hz
   have hlogx : 0 < Real.log x := Real.log_pos (lt_of_lt_of_le hz hzx)

@@ -116,7 +116,7 @@ theorem ProofData.U_le_x : U ≤ x := by
       refine Real.sqrt_le_iff.mpr ?_
       constructor
       · exact x_nonneg
-      · exact le_self_pow₀ (by linarith only [le_x]) (by norm_num)
+      · exact le_self_pow₀ (by linarith only [le_x]) (by positivity)
 
 open Qq Lean Meta Mathlib.Meta.Positivity in
 @[positivity @U _]

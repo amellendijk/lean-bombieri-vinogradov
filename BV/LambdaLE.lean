@@ -70,7 +70,7 @@ theorem Delta_LambdaLEU_bound {y : ℝ} {q : ℕ} (hq : 0 < q) {a : ZMod q} :
   rw [Delta]
   grw [abs_sub, abs_mul]
   have : (q.totient : ℝ)⁻¹ ≤ 1 := by
-    have : 0 < q.totient := by simp only [Nat.totient_pos, hq];
+    have : 0 < q.totient := by positivity
     field_simp
     norm_cast
   grw [this, abs_one]
@@ -98,7 +98,7 @@ theorem BV_LambdaLE_enorm {A : ℕ} (Q : ℝ) (hQ_nonneg : 0 ≤ Q)
       maxya q (fun y a ↦ ‖Δ_[Λ≤U](y; q, a)‖ₑ) ≤
         ENNReal.ofReal (2 * x / (Real.log x) ^ (A + 2)) := by
   let B : ℝ := 2 * U * Real.log x
-  have hB : 0 ≤ B := by dsimp [B]; positivity
+  have hB : 0 ≤ B := by positivity
   have hterm : ∀ q ∈ Finset.Ioc 0 ⌊Q⌋₊,
       maxya q (fun y a ↦ ‖Δ_[Λ≤U](y; q, a)‖ₑ) ≤ ENNReal.ofReal B := by
     intro q hq

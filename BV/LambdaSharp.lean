@@ -70,7 +70,7 @@ theorem log_on_coprime_apply (r b : ℕ) :
           exact ⟨he0, Nat.le_of_dvd (Nat.pos_of_ne_zero hb0) hb⟩
         rw [ArithmeticFunction.natCoe_apply, ArithmeticFunction.zeta_apply_ne hbe0,
             Nat.cast_one, mul_one, ArithmeticFunction.log_apply, ← mul_add,
-            ← Real.log_mul (by exact_mod_cast he0) (by exact_mod_cast hbe0),
+            ← Real.log_mul (by positivity) (by positivity),
             ← Nat.cast_mul, Nat.mul_div_cancel' hb]
     · simp [hb]
   rw [Finset.sum_congr rfl hterm, ← Finset.sum_mul]
@@ -192,7 +192,7 @@ theorem summatory_abs_moebiusLEV_le [ProofData] {x : ℝ} :
     · rw [moebiusLEV, on_apply_of_mem _ _ _ hn, ArithmeticFunction.intCoe_apply]
       exact_mod_cast ArithmeticFunction.abs_moebius_le_one
     · rw [moebiusLEV, on_apply_of_not_mem _ _ _ hn, abs_zero]
-      exact zero_le_one
+      positivity
   · -- `μ_{≤V}` vanishes beyond `V`.
     intro n hn
     have : (μ≤V : ArithmeticFunction ℝ) n = 0 := by
@@ -219,11 +219,11 @@ theorem summatory_abs_LambdaLEU_le [ProofData] {x : ℝ} (hx : 2 ≤ x) :
         _ ≤ Real.log x := by
           rcases Nat.eq_zero_or_pos n with hn0 | hn0
           · simpa [hn0] using hx0
-          · exact Real.log_le_log (by exact_mod_cast hn0) (le_trans hn hUx)
+          · exact Real.log_le_log (by positivity) (le_trans hn hUx)
     · intro n hn
       rw [LambdaLEU_apply_of_gt hn, abs_zero]
   · -- `x ≤ U`: the range has `≤ x` points, each of size `≤ log x`.
-    refine le_trans (summatory_le_UB x (by linarith) (Real.log x) ?_) (by gcongr)
+    refine le_trans (summatory_le_UB x (by positivity) (Real.log x) ?_) (by gcongr)
     intro n hn
     rw [Real.norm_eq_abs, abs_abs, abs_of_nonneg LambdaLEU_nonneg]
     by_cases hnU : (n : ℝ) ≤ U
@@ -232,7 +232,7 @@ theorem summatory_abs_LambdaLEU_le [ProofData] {x : ℝ} (hx : 2 ≤ x) :
         _ ≤ Real.log x := by
           rcases Nat.eq_zero_or_pos n with hn0 | hn0
           · simpa [hn0] using hx0
-          · exact Real.log_le_log (by exact_mod_cast hn0) hn
+          · exact Real.log_le_log (by positivity) hn
     · grind
 
 /-! ### Group F: the two term bounds -/
@@ -276,7 +276,7 @@ theorem Delta_term1_bound [ProofData] {q r : ℕ} [NeZero q] {a : ZMod q}
         have hle_er : e ≤ r := Nat.le_of_dvd (Nat.pos_of_ne_zero hr0) hedvd
         have hex : (e : ℝ) ≤ x := le_trans (by exact_mod_cast hle_er) hr
         have hloge0 : 0 ≤ Real.log e := Real.log_nonneg (by exact_mod_cast he')
-        have hloge : Real.log e ≤ Real.log x := Real.log_le_log (by exact_mod_cast he') hex
+        have hloge : Real.log e ≤ Real.log x := Real.log_le_log (by positivity) hex
         have hlogx0 : 0 ≤ Real.log x := le_trans hloge0 hloge
         have hμ : |(μ e : ℝ)| ≤ 1 := by exact_mod_cast ArithmeticFunction.abs_moebius_le_one
         -- `ℓ¹` bound for the restricted coefficient function
@@ -303,7 +303,7 @@ theorem Delta_term1_bound [ProofData] {q r : ℕ} [NeZero q] {a : ZMod q}
             ((μ≤V).on {n | r.Coprime n}) h2y a ha
           rw [pow_one] at hflog
           have hlogy0 : 0 ≤ Real.log y := Real.log_nonneg (by linarith)
-          have hlogxy : Real.log y ≤ Real.log x := Real.log_le_log (by linarith) hy
+          have hlogxy : Real.log y ≤ Real.log x := Real.log_le_log (by positivity) hy
           calc |Δ_[⇑(dilate e ((μ≤V).on {n | r.Coprime n}) * log.ppow 1)](y; q, a)|
               ≤ 2 * Real.log y * summatory (fun k => |((μ≤V).on {n | r.Coprime n}) k|) y := hflog
             _ ≤ 2 * Real.log x * V := by
@@ -337,7 +337,7 @@ theorem Delta_term1_bound [ProofData] {q r : ℕ} [NeZero q] {a : ZMod q}
                           * (log : ArithmeticFunction ℝ))](y; q, a)|
                       = |(μ e : ℝ)| * |Δ_[⇑(dilate e ((μ≤V).on {n | r.Coprime n})
                           * (log : ArithmeticFunction ℝ))](y; q, a)| := abs_mul _ _
-                    _ ≤ 1 * (2 * Real.log x * V) := mul_le_mul hμ hΔlog (abs_nonneg _) (by norm_num)
+                    _ ≤ 1 * (2 * Real.log x * V) := mul_le_mul hμ hΔlog (abs_nonneg _) (by positivity)
           _ = 4 * V * Real.log x := by ring
     _ = (r.divisors.card : ℝ) * (4 * V * Real.log x) := by
         rw [Finset.sum_const, nsmul_eq_mul]
@@ -398,7 +398,7 @@ theorem Delta_term2_bound [ProofData] {q r : ℕ} [NeZero q] {a : ZMod q}
             summatory_le_summatory (fun n _ _ => abs_on_le _ _ n)
           have e2 : summatory (fun k => |(Λ≤U * μ≤V) k|) y
               ≤ summatory (fun k => |Λ≤U k|) y * summatory (fun k => |μ≤V k|) y :=
-            summatory_abs_mul_le _ _ (by linarith)
+            summatory_abs_mul_le _ _ (by positivity)
           have e3 : summatory (fun k => |Λ≤U k|) y ≤ U * Real.log y :=
             summatory_abs_LambdaLEU_le h2y
           have e4 : summatory (fun k => |μ≤V k|) y ≤ V := summatory_abs_moebiusLEV_le
@@ -413,14 +413,14 @@ theorem Delta_term2_bound [ProofData] {q r : ℕ} [NeZero q] {a : ZMod q}
           have hflog := Delta_dilate_flog_bound (v := 0) he'
             ((Λ≤U * μ≤V).on {n | r.Coprime n}) h2y a ha
           rw [pow_zero, mul_one] at hflog
-          have hlogxy : Real.log y ≤ Real.log x := Real.log_le_log (by linarith) hy
+          have hlogxy : Real.log y ≤ Real.log x := Real.log_le_log (by positivity) hy
           calc |Δ_[⇑(dilate e ((Λ≤U * μ≤V).on {n | r.Coprime n}) * log.ppow 0)](y; q, a)|
               ≤ 2 * summatory (fun k => |((Λ≤U * μ≤V).on {n | r.Coprime n}) k|) y := hflog
             _ ≤ 2 * (U * Real.log y * V) := by linarith [hHbound]
             _ ≤ 2 * (U * Real.log x * V) := by gcongr
             _ = 2 * U * V * Real.log x := by ring
         rw [Delta_smul, smul_eq_mul, abs_mul]
-        have := mul_le_mul hμ hΔ (abs_nonneg _) (by norm_num : (0:ℝ) ≤ 1)
+        have := mul_le_mul hμ hΔ (abs_nonneg _) (by positivity : (0:ℝ) ≤ 1)
         rwa [one_mul] at this
     _ = (r.divisors.card : ℝ) * (2 * U * V * Real.log x) := by
         rw [Finset.sum_const, nsmul_eq_mul]
@@ -466,7 +466,7 @@ theorem Delta_LambdaSharp_bound [ProofData] {q r : ℕ} [NeZero q] {a : ZMod q} 
   refine habs.trans ?_
   refine (add_le_add hT1 hT2).trans ?_
   simp only [C_DLS]
-  nlinarith [mul_nonneg (mul_nonneg (mul_nonneg hτ hV) hlogx) (by linarith : (0:ℝ) ≤ U - 1)]
+  nlinarith [mul_nonneg (mul_nonneg (mul_nonneg hτ hV) hlogx) (by positivity : (0:ℝ) ≤ U - 1)]
 
 @[blueprint (statement := /--
 The divisor function has average order $\log$:
@@ -476,7 +476,7 @@ uniformly for $Q \ge 2$ (where $\tau(q) = $ `q.divisors.card`).
 theorem sum_divisors_card_le {Q : ℝ} (hQ : 2 ≤ Q) :
     ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, (q.divisors.card : ℝ) ≤ C_tau * Q * Real.log Q := by
   set N := ⌊Q⌋₊ with hN
-  have hQ0 : (0:ℝ) ≤ Q := by linarith
+  have hQ0 : (0:ℝ) ≤ Q := by positivity
   -- `∑_{q ≤ N} τ(q) = ∑_{q ≤ N} ⌊N/q⌋` (over `ℕ`).
   have hkey : (∑ q ∈ Finset.Ioc 0 N, q.divisors.card : ℕ) = ∑ q ∈ Finset.Ioc 0 N, (N / q) := by
     simp_rw [← sigma_zero_apply]
@@ -504,15 +504,15 @@ theorem sum_divisors_card_le {Q : ℝ} (hQ : 2 ≤ Q) :
   have hNQ : (N:ℝ) ≤ Q := Nat.floor_le hQ0
   have hNnn : (0:ℝ) ≤ (N:ℝ) := by positivity
   have hloghalf : (1:ℝ)/2 ≤ Real.log Q := by
-    have h2 : Real.log 2 ≤ Real.log Q := Real.log_le_log (by norm_num) (by linarith)
+    have h2 : Real.log 2 ≤ Real.log Q := Real.log_le_log (by positivity) (by linarith)
     have := Real.log_two_gt_d9
     linarith
   calc (N:ℝ) * (harmonic N:ℝ)
       ≤ (N:ℝ) * (1 + Real.log Q) := mul_le_mul_of_nonneg_left hHN hNnn
-    _ ≤ Q * (1 + Real.log Q) := mul_le_mul_of_nonneg_right hNQ (by linarith)
+    _ ≤ Q * (1 + Real.log Q) := mul_le_mul_of_nonneg_right hNQ (by positivity)
     _ ≤ C_tau * Q * Real.log Q := by
         rw [C_tau]
-        nlinarith [mul_nonneg hQ0 (by linarith : (0:ℝ) ≤ Real.log Q - 1/2)]
+        nlinarith [mul_nonneg hQ0 (by positivity : (0:ℝ) ≤ Real.log Q - 1/2)]
 
 @[blueprint (statement := /--
 For each fixed $A \ge 0$, $x \ge 2$ and $1 \le Q \le \sqrt{x}/(\log x)^{A+3}$,
@@ -531,7 +531,7 @@ theorem BV_LambdaSharp_enorm [ProofData] {A : ℕ} (Q : ℝ) (h1Q : 1 ≤ Q)
   have hsqrt_nonneg : (0:ℝ) ≤ √x := Real.sqrt_nonneg x
   have hsqrt_le_x : √x ≤ x := by
     rw [Real.sqrt_le_iff]
-    exact ⟨ProofData.x_nonneg, le_self_pow₀ (by linarith [ProofData.le_x]) (by norm_num)⟩
+    exact ⟨ProofData.x_nonneg, le_self_pow₀ (by linarith [ProofData.le_x]) (by positivity)⟩
   -- `(log x)^(A+3) ≥ 1`, hence `Q ≤ √x ≤ x`.
   have hpowge : (1:ℝ) ≤ (Real.log x)^(A+3) := one_le_pow₀ hL1
   have hQ_le_sqrt : Q ≤ √x := by
@@ -556,7 +556,7 @@ theorem BV_LambdaSharp_enorm [ProofData] {A : ℕ} (Q : ℝ) (h1Q : 1 ≤ Q)
     rw [Finset.mem_Ioc] at hq
     have hqQ : (q:ℝ) ≤ Q := by
       calc (q : ℝ) ≤ (⌊Q⌋₊ : ℕ) := by exact_mod_cast hq.2
-        _ ≤ Q := Nat.floor_le (by linarith)
+        _ ≤ Q := Nat.floor_le (by positivity)
     have hqx : (q:ℝ) ≤ x := hqQ.trans hQ_le_x
     have hqpos : 0 < q := hq.1
     haveI : NeZero q := ⟨hqpos.ne'⟩
@@ -575,11 +575,11 @@ theorem BV_LambdaSharp_enorm [ProofData] {A : ℕ} (Q : ℝ) (h1Q : 1 ≤ Q)
   have hS : ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, (q.divisors.card : ℝ) ≤ C_tau * Q * Real.log x := by
     by_cases hQ2 : 2 ≤ Q
     · refine (sum_divisors_card_le hQ2).trans ?_
-      have hlogQ : Real.log Q ≤ Real.log x := Real.log_le_log (by linarith) hQ_le_x
+      have hlogQ : Real.log Q ≤ Real.log x := Real.log_le_log (by positivity) hQ_le_x
       have hCQ : (0:ℝ) ≤ C_tau * Q := by rw [C_tau]; positivity
       nlinarith [hCQ, hlogQ]
     · have hQ2' : Q < 2 := lt_of_not_ge hQ2
-      have h0Q : (0:ℝ) ≤ Q := by linarith
+      have h0Q : (0:ℝ) ≤ Q := by positivity
       have hfloor : ⌊Q⌋₊ = 1 := by
         rw [Nat.floor_eq_iff h0Q]
         grind
@@ -593,12 +593,12 @@ theorem BV_LambdaSharp_enorm [ProofData] {A : ℕ} (Q : ℝ) (h1Q : 1 ≤ Q)
         C_BVLS * (x / (Real.log x) ^ A) := by
     rw [hfactor]
     have hcoef : (0:ℝ) ≤ C_DLS * U * V * Real.log x := by
-      have : (0:ℝ) ≤ C_DLS := by rw [C_DLS]; norm_num
+      have : (0:ℝ) ≤ C_DLS := by rw [C_DLS]; positivity
       positivity
     refine (mul_le_mul_of_nonneg_left hS hcoef).trans ?_
     -- `C_DLS · U · V · L · (C_tau · Q · L) ≤ C_BVLS · x / L^A`.
     have hQ3 : Q * (Real.log x)^(A+3) ≤ √x := (le_div_iff₀ (by positivity)).mp hQ
-    have hQpow : (0:ℝ) ≤ Q := by linarith
+    have hQpow : (0:ℝ) ≤ Q := by positivity
     have hQ2pow : Q * (Real.log x)^(A+2) ≤ √x :=
       le_trans (mul_le_mul_of_nonneg_left (pow_le_pow_right₀ hL1 (by omega)) hQpow) hQ3
     have hkey : U * V * (Q * (Real.log x)^(A+2)) ≤ x := by
@@ -611,7 +611,7 @@ theorem BV_LambdaSharp_enorm [ProofData] {A : ℕ} (Q : ℝ) (h1Q : 1 ≤ Q)
         = C_DLS * C_tau * (U * V * (Q * (Real.log x)^(A+2))) := by grind
       _ ≤ C_DLS * C_tau * x := by
           apply mul_le_mul_of_nonneg_left hkey
-          rw [C_DLS, C_tau]; norm_num
+          rw [C_DLS, C_tau]; positivity
   calc
     ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, maxya q (fun y a ↦ ‖Δ_[Λ♯](y; q, a)‖ₑ)
         ≤ ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊,
@@ -622,7 +622,7 @@ theorem BV_LambdaSharp_enorm [ProofData] {A : ℕ} (Q : ℝ) (h1Q : 1 ≤ Q)
         rw [ENNReal.ofReal_sum_of_nonneg]
         intro q _
         exact mul_nonneg
-          (mul_nonneg (mul_nonneg (mul_nonneg (by rw [C_DLS]; norm_num)
+          (mul_nonneg (mul_nonneg (mul_nonneg (by rw [C_DLS]; positivity)
             (by positivity)) hUnonneg) hVnonneg) hLpos.le
     _ ≤ ENNReal.ofReal (C_BVLS * (x / (Real.log x) ^ A)) :=
       ENNReal.ofReal_le_ofReal hreal

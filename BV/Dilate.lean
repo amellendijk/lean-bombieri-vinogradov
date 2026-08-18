@@ -53,7 +53,7 @@ theorem mul_dilate {e : ℕ} (he : 0 < e) (f g : ArithmeticFunction ℝ) :
       obtain ⟨hac, hne⟩ := hx
       refine Finset.mem_filter.2 ⟨Nat.mem_divisorsAntidiagonal.2 ⟨?_, ?_⟩, ⟨c, rfl⟩⟩
       · rw [← mul_assoc, mul_comm a, mul_assoc, hac]
-      · exact fun h => hne (by simpa [he.ne'] using h)
+      · positivity
     · rintro ⟨a, b⟩ hx
       simp only [Finset.mem_filter] at hx
       obtain ⟨c, hc⟩ := hx.2
@@ -82,7 +82,7 @@ private theorem mem_Ioc_floor (x : ℝ) (n : ℕ) :
 theorem image_div_filter_dvd {e : ℕ} (he : 0 < e) (x : ℝ) :
     ((Finset.Ioc 0 ⌊x⌋₊).filter (fun m => e ∣ m)).image (fun k => k / e) =
       Finset.Ioc 0 ⌊x / e⌋₊ := by
-  have he' : (0 : ℝ) < e := by exact_mod_cast he
+  have he' : (0 : ℝ) < e := by positivity
   ext m
   simp only [Finset.mem_image, Finset.mem_filter, mem_Ioc_floor]
   constructor
@@ -95,7 +95,7 @@ theorem image_div_filter_dvd {e : ℕ} (he : 0 < e) (x : ℝ) :
     grind
   · rintro ⟨h1, h2⟩
     refine ⟨e * m, ⟨⟨?_, ?_⟩, ⟨m, rfl⟩⟩, Nat.mul_div_cancel_left _ he⟩
-    · exact Nat.mul_pos he h1
+    · positivity
     · push_cast
       rw [mul_comm, ← le_div_iff₀ he']
       exact h2
@@ -104,7 +104,7 @@ theorem image_div_filter_dvd {e : ℕ} (he : 0 < e) (x : ℝ) :
 support with `{1, …, x/e} ⊆ {1, …, x}`). -/
 theorem summatory_abs_dilate_le {e : ℕ} (he : 0 < e) (f : ArithmeticFunction ℝ) {x : ℝ} :
     summatory (fun k => |dilate e f k|) x ≤ summatory (fun k => |f k|) x := by
-  have he' : (0 : ℝ) < e := by exact_mod_cast he
+  have he' : (0 : ℝ) < e := by positivity
   simp only [summatory]
   calc ∑ k ∈ Finset.Ioc 0 ⌊x⌋₊, |dilate e f k|
       = ∑ k ∈ (Finset.Ioc 0 ⌊x⌋₊).filter (fun m => e ∣ m), |f (k / e)| := by

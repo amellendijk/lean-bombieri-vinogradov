@@ -7,7 +7,7 @@ namespace BV
 
 private lemma sqrt_x_le_x [ProofData] : √x ≤ x := by
   rw [Real.sqrt_le_iff]
-  exact ⟨x_nonneg, le_self_pow₀ (by linarith [le_x]) (by norm_num)⟩
+  exact ⟨x_nonneg, le_self_pow₀ (by linarith [le_x]) (by positivity)⟩
 
 example [ProofData] : maxy (fun _ ↦ 0) = 0 := by
   simp [maxy]
@@ -37,7 +37,7 @@ example [ProofData] :
   have hd : 0 < d := by
     dsimp [d]
     exact sub_pos.mpr (Real.sqrt_lt_self_iff.mpr (by linarith [le_x]))
-  have ht : 0 < t := by dsimp [t]; positivity
+  have ht : 0 < t := by positivity
   have ht1 : 1 ≤ t := by
     dsimp [t]
     have hr : 0 ≤ (r : ℝ) := r.2

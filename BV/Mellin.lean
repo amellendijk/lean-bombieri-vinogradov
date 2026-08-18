@@ -68,11 +68,11 @@ lemma MellinOfPsi_better {σ₁ σ₂ : ℝ} (hσ₂ : 0 ≤ σ₂) {ν : ℝ �
             right
             trans ((1 / 2) ^ s.re)
             · apply Real.rpow_le_rpow_of_nonpos
-              · norm_num
+              · positivity
               · exact hx.1
               · exact hs_pn.le
             · apply Real.rpow_le_rpow_of_exponent_ge_of_imp
-              · norm_num
+              · positivity
               · norm_num
               · exact hσ₁s
               · simp
@@ -80,12 +80,11 @@ lemma MellinOfPsi_better {σ₁ σ₂ : ℝ} (hσ₂ : 0 ≤ σ₂) {ν : ℝ �
         convert mul_le_mul f_bound pow_bound (norm_nonneg _) ?_ using 1
         · rfl
         · simp [f]
-        · simp [f]
+        · positivity
   have Cnonneg : 0 ≤ C := by
-    simp [C, f]
     positivity
   by_cases CeqZero : C = 0
-  · refine ⟨1, by linarith, ?_⟩
+  · refine ⟨1, by positivity, ?_⟩
     intro s hs₁ hσ₁s hs₂
     have := mainBnd s hs₁ hσ₁s hs₂
     rw [CeqZero, zero_mul] at this
@@ -121,7 +120,7 @@ lemma mellin_bump_differentiable
     positivity
   · simp
   · apply Filter.Eventually.isBigO
-    filter_upwards [eventually_lt_nhds (show (0 : ℝ) < 1/2 by norm_num)
+    filter_upwards [eventually_lt_nhds (show (0 : ℝ) < 1/2 by positivity)
       |>.filter_mono (nhdsWithin_le_nhds), eventually_mem_nhdsWithin] with x hx hx'
     have := Set.notMem_subset suppν (a := x)
     simp only [one_div, mem_Icc, not_and, not_le, Function.mem_support, ne_eq,
@@ -263,7 +262,7 @@ lemma Smooth1_verticalIntegrable
   · -- Pointwise `O(1/(σ² + t²))` bound from `MellinOfSmooth1b`.
     calc ‖𝓜 (fun x ↦ (Smooth1 ν ε x : ℂ)) (σ + t * I)‖
         ≤ c * (ε * ‖(σ : ℂ) + t * I‖ ^ 2)⁻¹ :=
-          hc (σ / 2) (by linarith) (σ + t * I) (by grind) (by simp [σ_le])
+          hc (σ / 2) (by positivity) (σ + t * I) (by grind) (by simp [σ_le])
             ε εpos ε_lt_one
       _ = c / ε * (σ ^ 2 + t ^ 2)⁻¹ := by
           rw [Complex.sq_norm, Complex.normSq_add_mul_I, mul_inv]; ring
@@ -292,7 +291,7 @@ lemma Smooth1_mellinInv_mellin_eq
   apply mellinInv_mellin_eq σ (fun x ↦ (Smooth1 ν ε x : ℂ)) hx
   · -- `MellinConvergent` at `σ`.
     exact Smooth1MellinConvergent diffν suppν ⟨εpos, ε_lt_one⟩ νpos mass_one
-      (by simpa using σ_pos)
+      (by positivity)
   · -- `VerticalIntegrable (𝓜 …) σ`.
     exact Smooth1_verticalIntegrable diffν νpos suppν mass_one εpos ε_lt_one σ_pos σ_le
   · -- `ContinuousAt` of `fun x ↦ ↑(Smooth1 ν ε x)` at `x`.

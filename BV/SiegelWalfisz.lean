@@ -12,7 +12,7 @@ noncomputable def C_D1 (A : ℕ) : ℝ := C_SW A 0
 /-- The prime number theorem consequence of Siegel–Walfisz at an explicit endpoint. -/
 lemma PNT (A : ℕ) {z : ℝ} (hz : 2 ≤ z) :
     |summatory (fun n ↦ Λ n) z - z| ≤ C_D1 A * (z / Real.log z ^ A) := by
-  have h := siegel_walfisz A 0 hz (q := 1) (by norm_num) (by simp)
+  have h := siegel_walfisz A 0 hz (q := 1) (by positivity) (by simp)
     (a := (1 : ZMod 1)) (by simp)
   simp only [ψ_one_one] at h
   rw [← summatory_vonMangoldt] at h
@@ -30,7 +30,7 @@ lemma sum_vonMangoldt_not_coprime_ll_logq {z : ℝ} (hz : 2 ≤ z)
   rw [abs_of_nonneg]
   · simpa [summatory_apply, C_SVNC, div_eq_mul_inv, mul_assoc, mul_left_comm,
       mul_comm] using sum_vonMangoldt_not_coprime_le hz hq
-  · simpa [summatory_apply] using sum_vonMangoldt_not_coprime_nonneg z q
+  · positivity
 
 /-- Public generic coprime-error consequence of Siegel–Walfisz. -/
 lemma coprime_vonMangoldt_error (B : ℕ) {z : ℝ} (hz : 2 ≤ z)

@@ -164,7 +164,7 @@ theorem maxya_Delta_enorm_ne_top [ProofData] (f : ℕ → ℝ) (q : ℕ) :
   intro y _ hy2 a _
   exact (abs_Delta_le_two_summatory_abs f y q a).trans
     (mul_le_mul_of_nonneg_left (monotone_summatory _ (fun _ ↦ abs_nonneg _) hy2)
-      (by norm_num))
+      (by positivity))
 
 /-- For a unit `a`, restricting `f` to integers coprime to `q` does not change `Δ_[f](y; q, a)`,
 since `n ≡ a (mod q)` with `a` a unit forces `q.Coprime n`. -/
@@ -474,7 +474,7 @@ theorem sum_range_of_periodic_full_eq_add {R : Type*} [AddCommMonoid R] {a q : �
     ∑ i ∈ Finset.range q, f i = ∑ i ∈ Finset.range q, f (i + a) := by
   by_cases hq : q = 0
   · simp [hq]
-  have hq : 0 < q := by grind
+  have hq : 0 < q := by positivity
   conv_rhs => rw [← Finset.sum_image (by simp)]
   rw [eq_comm]
   apply Finset.sum_bij (i := fun x _ ↦ (x % q))
@@ -497,7 +497,7 @@ theorem sum_range_of_periodic_full_eq_add {R : Type*} [AddCommMonoid R] {a q : �
       rw [abs_of_nonneg]
       · grw [Int.mod_modEq]
         simp
-      · grind
+      · positivity
   · simp [hf.map_mod_nat]
 
 -- TODO: Consider other proof: use a-1 instead of constructing bijection.
@@ -550,7 +550,7 @@ theorem summatory_zeta_eq {x : ℝ} : summatory (ζ : ArithmeticFunction ℝ) x 
   congr! with n hn_pos hnx
   simp only [natCoe_apply, zeta_apply, Nat.cast_ite, CharP.cast_eq_zero, Nat.cast_one,
     ite_eq_right_iff, zero_ne_one, imp_false]
-  grind
+  positivity
 
 @[congr]
 theorem Set.indicator_apply_congr {α β : Type*} [Zero β] (r s : Set α) (f g : α → β) (a b : α) (hab : a = b) (hrs : r = s) (hfg : ∀ n, n = a → f n = g n) :
@@ -585,8 +585,7 @@ theorem Delta_one_bound {x : ℝ} {q : ℕ} (a : ZMod q) (hq : 0 < q) : ‖Δ_[f
   rw [h, sum_range_onCoprime]
   rw [abs_le]
   have : 0 < (q.totient : ℝ) := by
-    norm_cast
-    simp [Nat.totient_pos, hq]
+    positivity
   field_simp
   have : (0 : ℝ) ≤ ∑ x ∈ Finset.range (⌊x⌋₊ % q), onCoprime q (fun _ ↦ (1:ℝ)) (x+1) := by
     positivity
@@ -691,7 +690,7 @@ theorem Delta_abel_summation {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit
   simp_rw [mul_assoc, MeasureTheory.integral_const_mul, ← mul_sub]
   congr! 3 with χ hχ
   let c : ℕ → ℂ := fun n ↦ χ n
-  have := abel_summation_summatory (c := c) (f := (fun n ↦ g n)) (b := x) ?A (a := 1) (by norm_num) hx hg hg_int
+  have := abel_summation_summatory (c := c) (f := (fun n ↦ g n)) (b := x) ?A (a := 1) (by positivity) hx hg hg_int
   case A =>
     intro n _ hn
     norm_cast at hn
@@ -828,7 +827,7 @@ theorem Delta_flog_bound {v : ℕ} {f : ArithmeticFunction ℝ} {x : ℝ} (hx : 
       · simp
         grind
       · exact NeZero.pos _
-    replace hv : 0 < v := by grind
+    replace hv : 0 < v := by positivity
     have : ⇑(log.ppow v) = (fun n : ℕ ↦ (Real.log n)^v) := by
       ext n
       simp [hv]
@@ -855,7 +854,7 @@ theorem Delta_flog_bound {v : ℕ} {f : ArithmeticFunction ℝ} {x : ℝ} (hx : 
       intro t h1t htx
       apply DifferentiableAt.pow
       apply Real.differentiableAt_log
-      grind
+      positivity
     · have : deriv (fun x ↦ (Real.log x) ^ v)
         =ᵐ[(MeasureTheory.volume).restrict ({0}ᶜ)] fun x ↦ v * (Real.log x)^(v-1) * x⁻¹ := by
         simp
@@ -877,7 +876,7 @@ theorem Delta_flog_bound {v : ℕ} {f : ArithmeticFunction ℝ} {x : ℝ} (hx : 
       simp
     · apply MonotoneOn.comp (t := Set.Ici 0) (g := (· ^ v))
       · apply zpow_left_monoOn₀  (n := v)
-        grind
+        positivity
       · intro x hx y hy hxy
         simp only [Set.mem_Icc] at hx hy ⊢
         gcongr
@@ -887,6 +886,6 @@ theorem Delta_flog_bound {v : ℕ} {f : ArithmeticFunction ℝ} {x : ℝ} (hx : 
         intro h1a _
         apply Real.log_nonneg h1a
     · simp
-      grind
+      positivity
   · simp only [norm_zero]
     positivity

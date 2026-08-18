@@ -59,7 +59,7 @@ theorem BV_Delta_Lambda_enorm [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q)
         ENNReal.ofReal (C_BV_L A * x / (Real.log x) ^ A) := by
   have hL1 : (1 : ℝ) ≤ Real.log x := one_le_log_x
   have hx0 : (0 : ℝ) ≤ x := ProofData.x_nonneg
-  have hQ0 : (0 : ℝ) ≤ Q := by linarith
+  have hQ0 : (0 : ℝ) ≤ Q := by positivity
   have hstep : ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊,
       maxya q (fun y a ↦ ‖Δ_[Λ](y; q, a)‖ₑ) ≤
       (∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, maxya q (fun y a ↦ ‖Δ_[Λ♯](y; q, a)‖ₑ))
@@ -83,7 +83,7 @@ theorem BV_Delta_Lambda_enorm [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q)
   have hBf : 0 ≤ Bf := by
     dsimp [Bf]
     exact div_nonneg (mul_nonneg (C_BV_LF_nonneg A) hx0) (pow_nonneg log_x_pos.le _)
-  have hBle : 0 ≤ Ble := by dsimp [Ble]; positivity
+  have hBle : 0 ≤ Ble := by positivity
   have hpow : (2 : ℝ) * x / (Real.log x)^(A+2) ≤ 2 * x / (Real.log x)^A := by
     apply div_le_div_of_nonneg_left (by positivity) (by positivity)
     exact pow_le_pow_right₀ hL1 (by omega)
@@ -154,11 +154,11 @@ private lemma BV_compact_enorm (A : ℕ) {x Q : ℝ} (hx : 2 ≤ x)
       ENNReal.ofReal (((Real.log 4 + 5) * Real.exp 16 * 32 ^ A /
         (Real.log 2) ^ (A + 3)) * x / (Real.log x) ^ A) := by
   let K : ℝ := Real.log 4 + 5
-  have hK : 0 ≤ K := by dsimp [K]; positivity
-  have hx0 : 0 ≤ x := by linarith
+  have hK : 0 ≤ K := by positivity
+  have hx0 : 0 ≤ x := by positivity
   have hlog2 : 0 < Real.log 2 := Real.log_pos (by norm_num)
   have hlogx : 0 < Real.log x := Real.log_pos (by linarith)
-  have hloglo : Real.log 2 ≤ Real.log x := Real.log_le_log (by norm_num) hx
+  have hloglo : Real.log 2 ≤ Real.log x := Real.log_le_log (by positivity) hx
   have hloghi : Real.log x ≤ 32 := by
     rw [← Real.log_exp 32]
     exact Real.log_le_log (by positivity) hxE
@@ -184,7 +184,7 @@ private lemma BV_compact_enorm (A : ℕ) {x Q : ℝ} (hx : 2 ≤ x)
         = (Finset.Ioc 0 ⌊Q⌋₊).card * (K * x) := by simp
     _ ≤ Q * (K * x) := by
       have hc : ((Finset.Ioc 0 ⌊Q⌋₊).card : ℝ) ≤ Q := by
-        simpa using Nat.floor_le (by linarith : 0 ≤ Q)
+        simpa using Nat.floor_le (by positivity : 0 ≤ Q)
       exact mul_le_mul_of_nonneg_right hc (mul_nonneg hK hx0)
     _ ≤ (Real.exp 16 / (Real.log 2) ^ (A + 3)) * (K * x) :=
       mul_le_mul_of_nonneg_right hQ' (mul_nonneg hK hx0)
@@ -219,15 +219,11 @@ private lemma BV_large_enorm [ProofData] (A : ℕ) {Q : ℝ} (hQ0 : 1 ≤ Q)
   let R : ℝ := |C_SW (A + 2) 0| * 2 ^ (A + 2) * x / L ^ (A + 2) +
     (Real.log 2)⁻¹ * L ^ 2
   have hL : 1 ≤ L := by simpa [L] using one_le_log_x
-  have hL0 : 0 < L := lt_of_lt_of_le (by norm_num) hL
-  have hK : 0 ≤ K := by dsimp [K]; positivity
+  have hL0 : 0 < L := lt_of_lt_of_le (by positivity) hL
+  have hK : 0 ≤ K := by positivity
   have hx0 : 0 ≤ x := ProofData.x_nonneg
   have hR : 0 ≤ R := by
-    dsimp [R]
-    exact add_nonneg
-      (div_nonneg (mul_nonneg (mul_nonneg (abs_nonneg _) (by positivity)) hx0)
-        (pow_nonneg (le_of_lt hL0) _))
-      (mul_nonneg (by positivity) (sq_nonneg _))
+    positivity
   have hsqrt_le_x : √x ≤ x := by
     rw [Real.sqrt_le_iff]
     constructor
@@ -246,7 +242,7 @@ private lemma BV_large_enorm [ProofData] (A : ℕ) {Q : ℝ} (hQ0 : 1 ≤ Q)
     have hx16 : Real.exp 16 ≤ x := by
       rw [← Real.exp_log ProofData.x_pos]
       exact Real.exp_le_exp.mpr h16
-    rw [Real.le_sqrt (by norm_num) hx0]
+    rw [Real.le_sqrt (by positivity) hx0]
     calc (2 : ℝ) ^ 2 ≤ Real.exp 16 := by
           have he := Real.add_one_le_exp (16 : ℝ)
           grind
@@ -265,7 +261,7 @@ private lemma BV_large_enorm [ProofData] (A : ℕ) {Q : ℝ} (hQ0 : 1 ≤ Q)
     · have hqcast : (q : ℝ) ≤ x := hqmem.2.trans hQx
       have hlogq : Real.log q ≤ L := by
         dsimp [L]
-        exact Real.log_le_log (by exact_mod_cast hqpos) hqcast
+        exact Real.log_le_log (by positivity) hqcast
       have hz2 : 2 ≤ z := hsqrt_two.trans hzs
       have herr := coprime_vonMangoldt_error (A + 2) hz2 hqpos
       have hratio := pnt_ratio_bound x z (A + 2) (by linarith) hz.2 hzs
@@ -283,7 +279,7 @@ private lemma BV_large_enorm [ProofData] (A : ℕ) {Q : ℝ} (hQ0 : 1 ≤ Q)
         have hsecond : (Real.log 2)⁻¹ * (Real.log q * Real.log z) ≤
             (Real.log 2)⁻¹ * Real.log x ^ 2 := by
           have hlogz : Real.log z ≤ Real.log x :=
-            Real.log_le_log (by linarith) hz.2
+            Real.log_le_log (by positivity) hz.2
           gcongr
           nlinarith
         calc
@@ -341,7 +337,7 @@ private lemma BV_large_enorm [ProofData] (A : ℕ) {Q : ℝ} (hQ0 : 1 ≤ Q)
       rw [mul_comm]
       exact mul_le_mul_of_nonneg_left hsumφ hR
     have hcard : ((Finset.Ioc 0 ⌊Q⌋₊).card : ℝ) ≤ Q := by
-      simpa using Nat.floor_le (by linarith : 0 ≤ Q)
+      simpa using Nat.floor_le (by positivity : 0 ≤ Q)
     have hsmall : ∑ _q ∈ Finset.Ioc 0 ⌊Q⌋₊, K * √x ≤ K * x / L ^ (A + 3) := by
       rw [Finset.sum_const, nsmul_eq_mul]
       calc
@@ -358,13 +354,13 @@ private lemma BV_large_enorm [ProofData] (A : ℕ) {Q : ℝ} (hQ0 : 1 ≤ Q)
       rw [← ENNReal.ofReal_sum_of_nonneg]
       · exact ENNReal.ofReal_le_ofReal hphi
       · intro q _
-        exact mul_nonneg (by positivity) hR
+        positivity
     have hsmallE : ∑ _q ∈ Finset.Ioc 0 ⌊Q⌋₊, ENNReal.ofReal (K * √x) ≤
         ENNReal.ofReal (K * x / L ^ (A + 3)) := by
       rw [← ENNReal.ofReal_sum_of_nonneg]
       · exact ENNReal.ofReal_le_ofReal hsmall
       · intro _ _
-        exact mul_nonneg hK (Real.sqrt_nonneg _)
+        positivity
     have hBd : 0 ≤ |C_BV_L A| * x / L ^ A := by positivity
     have hBp : 0 ≤ R * (|C_tot| * L) :=
       mul_nonneg hR (mul_nonneg (abs_nonneg _) hL0.le)
@@ -448,7 +444,7 @@ theorem bombieri_vinogradov_enorm (A : ℕ) {x : ℝ} (hx : 2 ≤ x) {Q : ℝ} (
         ENNReal.ofReal (C_BV A * x / (Real.log x)^A) := by
   change ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, psiMaxEnorm x q ≤
     ENNReal.ofReal (C_BV A * x / Real.log x ^ A)
-  have hx0 : 0 ≤ x := by linarith
+  have hx0 : 0 ≤ x := by positivity
   have hlogx : 0 < Real.log x := Real.log_pos (by linarith)
   have hscale : 0 ≤ x / (Real.log x) ^ A :=
     div_nonneg hx0 (pow_nonneg (le_of_lt hlogx) _)
@@ -485,7 +481,7 @@ theorem bombieri_vinogradov_enorm (A : ℕ) {x : ℝ} (hx : 2 ≤ x) {Q : ℝ} (
         UV_le := by
           dsimp [W]
           rw [← Real.exp_add]
-          have hsx : 0 < √x := Real.sqrt_pos.2 (by linarith)
+          have hsx : 0 < √x := Real.sqrt_pos.2 (by positivity)
           rw [← Real.exp_log hsx, Real.log_sqrt hx0]
           apply Real.exp_le_exp.mpr
           have hs : Real.sqrt (Real.log x) ^ 2 = Real.log x :=
@@ -523,7 +519,7 @@ theorem bombieri_vinogradov (A : ℕ) {x : ℝ} (hx : 2 ≤ x) {Q : ℝ}
     exact psiMaxEnorm_ne_top (by exact_mod_cast hq.1)
   have hC : 0 ≤ C_BV A := by rw [C_BV]; positivity
   have hRHS : 0 ≤ C_BV A * x / Real.log x ^ A :=
-    div_nonneg (mul_nonneg hC (by linarith))
+    div_nonneg (mul_nonneg hC (by positivity))
       (pow_nonneg (Real.log_pos (by linarith)).le _)
   have hto := ENNReal.toReal_mono ENNReal.ofReal_ne_top hcanon
   rw [BV.toReal_finset_sum (Finset.Ioc 0 ⌊Q⌋₊) (fun q ↦ psiMaxEnorm x q) hfin,

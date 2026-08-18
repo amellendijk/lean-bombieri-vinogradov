@@ -169,7 +169,7 @@ theorem summatory_eq_summatory_of_lt_of_eq_zero {R : Type*} [AddCommMonoid R] [P
   constructor
   · by_contra hnx
     have hnle : (n : ℝ) ≤ x := le_of_not_gt hnx
-    have hx0 : 0 ≤ x := le_trans (by exact_mod_cast hy.1.le) hnle
+    have hx0 : 0 ≤ x := le_trans (by positivity) hnle
     have : n ≤ ⌊x⌋₊ := (Nat.le_floor_iff hx0).mpr hnle
     exact hx ⟨hy.1, this⟩
   · have hy0 : 0 ≤ y := by
@@ -241,7 +241,7 @@ theorem summatory_le_UB {R : Type*} {f : ℕ → R}
   ‖summatory f x‖ ≤ x * M := by
   have hM : 0 ≤ M := by
     grw [← hf 0 (mod_cast hx)]
-    simp
+    positivity
   grw [summatory, norm_sum_le]
   trans ∑ i ∈ Finset.Ioc 0 ⌊x⌋₊, M
   · gcongr with n hn
@@ -260,7 +260,7 @@ theorem summatory_le_support_mul_UB {R : Type*} {f : ℕ → R}
   ‖summatory f x‖ ≤ S * M := by
   have hM : 0 ≤ M := by
     grw [← hf 0 (mod_cast hS)]
-    simp
+    positivity
   by_cases hx : x < 0
   · rw [summatory_of_neg hx]
     simp only [norm_zero, ge_iff_le]
@@ -330,9 +330,9 @@ theorem summatory_tendsTo_left
     simp only [Finset.mem_Ioc, Finset.mem_Ioo]
     constructor
     · intro ⟨hn0, hny⟩
-      exact ⟨hn0, Nat.lt_ceil.mpr (lt_of_le_of_lt ((Nat.le_floor_iff' (by omega)).mp hny) hlt)⟩
+      exact ⟨hn0, Nat.lt_ceil.mpr (lt_of_le_of_lt ((Nat.le_floor_iff' (by positivity)).mp hny) hlt)⟩
     · intro ⟨hn0, hnx⟩
-      refine ⟨hn0, (Nat.le_floor_iff' (by omega)).mpr ?_⟩
+      refine ⟨hn0, (Nat.le_floor_iff' (by positivity)).mpr ?_⟩
       have h1 : (n : ℝ) + 1 ≤ (⌈x⌉₊ : ℝ) := by exact_mod_cast Nat.succ_le_of_lt hnx
       linarith [hy.1]
   · have hx' : x < 0 := not_le.mp hx

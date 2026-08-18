@@ -195,7 +195,7 @@ theorem MeasureTheory.IntegrableAtFilter.mul_boundedAtFilter {α ε' : Type*}
     · simp [hx]
       exact ht (Set.mem_of_mem_inter_right hx)
     · simp [hx]
-      grind
+      positivity
 
 -- TODO: Figure out how to not repeat the previous proof
 theorem MeasureTheory.IntegrableAtFilter.boundedAtFilter_mul {α ε' : Type*}
@@ -223,7 +223,7 @@ theorem MeasureTheory.IntegrableAtFilter.boundedAtFilter_mul {α ε' : Type*}
     · simp [hx]
       exact ht (Set.mem_of_mem_inter_right hx)
     · simp [hx]
-      grind
+      positivity
 
 theorem Filter.BoundedAtFilter.integrableAtFilter {α β : Type*}
     [TopologicalSpace α] [MeasurableSpace α] [NormedAddCommGroup β]

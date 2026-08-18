@@ -110,7 +110,7 @@ theorem integrable_term {σ : ℝ} (hσ_pos : 0 < σ) (hσ : σ ≤ 2)
         (g n * χ ↑n * (n : ℂ) ^ (-((σ : ℂ) + ↑t * I))) *
         (1 / (y : ℂ)) ^ (-((σ : ℂ) + ↑t * I)) •
         mellin (fun x => (↑(Smooth1 ν ε x) : ℂ)) ((σ : ℂ) + ↑t * I)) := by
-  have hy0 : 0 < y := by linarith
+  have hy0 : 0 < y := by positivity
   -- The Mellin factor is vertically integrable (our new lemma, with `Bump` data adapted).
   have hVI : Integrable (fun t : ℝ =>
       mellin (fun x => (↑(Smooth1 ν ε x) : ℂ)) ((σ : ℂ) + ↑t * I)) :=
@@ -217,7 +217,7 @@ private lemma norm_T_le [Bump] [FG] {q : ℕ} {ε : ℝ} (hε_pos : 0 < ε)
     {χ : DirichletCharacter ℂ q} {y : ℝ} (hy : 1 ≤ y) :
     ‖T ε y χ‖ ≤ ∑ m ∈ Finset.Ioc 0 ⌊M⌋₊, ∑ n ∈ Finset.Ioc 0 ⌊N⌋₊,
       ‖f m‖ * ‖χ (m : ZMod q)‖ * ‖g n‖ * ‖χ (n : ZMod q)‖ := by
-  have hy0 : (0 : ℝ) < y := by linarith
+  have hy0 : (0 : ℝ) < y := by positivity
   rw [T, summatory_apply]
   refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun m hm => ?_)
   simp only [Finset.mem_Ioc] at hm
@@ -241,7 +241,7 @@ theorem sup_summatory_eq_sup_nat {f : ℕ → ℂ}
       ⨆ y ∈ Set.Icc 1 x, ‖summatory f y‖ =
       ⨆ K ∈ Set.Icc 1 ⌊x⌋₊, ‖summatory f (K + 2⁻¹)‖ := by
   have hfloor_add_half {n : ℕ} : ⌊(n + 2⁻¹: ℝ)⌋₊ = n := by
-    rw [add_comm, Nat.floor_add_natCast (show 0 ≤ (2⁻¹ : ℝ) by norm_num)]
+    rw [add_comm, Nat.floor_add_natCast (show 0 ≤ (2⁻¹ : ℝ) by positivity)]
     norm_num
   apply le_antisymm
   · apply Real.iSup_le _ (by positivity)
@@ -275,7 +275,7 @@ theorem sup_summatory_eq_sup_nat {f : ℕ → ℂ}
         refine ⟨h.1, ?_⟩
         rw [Nat.le_floor_iff] at h
         · exact h.2
-        · grind
+        · positivity
       simp [this, ciSup_unique, ge_iff_le]
       simp [summatory_apply, hfloor_add_half]
     · refine bddAbove_range_biSup (B := summatory (fun m => ‖f m‖) x)
@@ -304,7 +304,7 @@ theorem T_norm_le_integral [Bump] [FG] {q : ℕ} {ε : ℝ} (hε_pos : 0 < ε) (
       ∫ t : ℝ, ‖summatory (fun m ↦ f m * χ m * (m : ℂ) ^ (-(σ + t * I))) M‖ *
         ‖summatory (fun n ↦ g n * χ n * (n : ℂ) ^ (-(σ + t * I))) N‖ *
         ‖mellin (fun x ↦ (Smooth1 ν ε x : ℂ)) (σ + t * I)‖ := by
-  have hy0 : (0 : ℝ) < y := by linarith
+  have hy0 : (0 : ℝ) < y := by positivity
   rw [T_eq_integral_sum hσ_pos hσ hε_pos y hy hε_one, norm_smul]
   have hnorm_const : ‖(1 / (2 * π) : ℝ)‖ = 1 / (2 * π) := by
     rw [Real.norm_eq_abs, abs_of_pos (by positivity)]
@@ -455,7 +455,7 @@ lemma exists_mellin_smooth1_boundA [Bump] :
     ∃ C : ℝ, 0 ≤ C ∧ ∀ (ε σ t : ℝ), 0 < ε → ε < 1 → 0 < σ → σ ≤ 2 →
       ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) ((σ : ℂ) + t * I)‖
         ≤ C * ‖(σ : ℂ) + t * I‖⁻¹ := by
-  obtain ⟨C, hC⟩ := (mellin_bump_bounded (σ₁ := 0) (σ₂ := 2) (by norm_num)
+  obtain ⟨C, hC⟩ := (mellin_bump_bounded (σ₁ := 0) (σ₂ := 2) (by positivity)
     (diffν.of_le (by simp)) suppν).bound
   rw [Filter.eventually_principal] at hC
   simp only [mem_setOf_eq, norm_one, mul_one] at hC
@@ -487,7 +487,7 @@ lemma log_one_add_le {x L : ℝ} (hx : 1 ≤ x) (hL : L = Real.log (x + 1)) :
     Real.log (1 + 6 * Real.log 2 * x * L) ≤ (1 + 6 * Real.log 2) * L := by
   have hlog2 : 0 < Real.log 2 := Real.log_pos (by norm_num)
   have hLpos : 0 < L := by rw [hL]; exact Real.log_pos (by linarith)
-  have hxpos : 0 < x := by linarith
+  have hxpos : 0 < x := by positivity
   have ha_pos : 0 < 6 * Real.log 2 := by positivity
   have key : 1 + 6 * Real.log 2 * x * L ≤ (1 + x) * (1 + 6 * Real.log 2 * L) := by
     nlinarith [mul_pos ha_pos hLpos, hxpos, mul_pos hxpos (mul_pos ha_pos hLpos)]
@@ -519,8 +519,6 @@ lemma C_LS_nonneg : 0 ≤ C_LS := by
   have key : (0 : ℝ) ≤ C_LS * ((1 : ℕ) + (1 : ℝ) ^ 2) *
       ∑ n ∈ Finset.Ioc (0 : ℤ) (0 + (1 : ℕ)), ‖(if n = 1 then (1 : ℂ) else 0)‖ ^ 2 := by
     refine le_trans ?_ h
-    apply Finset.sum_nonneg; intro q _
-    apply Finset.sum_nonneg; intro χ _
     positivity
   have hS : (∑ n ∈ Finset.Ioc (0 : ℤ) (0 + (1 : ℕ)), ‖(if n = 1 then (1 : ℂ) else 0)‖ ^ 2) = 1 := by
     rw [show Finset.Ioc (0 : ℤ) (0 + (1 : ℕ)) = {1} from by decide, Finset.sum_singleton]
@@ -563,7 +561,7 @@ lemma largeSieve_factor {Q : ℝ} (hQ : 1 ≤ Q) {σ : ℝ} (hσ_pos : 0 < σ) (
     rw [hS0]; simp
   -- `⌊P⌋₊ > 0`: apply the large sieve.
   have hP1 : (1 : ℝ) ≤ P := Nat.floor_pos.mp hPpos
-  have hPnn : (0 : ℝ) ≤ P := by linarith
+  have hPnn : (0 : ℝ) ≤ P := by positivity
   set c : ℤ → ℂ := fun n => h n.toNat * ((n.toNat : ℂ)) ^ (-(σ + t * I)) with hc
   have hLS := large_sieve Q hQ 0 ⌊P⌋₊ hPpos c
   simp only [div_eq_mul_inv, zero_add] at hLS
@@ -587,7 +585,7 @@ lemma largeSieve_factor {Q : ℝ} (hQ : 1 ≤ Q) {σ : ℝ} (hσ_pos : 0 < σ) (
     simp only [Finset.mem_Ioc] at hm
     have hm1 : 1 ≤ m := hm.1
     simp only [hc, Int.toNat_natCast, norm_mul, mul_pow]
-    rw [Complex.norm_natCast_cpow_of_pos (by omega)]
+    rw [Complex.norm_natCast_cpow_of_pos (by positivity)]
     have hre : (-(σ + t * I)).re = -σ := by simp
     rw [hre]
     have hle1 : (m : ℝ) ^ (-σ) ≤ 1 :=
@@ -611,7 +609,6 @@ lemma largeSieve_factor {Q : ℝ} (hQ : 1 ≤ Q) {σ : ℝ} (hσ_pos : 0 < σ) (
     _ ≤ C_LS * ((⌊P⌋₊ : ℝ) + Q ^ 2) * ∑ n ∈ Finset.Ioc (0 : ℤ) (⌊P⌋₊ : ℤ), ‖c n‖ ^ 2 := hLS
     _ ≤ C_LS * ((⌊P⌋₊ : ℝ) + Q ^ 2) * summatory (fun m ↦ ‖h m‖ ^ 2) P := by
           apply mul_le_mul_of_nonneg_left hb
-          have : (0 : ℝ) ≤ (⌊P⌋₊ : ℝ) + Q ^ 2 := by positivity
           positivity
     _ ≤ C_LS * (P + Q ^ 2) * summatory (fun m ↦ ‖h m‖ ^ 2) P := by
           apply mul_le_mul_of_nonneg_right _ hSnn
@@ -677,7 +674,7 @@ theorem largeSieve_char_bound [FG] {Q : ℝ} (hQ : 1 ≤ Q) {σ : ℝ} (hσ_pos 
   rw [eLHS]
   -- nonnegativity of the CS sum
   have hLHSnn : 0 ≤ ∑ p ∈ s, aF p * aG p :=
-    Finset.sum_nonneg (fun p _ => by simp only [haF, haG]; positivity)
+    Finset.sum_nonneg (fun p _ => by positivity)
   -- the two large-sieve bounds
   have hSFle : ∑ p ∈ s, aF p ^ 2 ≤ C_LS * (M + Q ^ 2) * Sf := by
     rw [← eF, hSf]; exact largeSieve_factor hQ hσ_pos t (⇑f) M
@@ -691,7 +688,7 @@ theorem largeSieve_char_bound [FG] {Q : ℝ} (hQ : 1 ≤ Q) {σ : ℝ} (hσ_pos 
     (Finset.sum_mul_sq_le_sq_mul_sq s aF aG).trans
       (mul_le_mul hSFle hSGle (Finset.sum_nonneg (fun p _ => sq_nonneg _)) hAFnn)
   -- the constant comparison `√((M+Q²)(N+Q²)) ≤ √(NM)+√M Q+√N Q+Q²`
-  have hQ0 : (0 : ℝ) ≤ Q := by linarith
+  have hQ0 : (0 : ℝ) ≤ Q := by positivity
   have hM := hM_pos.le
   have hN := hN_pos.le
   have hκ : (M + Q ^ 2) * (N + Q ^ 2)
@@ -751,7 +748,7 @@ theorem mellin_J_bound [Bump] {ε : ℝ} (hε_pos : 0 < ε) (hε_one : ε < 1) {
   have hL_pos : 0 < L := Real.log_pos hx1
   have hlog2 : 0 < Real.log 2 := Real.log_pos (by norm_num)
   have hL_ge : Real.log 2 ≤ L := by
-    rw [hL]; exact Real.log_le_log (by norm_num) (by linarith)
+    rw [hL]; exact Real.log_le_log (by positivity) (by linarith)
   -- the two bump-decay constants
   obtain ⟨hCA_nonneg, hCA⟩ := exists_mellin_smooth1_boundA.choose_spec
   obtain ⟨hCB_pos, hCB⟩ := exists_mellin_smooth1_boundB.choose_spec
@@ -838,7 +835,7 @@ theorem mellin_J_bound [Bump] {ε : ℝ} (hε_pos : 0 < ε) (hε_one : ε < 1) {
             rw [le_div_iff₀ hlog2]; linarith
           calc 2 * CB = 2 * CB * 1 := by ring
             _ ≤ 2 * CB * (L / Real.log 2) :=
-                mul_le_mul_of_nonneg_left hLratio (mul_nonneg (by norm_num) hCB_pos.le)
+                mul_le_mul_of_nonneg_left hLratio (mul_nonneg (by positivity) hCB_pos.le)
             _ = 2 * CB / Real.log 2 * L := by ring
   -- assemble
   rw [← MeasureTheory.integral_add_compl (measurableSet_Icc (a := -T) (b := T)) hInt]
@@ -903,7 +900,7 @@ theorem summatory_T_ll [Bump] [FG] {ε Q : ℝ} (hε_pos : 0 < ε) (hQ : 1 ≤ Q
   have hlog2 := Real.log_two_gt_d9
   -- `ε < 1` is automatic: `ε = (6 log 2)⁻¹ x⁻¹ ≤ (6 log 2)⁻¹ < 1`.
   have hε_one : ε < 1 := by
-    have hx' : x⁻¹ ≤ 1 := by rw [inv_le_one₀ (by linarith)]; exact hx
+    have hx' : x⁻¹ ≤ 1 := by rw [inv_le_one₀ (by positivity)]; exact hx
     calc ε ≤ (6 * Real.log 2)⁻¹ * x⁻¹ := hε.le
       _ ≤ (6 * Real.log 2)⁻¹ * 1 := by gcongr
       _ < 1 := by rw [mul_one, inv_lt_one₀ (by positivity)]; nlinarith
@@ -913,13 +910,13 @@ theorem summatory_T_ll [Bump] [FG] {ε Q : ℝ} (hε_pos : 0 < ε) (hQ : 1 ≤ Q
   have hL_pos : 0 < L := Real.log_pos hx1
   set σ : ℝ := L⁻¹ with hσdef
   have hσ_pos : 0 < σ := by positivity
-  have hL_ge : Real.log 2 ≤ L := Real.log_le_log (by norm_num) (by linarith)
+  have hL_ge : Real.log 2 ≤ L := Real.log_le_log (by positivity) (by linarith)
   have hσ_le : σ ≤ 2 := by
-    rw [hσdef, inv_le_comm₀ hL_pos (by norm_num)]
+    rw [hσdef, inv_le_comm₀ hL_pos (by positivity)]
     linarith
   -- `(x+1)^σ = e`, hence `y^σ ≤ e` for `1 ≤ y ≤ x+1`.
   have hxσ : (x + 1) ^ σ = Real.exp 1 := by
-    rw [Real.rpow_def_of_pos (by linarith), hσdef, ← hL, mul_inv_cancel₀ hL_pos.ne']
+    rw [Real.rpow_def_of_pos (by positivity), hσdef, ← hL, mul_inv_cancel₀ hL_pos.ne']
   -- Abbreviation for the (nonnegative) integrand.
   let B : ∀ (q : ℕ), DirichletCharacter ℂ q → ℝ → ℝ := fun q χ t =>
     ‖summatory (fun m ↦ f m * χ m * (m : ℂ) ^ (-(σ + t * I))) M‖ *
@@ -927,7 +924,6 @@ theorem summatory_T_ll [Bump] [FG] {ε Q : ℝ} (hε_pos : 0 < ε) (hQ : 1 ≤ Q
       ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)‖
   have hB_nonneg : ∀ (q : ℕ) (χ : DirichletCharacter ℂ q) (t : ℝ), 0 ≤ B q χ t := by
     intro q χ t
-    show 0 ≤ ‖_‖ * ‖_‖ * ‖_‖
     positivity
   have hB_int : ∀ (q : ℕ) (χ : DirichletCharacter ℂ q), Integrable (B q χ) :=
     fun q χ => integrable_norm_FG_mellin hε_pos hε_one hσ_pos hσ_le
@@ -966,10 +962,6 @@ theorem summatory_T_ll [Bump] [FG] {ε Q : ℝ} (hε_pos : 0 < ε) (hQ : 1 ≤ Q
   have hD_le : ∀ t, D t ≤ Cb := fun t => largeSieve_char_bound hQ hσ_pos t
   have hD_nonneg : ∀ t, 0 ≤ D t := by
     intro t
-    apply summatory_nonneg
-    intro q hq
-    apply Finset.sum_nonneg
-    intro χ hχ
     positivity
   have hCb_nonneg : 0 ≤ Cb := le_trans (hD_nonneg 0) (hD_le 0)
   have hmnorm_int : Integrable (fun t : ℝ =>
@@ -1072,7 +1064,7 @@ theorem summatory_T_ll_nat [Bump] [FG] {ε Q : ℝ} (hε_pos : 0 < ε)(hQ : 1 �
         have : (K : ℝ) ≤ x := by
           grw [h.2]
           apply Nat.floor_le
-          grind
+          positivity
         grind
       simp only [h, h', ciSup_unique]
       rfl
@@ -1093,12 +1085,12 @@ theorem Nat.le_of_add_real_le {m n : ℕ} {x : ℝ} (hx_pos : 0 < x) (hx : x ≤
   have : Nat.ceil x = 1 := by
     rw [Nat.ceil_eq_iff]
     · simp [hx_pos, hx]
-    · norm_num
+    · positivity
   apply_fun Nat.ceil (α := ℝ) at h
   · simp only [Nat.ceil_natCast] at h
     rw [add_comm, Nat.ceil_add_natCast] at h
     · grind
-    · exact hx_pos.le
+    · positivity
   exact Nat.ceil_mono
 
 
@@ -1120,9 +1112,9 @@ theorem T_eq_sharp {x : ℝ} (hx : 1 ≤ x) [Bump] [FG] {q : ℕ} {ε : ℝ} (h�
     · positivity
     · have : (m : ℝ) * n ≤ K := by
         norm_cast at h ⊢
-        apply Nat.le_of_le_add_real (by norm_num) (by norm_num) h
+        apply Nat.le_of_le_add_real (by positivity) (by norm_num) h
       grw [hε, this]
-      have : 0 < x + 1 := by linarith
+      have : 0 < x + 1 := by positivity
       field_simp
       linarith
   · grw [h_above]
@@ -1136,7 +1128,7 @@ theorem T_eq_sharp {x : ℝ} (hx : 1 ≤ x) [Bump] [FG] {q : ℕ} {ε : ℝ} (h�
       grw [hε]
       have : (K : ℝ) + 1 ≤ m * n := by
         norm_cast at h ⊢
-        apply Nat.le_of_add_real_le (by norm_num) (by norm_num) h.le
+        apply Nat.le_of_add_real_le (by positivity) (by norm_num) h.le
       grw [mul_assoc, ← this]
       field_simp
       nlinarith
@@ -1240,7 +1232,7 @@ theorem LargeSieve_convolution_aux [Bump] [fg : FG]
         grw [hK.2]
         norm_cast
         grind
-      · linarith
+      · positivity
       · exact_mod_cast hK.1
       · positivity
     _ ≤ _ := by
