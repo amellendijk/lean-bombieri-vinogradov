@@ -193,7 +193,6 @@ lemma isLocallyBounded_Delta {R : Type*} [NormedField R] (f : ℕ → R) (q : �
 @[fun_prop]
 lemma isLocallyBoundedOn_Delta {R : Type*} [NormedField R] {s : Set ℝ} (f : ℕ → R) (q : ℕ) (a : ZMod q) :
     IsLocallyBoundedOn (fun x ↦ Δ_[f](x; q, a)) s := by
-  simp [Delta]
   fun_prop
 
 open MeasureTheory in
@@ -866,11 +865,7 @@ theorem Delta_flog_bound {v : ℕ} {f : ArithmeticFunction ℝ} {x : ℝ} (hx : 
       · simp
       apply ContinuousOn.locallyIntegrableOn
       · apply ContinuousOn.mul
-        · apply ContinuousOn.mul
-          · fun_prop
-          · apply ContinuousOn.pow
-            apply Real.continuousOn_log.mono
-            simp
+        · fun_prop
         · apply continuousOn_inv₀.mono
           simp
       simp

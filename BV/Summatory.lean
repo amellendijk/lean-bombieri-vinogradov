@@ -290,9 +290,7 @@ theorem aeStronglyMeasurable_summatory
   have : summatory f = (fun n : ℕ ↦ ∑ i ∈ Finset.Ioc 0 n, f i) ∘ (⌊·⌋₊) := by
     ext x; simp [summatory_apply]
   rw [this]
-  apply AEStronglyMeasurable.comp_measurable
-  · fun_prop
-  · fun_prop
+  fun_prop
 
 @[fun_prop]
 theorem measurable_summatory
@@ -302,7 +300,7 @@ theorem measurable_summatory
   have : summatory f = (fun n : ℕ ↦ ∑ i ∈ Finset.Ioc 0 n, f i) ∘ (⌊·⌋₊) := by
     ext x; simp [summatory_apply]
   rw [this]
-  exact Measurable.of_discrete.comp Nat.measurable_floor
+  fun_prop
 
 theorem summatory_tendsTo_right
     {R : Type*} [NormedAddCommGroup R] {f : ℕ → R} (x : ℝ) :
