@@ -1,5 +1,34 @@
 # Lean Bombieri-Vinogradov — Claude Documentation
 
+## Purpose of This Branch (`asymp-notation`)
+
+This branch is an **experiment with the new big-O notation** from the draft Mathlib PR
+[mathlib4#39450](https://github.com/leanprover-community/mathlib4/pull/39450), ported into
+`BV/Mathlib/Tactic/Asymptotics/` (import via `BV.Mathlib.Tactic.Asymptotics.Basic`). The
+notation provides `asymp% x : α in l => lhs = rhs` statements where the right-hand side may
+contain `O(f x)` / `O[l](f x)` terms, backed by `Asymptotics.bigO` sets, `Asymptotics.map`,
+and the `AsympRel` relation.
+
+**Goal:** transition as much of this project as possible to the new notation. The notation is
+very new and we *expect* to run into issues along the way. The point of the experiment is to
+learn:
+
+1. how the notation itself can be improved (elaboration, delaboration, binder names,
+   metavariable issues, filter handling, …), and
+2. what tactics/lemmas are needed to manipulate these expressions efficiently and clearly
+   (currently: `magic_tac`, `push`/`pull`, `grw`/`gcongr` with `AsympRel`/`RightSerial`
+   congruence lemmas — see the `terry` example in `BV/Mathlib/Tactic/Asymptotics/Basic.lean`
+   for the current workflow and its pain points).
+
+When you hit friction — a statement that can't be expressed, a rewrite that should be one step
+but takes five, a delaborator glitch, a missing congruence lemma — **record it** in
+`notes/AsympNotationFindings.md` (create it if absent), ideally with a minimal example. These
+findings are the primary deliverable of the branch, alongside the converted proofs.
+
+Do not change the pinned mathlib version; the ported files compile against it as-is.
+
+---
+
 ## Project Goal
 
 Formalize the **Bombieri-Vinogradov theorem** in Lean 4 / Mathlib, modulo two axioms:
