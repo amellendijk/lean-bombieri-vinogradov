@@ -51,36 +51,61 @@ theorem maxya_ne_top_of_le_ofReal [ProofData] {q : ℕ} {f : ℝ → ZMod q → 
     (h : maxya q f ≤ ENNReal.ofReal B) : maxya q f ≠ ⊤ :=
   ne_top_of_le_ne_top ENNReal.ofReal_ne_top h
 
-/-- Real-valued view of `maxy`. This is meaningful once finiteness has been proved. -/
-noncomputable def maxyReal [ProofData] (f : ℝ → ℝ≥0∞) : ℝ := (maxy f).toReal
-
-theorem maxyReal_le_of_le_ofReal [ProofData] {f : ℝ → ℝ≥0∞} {B : ℝ} (hB : 0 ≤ B)
-    (h : maxy f ≤ ENNReal.ofReal B) : maxyReal f ≤ B := by
-  rw [maxyReal]
-  exact (ENNReal.toReal_mono ENNReal.ofReal_ne_top h).trans_eq (ENNReal.toReal_ofReal hB)
-
-theorem le_maxyReal_of_ne_top [ProofData] {f : ℝ → ℝ≥0∞} {y : ℝ}
-    (hy1 : √x ≤ y) (hy2 : y ≤ x) (hfin : maxy f ≠ ⊤) :
-    (f y).toReal ≤ maxyReal f := ENNReal.toReal_mono hfin (le_maxy hy1 hy2)
-
-theorem maxyReal_ofReal_le [ProofData] {f : ℝ → ℝ} {B : ℝ} (hB : 0 ≤ B)
+/-- Bound `maxy` of an `ENNReal.ofReal`-valued function by a pointwise real bound.
+No nonnegativity or boundedness side conditions are needed. -/
+theorem maxy_ofReal_le [ProofData] {f : ℝ → ℝ} {B : ℝ}
     (hf : ∀ y, √x ≤ y → y ≤ x → f y ≤ B) :
-    maxyReal (fun y ↦ ENNReal.ofReal (f y)) ≤ B := by
-  apply maxyReal_le_of_le_ofReal hB
-  exact maxy_le fun y hy1 hy2 ↦ ENNReal.ofReal_le_ofReal (hf y hy1 hy2)
+    maxy (fun y ↦ ENNReal.ofReal (f y)) ≤ ENNReal.ofReal B :=
+  maxy_le fun y hy1 hy2 ↦ ENNReal.ofReal_le_ofReal (hf y hy1 hy2)
 
-theorem le_maxyReal_ofReal [ProofData] {f : ℝ → ℝ} {y : ℝ}
-    (hy1 : √x ≤ y) (hy2 : y ≤ x) {B : ℝ}
-    (hf0 : 0 ≤ f y) (hf : ∀ z, √x ≤ z → z ≤ x → f z ≤ B) :
-    f y ≤ maxyReal (fun z ↦ ENNReal.ofReal (f z)) := by
-  have hmax : maxy (fun z ↦ ENNReal.ofReal (f z)) ≤ ENNReal.ofReal B :=
-    maxy_le fun z hz1 hz2 ↦ ENNReal.ofReal_le_ofReal (hf z hz1 hz2)
-  have hfin := maxy_ne_top_of_le_ofReal hmax
-  simpa [ENNReal.toReal_ofReal hf0] using
-    (le_maxyReal_of_ne_top (f := fun z ↦ ENNReal.ofReal (f z)) hy1 hy2 hfin)
+/-- Bound an `ℝ≥0∞`-valued sum termwise by `ENNReal.ofReal` of a real sum. -/
+theorem sum_le_ofReal_sum {ι : Type*} {s : Finset ι} {f : ι → ℝ≥0∞} {g : ι → ℝ}
+    (hg : ∀ i ∈ s, 0 ≤ g i) (h : ∀ i ∈ s, f i ≤ ENNReal.ofReal (g i)) :
+    ∑ i ∈ s, f i ≤ ENNReal.ofReal (∑ i ∈ s, g i) := by
+  rw [ENNReal.ofReal_sum_of_nonneg hg]
+  exact Finset.sum_le_sum h
 
-theorem toReal_iSup_of_finite {ι : Sort*} {f : ι → ℝ≥0∞} (hf : ∀ i, f i ≠ ⊤) :
-    (⨆ i, f i).toReal = ⨆ i, (f i).toReal := ENNReal.toReal_iSup hf
+/-- Bound `ENNReal.ofReal` of a real sum termwise by an `ℝ≥0∞`-valued sum. -/
+theorem ofReal_sum_le_sum {ι : Type*} {s : Finset ι} {f : ι → ℝ≥0∞} {g : ι → ℝ}
+    (hg : ∀ i ∈ s, 0 ≤ g i) (h : ∀ i ∈ s, ENNReal.ofReal (g i) ≤ f i) :
+    ENNReal.ofReal (∑ i ∈ s, g i) ≤ ∑ i ∈ s, f i := by
+  rw [ENNReal.ofReal_sum_of_nonneg hg]
+  exact Finset.sum_le_sum h
+
+/-! ### `ℝ≥0∞`-cast bridging lemmas
+
+These push `ENNReal.ofReal` through the coefficient patterns `(n : ℝ≥0∞)⁻¹ * _` and
+`(q : ℝ≥0∞) * (m : ℝ≥0∞)⁻¹ * _` that appear alongside `maxy` in weighted character sums. -/
+
+theorem natCast_inv_eq_ofReal {n : ℕ} (hn : n ≠ 0) :
+    (n : ℝ≥0∞)⁻¹ = ENNReal.ofReal ((n : ℝ)⁻¹) := by
+  rw [ENNReal.ofReal_inv_of_pos (by positivity), ENNReal.ofReal_natCast]
+
+theorem natCast_inv_mul_ofReal {n : ℕ} (hn : n ≠ 0) (t : ℝ) :
+    (n : ℝ≥0∞)⁻¹ * ENNReal.ofReal t = ENNReal.ofReal ((n : ℝ)⁻¹ * t) := by
+  rw [ENNReal.ofReal_mul (by positivity), natCast_inv_eq_ofReal hn]
+
+theorem natCast_mul_natCast_inv_mul_ofReal (q : ℕ) {m : ℕ} (hm : m ≠ 0) (t : ℝ) :
+    (q : ℝ≥0∞) * (m : ℝ≥0∞)⁻¹ * ENNReal.ofReal t
+      = ENNReal.ofReal ((q : ℝ) * (m : ℝ)⁻¹ * t) := by
+  rw [mul_assoc, natCast_inv_mul_ofReal hm, ← ENNReal.ofReal_natCast q,
+    ← ENNReal.ofReal_mul (by positivity), mul_assoc]
+
+theorem pow_two_inv_mul_ofReal (j : ℕ) (t : ℝ) :
+    ((2 : ℝ≥0∞) ^ j)⁻¹ * ENNReal.ofReal t = ENNReal.ofReal (((2 : ℝ) ^ j)⁻¹ * t) := by
+  rw [ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_inv_of_pos (by positivity),
+    ENNReal.ofReal_pow (by norm_num), ENNReal.ofReal_ofNat]
+
+/-- `(m*n)⁻¹ = m⁻¹ * n⁻¹` for `ℕ`-casts in `ℝ≥0∞`; holds without any hypotheses. -/
+theorem natCast_mul_inv (m n : ℕ) :
+    ((m * n : ℕ) : ℝ≥0∞)⁻¹ = (m : ℝ≥0∞)⁻¹ * (n : ℝ≥0∞)⁻¹ := by
+  push_cast
+  rw [ENNReal.mul_inv (Or.inr (ENNReal.natCast_ne_top n)) (Or.inl (ENNReal.natCast_ne_top m))]
+
+/-- Antitonicity of `(· : ℝ≥0∞)⁻¹` along `ℕ`-casts. -/
+theorem natCast_inv_le_natCast_inv {m n : ℕ} (h : m ≤ n) :
+    (n : ℝ≥0∞)⁻¹ ≤ (m : ℝ≥0∞)⁻¹ :=
+  ENNReal.inv_le_inv' (by exact_mod_cast h)
 
 theorem toReal_finset_sum {ι : Type*} (s : Finset ι) (f : ι → ℝ≥0∞)
     (hf : ∀ i ∈ s, f i ≠ ⊤) :
