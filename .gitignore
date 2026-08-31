@@ -1,5 +1,7 @@
 /.lake
 
+/worktrees/
+
 /.claude
 
 /blueprint/web

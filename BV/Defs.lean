@@ -221,7 +221,7 @@ theorem Nat.Icc_sqrt_nonempty : (Nat.Icc (√x) x).Nonempty := by
     · exact le_x
 
 
-noncomputable def maxy [ProofData] (f : ℝ → ℝ) : ℝ :=  ⨆ y ∈ Set.Icc (√ x) x, f y
+noncomputable def maxy (f : ℝ → ℝ) : ℝ :=  ⨆ y ∈ Set.Icc (√ x) x, f y
 
 theorem maxy_le {f : ℝ → ℝ} {M : ℝ}
     (hf : ∀ y, √x ≤ y → y ≤ x → f y ≤ M) (hM : 0 ≤ M) :
@@ -235,7 +235,7 @@ theorem maxy_le {f : ℝ → ℝ} {M : ℝ}
 
 -- TODO : We're taking the maximum over the naturals in [√x, x], but really we should use reals.
 /-- The maximum of $f$ over all $y \in \left[\sqrt{x}, x\right]$ and $a \in (\mathbb{Z} / q\mathbb{Z})^* -/
-noncomputable def maxya [ProofData] (q : ℕ) (f : ℝ → ZMod q → ℝ) : ℝ :=
+noncomputable def maxya (q : ℕ) (f : ℝ → ZMod q → ℝ) : ℝ :=
   ⨆ a : (ZMod q)ˣ, maxy (fun y ↦ f y a)
 
 theorem maxya_le {q : ℕ} {f : ℝ → ZMod q → ℝ} {M : ℝ} (hf : ∀ y, √x ≤ y → y ≤ x → ∀ a, f y a ≤ M) (hM : 0 ≤ M) :
@@ -291,7 +291,7 @@ section Lambda
 @[blueprint (statement :=
 /-- $\Lambda_{\le U} = 1_{≤ U} \cdot \Lambda$ -/
 )]
-noncomputable def LambdaLEU [ProofData] : ArithmeticFunction ℝ :=
+noncomputable def LambdaLEU : ArithmeticFunction ℝ :=
   ArithmeticFunction.vonMangoldt.on (Set.Icc 1 (Nat.floor U))
 
 scoped[BV] notation3 "Λ≤U" => LambdaLEU
@@ -338,7 +338,7 @@ def LambdaLEU_positivity : PositivityExt where eval {u α} _ pα? e :=
 @[blueprint (statement :=
 /-- $\mu_{\le U} = 1_{≤ U} \cdot \mu$ -/
 )]
-noncomputable def moebiusLEV [ProofData] : ArithmeticFunction ℝ :=
+noncomputable def moebiusLEV : ArithmeticFunction ℝ :=
   (μ).on (Set.Icc 1 (Nat.floor V))
 
 scoped[BV] notation3 "μ≤V" => moebiusLEV
@@ -347,7 +347,7 @@ open ArithmeticFunction in
 @[blueprint (statement :=
 /-- $\Lambda^\sharp = \mu_{\le V} * \log - (\Lambda_{\le U} * \mu_{\le V}) * 1$ -/
 )]
-noncomputable def LambdaSharp [ProofData] : ArithmeticFunction ℝ :=
+noncomputable def LambdaSharp : ArithmeticFunction ℝ :=
    μ≤V * log - Λ≤U * μ≤V * zeta
 
 scoped[BV] notation3 "Λ♯" => LambdaSharp

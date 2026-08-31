@@ -4,6 +4,7 @@ import Mathlib.Analysis.MellinInversion
 import PrimeNumberTheoremAnd.MellinCalculus
 import PrimeNumberTheoremAnd.MediumPNT
 
+import BV.Mathlib.Analysis.MellinTransform
 import BV.Mathlib.MeasureTheory.Function.LocallyIntegrable
 
 local notation (name := mellintransform) "𝓜" => mellin

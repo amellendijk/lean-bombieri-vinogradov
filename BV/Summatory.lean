@@ -286,6 +286,21 @@ theorem summatory_tendsTo_right
   · exact Nat.lt_succ_iff.mp ((Nat.floor_lt' (Nat.succ_ne_zero _)).mpr (by push_cast; exact hy.2))
   · exact Nat.floor_le_floor hy.1
 
+open MeasureTheory
+
+@[fun_prop]
+theorem measurable_summatory_const {X R : Type*} [MeasurableSpace X] [NormedAddCommGroup R] [MeasurableSpace R]
+    [MeasurableAdd₂ R] {f : X → ℕ → R} (hf : ∀ n, Measurable (f · n)) (N : ℝ) :
+    Measurable (fun t => summatory (f t) N) := by
+  unfold summatory
+  exact Finset.measurable_sum _ (fun n _ => hf n)
+
+theorem aeStronglyMeasurable_summatory_const {X R : Type*} [MeasurableSpace X] {μ : Measure X} [NormedAddCommGroup R]
+    {f : X → ℕ → R} (hf : ∀ n, AEStronglyMeasurable (f · n) μ) (N : ℝ) :
+    AEStronglyMeasurable (fun t => summatory (f t) N) μ := by
+  unfold summatory
+  exact Finset.aestronglyMeasurable_fun_sum _ (fun n _ => hf n)
+
 theorem summatory_tendsTo_left
     {R : Type*} [NormedAddCommGroup R] {f : ℕ → R} (x : ℝ) :
     Tendsto (summatory f) (𝓝[<] x) (𝓝 (∑ n ∈ Finset.Ioo 0 (⌈x⌉₊), f n)) := by
