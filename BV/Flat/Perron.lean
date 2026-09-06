@@ -1,9 +1,12 @@
 import Mathlib
 
+import BV.ForMathlib.Lintegral
+
 import PrimeNumberTheoremAnd.SmoothExistence
 
 import BV.Mellin
 import BV.Delta
+import BV.DirichletAverage
 
 
 /-
@@ -93,8 +96,20 @@ lemma hσ_pos : 0 < σ := by
   · simp
   apply hlogx_succ_pos
 
+lemma hσ_le_one : σ ≤ 1 := by
+  rw [σ]
+  have := hlogx_succ_pos
+  field_simp
+  rw [Real.le_log_iff_exp_le]
+  · have := exp_one_lt_d9
+    have := hx
+    linarith
+  · have := hx_pos
+    linarith
+
 lemma hσ_le_two : σ ≤ 2 := by
-  sorry
+  have := hσ_le_one
+  grind
 
 end Flat.ProofData
 
@@ -124,8 +139,6 @@ theorem T_eq_sum_integral
     simp
   · rw [← MeasureTheory.integral_Ici_eq_integral_Ioi]
     apply mass_one
-
-
 
 /--
 Written by Claude:
@@ -222,15 +235,42 @@ theorem T_eq_integral_sum
     exact integrable_term hy m i
       (Finset.mem_Ioc.mp hm).1 (Finset.mem_Ioc.mp hi).1
 
-noncomputable def B [Bump] [FG] {q : ℕ} (σ ε t : ℝ) (χ : DirichletCharacter ℂ q) : ℝ≥0∞ :=
-    ‖summatory (fun m ↦ f m * χ m * m ^ (-(σ + t * I))) M‖ₑ *
-    ‖summatory (fun n ↦ g n * χ n * n ^ (-(σ + t * I))) N‖ₑ *
-    ‖mellin (fun x ↦ (Smooth1 ν ε x : ℂ)) (σ + t * I)‖ₑ
+noncomputable def twistedLSum {q : ℕ} (s : ℂ) (f : ℕ → ℂ) (χ : DirichletCharacter ℂ q) (N : ℝ) :=
+  summatory (fun n ↦ f n * χ n * n ^ s) N
 
 @[fun_prop]
-lemma Measurable_B [Bump] [FG] {q : ℕ} (σ ε : ℝ) (χ : DirichletCharacter ℂ q) : Measurable (fun t ↦ B σ ε t χ) := by
-  dsimp [B]
+lemma Measurable_twistedLSum {q : ℕ} (f : ℕ → ℂ) (χ : DirichletCharacter ℂ q) (N : ℝ) :
+    Measurable (fun t ↦ twistedLSum t f χ N) := by
+  simp only [twistedLSum]
   fun_prop
+
+lemma dirichletAverage_twistedLSum_sq_le (s : ℂ) (f : ℕ → ℂ) (N Q : ℝ) :
+    ∫⁻ qχ, ‖twistedLSum s f qχ.2 N‖ₑ ^ 2 ∂dirichletMeas Q ≤ .ofReal (C_LS * (N + Q^2)) * (summatory (fun n ↦ ‖f n‖ₑ ^ 2) N)  := by
+  have := large_sieve
+  sorry
+
+
+@[reducible]
+noncomputable def F [FG] {q : ℕ} (σ t : ℝ) (χ : DirichletCharacter ℂ q) :=
+  twistedLSum (-(σ + t * I)) f χ M
+
+lemma dirichletAverage_F_sq_le [FG] (σ t : ℝ) (Q : ℝ) :
+    ∫⁻ qχ, ‖F σ t qχ.2‖ₑ ^ 2 ∂dirichletMeas Q ≤ .ofReal (C_LS * (M + Q^2)) * (summatory (fun n ↦ ‖f n‖ₑ ^ 2) M)  := by
+  apply dirichletAverage_twistedLSum_sq_le
+
+@[reducible]
+noncomputable def G [FG] {q : ℕ} (σ t : ℝ) (χ : DirichletCharacter ℂ q) :=
+  twistedLSum (-(σ + t * I)) g χ N
+
+-- noncomputable def B [Bump] [FG] {q : ℕ} (σ ε t : ℝ) (χ : DirichletCharacter ℂ q) : ℝ≥0∞ :=
+--     ‖summatory (fun m ↦ f m * χ m * m ^ (-(σ + t * I))) M‖ₑ *
+--     ‖summatory (fun n ↦ g n * χ n * n ^ (-(σ + t * I))) N‖ₑ *
+--     ‖mellin (fun x ↦ (Smooth1 ν ε x : ℂ)) (σ + t * I)‖ₑ
+
+-- @[fun_prop]
+-- lemma Measurable_B [Bump] [FG] {q : ℕ} (σ ε : ℝ) (χ : DirichletCharacter ℂ q) : Measurable (fun t ↦ B σ ε t χ) := by
+--   dsimp [B]
+--   fun_prop
 
 open NNReal
 
@@ -254,7 +294,7 @@ theorem Complex.arg_ofReal_eq_pi_iff (x : ℝ) :
     (x : ℂ).arg = π ↔ x < 0 := by
   simp [Complex.arg_eq_pi_iff]
 
-theorem sup_T_le_lintegral_B [Bump] [FG] [ProofData] {q : ℕ} (χ : DirichletCharacter ℂ q) : ⨆ y ∈ Icc 1 (x+1), ‖T ε y χ‖ₑ ≤ C_TB * ∫⁻ t : ℝ, B σ ε t χ := by
+theorem sup_T_le_lintegral_B [Bump] [FG] [ProofData] {q : ℕ} (χ : DirichletCharacter ℂ q) : ⨆ y ∈ Icc 1 (x+1), ‖T ε y χ‖ₑ ≤ C_TB * ∫⁻ t : ℝ, ‖F σ t χ‖ₑ * ‖G σ t χ‖ₑ * ‖mellin (fun x ↦ (Smooth1 ν ε x : ℂ)) (σ + t * I)‖ₑ := by
   refine iSup_le fun y ↦ iSup_le fun hy ↦ ?_
   simp only [mem_Icc] at hy
   rw [T_eq_integral_sum y hy.1]
@@ -277,21 +317,138 @@ theorem sup_T_le_lintegral_B [Bump] [FG] [ProofData] {q : ℕ} (χ : DirichletCh
     · grind
     -- TODO: tag with positivity
     · exact hσ_pos.le
-
-  grw [B, C_TB_def, this]
+  grw [F, G, C_TB_def, this]
   -- lemma enorm_eq_nnnorm let us side-step some issues with casts and enorms. Look into this.
-  simp [ne_eq, Real.pi_ne_zero, not_false_eq_true, OfNat.ofNat_ne_zero,
-    neg_add_rev, enorm_eq_nnnorm]
+  simp [twistedLSum, ne_eq, Real.pi_ne_zero, not_false_eq_true, OfNat.ofNat_ne_zero, enorm_eq_nnnorm]
   apply le_of_eq
   ring
 
-def C_LSC : ℝ := sorry
+open DirichletAverage
+
+lemma CS (f g : {q : ℕ} → (DirichletCharacter ℂ q) → ENNReal) (Q : ℝ) :
+    (∫⁻ a, f a.2 * g a.2 ∂dirichletMeas Q) ≤ (∫⁻ a, f a.2 ^ 2  ∂dirichletMeas Q) ^ (1/2 : ℝ) * (∫⁻ a, g a.2 ^ 2  ∂dirichletMeas Q)^ (1/2 : ℝ) := by
+  have := ENNReal.lintegral_mul_le_Lp_mul_Lq (μ := dirichletMeas Q) (f := fun p ↦ f p.2) (g := fun p ↦ g p.2) .two_two (by fun_prop) (by fun_prop)
+  simpa using this
+
+theorem dirichletAverage_FG_le [Bump] [FG] [ProofData] {y : ℝ} : ∫⁻ (a : (q : ℕ) × DirichletCharacter ℂ q), ‖F σ y a.snd‖ₑ * ‖G σ y a.snd‖ₑ ∂dirichletMeas Q ≤ .ofReal ((√(N * M) + √M * Q + √N * Q + Q ^ 2) * √(summatory (fun m => ‖f m‖ ^ 2) M) * √(summatory (fun n => ‖g n‖^2) N)) := by
+  have := CS (f := fun χ ↦ ‖F σ y χ‖ₑ) (g := fun χ ↦ ‖G σ y χ‖ₑ) Q
+  apply this.trans
+  grw [dirichletAverage_F_sq_le]
+
+  sorry
+
+
+section Mellin
+
+def C_Center : ℝ≥0 := sorry
+
+lemma mellin_center_bound [Bump] {ε σ : ℝ} : ∫⁻ (a : ℝ) in Set.Icc (-ε⁻¹) (ε⁻¹), ‖mellin (fun x => (Smooth1 ν ε x : ℂ)) (↑σ + ↑a * I)‖ₑ ≤ C_Center * .ofReal σ⁻¹ := by
+  sorry
+
+private lemma right_tail {σ T : ℝ} (hT : 0 < T) :
+    ∫⁻ (t : ℝ) in Ioi T, ENNReal.ofReal (σ ^ 2 + t ^ 2)⁻¹ ≤ .ofReal (T⁻¹) := by
+  trans (∫⁻ (t : ℝ) in Ioi T, ENNReal.ofReal (t ^ 2)⁻¹)
+  · apply lintegral_mono_ae
+    filter_upwards [ae_restrict_mem (by measurability)] with x hx
+    simp only [mem_Ioi] at hx
+    have : 0 < x := by grind
+    gcongr
+    nlinarith only
+  have {t : ℝ} : (t ^ 2)⁻¹ = t ^ (-2 : ℝ) := by
+    simp only [rpow_neg_ofNat, Int.reduceNeg, zpow_neg, zpow_ofNat]
+  simp_rw [this]
+  rw [← MeasureTheory.ofReal_integral_eq_lintegral_ofReal]
+  gcongr
+  · rw [integral_Ioi_rpow_of_lt]
+    · norm_num
+      rw [Real.rpow_neg_one]
+    · norm_num
+    · exact hT
+  · exact integrableOn_Ioi_rpow_of_lt (show -2 < (-1 : ℝ) by norm_num) hT |>.integrable
+  · filter_upwards with t
+    simp only [Pi.zero_apply, rpow_neg_ofNat, Int.reduceNeg, zpow_neg, inv_nonneg]
+    positivity
+
+private lemma left_tail_closed {σ T : ℝ} (hT : 0 < T) :
+    ∫⁻ (t : ℝ) in Iic (-T), ENNReal.ofReal (σ ^ 2 + t ^ 2)⁻¹ ≤ .ofReal (T⁻¹) := by
+  simp [← lintegral_comp_neg_Ioi, right_tail hT]
+
+private lemma left_tail {σ T : ℝ} (hT : 0 < T) :
+    ∫⁻ (t : ℝ) in Iio (-T), ENNReal.ofReal (σ ^ 2 + t ^ 2)⁻¹ ≤ .ofReal (T⁻¹) := by
+  convert left_tail_closed hT using 1
+  exact setLIntegral_congr Iio_ae_eq_Iic
+
+private lemma tail_bound {σ T : ℝ} (hT : 0 < T) : ∫⁻ (t : ℝ) in (Icc (-T) T)ᶜ, ENNReal.ofReal (σ ^ 2 + t ^ 2)⁻¹ ≤ .ofReal (2 * T⁻¹) := by
+  have : (Icc (-T) T)ᶜ = Ioi T ∪ Iio (-T) := by grind
+  grw [this, lintegral_union (by measurability), right_tail hT, left_tail hT, ← ENNReal.ofReal_add]
+  · ring_nf
+    rfl
+  · positivity
+  · positivity
+  · simp [hT.le]
+
+noncomputable def C_Tail [Bump] : ℝ≥0 := ⟨
+  2 * (MellinOfSmooth1b (diffν.of_le (by simp)) suppν).choose,
+  by
+    obtain ⟨hC, -⟩ := (MellinOfSmooth1b (diffν.of_le (by simp)) suppν).choose_spec
+    positivity⟩
+
+lemma mellin_tail_bound [Bump] {ε σ : ℝ} (hε_pos : 0 < ε) (hε_lt_one : ε < 1) (hσ_pos : 0 < σ) (hσ_le_two : σ ≤ 2) : ∫⁻ (a : ℝ) in (Set.Icc (-ε⁻¹) (ε⁻¹))ᶜ, ‖mellin (fun x => (Smooth1 ν ε x : ℂ)) (↑σ + ↑a * I)‖ₑ ≤ C_Tail := by
+  let C := MellinOfSmooth1b (diffν.of_le (by simp)) suppν |>.choose
+  obtain ⟨hC, bdd⟩ := MellinOfSmooth1b (diffν.of_le (by simp)) suppν |>.choose_spec
+  trans  ∫⁻ (a : ℝ) in (Icc (-ε⁻¹) ε⁻¹)ᶜ, .ofReal (C * (ε * ‖(σ + a * I)‖ ^ 2)⁻¹)
+  · gcongr
+    grw [← bdd (σ/2) (by positivity)]
+    · simp
+    · simp [hσ_pos.le]
+    · simp [hσ_le_two]
+    · exact hε_pos
+    · exact hε_lt_one
+  trans  ∫⁻ (a : ℝ) in (Icc (-ε⁻¹) ε⁻¹)ᶜ, .ofReal (C * ε⁻¹) * .ofReal (‖(σ + a * I)‖ ^ 2)⁻¹
+  · -- TODO: lift ennreal to real tactic would be helpful here
+    gcongr
+    rw [mul_inv, ← mul_assoc, ENNReal.ofReal_mul]
+    positivity
+  · have {x : ℝ} : ‖σ + x * I‖^2 = σ^2 + x^2 := by rw [Complex.sq_norm, Complex.normSq_add_mul_I]
+    simp [this]
+    grw [lintegral_const_mul _ (by fun_prop), tail_bound (by positivity), C_Tail, ← ENNReal.ofReal_mul (by positivity)]
+    simp only [inv_inv, mul_inv_rev, exists_prop, ofReal_le_coe, C, NNReal.toReal]
+    field_simp
+    rfl
+
+noncomputable def C_mellin [Bump] : ℝ≥0∞ := C_Center + 2 * C_Tail
+
+lemma lintegral_mellin_bdd [Bump] {ε σ : ℝ} (hσ_pos : 0 < σ) (hσ_le_two : σ ≤ 2) (hε_pos : 0 < ε) (hε_lt_one : ε < 1) :
+    ∫⁻ (a : ℝ), ‖mellin (fun x => (Smooth1 ν ε x : ℂ)) (↑σ + ↑a * I)‖ₑ ≤ C_mellin * .ofReal σ⁻¹ := by
+  rw [← MeasureTheory.lintegral_add_compl (A := Set.Icc (-ε⁻¹) (ε⁻¹)) _ (by measurability)]
+  grw [mellin_center_bound, mellin_tail_bound hε_pos hε_lt_one hσ_pos hσ_le_two, C_mellin]
+  rw [← ENNReal.toReal_le_toReal (by finiteness) (by finiteness)]
+  simp (disch := finiteness) [ENNReal.toReal_add,]
+  have : 2⁻¹ ≤ σ⁻¹ := by simp [field, hσ_le_two]
+  nlinarith
+
+end Mellin
+
+
+def C_LSC : ℝ≥0 := sorry
+
 
 open _root_.Classical in
 theorem summatory_T_ll [Bump] [FG] [ProofData] :
-    summatory (fun q => ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive, ↑q * (↑q.totient)⁻¹ * ⨆ y ∈ Icc 1 (x+1), ‖T ε y χ‖ₑ) Q ≤ .ofReal (C_LSC *
-    (√(N * M) + √M * Q + √N * Q + Q ^ 2) * √(summatory (fun m => ‖f m‖ ^ 2) M) * √(summatory (fun n => ‖g n‖^2) N)) := by
-  sorry
+    summatory (fun q => ↑q * (↑q.totient)⁻¹ * ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive, ⨆ y ∈ Icc 1 (x+1), ‖T ε y χ‖ₑ) Q ≤ .ofReal (C_LSC *
+    (√(N * M) + √M * Q + √N * Q + Q ^ 2) * √(summatory (fun m => ‖f m‖ ^ 2) M) * √(summatory (fun n => ‖g n‖^2) N) * (Real.log (x + 1))) := by
+  rw [← lintegral_dirichletMeas]
+  grw [sup_T_le_lintegral_B]
+  rw [lintegral_const_mul _ (.of_discrete), MeasureTheory.lintegral_lintegral_swap]
+  · conv_lhs =>
+      right; right; intro y
+      rw [lintegral_mul_const _ (by fun_prop)]
+    grw [dirichletAverage_FG_le, lintegral_const_mul _ (by fun_prop)]
+    sorry
+  · apply Measurable.aemeasurable
+    apply measurable_from_prod_countable_right
+    simp only [Function.uncurry_apply_pair]
+    fun_prop
 
 theorem sup_summatory_eq_sup_nat {f : ℕ → ℂ}
     {x : ℝ} (hx : 2 ≤ x) :
@@ -336,17 +493,17 @@ open ENNReal
 theorem temp [fg : FG]
     {x Q : ℝ} (hx : 2 ≤ x) :
   open Classical in
-    summatory (fun q ↦ ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
-      q * (q.totient : ℝ≥0∞)⁻¹ * ⨆ y ∈ Set.Icc 1 x, ‖summatory (fun n ↦ (f * g) n * χ n) y‖ₑ) Q =
-    summatory (fun q ↦ ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
-      q * (q.totient : ℝ≥0∞)⁻¹ * ⨆ K ∈ Set.Icc 1 ⌊x⌋₊, ‖summatory (fun n ↦ (f * g) n * χ n) (K + 2⁻¹)‖ₑ) Q := by
+    summatory (fun q ↦ q * (q.totient : ℝ≥0∞)⁻¹ * ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
+      ⨆ y ∈ Set.Icc 1 x, ‖summatory (fun n ↦ (f * g) n * χ n) y‖ₑ) Q =
+    summatory (fun q ↦ q * (q.totient : ℝ≥0∞)⁻¹ * ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
+      ⨆ K ∈ Set.Icc 1 ⌊x⌋₊, ‖summatory (fun n ↦ (f * g) n * χ n) (K + 2⁻¹)‖ₑ) Q := by
   simp_rw [sup_summatory_eq_sup_nat hx]
 
 open _root_.Classical in
 theorem summatory_T_ll_nat [Bump] [FG] [data : ProofData] :
-    (summatory (fun q => ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive, ↑q * (↑q.totient)⁻¹ * ⨆ K ∈ Icc 1 ⌊x⌋₊, ‖T ε (↑K + 2⁻¹) χ‖ₑ) Q) ≤ .ofReal (C_LSC *
-    (√(N * M) + √M * Q + √N * Q + Q ^ 2) * √(summatory (fun m => ‖f m‖ ^ 2) M) * √(summatory (fun n => ‖g n‖^2) N)) := by
-  trans (summatory (fun q => ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive, ↑q * (↑q.totient)⁻¹ * ⨆ y ∈ Icc 1 (x+1), ‖T ε y χ‖ₑ) Q)
+    (summatory (fun q => ↑q * (↑q.totient)⁻¹ * ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive, ⨆ K ∈ Icc 1 ⌊x⌋₊, ‖T ε (↑K + 2⁻¹) χ‖ₑ) Q) ≤ .ofReal (C_LSC *
+    (√(N * M) + √M * Q + √N * Q + Q ^ 2) * √(summatory (fun m => ‖f m‖ ^ 2) M) * √(summatory (fun n => ‖g n‖^2) N) * Real.log (x + 1)) := by
+  trans (summatory (fun q => ↑q * (↑q.totient)⁻¹ * ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive, ⨆ y ∈ Icc 1 (x+1), ‖T ε y χ‖ₑ) Q)
   · gcongr with q hq hqQ χ hχ
     apply iSup_le
     intro K
@@ -504,18 +661,18 @@ theorem FG.summatory_mul_char [fg : FG] {q : ℕ} {χ : DirichletCharacter ℂ q
 theorem LargeSieve_convolution [fg : FG]
     {x Q : ℝ} (hx : 2 ≤ x) (hQ : 1 ≤ Q) :
   open Classical in
-    (summatory (fun q ↦ ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
-      q * (q.totient : ℝ≥0∞)⁻¹ * ⨆ y ∈ Set.Icc 1 x, ‖summatory (fun n ↦ (f * g) n * χ n) y‖ₑ) Q)
+    (summatory (fun q ↦ q * (q.totient : ℝ≥0∞)⁻¹ * ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
+      ⨆ y ∈ Set.Icc 1 x, ‖summatory (fun n ↦ (f * g) n * χ n) y‖ₑ) Q)
       ≤ .ofReal (C_LSC * (√(N * M) + √M * Q + √N * Q + Q^2) *
-      √(summatory (fun m ↦ ‖f m‖^2) M) * √(summatory (fun n ↦ ‖g n‖^2) N)) := by
+      √(summatory (fun m ↦ ‖f m‖^2) M) * √(summatory (fun n ↦ ‖g n‖^2) N) * Real.log (x + 1)) := by
   classical
   let ε := (6 * Real.log 2)⁻¹ * x⁻¹
   simp_rw [temp hx, FG.summatory_mul_char]
   obtain ⟨ν, diffν, νpos, suppν, mass_one⟩ := SmoothExistence
   let inst : Bump := {ν, diffν, νpos, suppν, mass_one}
   calc
-    _ = (summatory (fun q ↦ ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
-        q * (q.totient : ℝ≥0∞)⁻¹ * ⨆ K ∈ Set.Icc 1 ⌊x⌋₊, ‖T ε (K + 2⁻¹) χ‖ₑ) Q) := by
+    _ = (summatory (fun q ↦ q * (q.totient : ℝ≥0∞)⁻¹ * ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
+        ⨆ K ∈ Set.Icc 1 ⌊x⌋₊, ‖T ε (K + 2⁻¹) χ‖ₑ) Q) := by
       congr! with q hq_pos hQ χ hχ K hK
       simp only [mem_Icc] at hK
       rw [Flat.T_eq_sharp _ _ _ le_rfl]
