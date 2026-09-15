@@ -6,7 +6,7 @@ import PrimeNumberTheoremAnd.SmoothExistence
 
 import BV.Mellin
 import BV.Delta
-import BV.DirichletAverage
+import BV.Flat.DirichletAverage
 
 
 /-
@@ -334,7 +334,6 @@ theorem dirichletAverage_FG_le [Bump] [FG] [ProofData] {y : ℝ} : ∫⁻ (a : (
   have := CS (f := fun χ ↦ ‖F σ y χ‖ₑ) (g := fun χ ↦ ‖G σ y χ‖ₑ) Q
   apply this.trans
   grw [dirichletAverage_F_sq_le]
-
   sorry
 
 
@@ -342,7 +341,8 @@ section Mellin
 
 def C_Center : ℝ≥0 := sorry
 
-lemma mellin_center_bound [Bump] {ε σ : ℝ} : ∫⁻ (a : ℝ) in Set.Icc (-ε⁻¹) (ε⁻¹), ‖mellin (fun x => (Smooth1 ν ε x : ℂ)) (↑σ + ↑a * I)‖ₑ ≤ C_Center * .ofReal σ⁻¹ := by
+lemma mellin_center_bound [Bump] {ε σ : ℝ} :
+    ∫⁻ (a : ℝ) in Set.Icc (-ε⁻¹) (ε⁻¹), ‖mellin (fun x => (Smooth1 ν ε x : ℂ)) (↑σ + ↑a * I)‖ₑ ≤ C_Center * .ofReal (Real.log (ε⁻¹)) := by
   sorry
 
 private lemma right_tail {σ T : ℝ} (hT : 0 < T) :
@@ -419,12 +419,12 @@ lemma mellin_tail_bound [Bump] {ε σ : ℝ} (hε_pos : 0 < ε) (hε_lt_one : ε
 noncomputable def C_mellin [Bump] : ℝ≥0∞ := C_Center + 2 * C_Tail
 
 lemma lintegral_mellin_bdd [Bump] {ε σ : ℝ} (hσ_pos : 0 < σ) (hσ_le_two : σ ≤ 2) (hε_pos : 0 < ε) (hε_lt_one : ε < 1) :
-    ∫⁻ (a : ℝ), ‖mellin (fun x => (Smooth1 ν ε x : ℂ)) (↑σ + ↑a * I)‖ₑ ≤ C_mellin * .ofReal σ⁻¹ := by
+    ∫⁻ (a : ℝ), ‖mellin (fun x => (Smooth1 ν ε x : ℂ)) (↑σ + ↑a * I)‖ₑ ≤ C_mellin * .ofReal (Real.log (ε⁻¹)) := by
   rw [← MeasureTheory.lintegral_add_compl (A := Set.Icc (-ε⁻¹) (ε⁻¹)) _ (by measurability)]
   grw [mellin_center_bound, mellin_tail_bound hε_pos hε_lt_one hσ_pos hσ_le_two, C_mellin]
   rw [← ENNReal.toReal_le_toReal (by finiteness) (by finiteness)]
+  have : 2⁻¹ ≤ -Real.log ε  := sorry
   simp (disch := finiteness) [ENNReal.toReal_add,]
-  have : 2⁻¹ ≤ σ⁻¹ := by simp [field, hσ_le_two]
   nlinarith
 
 end Mellin

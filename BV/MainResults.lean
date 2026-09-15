@@ -4,7 +4,7 @@ import Architect
 import BV.Defs
 import BV.LambdaLE
 import BV.LambdaSharp
-import BV.LambdaFlat
+import BV.Flat.LambdaFlat
 
 open ArithmeticFunction
 
@@ -35,7 +35,7 @@ Follows from \ref{Lambda_decomp} and the triangle inequality, combining the boun
 \ref{BV_LambdaLE}, \ref{BV_LambdaSharp}, and \ref{BV_LambdaFlat}.
 -/) (uses := [BV_LambdaLE, BV_LambdaSharp, BV_LambdaFlat, Lambda_decomp])]
 theorem BV_Delta_Lambda [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q) (hQ : Q ≤ √x / (Real.log x)^(A+3)) :
-    ∑ q ∈ Nat.Icc 0 Q, maxya q (fun y a ↦ Δ_[Λ](y; q, a)) ≤
+    ∑ q ∈ Nat.Icc 0 Q, maxya q (fun y a ↦ |Δ_[Λ](y; q, a)|) ≤
       C_BV_L A * x / (Real.log x)^A := by
   sorry
 

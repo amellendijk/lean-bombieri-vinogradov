@@ -7,12 +7,11 @@ import BV.ForMathlib.IsLocallyBounded
 import BV.ForMathlib.Log
 import BV.ForMathlib.Monotone
 import BV.ForMathlib.RCLikeToComplex
-import BV.LambdaFlat
+import BV.Flat.LambdaFlat
 import BV.LambdaLE
 import BV.LambdaSharp
 import BV.MainResults
 import BV.Mathlib.Analysis.Calculus.Deriv.Slope
 import BV.Mathlib.MeasureTheory.Function.LocallyIntegrable
 import BV.Mellin
-import BV.Setup
 import BV.Summatory

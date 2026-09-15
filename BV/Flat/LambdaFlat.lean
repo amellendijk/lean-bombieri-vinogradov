@@ -192,6 +192,6 @@ Plug the bound from \ref{T_r_bound} into \ref{BV_LambdaFlat_via_T},
 then choose $U = V = e^{\sqrt{\log x}}$ and $C = A + 4$.
 -/) (uses := [BV_LambdaFlat_via_T, T_r_bound, Delta_LambdaFlat_small_conductor])]
 theorem BV_LambdaFlat [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q) (hQ : Q ≤ √x / (Real.log x)^(A+3)) :
-    ∑ q ∈ Nat.Icc 0 Q, maxya q (fun y a ↦ Δ_[Λ♭](y; q, a)) ≤
+    ∑ q ∈ Nat.Icc 0 Q, maxya q (fun y a ↦ |Δ_[Λ♭](y; q, a)|) ≤
       C_BV_LF A * x / (Real.log x)^A := by
   sorry

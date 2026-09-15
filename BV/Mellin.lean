@@ -210,6 +210,49 @@ lemma mellin_bump_bounded {σ₁ σ₂ : ℝ} (hσ₂ : 0 ≤ σ₂) {ν : ℝ �
     grind
   · simp
 
+-- Annoying, we can't use bigO since the constant can't depend on epsilon or sigma.
+lemma mellin_smooth1_bound {ε σ₂ : ℝ} (hε : 0 < ε) (hσ₂ : 0 ≤ σ₂) {ν : ℝ → ℝ} (diffν : ContDiff ℝ 1 ν)
+    (suppν : ν.support ⊆ Set.Icc (1 / 2) 2) :
+    𝓜 (fun x ↦ (Smooth1 ν ε x : ℂ)) =O[principal {s | 0 < s.re ∧ s.re ≤ σ₂}] fun s ↦ s⁻¹ := by
+  calc _ =ᶠ[principal {s | 0 < s.re ∧ s.re ≤ σ₂}] fun s ↦ (s⁻¹ * 𝓜 (fun x ↦ (ν x : ℂ)) (ε * s)) := by
+        filter_upwards [eventually_mem_principal _] with s hs
+        rw [MellinOfSmooth1a diffν suppν hε]
+        grind
+    _ =O[principal {s | 0 < s.re ∧ s.re ≤ σ₂}] (fun s ↦ s⁻¹ * 1) := by
+        apply IsBigO.mul (isBigO_refl _ _)
+        apply mellin_bump_bounded (σ₁ := 0) (σ₂ := σ₂*ε) (by positivity) diffν suppν
+          |>.comp_tendsto (k := fun x ↦ ε * x) (l' := principal {s | 0 < s.re ∧ s.re ≤ σ₂}) _
+          |>.trans (isBigO_const_const (1 : ℝ) (one_ne_zero : (1: ℂ) ≠ 0) _)
+        simp
+        intro s _ _
+        refine ⟨by nlinarith, by nlinarith⟩
+    _ = _ := by simp
+
+
+lemma mellin_smooth1_bound' {σ₂ : ℝ} (hσ₂ : 0 ≤ σ₂) {ν : ℝ → ℝ} (diffν : ContDiff ℝ 1 ν)
+    (suppν : ν.support ⊆ Set.Icc (1 / 2) 2) :
+    ∃ C : NNReal, ∀ ε, 0 < ε → ε ≤ 1 → ∀ s : ℂ, 0 < s.re → s.re ≤ σ₂ →
+    ‖𝓜 (fun x ↦ (Smooth1 ν ε x : ℂ)) s‖ ≤ C * ‖s⁻¹‖ := by
+  obtain ⟨C, hC_pos, bdd⟩ := mellin_bump_bounded (σ₁ := 0) (σ₂ := σ₂) (by positivity) diffν suppν |> isBigO_iff'.mp
+  simp only [norm_one, mul_one, eventually_principal, mem_setOf_eq, and_imp] at bdd
+  let C' : NNReal :=  ⟨C, hC_pos.le⟩
+  use C'
+  intro ε hε_pos hε_one s hs hs'
+  rw [MellinOfSmooth1a diffν suppν hε_pos, norm_mul]
+  trans ‖s⁻¹‖ * C'
+  · gcongr
+    simp [C', NNReal.toReal]
+    apply bdd _ (by simp [hs.le, hε_pos])
+    · simp
+      grw [hs', hε_one, one_mul]
+  · ring_nf
+    rfl
+  · exact hs
+
+
+
+
+
 lemma mellin_partial_int {σ₁ σ₂ : ℝ}
     {ν : ℝ → ℝ} {k : ℕ} (diffν : ContDiff ℝ k ν)
     (suppν : ν.support ⊆ Set.Icc (1 / 2) 2) (s : ℂ) :
@@ -223,6 +266,8 @@ lemma mellin_isBigO_pow {σ₁ σ₂ : ℝ}
       =O[principal (Complex.re ⁻¹' (Set.Icc σ₁ σ₂))]
       fun s ↦ (1+‖s‖)^k := by
   sorry
+
+
 
 /--
 Written by Claude:
