@@ -6,20 +6,6 @@ import BV.Mellin
 import BV.Delta
 
 
-/-
-Some token numbers from Opus:
- Session
- Total cost:            $35.38
- Total duration (API):  1h 17m 2s
- Total duration (wall): 1d 5h 4m
- Total code changes:    987 lines added, 149 lines removed
- Usage by model:
-     claude-haiku-4-5:  1.6k input, 57 output, 0 cache read, 0 cache write ($0.0019)
-      claude-opus-4-8:  17.0k input, 379.3k output, 30.2m cache read, 1.1m cache write ($35.38)
-
-Note: There is a sloppish sorry-free version of this file on the branch claude-fable.
--/
-
 namespace Mathlib.Meta.Positivity
 open Qq Lean Meta
 
@@ -34,7 +20,7 @@ def evalRealiSup : PositivityExt where eval {u α} zα pα? e :=
     let i : Q($ι) ← mkFreshExprMVarQ q($ι) .syntheticOpaque
     have body : Q(ℝ) := .betaRev f #[i]
     let rbody ← core zα pα body
-    let some pbody := rbody.toNonneg | throwError "idk"
+    let some pbody := rbody.toNonneg | return .none
     let pr : Q(∀ i, 0 ≤ $f i) ← mkLambdaFVars #[i] pbody
     assertInstancesCommute
     return .nonnegative q(Real.iSup_nonneg $pr)
@@ -42,6 +28,25 @@ def evalRealiSup : PositivityExt where eval {u α} zα pα? e :=
 
 end Mathlib.Meta.Positivity
 
+
+-- The existing `fun_prop` rule for constant complex powers requires a `NeZero`
+-- instance. This version also lets its discharger use nonvanishing hypotheses.
+attribute [fun_prop] Continuous.const_cpow
+
+/-- A finite summatory function is continuous in a parameter when its terms are. -/
+@[fun_prop]
+lemma continuous_summatory {α E : Type*} [TopologicalSpace α] [AddCommMonoid E]
+    [TopologicalSpace E] [ContinuousAdd E] {F : ℕ → α → E} {x : ℝ}
+    (hF : ∀ n ∈ Finset.Ioc 0 ⌊x⌋₊, Continuous (F n)) :
+    Continuous (fun t ↦ summatory (fun n ↦ F n t) x) :=
+  continuous_finsetSum _ hF
+
+/-- Integration commutes with a finite summatory function. -/
+lemma integral_summatory {α E : Type*} [MeasurableSpace α] [NormedAddCommGroup E]
+    [NormedSpace ℝ E] {μ : MeasureTheory.Measure α} {F : ℕ → α → E} {x : ℝ}
+    (hF : ∀ n ∈ Finset.Ioc 0 ⌊x⌋₊, MeasureTheory.Integrable (F n) μ) :
+    ∫ t, summatory (fun n ↦ F n t) x ∂μ = summatory (fun n ↦ ∫ t, F n t ∂μ) x :=
+  MeasureTheory.integral_finsetSum _ hF
 
 open ArithmeticFunction Set
 
@@ -75,6 +80,50 @@ namespace Flat
 
 open Complex
 
+lemma Bump.mass_one_Ioi [Bump] : ∫ x in Ioi 0, ν x / x = 1 := by
+  rw [← integral_Ici_eq_integral_Ioi, mass_one]
+
+/-- The smoothed cutoff has an integrable Mellin transform on each relevant vertical line. -/
+lemma Bump.verticalIntegrable [Bump] {ε σ : ℝ} (hε : 0 < ε) (hε1 : ε < 1)
+    (hσ : 0 < σ) (hσ2 : σ ≤ 2) :
+    Integrable (fun t : ℝ ↦ mellin (fun x ↦ (Smooth1 ν ε x : ℂ)) (σ + t * I)) :=
+  Smooth1_verticalIntegrable (diffν.of_le (by simp)) (fun x _ ↦ νpos x) suppν
+    Bump.mass_one_Ioi hε hε1 hσ hσ2
+
+lemma Bump.norm_smooth1_le_one [Bump] {ε x : ℝ} (hε : 0 < ε) (hx : 0 < x) :
+    ‖(Smooth1 ν ε x : ℂ)‖ ≤ 1 := by
+  rw [Complex.norm_real, Real.norm_eq_abs,
+    abs_of_nonneg (Smooth1Nonneg (fun x _ ↦ νpos x) hx hε)]
+  exact Smooth1LeOne (fun x _ ↦ νpos x) Bump.mass_one_Ioi hε hx
+
+/-- A positive real base has constant norm along a vertical line of exponents. -/
+lemma norm_cpow_neg_vertical {r : ℝ} (hr : 0 < r) (σ t : ℝ) :
+    ‖(r : ℂ) ^ (-(σ + t * I))‖ = r ^ (-σ) := by
+  simp [Complex.norm_cpow_eq_rpow_re_of_pos hr]
+
+lemma norm_one_div_cpow_neg_vertical {y : ℝ} (hy : 0 < y) (σ t : ℝ) :
+    ‖(1 / (y : ℂ)) ^ (-(σ + t * I))‖ = y ^ σ := by
+  rw [show (1 / (y : ℂ)) = ((1 / y : ℝ) : ℂ) by simp,
+    norm_cpow_neg_vertical (by positivity), one_div, Real.inv_rpow hy.le,
+    ← Real.rpow_neg hy.le, neg_neg]
+
+/-- A Dirichlet polynomial is continuous on a vertical line. -/
+@[fun_prop]
+lemma continuous_dirichletSum (c : ℕ → ℂ) (σ P : ℝ) :
+    Continuous (fun t : ℝ ↦ summatory (fun m ↦ c m * (m : ℂ) ^ (-(σ + t * I))) P) := by
+  apply continuous_summatory
+  intro m hm
+  have hm0 : (m : ℂ) ≠ 0 := by exact_mod_cast (Finset.mem_Ioc.mp hm).1.ne'
+  fun_prop (disch := simp_all)
+
+/-- The weighted ℓ¹ mass bounds a Dirichlet polynomial uniformly on a vertical line. -/
+lemma norm_dirichletSum_le (c : ℕ → ℂ) (σ P t : ℝ) :
+    ‖summatory (fun m ↦ c m * (m : ℂ) ^ (-(σ + t * I))) P‖ ≤
+      summatory (fun m ↦ ‖c m‖ * (m : ℝ) ^ (-σ)) P := by
+  refine (_root_.norm_summatory_le _ _).trans (summatory_le_summatory fun m hm _ ↦ ?_)
+  rw [norm_mul, Complex.norm_natCast_cpow_of_pos hm]
+  simp
+
 theorem T_eq_sum_integral {σ : ℝ} (hσ_pos : 0 < σ) (hσ : σ ≤ 2)
     [Bump] [FG] {q : ℕ} {ε : ℝ} (hε_pos : 0 < ε) {χ : DirichletCharacter ℂ q} (y : ℝ) (hy : 1 ≤ y) (hε_one : ε < 1) :
   T ε y χ =
@@ -95,13 +144,7 @@ theorem T_eq_sum_integral {σ : ℝ} (hσ_pos : 0 < σ) (hσ : σ ≤ 2)
 
 
 
-/--
-Written by Claude:
-A single term `f m χ(m) m^{-s} · g n χ(n) n^{-s} · (1/y)^{-s} · 𝓜(Smooth1 ν ε)(s)` is
-integrable along the vertical line `s = σ + t·I`. The `r^{-(σ+t·I)}` factors all have constant
-norm `r^{-σ}`, so the integrand is a bounded (in `t`) multiple of `𝓜(Smooth1 ν ε)(σ + t·I)`, which
-is integrable by `Smooth1_verticalIntegrable`. This is the common engine behind the two
-integrability side-goals in `T_eq_integral_sum`. -/
+/-- Each term of the Mellin representation is integrable: its prefactor has constant norm. -/
 theorem integrable_term {σ : ℝ} (hσ_pos : 0 < σ) (hσ : σ ≤ 2)
     [Bump] [FG] {q : ℕ} {ε : ℝ} (hε_pos : 0 < ε) (hε_one : ε < 1)
     {χ : DirichletCharacter ℂ q} {y : ℝ} (hy : 1 ≤ y) (m n : ℕ) (hm : 0 < m) (hn : 0 < n) :
@@ -110,46 +153,24 @@ theorem integrable_term {σ : ℝ} (hσ_pos : 0 < σ) (hσ : σ ≤ 2)
         (g n * χ ↑n * (n : ℂ) ^ (-((σ : ℂ) + ↑t * I))) *
         (1 / (y : ℂ)) ^ (-((σ : ℂ) + ↑t * I)) •
         mellin (fun x => (↑(Smooth1 ν ε x) : ℂ)) ((σ : ℂ) + ↑t * I)) := by
-  have hy0 : 0 < y := by positivity
-  -- The Mellin factor is vertically integrable (our new lemma, with `Bump` data adapted).
-  have hVI : Integrable (fun t : ℝ =>
-      mellin (fun x => (↑(Smooth1 ν ε x) : ℂ)) ((σ : ℂ) + ↑t * I)) :=
-    Smooth1_verticalIntegrable (diffν.of_le (by simp)) (fun x _ => νpos x) suppν
-      (by rw [← MeasureTheory.integral_Ici_eq_integral_Ioi]; exact mass_one) hε_pos hε_one hσ_pos hσ
-  -- The prefactor `Q` collects everything except the Mellin factor.
-  have hcont : Continuous (fun t : ℝ => -((σ : ℂ) + ↑t * I)) := by fun_prop
-  have e1 : Continuous (fun t : ℝ => (m : ℂ) ^ (-((σ : ℂ) + ↑t * I))) :=
-    hcont.const_cpow (Or.inl (by exact_mod_cast hm.ne'))
-  have e2 : Continuous (fun t : ℝ => (n : ℂ) ^ (-((σ : ℂ) + ↑t * I))) :=
-    hcont.const_cpow (Or.inl (by exact_mod_cast hn.ne'))
-  have e3 : Continuous (fun t : ℝ => (1 / (y : ℂ)) ^ (-((σ : ℂ) + ↑t * I))) :=
-    hcont.const_cpow (Or.inl (one_div_ne_zero (by exact_mod_cast hy0.ne')))
-  have hQcont : Continuous (fun t : ℝ =>
-      f m * χ ↑m * g n * χ ↑n * (m : ℂ) ^ (-((σ : ℂ) + ↑t * I)) *
-        (n : ℂ) ^ (-((σ : ℂ) + ↑t * I)) * (1 / (y : ℂ)) ^ (-((σ : ℂ) + ↑t * I))) :=
-    (((((continuous_const.mul continuous_const).mul continuous_const).mul
-      continuous_const).mul e1).mul e2).mul e3
-  -- The prefactor has constant norm, hence is bounded.
-  have hnorm : ∀ t : ℝ, ‖f m * χ ↑m * g n * χ ↑n * (m : ℂ) ^ (-((σ : ℂ) + ↑t * I)) *
-        (n : ℂ) ^ (-((σ : ℂ) + ↑t * I)) * (1 / (y : ℂ)) ^ (-((σ : ℂ) + ↑t * I))‖ =
-      ‖f m‖ * ‖χ (↑m : ZMod q)‖ * ‖g n‖ * ‖χ (↑n : ZMod q)‖ *
-        ((m : ℝ) ^ (-σ) * (n : ℝ) ^ (-σ) * (1 / y) ^ (-σ)) := by
-    intro t
-    have hre : (-((σ : ℂ) + ↑t * I)).re = -σ := by simp
-    simp only [norm_mul]
-    rw [Complex.norm_natCast_cpow_of_pos hm, Complex.norm_natCast_cpow_of_pos hn,
-      show (1 / (y : ℂ)) = ((1 / y : ℝ) : ℂ) by push_cast; ring,
-      Complex.norm_cpow_eq_rpow_re_of_pos (by positivity), hre]
-    ring
-  -- Bounded × integrable, then reassociate to the target shape.
-  refine (hVI.bdd_mul hQcont.aestronglyMeasurable
-    (Filter.Eventually.of_forall fun t => (hnorm t).le)).congr
-    (Filter.Eventually.of_forall fun t => ?_)
-  simp only [smul_eq_mul]; ring
+  have hm0 : (m : ℂ) ≠ 0 := by exact_mod_cast hm.ne'
+  have hn0 : (n : ℂ) ≠ 0 := by exact_mod_cast hn.ne'
+  have hy0 : (y : ℂ) ≠ 0 := by exact_mod_cast (show 0 < y by positivity).ne'
+  have hcont : Continuous (fun t : ℝ ↦
+      f m * χ m * (m : ℂ) ^ (-(σ + t * I)) *
+        (g n * χ n * (n : ℂ) ^ (-(σ + t * I))) *
+        (1 / (y : ℂ)) ^ (-(σ + t * I))) := by
+    fun_prop (disch := simp_all)
+  simp only [smul_eq_mul, ← mul_assoc] at hcont ⊢
+  refine (Bump.verticalIntegrable hε_pos hε_one hσ_pos hσ).bdd_mul
+    hcont.aestronglyMeasurable (c := ‖f m * χ m‖ * (m : ℝ) ^ (-σ) *
+      (‖g n * χ n‖ * (n : ℝ) ^ (-σ)) * y ^ σ) ?_
+  filter_upwards with t
+  simp only [norm_mul]
+  rw [Complex.norm_natCast_cpow_of_pos hm, Complex.norm_natCast_cpow_of_pos hn,
+    norm_one_div_cpow_neg_vertical (by positivity)]
+  simp [mul_assoc]
 
-
--- lemma summaotry_mul_char_mul_pow_ll (f : ℕ → ℂ) {σ : ℝ} (hσ_pos : 0 < σ) {t : ℝ} :
---     ‖summatory (fun m ↦ f m * χ m * m ^ (-(σ + t * I))) M‖ ≤
 
 theorem T_eq_integral_sum {σ : ℝ} (hσ_pos : 0 < σ) (hσ : σ ≤ 2)
     [Bump] [FG] {q : ℕ} {ε : ℝ} (hε_pos : 0 < ε) {χ : DirichletCharacter ℂ q} (y : ℝ) (hy : 1 ≤ y) (hε_one : ε < 1) :
@@ -162,9 +183,9 @@ theorem T_eq_integral_sum {σ : ℝ} (hσ_pos : 0 < σ) (hσ : σ ≤ 2)
   rw [T_eq_sum_integral hσ_pos hσ hε_pos y hy hε_one]
   pull summatory
   simp_rw [summatory_apply]
-  rw [MeasureTheory.integral_finset_sum, Finset.smul_sum, Finset.sum_comm]
+  rw [MeasureTheory.integral_finsetSum, Finset.smul_sum, Finset.sum_comm]
   congr! with n hn
-  rw [MeasureTheory.integral_finset_sum, Finset.smul_sum]
+  rw [MeasureTheory.integral_finsetSum, Finset.smul_sum]
   · congr! 1 with m hm
     simp [← integral_const_mul]
     congr! 2 with t
@@ -186,7 +207,7 @@ theorem T_eq_integral_sum {σ : ℝ} (hσ_pos : 0 < σ) (hσ : σ ≤ 2)
       (Finset.mem_Ioc.mp hm).1 (Finset.mem_Ioc.mp hn).1
   · -- Outer sum (over `n ≤ N`): a finite sum of `integrable_term` terms.
     intro i hi
-    refine integrable_finset_sum _ fun m hm => ?_
+    refine integrable_finsetSum _ fun m hm => ?_
     exact integrable_term hσ_pos hσ hε_pos hε_one hy m i
       (Finset.mem_Ioc.mp hm).1 (Finset.mem_Ioc.mp hi).1
 
@@ -217,23 +238,14 @@ private lemma norm_T_le [Bump] [FG] {q : ℕ} {ε : ℝ} (hε_pos : 0 < ε)
     {χ : DirichletCharacter ℂ q} {y : ℝ} (hy : 1 ≤ y) :
     ‖T ε y χ‖ ≤ ∑ m ∈ Finset.Ioc 0 ⌊M⌋₊, ∑ n ∈ Finset.Ioc 0 ⌊N⌋₊,
       ‖f m‖ * ‖χ (m : ZMod q)‖ * ‖g n‖ * ‖χ (n : ZMod q)‖ := by
-  have hy0 : (0 : ℝ) < y := by positivity
   rw [T, summatory_apply]
-  refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun m hm => ?_)
-  simp only [Finset.mem_Ioc] at hm
+  refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun m hm ↦ ?_)
   rw [summatory_apply]
-  refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun n hn => ?_)
-  simp only [Finset.mem_Ioc] at hn
-  have hmpos : (0 : ℝ) < m := by exact_mod_cast hm.1
-  have hnpos : (0 : ℝ) < n := by exact_mod_cast hn.1
-  have hpos : 0 < (m : ℝ) * n / y := by positivity
-  have hs1 : ‖(↑(Smooth1 ν ε ((m : ℝ) * n / y)) : ℂ)‖ ≤ 1 := by
-    rw [Complex.norm_real, Real.norm_eq_abs,
-      abs_of_nonneg (Smooth1Nonneg (fun x _ => νpos x) hpos hε_pos)]
-    exact Smooth1LeOne (fun x _ => νpos x)
-      (by rw [← MeasureTheory.integral_Ici_eq_integral_Ioi]; exact mass_one) hε_pos hpos
-  rw [norm_mul, norm_mul, norm_mul, norm_mul]
-  exact mul_le_of_le_one_right (by positivity) hs1
+  refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun n hn ↦ ?_)
+  obtain ⟨hm, _⟩ := Finset.mem_Ioc.mp hm
+  obtain ⟨hn, _⟩ := Finset.mem_Ioc.mp hn
+  simp only [norm_mul]
+  exact mul_le_of_le_one_right (by positivity) (Bump.norm_smooth1_le_one hε_pos (by positivity))
 
 theorem sup_summatory_eq_sup_nat {f : ℕ → ℂ}
     {x : ℝ} (hx : 1 ≤ x) :
@@ -323,13 +335,8 @@ theorem T_norm_le_integral [Bump] [FG] {q : ℕ} {ε : ℝ} (hε_pos : 0 < ε) (
         apply MeasureTheory.integral_congr_ae
         filter_upwards with t
         simp only [norm_mul, smul_eq_mul]
-        have hcpow : ‖(1 / (y : ℂ)) ^ (-(σ + t * I))‖ = y ^ σ := by
-          rw [show (1 / (y : ℂ)) = ((1 / y : ℝ) : ℂ) by push_cast; ring,
-            Complex.norm_cpow_eq_rpow_re_of_pos (by positivity)]
-          simp only [neg_re, add_re, ofReal_re, mul_re, I_re, mul_zero, ofReal_im, I_im, mul_one,
-            sub_zero, add_zero]
-          rw [one_div, Real.inv_rpow hy0.le, ← Real.rpow_neg hy0.le, neg_neg]
-        grind
+        rw [norm_one_div_cpow_neg_vertical hy0]
+        ring
     _ = y ^ σ * ∫ t : ℝ, _ := MeasureTheory.integral_const_mul _ _
 
 /-! ### Auxiliary real-analysis lemmas for the `J`-integral (Step 4) -/
@@ -390,21 +397,9 @@ private lemma integral_compl_Icc_inv_sq {T : ℝ} (hT : 0 < T) :
 /-- `∫_{0}^{T} (σ+t)⁻¹ = log(σ+T) - log σ` for `σ > 0`, `T ≥ 0`. -/
 private lemma integral_inv_shift {σ T : ℝ} (hσ : 0 < σ) (hT : 0 ≤ T) :
     ∫ t in (0 : ℝ)..T, (σ + t)⁻¹ = Real.log (σ + T) - Real.log σ := by
-  have hderiv : ∀ t ∈ Set.uIcc (0 : ℝ) T, HasDerivAt (fun s => Real.log (σ + s)) (σ + t)⁻¹ t := by
-    intro t ht
-    rw [Set.uIcc_of_le hT, Set.mem_Icc] at ht
-    have hpos : 0 < σ + t := by linarith [ht.1]
-    have := (Real.hasDerivAt_log hpos.ne').comp t
-      ((hasDerivAt_const t σ).add (hasDerivAt_id t))
-    convert! this using 1 <;> ring
-  rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv ?_]
-  · simp
-  · apply ContinuousOn.intervalIntegrable
-    apply ContinuousOn.inv₀
-    · fun_prop
-    · intro t ht
-      rw [Set.uIcc_of_le hT, Set.mem_Icc] at ht
-      grind
+  rw [intervalIntegral.integral_comp_add_left, add_zero,
+    integral_inv (notMem_uIcc_of_lt hσ (by positivity)),
+    Real.log_div (by positivity) hσ.ne']
 
 /-- `∫_{[-T,T]} (σ+|t|)⁻¹ = 2(log(σ+T) - log σ)` for `σ > 0`, `T ≥ 0`. -/
 private lemma integral_Icc_inv_abs {σ T : ℝ} (hσ : 0 < σ) (hT : 0 ≤ T) :
@@ -424,29 +419,11 @@ private lemma integral_Icc_inv_abs {σ T : ℝ} (hσ : 0 < σ) (hT : 0 ≤ T) :
     show (σ + |t|)⁻¹ = (σ + t)⁻¹
     rw [abs_of_nonneg ht.1]
   have hleft : ∫ t in (-T : ℝ)..0, (σ + |t|)⁻¹ = Real.log (σ + T) - Real.log σ := by
-    have hcongr : ∫ t in (-T : ℝ)..0, (σ + |t|)⁻¹ = ∫ t in (-T : ℝ)..0, (σ - t)⁻¹ := by
-      apply intervalIntegral.integral_congr
-      intro t ht
-      rw [Set.uIcc_of_le (by linarith : -T ≤ (0 : ℝ)), Set.mem_Icc] at ht
-      grind
-    rw [hcongr]
-    have hderiv : ∀ t ∈ Set.uIcc (-T : ℝ) 0,
-        HasDerivAt (fun s => -Real.log (σ - s)) (σ - t)⁻¹ t := by
-      intro t ht
-      rw [Set.uIcc_of_le (by linarith : -T ≤ (0 : ℝ)), Set.mem_Icc] at ht
-      have hpos : 0 < σ - t := by linarith [ht.2]
-      have := ((Real.hasDerivAt_log hpos.ne').comp t
-        ((hasDerivAt_const t σ).sub (hasDerivAt_id t))).neg
-      convert! this using 1 <;> ring
-    rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv ?_]
-    · grind
-    · apply ContinuousOn.intervalIntegrable
-      apply ContinuousOn.inv₀
-      · fun_prop
-      · intro t ht
-        rw [Set.uIcc_of_le (by linarith : -T ≤ (0 : ℝ)), Set.mem_Icc] at ht
-        grind
-  grind
+    rw [← hright]
+    simpa using (intervalIntegral.integral_comp_neg
+      (fun t : ℝ ↦ (σ + |t|)⁻¹) (a := 0) (b := T)).symm
+  rw [hleft, hright]
+  ring
 
 /-- Bound A of Step 4: on the vertical line `Re s = σ` with `0 < σ ≤ 2` and `0 < ε < 1`, the
 Mellin transform of `Smooth1 ν ε` decays like `1/‖s‖`, with a constant depending only on `ν`.
@@ -515,27 +492,63 @@ noncomputable def C_LSC [Bump] : ℝ := Real.exp 1 / (2 * π) * C_LS * C_J
 coefficient, whose left-hand side is a nonnegative sum. -/
 lemma C_LS_nonneg : 0 ≤ C_LS := by
   have h := large_sieve 1 le_rfl 0 1 one_pos (fun n => if n = 1 then 1 else 0)
-  -- The left-hand side of the large sieve is a sum of nonnegative terms.
-  have key : (0 : ℝ) ≤ C_LS * ((1 : ℕ) + (1 : ℝ) ^ 2) *
+  have hnonneg : (0 : ℝ) ≤ C_LS * ((1 : ℕ) + (1 : ℝ) ^ 2) *
       ∑ n ∈ Finset.Ioc (0 : ℤ) (0 + (1 : ℕ)), ‖(if n = 1 then (1 : ℂ) else 0)‖ ^ 2 := by
     refine le_trans ?_ h
     positivity
-  have hS : (∑ n ∈ Finset.Ioc (0 : ℤ) (0 + (1 : ℕ)), ‖(if n = 1 then (1 : ℂ) else 0)‖ ^ 2) = 1 := by
-    rw [show Finset.Ioc (0 : ℤ) (0 + (1 : ℕ)) = {1} from by decide, Finset.sum_singleton]
-    norm_num
-  rw [hS] at key
-  nlinarith [key]
+  rw [show Finset.Ioc (0 : ℤ) (0 + (1 : ℕ)) = {1} by decide] at hnonneg
+  norm_num at hnonneg
+  linarith
+
+lemma C_J_nonneg [Bump] : 0 ≤ C_J := by
+  have := exists_mellin_smooth1_boundA.choose_spec.1
+  have := exists_mellin_smooth1_boundB.choose_spec.1
+  unfold C_J
+  positivity
+
+lemma C_LSC_nonneg [Bump] : 0 ≤ C_LSC := by
+  have := C_LS_nonneg
+  have := C_J_nonneg
+  unfold C_LSC
+  positivity
+
+end Flat
+
+namespace Mathlib.Meta.Positivity
+open Qq Lean Meta
+
+/-- Positivity of the constants used in the Perron and large-sieve estimates. -/
+@[positivity Flat.FG.M, Flat.FG.N, C_LS, Flat.C_J, Flat.C_LSC]
+def evalPerronConstant : PositivityExt where eval {u α} zα pα? e :=
+  match pα? with | none => pure .none | some pα => do
+  match u, α, e with
+  | 0, ~q(ℝ), ~q(@Flat.FG.M $inst) =>
+    assertInstancesCommute
+    return .positive q(@Flat.FG.hM_pos $inst)
+  | 0, ~q(ℝ), ~q(@Flat.FG.N $inst) =>
+    assertInstancesCommute
+    return .positive q(@Flat.FG.hN_pos $inst)
+  | 0, ~q(ℝ), ~q(C_LS) =>
+    assertInstancesCommute
+    return .nonnegative q(Flat.C_LS_nonneg)
+  | 0, ~q(ℝ), ~q(@Flat.C_J $inst) =>
+    assertInstancesCommute
+    return .nonnegative q(@Flat.C_J_nonneg $inst)
+  | 0, ~q(ℝ), ~q(@Flat.C_LSC $inst) =>
+    assertInstancesCommute
+    return .nonnegative q(@Flat.C_LSC_nonneg $inst)
+  | _, _, _ => throwError "not a Perron constant"
+
+end Mathlib.Meta.Positivity
+
+namespace Flat
+open Complex
 
 /-- Reindex a sum over the integer interval `(0, k]` as a sum over the natural-number
 interval `(0, k]` via the cast `ℕ → ℤ`. -/
 lemma sum_Ioc_natCast {R : Type*} [AddCommMonoid R] (k : ℕ) (G : ℤ → R) :
     ∑ n ∈ Finset.Ioc (0 : ℤ) (k : ℤ), G n = ∑ m ∈ Finset.Ioc (0 : ℕ) k, G (m : ℤ) := by
-  apply Finset.sum_nbij' (i := fun n : ℤ => n.toNat) (j := fun m : ℕ => (m : ℤ))
-  · grind
-  · grind
-  · grind
-  · grind
-  · grind
+  apply Finset.sum_nbij' (i := fun n : ℤ ↦ n.toNat) (j := fun m : ℕ ↦ (m : ℤ)) <;> grind
 
 /-- One application of the large sieve to a single Dirichlet polynomial:
 `∑_{q≤Q} ∑*_χ (q/φq) ‖∑_{m≤P} h(m) χ(m) m^{-(σ+it)}‖² ≤ C_LS (P+Q²) ∑_{m≤P} ‖h(m)‖²`,
@@ -551,14 +564,7 @@ lemma largeSieve_factor {Q : ℝ} (hQ : 1 ≤ Q) {σ : ℝ} (hσ_pos : 0 < σ) (
   have hSnn : (0 : ℝ) ≤ summatory (fun m ↦ ‖h m‖ ^ 2) P :=
     summatory_nonneg _ _ (fun n _ => by positivity)
   rcases Nat.eq_zero_or_pos ⌊P⌋₊ with hP0 | hPpos
-  · -- `⌊P⌋₊ = 0`: every inner sum is empty, both sides are zero.
-    have hS0 : summatory (fun m ↦ ‖h m‖ ^ 2) P = 0 := by rw [summatory_apply, hP0]; simp
-    have hT0 : ∀ (q : ℕ) (χ : DirichletCharacter ℂ q),
-        summatory (fun m ↦ h m * χ m * (m : ℂ) ^ (-(σ + t * I))) P = 0 := by
-      intro q χ; rw [summatory_apply, hP0]; simp
-    simp only [hT0, norm_zero, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true,
-      zero_pow, mul_zero, Finset.sum_const_zero]
-    rw [hS0]; simp
+  · simp [summatory_apply, hP0]
   -- `⌊P⌋₊ > 0`: apply the large sieve.
   have hP1 : (1 : ℝ) ≤ P := Nat.floor_pos.mp hPpos
   have hPnn : (0 : ℝ) ≤ P := by positivity
@@ -601,11 +607,7 @@ lemma largeSieve_factor {Q : ℝ} (hQ : 1 ≤ Q) {σ : ℝ} (hσ_pos : 0 < σ) (
       = ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
         (q : ℝ) * (q.totient : ℝ)⁻¹ *
         ‖∑ n ∈ Finset.Ioc (0 : ℤ) (⌊P⌋₊ : ℤ), c n * χ n‖ ^ 2 := by
-          apply Finset.sum_congr rfl
-          intro q hq
-          apply Finset.sum_congr rfl
-          intro χ hχ
-          rw [ha q χ]
+          simp_rw [ha]
     _ ≤ C_LS * ((⌊P⌋₊ : ℝ) + Q ^ 2) * ∑ n ∈ Finset.Ioc (0 : ℤ) (⌊P⌋₊ : ℤ), ‖c n‖ ^ 2 := hLS
     _ ≤ C_LS * ((⌊P⌋₊ : ℝ) + Q ^ 2) * summatory (fun m ↦ ‖h m‖ ^ 2) P := by
           apply mul_le_mul_of_nonneg_left hb
@@ -614,6 +616,27 @@ lemma largeSieve_factor {Q : ℝ} (hQ : 1 ≤ Q) {σ : ℝ} (hσ_pos : 0 < σ) (
           apply mul_le_mul_of_nonneg_right _ hSnn
           have : (⌊P⌋₊ : ℝ) ≤ P := Nat.floor_le hPnn
           gcongr
+
+/-- Weighted Cauchy–Schwarz, with the weights kept outside the squares. -/
+lemma sum_weight_mul_le_sqrt {ι : Type*} (s : Finset ι) (w a b : ι → ℝ)
+    (hw : ∀ i, 0 ≤ w i) :
+    ∑ i ∈ s, w i * (a i * b i) ≤
+      √(∑ i ∈ s, w i * a i ^ 2) * √(∑ i ∈ s, w i * b i ^ 2) := by
+  have hprod : ∀ i, (√(w i) * a i) * (√(w i) * b i) = w i * (a i * b i) := by
+    intro i
+    rw [mul_mul_mul_comm, Real.mul_self_sqrt (hw i)]
+  simpa only [hprod, mul_pow, Real.sq_sqrt (hw _)] using
+    Real.sum_mul_le_sqrt_mul_sqrt s (fun i ↦ √(w i) * a i) (fun i ↦ √(w i) * b i)
+
+lemma sqrt_add_sq_mul_le {M N Q : ℝ} (hM : 0 ≤ M) (hN : 0 ≤ N) (hQ : 0 ≤ Q) :
+    √(M + Q ^ 2) * √(N + Q ^ 2) ≤ √(N * M) + √M * Q + √N * Q + Q ^ 2 := by
+  have hbound (x : ℝ) (hx : 0 ≤ x) : √(x + Q ^ 2) ≤ √x + Q := by
+    apply Real.sqrt_le_iff.mpr
+    refine ⟨by positivity, ?_⟩
+    nlinarith [Real.sq_sqrt hx, mul_nonneg (Real.sqrt_nonneg x) hQ]
+  calc
+    _ ≤ (√M + Q) * (√N + Q) := by gcongr <;> apply hbound <;> assumption
+    _ = _ := by rw [Real.sqrt_mul hN]; ring
 
 /-- Step 4 of `notes/theorem26_6_smooth.md`: summing the pointwise products
 `‖F_{σ+tI}(χ)‖·‖G_{σ+tI}(χ)‖` over `q ≤ Q` and primitive `χ (mod q)` (weighted by `q/φ(q)`),
@@ -628,98 +651,27 @@ theorem largeSieve_char_bound [FG] {Q : ℝ} (hQ : 1 ≤ Q) {σ : ℝ} (hσ_pos 
     ≤ C_LS * (√(N * M) + √M * Q + √N * Q + Q ^ 2) *
       √(summatory (fun m ↦ ‖f m‖ ^ 2) M) * √(summatory (fun n ↦ ‖g n‖ ^ 2) N) := by
   classical
-  rw [summatory_apply]
-  set Sf : ℝ := summatory (fun m ↦ ‖f m‖ ^ 2) M with hSf
-  set Sg : ℝ := summatory (fun n ↦ ‖g n‖ ^ 2) N with hSg
-  have hSfnn : 0 ≤ Sf := summatory_nonneg _ _ (fun n _ => by positivity)
-  have hSgnn : 0 ≤ Sg := summatory_nonneg _ _ (fun n _ => by positivity)
-  -- the sigma index set of pairs `(q, χ)` with `χ` primitive
-  set s : Finset (Σ q : ℕ, DirichletCharacter ℂ q) :=
-    (Finset.Ioc 0 ⌊Q⌋₊).sigma
-      (fun q => Finset.univ.filter (fun χ : DirichletCharacter ℂ q => χ.IsPrimitive)) with hs
-  -- the Cauchy–Schwarz vectors `√(q/φq)·‖F‖` and `√(q/φq)·‖G‖`
-  set aF : (Σ q : ℕ, DirichletCharacter ℂ q) → ℝ := fun p =>
-    Real.sqrt ((p.1 : ℝ) * (p.1.totient : ℝ)⁻¹) *
-      ‖summatory (fun m ↦ f m * p.2 m * (m : ℂ) ^ (-(σ + t * I))) M‖ with haF
-  set aG : (Σ q : ℕ, DirichletCharacter ℂ q) → ℝ := fun p =>
-    Real.sqrt ((p.1 : ℝ) * (p.1.totient : ℝ)⁻¹) *
-      ‖summatory (fun n ↦ g n * p.2 n * (n : ℂ) ^ (-(σ + t * I))) N‖ with haG
-  -- LHS as a single sum over `s`
-  have eLHS : (∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
-      (q : ℝ) * (q.totient : ℝ)⁻¹ *
-      (‖summatory (fun m ↦ f m * χ m * (m : ℂ) ^ (-(σ + t * I))) M‖ *
-       ‖summatory (fun n ↦ g n * χ n * (n : ℂ) ^ (-(σ + t * I))) N‖))
-      = ∑ p ∈ s, aF p * aG p := by
-    rw [Finset.sum_sigma', hs]
-    apply Finset.sum_congr rfl; intro p _
-    simp only [haF, haG]
-    symm
-    rw [mul_mul_mul_comm, Real.mul_self_sqrt (by positivity)]
-  have eF : (∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
-      (q : ℝ) * (q.totient : ℝ)⁻¹ *
-        ‖summatory (fun m ↦ f m * χ m * (m : ℂ) ^ (-(σ + t * I))) M‖ ^ 2)
-      = ∑ p ∈ s, aF p ^ 2 := by
-    rw [Finset.sum_sigma', hs]
-    apply Finset.sum_congr rfl; intro p _
-    simp only [haF]
-    rw [mul_pow, Real.sq_sqrt (by positivity)]
-  have eG : (∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
-      (q : ℝ) * (q.totient : ℝ)⁻¹ *
-        ‖summatory (fun n ↦ g n * χ n * (n : ℂ) ^ (-(σ + t * I))) N‖ ^ 2)
-      = ∑ p ∈ s, aG p ^ 2 := by
-    rw [Finset.sum_sigma', hs]
-    apply Finset.sum_congr rfl; intro p _
-    simp only [haG]
-    rw [mul_pow, Real.sq_sqrt (by positivity)]
-  rw [eLHS]
-  -- nonnegativity of the CS sum
-  have hLHSnn : 0 ≤ ∑ p ∈ s, aF p * aG p :=
-    Finset.sum_nonneg (fun p _ => by positivity)
-  -- the two large-sieve bounds
-  have hSFle : ∑ p ∈ s, aF p ^ 2 ≤ C_LS * (M + Q ^ 2) * Sf := by
-    rw [← eF, hSf]; exact largeSieve_factor hQ hσ_pos t (⇑f) M
-  have hSGle : ∑ p ∈ s, aG p ^ 2 ≤ C_LS * (N + Q ^ 2) * Sg := by
-    rw [← eG, hSg]; exact largeSieve_factor hQ hσ_pos t (⇑g) N
-  have hAFnn : 0 ≤ C_LS * (M + Q ^ 2) * Sf :=
-    le_trans (Finset.sum_nonneg (fun p _ => sq_nonneg _)) hSFle
-  -- Cauchy–Schwarz, then the large sieve bounds
-  have hsq : (∑ p ∈ s, aF p * aG p) ^ 2 ≤
-      (C_LS * (M + Q ^ 2) * Sf) * (C_LS * (N + Q ^ 2) * Sg) :=
-    (Finset.sum_mul_sq_le_sq_mul_sq s aF aG).trans
-      (mul_le_mul hSFle hSGle (Finset.sum_nonneg (fun p _ => sq_nonneg _)) hAFnn)
-  -- the constant comparison `√((M+Q²)(N+Q²)) ≤ √(NM)+√M Q+√N Q+Q²`
-  have hQ0 : (0 : ℝ) ≤ Q := by positivity
-  have hM := hM_pos.le
-  have hN := hN_pos.le
-  have hκ : (M + Q ^ 2) * (N + Q ^ 2)
-      ≤ (√(N * M) + √M * Q + √N * Q + Q ^ 2) ^ 2 := by
-    have ha := Real.sqrt_nonneg M
-    have hb := Real.sqrt_nonneg N
-    have e1 : √M ^ 2 = M := Real.sq_sqrt hM
-    have e2 : √N ^ 2 = N := Real.sq_sqrt hN
-    have e3 : √(N * M) = √N * √M := Real.sqrt_mul hN M
-    rw [e3]
-    nlinarith [e1, e2, ha, hb, hQ0, mul_nonneg ha hQ0, mul_nonneg hb hQ0,
-      mul_nonneg ha hb, mul_nonneg (mul_nonneg ha hb) hQ0, sq_nonneg Q]
-  -- the RHS is nonnegative and its square dominates `AF·AG`
-  have hκnn : 0 ≤ √(N * M) + √M * Q + √N * Q + Q ^ 2 :=
-    add_nonneg (add_nonneg (add_nonneg (Real.sqrt_nonneg _)
-      (mul_nonneg (Real.sqrt_nonneg _) hQ0)) (mul_nonneg (Real.sqrt_nonneg _) hQ0)) (sq_nonneg _)
-  have hRHSnn : 0 ≤ C_LS * (√(N * M) + √M * Q + √N * Q + Q ^ 2) * √Sf * √Sg :=
-    mul_nonneg (mul_nonneg (mul_nonneg C_LS_nonneg hκnn) (Real.sqrt_nonneg _)) (Real.sqrt_nonneg _)
-  have hfin : (C_LS * (M + Q ^ 2) * Sf) * (C_LS * (N + Q ^ 2) * Sg)
-      ≤ (C_LS * (√(N * M) + √M * Q + √N * Q + Q ^ 2) * √Sf * √Sg) ^ 2 := by
-    have hRHS2 : (C_LS * (√(N * M) + √M * Q + √N * Q + Q ^ 2) * √Sf * √Sg) ^ 2
-        = C_LS ^ 2 * (√(N * M) + √M * Q + √N * Q + Q ^ 2) ^ 2 * Sf * Sg := by
-      rw [mul_pow, mul_pow, mul_pow, Real.sq_sqrt hSfnn, Real.sq_sqrt hSgnn]
-    rw [hRHS2]
-    nlinarith [hκ, sq_nonneg C_LS, hSfnn, hSgnn, mul_nonneg hSfnn hSgnn,
-      mul_nonneg (mul_nonneg (sq_nonneg C_LS) hSfnn) hSgnn]
-  -- conclude
-  have key : (∑ p ∈ s, aF p * aG p) ^ 2
-      ≤ (C_LS * (√(N * M) + √M * Q + √N * Q + Q ^ 2) * √Sf * √Sg) ^ 2 := hsq.trans hfin
-  have := Real.sqrt_le_sqrt key
-  rwa [Real.sqrt_sq hLHSnn, Real.sqrt_sq hRHSnn] at this
+  let s := (Finset.Ioc 0 ⌊Q⌋₊).sigma
+    (fun q ↦ Finset.univ.filter (fun χ : DirichletCharacter ℂ q ↦ χ.IsPrimitive))
+  have hCS := sum_weight_mul_le_sqrt s (fun p ↦ (p.1 : ℝ) * (p.1.totient : ℝ)⁻¹)
+    (fun p ↦ ‖summatory (fun m ↦ f m * p.2 m * (m : ℂ) ^ (-(σ + t * I))) M‖)
+    (fun p ↦ ‖summatory (fun n ↦ g n * p.2 n * (n : ℂ) ^ (-(σ + t * I))) N‖)
+    (fun _ ↦ by positivity)
+  simp only [s, Finset.sum_sigma] at hCS
+  refine hCS.trans ?_
+  calc
+    _ ≤ √(C_LS * (M + Q ^ 2) * summatory (fun m ↦ ‖f m‖ ^ 2) M) *
+        √(C_LS * (N + Q ^ 2) * summatory (fun n ↦ ‖g n‖ ^ 2) N) := by
+      gcongr <;> exact largeSieve_factor hQ hσ_pos t _ _
+    _ = C_LS * (√(M + Q ^ 2) * √(N + Q ^ 2)) *
+        √(summatory (fun m ↦ ‖f m‖ ^ 2) M) * √(summatory (fun n ↦ ‖g n‖ ^ 2) N) := by
+      simp only [Real.sqrt_mul (by positivity : 0 ≤ C_LS * (M + Q ^ 2)),
+        Real.sqrt_mul (by positivity : 0 ≤ C_LS * (N + Q ^ 2)),
+        Real.sqrt_mul C_LS_nonneg]
+      nlinarith [Real.sq_sqrt C_LS_nonneg]
+    _ ≤ _ := by
+      gcongr
+      exact sqrt_add_sq_mul_le (by positivity) (by positivity) (by positivity)
 
 /-- `‖σ + tI‖⁻¹ ≤ √2 · (σ + |t|)⁻¹` for `σ > 0`: the reverse triangle estimate
 `σ + |t| ≤ √2 · ‖σ + tI‖`. -/
@@ -760,9 +712,7 @@ theorem mellin_J_bound [Bump] {ε : ℝ} (hε_pos : 0 < ε) (hε_one : ε < 1) {
   have hT_pos : 0 < T := by positivity
   -- the integrand is integrable on `ℝ`
   have hVI : Integrable (fun t : ℝ ↦ mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)) :=
-    Smooth1_verticalIntegrable (diffν.of_le (by simp)) (fun x _ => νpos x) suppν
-      (by rw [← MeasureTheory.integral_Ici_eq_integral_Ioi]; exact mass_one)
-      hε_pos hε_one hσ_pos hσ
+    Bump.verticalIntegrable hε_pos hε_one hσ_pos hσ
   have hInt : Integrable (fun t : ℝ ↦ ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)‖) :=
     hVI.norm
   -- centre estimate `∫_{|t|≤T} ≤ 2√2 (1+6 log 2) CA · L`
@@ -851,45 +801,18 @@ theorem integrable_norm_FG_mellin [Bump] [FG] {q : ℕ} {ε : ℝ} (hε_pos : 0 
       ‖summatory (fun m ↦ f m * χ m * (m : ℂ) ^ (-(σ + t * I))) M‖ *
         ‖summatory (fun n ↦ g n * χ n * (n : ℂ) ^ (-(σ + t * I))) N‖ *
         ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)‖) := by
-  classical
-  -- The Mellin factor is vertically integrable.
-  have hVI : Integrable (fun t : ℝ ↦ mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)) :=
-    Smooth1_verticalIntegrable (diffν.of_le (by simp)) (fun x _ => νpos x) suppν
-      (by rw [← MeasureTheory.integral_Ici_eq_integral_Ioi]; exact mass_one)
-      hε_pos hε_one hσ_pos hσ
-  -- Each partial Dirichlet sum is continuous and bounded in `t`.
-  have key : ∀ (c : ℕ → ℂ) (P : ℝ),
-      Continuous (fun t : ℝ ↦ summatory (fun m ↦ c m * χ m * (m : ℂ) ^ (-(σ + t * I))) P) ∧
-      ∃ C : ℝ, ∀ t : ℝ,
-        ‖summatory (fun m ↦ c m * χ m * (m : ℂ) ^ (-(σ + t * I))) P‖ ≤ C := by
-    intro c P
-    have hexp : Continuous (fun t : ℝ ↦ (-(↑σ + ↑t * I) : ℂ)) := by fun_prop
-    have hcont : Continuous
-        (fun t : ℝ ↦ summatory (fun m ↦ c m * χ m * (m : ℂ) ^ (-(σ + t * I))) P) := by
-      simp_rw [summatory_apply]
-      apply continuous_finset_sum
-      intro m hm
-      simp only [Finset.mem_Ioc] at hm
-      exact continuous_const.mul
-        (hexp.const_cpow (Or.inl (by exact_mod_cast (show (0 : ℕ) < m by omega).ne')))
-    refine ⟨hcont, summatory (fun m ↦ ‖c m‖ * ‖χ (m : ZMod q)‖ * (m : ℝ) ^ (-σ)) P, fun t ↦ ?_⟩
-    rw [summatory_apply, summatory_apply]
-    refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun m hm ↦ le_of_eq ?_)
-    simp only [Finset.mem_Ioc] at hm
-    rw [norm_mul, norm_mul, Complex.norm_natCast_cpow_of_pos (by omega)]
-    simp only [neg_re, add_re, ofReal_re, mul_re, I_re, mul_zero, ofReal_im, I_im, mul_one,
-      sub_zero, add_zero]
-  obtain ⟨hFcont, C_F, hF_bound⟩ := key (fun m ↦ f m) M
-  obtain ⟨hGcont, C_G, hG_bound⟩ := key (fun n ↦ g n) N
-  -- `‖F_t‖·‖G_t‖` is continuous and bounded; multiply by the integrable Mellin norm.
-  have hbound : ∀ t : ℝ, ‖(fun t ↦ ‖summatory (fun m ↦ (f m) * χ m * (m : ℂ) ^ (-(σ + t * I))) M‖ *
-        ‖summatory (fun n ↦ (g n) * χ n * (n : ℂ) ^ (-(σ + t * I))) N‖) t‖ ≤ C_F * C_G := by
-    intro t
-    rw [Real.norm_eq_abs, abs_of_nonneg (by positivity)]
-    exact mul_le_mul (hF_bound t) (hG_bound t) (norm_nonneg _)
-      (le_trans (norm_nonneg _) (hF_bound 0))
-  exact hVI.norm.bdd_mul (hFcont.norm.mul hGcont.norm).aestronglyMeasurable
-    (Filter.Eventually.of_forall hbound)
+  have hcont : Continuous (fun t : ℝ ↦
+      ‖summatory (fun m ↦ f m * χ m * (m : ℂ) ^ (-(σ + t * I))) M‖ *
+        ‖summatory (fun n ↦ g n * χ n * (n : ℂ) ^ (-(σ + t * I))) N‖) := by
+    fun_prop
+  refine (Bump.verticalIntegrable hε_pos hε_one hσ_pos hσ).norm.bdd_mul
+    hcont.aestronglyMeasurable (c :=
+      summatory (fun m ↦ ‖f m * χ m‖ * (m : ℝ) ^ (-σ)) M *
+      summatory (fun n ↦ ‖g n * χ n‖ * (n : ℝ) ^ (-σ)) N) ?_
+  filter_upwards with t
+  rw [Real.norm_of_nonneg (by positivity)]
+  exact mul_le_mul (norm_dirichletSum_le _ _ _ _) (norm_dirichletSum_le _ _ _ _)
+    (norm_nonneg _) (by positivity)
 
 open _root_.Classical in
 theorem summatory_T_ll [Bump] [FG] {ε Q : ℝ} (hε_pos : 0 < ε) (hQ : 1 ≤ Q)
@@ -922,17 +845,13 @@ theorem summatory_T_ll [Bump] [FG] {ε Q : ℝ} (hε_pos : 0 < ε) (hQ : 1 ≤ Q
     ‖summatory (fun m ↦ f m * χ m * (m : ℂ) ^ (-(σ + t * I))) M‖ *
       ‖summatory (fun n ↦ g n * χ n * (n : ℂ) ^ (-(σ + t * I))) N‖ *
       ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)‖
-  have hB_nonneg : ∀ (q : ℕ) (χ : DirichletCharacter ℂ q) (t : ℝ), 0 ≤ B q χ t := by
-    intro q χ t
-    positivity
   have hB_int : ∀ (q : ℕ) (χ : DirichletCharacter ℂ q), Integrable (B q χ) :=
     fun q χ => integrable_norm_FG_mellin hε_pos hε_one hσ_pos hσ_le
   -- Step 1 & 3: per-character bound, using `T_norm_le_integral` and `y^σ ≤ e`.
   have hsup : ∀ (q : ℕ) (χ : DirichletCharacter ℂ q),
       (⨆ y ∈ Icc 1 (x + 1), ‖T ε y χ‖) ≤ (Real.exp 1 / (2 * π)) * ∫ t : ℝ, B q χ t := by
     intro q χ
-    have hI_nonneg : 0 ≤ ∫ t : ℝ, B q χ t :=
-      MeasureTheory.integral_nonneg (fun t => hB_nonneg q χ t)
+    have hI_nonneg : 0 ≤ ∫ t : ℝ, B q χ t := by positivity
     apply Real.iSup_le _ (by positivity)
     intro y
     apply Real.iSup_le _ (by positivity)
@@ -946,11 +865,6 @@ theorem summatory_T_ll [Bump] [FG] {ε Q : ℝ} (hε_pos : 0 < ε) (hQ : 1 ≤ Q
           gcongr
           rw [← hxσ]
           exact Real.rpow_le_rpow (by linarith [hy.1]) hy.2 hσ_pos.le
-  have hBeq : ∀ (q : ℕ) (χ : DirichletCharacter ℂ q) (t : ℝ), B q χ t =
-      (‖summatory (fun m ↦ f m * χ m * (m : ℂ) ^ (-(σ + t * I))) M‖ *
-       ‖summatory (fun n ↦ g n * χ n * (n : ℂ) ^ (-(σ + t * I))) N‖) *
-      ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)‖ := fun q χ t => by
-    rfl
   -- `D t` is the large-sieve double sum at parameter `t` (without the Mellin factor).
   set D : ℝ → ℝ := fun t => summatory (fun q =>
     ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
@@ -960,25 +874,16 @@ theorem summatory_T_ll [Bump] [FG] {ε Q : ℝ} (hε_pos : 0 < ε) (hQ : 1 ≤ Q
   set Cb : ℝ := C_LS * (√(N * M) + √M * Q + √N * Q + Q ^ 2) *
     √(summatory (fun m ↦ ‖f m‖ ^ 2) M) * √(summatory (fun n ↦ ‖g n‖ ^ 2) N) with hCbdef
   have hD_le : ∀ t, D t ≤ Cb := fun t => largeSieve_char_bound hQ hσ_pos t
-  have hD_nonneg : ∀ t, 0 ≤ D t := by
-    intro t
-    positivity
-  have hCb_nonneg : 0 ≤ Cb := le_trans (hD_nonneg 0) (hD_le 0)
   have hmnorm_int : Integrable (fun t : ℝ =>
-      ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)‖) := by
-    have hVI : Integrable (fun t : ℝ =>
-        mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)) :=
-      Smooth1_verticalIntegrable (diffν.of_le (by simp)) (fun x _ => νpos x) suppν
-        (by rw [← MeasureTheory.integral_Ici_eq_integral_Ioi]; exact mass_one)
-        hε_pos hε_one hσ_pos hσ_le
-    exact hVI.norm
+      ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)‖) :=
+    (Bump.verticalIntegrable hε_pos hε_one hσ_pos hσ_le).norm
   -- The product `q/φ(q) · B q χ` is integrable (constant times `B q χ`).
   have hcB_int : ∀ (q : ℕ) (χ : DirichletCharacter ℂ q),
       Integrable (fun t => (q : ℝ) * (q.totient : ℝ)⁻¹ * B q χ t) :=
     fun q χ => (hB_int q χ).const_mul _
   have hsum_int : ∀ (q : ℕ), Integrable (fun t =>
       ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive, (q : ℝ) * (q.totient : ℝ)⁻¹ * B q χ t) :=
-    fun q => integrable_finset_sum _ (fun χ _ => hcB_int q χ)
+    fun q => integrable_finsetSum _ (fun χ _ => hcB_int q χ)
   -- The Mellin integrand factors out of the double sum:  `G t = D t · ‖𝓜(σ+tI)‖`.
   have hG_eq : ∀ t, summatory (fun q =>
       ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
@@ -986,7 +891,7 @@ theorem summatory_T_ll [Bump] [FG] {ε Q : ℝ} (hε_pos : 0 < ε) (hQ : 1 ≤ Q
       = D t * ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) (σ + t * I)‖ := by
     intro t
     rw [hDdef]
-    simp only [hBeq, ← mul_assoc, ← Finset.sum_mul, summatory_mul]
+    simp only [B, ← mul_assoc, ← Finset.sum_mul, summatory_mul]
   -- The key swap: finite double sum of integrals = integral of finite double sum.
   have hmain_eq : summatory (fun q =>
       ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
@@ -1002,13 +907,8 @@ theorem summatory_T_ll [Bump] [FG] {ε Q : ℝ} (hε_pos : 0 < ε) (hQ : 1 ≤ Q
     rw [mul_summatory]
     congr 1
     -- goal: summatory (fun q ↦ ∑*_χ ∫ (q/φq B)) Q = ∫ t, D t · ‖𝓜‖
-    simp_rw [← MeasureTheory.integral_finset_sum _ (fun χ _ => hcB_int _ χ)]
-    rw [show summatory (fun q => ∫ t : ℝ, ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
-            (q : ℝ) * (q.totient : ℝ)⁻¹ * B q χ t) Q
-          = ∫ t : ℝ, summatory (fun q => ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
-            (q : ℝ) * (q.totient : ℝ)⁻¹ * B q χ t) Q from
-        (MeasureTheory.integral_finset_sum (Finset.Ioc 0 ⌊Q⌋₊)
-          (fun q _ => hsum_int q)).symm]
+    simp_rw [← MeasureTheory.integral_finsetSum _ (fun χ _ => hcB_int _ χ)]
+    rw [← integral_summatory (fun q _ ↦ hsum_int q)]
     exact MeasureTheory.integral_congr_ae (Filter.Eventually.of_forall hG_eq)
   -- Assemble the chain.
   calc summatory (fun q => ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
@@ -1197,19 +1097,12 @@ theorem FG.summatory_mul_char [fg : FG] {q : ℕ} {χ : DirichletCharacter ℂ q
     g := g.twist χ
     hf := by simp +contextual [hf]
     hg := by simp +contextual [hg]
-    }
-  have := FG.summatory_mul (fg := inst) (y := y)
-  unfold inst at this
-  simp only [twist_apply, Algebra.algebraMap_self, RingHom.id_apply, ← mul_assoc] at this
-  calc
-    summatory (fun n ↦ (@FG.f fg * @FG.g fg) n * χ n) y =
-        summatory (fun n ↦ ((@FG.f fg).twist χ * (@FG.g fg).twist χ) n) y := by
-      simp [Finset.sum_mul]
-      congr! 2 with n hn_pos hny ⟨a, b⟩ hab
-      simp only [Nat.mem_divisorsAntidiagonal, ne_eq] at hab
-      simp [← hab.1]
-      ring
-    _ = _ := this
+  }
+  have h := FG.summatory_mul (fg := inst) (y := y)
+  unfold inst at h
+  simpa only [← ArithmeticFunction.mul_twist, twist_apply, Algebra.algebraMap_self,
+    RingHom.id_apply, mul_assoc] using h
+
 
 theorem LargeSieve_convolution_aux [Bump] [fg : FG]
     {x Q : ℝ} (hx : 1 ≤ x) (hQ : 1 ≤ Q) :

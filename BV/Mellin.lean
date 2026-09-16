@@ -18,6 +18,68 @@ theorem ContinuousAt.boundedAtFilter {X Y : Type*} [TopologicalSpace X] [Seminor
   exact ⟨_, hf.tendsto.eventually ((continuous_norm (E := Y)).tendsto (f x)
     |>.eventually_le_const (u := ‖f x‖ + 1) (by grind))⟩
 
+/-- The Mellin transform of *any* function is strongly measurable, with no hypotheses on `f`:
+either `f` is a.e. strongly measurable on `Ioi 0` and the parametric-integral machinery applies,
+or the integrand is non-measurable for every `s` (the kernel `x ^ (s - 1)` never vanishes on
+`Ioi 0`), so `mellin f ≡ 0`. -/
+theorem stronglyMeasurable_mellin {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    (f : ℝ → E) : StronglyMeasurable (𝓜 f) := by
+  by_cases hf : AEStronglyMeasurable f (volume.restrict (Ioi 0))
+  · obtain ⟨g, hg, hfg⟩ := hf
+    have heq : 𝓜 f = fun s => ∫ x in Ioi (0:ℝ), Complex.exp ((s - 1) * Real.log x) • g x := by
+      funext s
+      show ∫ x in Ioi (0:ℝ), (x:ℂ) ^ (s - 1) • f x = _
+      refine integral_congr_ae ?_
+      filter_upwards [ae_restrict_mem measurableSet_Ioi, hfg] with x hx hfgx
+      rw [hfgx, Complex.cpow_def_of_ne_zero (ofReal_ne_zero.mpr hx.ne'),
+        ← Complex.ofReal_log hx.le, mul_comm]
+    rw [heq]
+    have hF : StronglyMeasurable fun p : ℂ × ℝ =>
+        Complex.exp ((p.1 - 1) * Real.log p.2) • g p.2 :=
+      ((Complex.measurable_exp.comp ((measurable_fst.sub measurable_const).mul
+        (Complex.measurable_ofReal.comp (Real.measurable_log.comp
+          measurable_snd)))).stronglyMeasurable).smul (hg.comp_measurable measurable_snd)
+    exact hF.integral_prod_right'
+  · have h0 : 𝓜 f = fun _ => 0 := by
+      funext s
+      refine integral_undef fun hInt => hf ?_
+      have hker : Measurable fun x : ℝ => (Complex.exp ((s - 1) * Real.log x))⁻¹ :=
+        (Complex.measurable_exp.comp (measurable_const.mul
+          (Complex.measurable_ofReal.comp Real.measurable_log))).inv
+      have h1 : AEStronglyMeasurable
+          (fun x : ℝ => (Complex.exp ((s - 1) * Real.log x))⁻¹ • ((x:ℂ) ^ (s - 1) • f x))
+          (volume.restrict (Ioi 0)) :=
+        hker.aestronglyMeasurable.smul hInt.aestronglyMeasurable
+      refine h1.congr ?_
+      filter_upwards [ae_restrict_mem measurableSet_Ioi] with x hx
+      rw [Complex.cpow_def_of_ne_zero (ofReal_ne_zero.mpr hx.ne'),
+        ← Complex.ofReal_log hx.le, mul_comm, inv_smul_smul₀ (Complex.exp_ne_zero _)]
+    rw [h0]
+    exact stronglyMeasurable_const
+
+@[fun_prop]
+theorem measurable_mellin {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    [MeasurableSpace E] [BorelSpace E] (f : ℝ → E) : Measurable (𝓜 f) :=
+  (stronglyMeasurable_mellin f).measurable
+
+/-- Composition form so that `fun_prop` can close `StronglyMeasurable` goals about
+`fun a => 𝓜 f (g a)` (e.g. along a vertical line `g = fun t => σ + t * I`). -/
+@[fun_prop]
+theorem stronglyMeasurable_mellin_comp {α : Type*} [MeasurableSpace α]
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] (f : ℝ → E)
+    {g : α → ℂ} (hg : Measurable g) :
+    StronglyMeasurable (fun a => 𝓜 f (g a)) :=
+  (stronglyMeasurable_mellin f).comp_measurable hg
+
+/-- Composition form so that `fun_prop` can close `AEStronglyMeasurable` goals about
+`fun a => 𝓜 f (g a)` (it does not route them through `Measurable` on its own). -/
+@[fun_prop]
+theorem aestronglyMeasurable_mellin_comp {α : Type*} [MeasurableSpace α] {μ : Measure α}
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] (f : ℝ → E)
+    {g : α → ℂ} (hg : Measurable g) :
+    AEStronglyMeasurable (fun a => 𝓜 f (g a)) μ :=
+  (stronglyMeasurable_mellin_comp f hg).aestronglyMeasurable
+
 /-- Variant of MellinOfPsi on aribtrary vertial strips. `hσ₂` is unnecessary but harmless.  -/
 lemma MellinOfPsi_better {σ₁ σ₂ : ℝ} (hσ₂ : 0 ≤ σ₂) {ν : ℝ → ℝ} (diffν : ContDiff ℝ 1 ν)
     (suppν : ν.support ⊆ Set.Icc (1 / 2) 2) :
