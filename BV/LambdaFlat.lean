@@ -12,8 +12,10 @@ open scoped Moebius BV zeta ENNReal
 /-! ## Type II sums: the flat part $\Lambda^\flat$ -/
 
 /-- $S_r(y, \xi) := \left|\sum_{n \le y} \Lambda_r^\flat(n)\,\xi(n)\right|$ -/
-@[blueprint (latexEnv := "definition") (statement := /--
-$$S_r(y, \xi) := \left|\sum_{n \le y} \Lambda_r^\flat(n)\,\xi(n)\right|$$
+@[blueprint (title := /-- The twisted sums $S_r(y, \xi)$ -/) (statement := /--
+For $r \in \N$, a real $y$ and a Dirichlet character $\xi$ modulo some $d \in \N$, set
+$$S_r(y, \xi) := \Big| \sum_{n \le y} \Lambda^\flat_r(n)\, \xi(n) \Big| ,$$
+where $\Lambda^\flat_r$ is the restriction of $\Lambda^\flat$ to the integers coprime to $r$ (\Cref{onCoprime}).
 -/)]
 noncomputable def S [ProofData] {q : ℕ} (r : ℕ) (y : ℝ) (ξ : DirichletCharacter ℂ q) : ℝ :=
     ‖summatory (fun n ↦ onCoprime r Λ♭ n * ξ n) y‖
@@ -21,9 +23,12 @@ noncomputable def S [ProofData] {q : ℕ} (r : ℕ) (y : ℝ) (ξ : DirichletCha
 -- TODO: Figure out how we want to handle C here: ideally we don't have to pass it explicitly every time.
 -- TODO: We're using Nat.Icc while the definition of T is left-open. Consider if we want to define and use Nat.Ioc instead
 /-- $T_r(x, Q) := \sum_{(\log x)^C < d \le Q/r} \frac{1}{\varphi(d)} \sum_{\xi \pmod{d}}^* \max_{\sqrt{x} \le y \le x} S_r(y, \xi)$ -/
-@[blueprint (latexEnv := "definition") (statement := /--
-$$T_r(x, Q) := \sum_{(\log x)^C < d \le Q/r} \frac{1}{\varphi(d)} \sumstar_{\xi \pmod{d}} \max_{\sqrt{x} \le y \le x} S_r(y, \xi)$$
--/) (uses := [S])]
+@[blueprint (title := /-- The quantities $T_r(Q)$ -/) (statement := /--
+For a real $C$, an integer $r \ge 1$ and a real $Q$, set
+$$T^{(C)}_r(Q) := \sum_{(\log x)^C < d \le Q/r} \frac{1}{\varphi(d)} \sumstar_{\xi \bmod d} \ \max_{\sqrt x \le y \le x} S_r(y, \xi) \ \in [0, \infty],$$
+where $\sumstar$ is a sum over primitive characters and the maximum is that of \Cref{BV.maxy}. (For
+$r = 0$ the range of $d$ is empty and $T_r^{(C)}(Q) = 0$.) We usually suppress $C$ from the notation.
+-/)]
 noncomputable def T [ProofData] (C : ℝ) (r : ℕ) (Q : ℝ) : ℝ≥0∞ :=
   open Classical in
     ∑ d ∈ Finset.Ioc ⌊(Real.log x)^C⌋₊ ⌊Q/r⌋₊, (d.totient : ℝ≥0∞)⁻¹ *
@@ -56,6 +61,7 @@ lemma conductor_changeLevel_eq {R : Type*} [CommMonoidWithZero R] {n m : ℕ} [N
 /-- For `d ∣ q`, the Dirichlet characters mod `q` of conductor exactly `d` are precisely the
 `changeLevel` images of the primitive characters mod `d`.  This is the "intermediate result without
 the nonprincipal assumption" underlying `character_sum_by_conductor`. -/
+@[blueprint "character_sum_by_conductor" (latexEnv := "lemma")]
 theorem sum_conductor_fiber {R : Type*} [AddCommMonoid R] {q : ℕ} [NeZero q]
     (f : DirichletCharacter ℂ q → R) {d : ℕ} (hd : d ∣ q) :
   open Classical in
@@ -80,11 +86,18 @@ theorem sum_conductor_fiber {R : Type*} [AddCommMonoid R] {q : ℕ} [NeZero q]
   rw [← hset, Finset.sum_image
     (fun a _ b _ h => DirichletCharacter.changeLevel_injective hd h)]
 
-@[blueprint (latexEnv := "lemma") (statement := /--
-This is a standard result. Let $f$ be a function from Dirichlet characters. Then
-$$\sum_{\substack{\chi \pmod{q} \\ \chi \ne \chi_0}} f(\chi) = \sum_{\substack{d \mid q \\ d > 1}} \sumstar_{\xi \pmod{d}} f(1_{(n,q)=1}\xi)$$
-Note the principal character $\chi_0$ corresponds to the (primitive) trivial character mod $1$, so
-it is excluded on the right by the condition $d > 1$.
+@[blueprint (latexEnv := "lemma") (title := /-- Grouping characters by conductor -/) (statement := /--
+Let $q \ge 1$ and let $f$ be a function on the Dirichlet characters modulo $q$ with values in an additive
+commutative monoid. Then
+$$\sum_{\substack{\chi \bmod q \\ \chi \ne \chi_0}} f(\chi) = \sum_{\substack{d \mid q \\ d \ne 1}}\ \sumstar_{\xi \bmod d} f(\xi \uparrow^q),$$
+where $\xi \uparrow^q$ denotes the character modulo $q$ induced by $\xi$, i.e. $(\xi\uparrow^q)(n) = \xi(n) 1_{(n, q) = 1}$.
+-/) (proof := /--
+Group the characters $\chi \bmod q$ according to their conductor $d$, which divides $q$. For a fixed
+$d \mid q$, the map $\xi \mapsto \xi\uparrow^q$ is a bijection from the primitive characters modulo $d$ onto
+the characters modulo $q$ of conductor $d$: it is injective, it preserves the conductor, and every
+character of conductor $d$ is induced by its (primitive) associated character modulo $d$. Finally a
+character modulo $q$ is principal if and only if its conductor is $1$, which accounts for the
+exclusion of $d = 1$ on the right and of $\chi_0$ on the left.
 -/)]
 theorem character_sum_by_conductor {R : Type*} [AddCommMonoid R] {q : ℕ} [NeZero q]
     (f : DirichletCharacter ℂ q → R) :
@@ -187,6 +200,21 @@ noncomputable def GinnerTerm {q : ℕ} (a : ZMod q) (g : ℕ → ℝ) (x : ℝ) 
 open Classical in
 /-- `φ(d) Δ_g(x; d, a)` equals the sum over divisors `i ∣ d` of `GinnerTerm` (with the `i = 1`
 contribution removed). This is the conductor-grouping of `Delta_eq_sum_char`. -/
+@[blueprint (latexEnv := "lemma") (title := /-- $\varphi(d)\Delta_g$ as a sum over conductors -/) (statement := /--
+Let $q \ge 1$, $a \in (\Z/q\Z)^*$, and let $g : \N \to \R$ vanish at every $n$ with $(n, q) > 1$. For
+$x \in \R$ and $i \ge 1$ put
+$$G_i := \sumstar_{\xi \bmod i} \overline{\xi(a)} \sum_{n \le x} \xi(n) g(n) .$$
+Then for every divisor $d$ of $q$,
+$$\varphi(d)\, \Delta_g(x; d, a) = \sum_{\substack{i \mid d \\ i \ne 1}} G_i ,$$
+where $a$ is reduced modulo $d$ (resp. modulo $i$) on the right.
+-/) (proof := /--
+Since $d \mid q$, the reduction of $a$ modulo $d$ is a unit, so \Cref{Delta_eq_sum_char} gives
+$\varphi(d)\Delta_g(x;d,a) = \sum_{\chi \ne \chi_0 \bmod d} \overline{\chi(a)} \sum_{n \le x} \chi(n) g(n)$.
+Apply \Cref{character_sum_by_conductor} to the modulus $d$. For $\xi$ primitive modulo $i \mid d$ and
+$n$ with $g(n) \ne 0$ we have $(n, q) = 1$, hence $(n, d) = 1$ and $(\xi\uparrow^d)(n) = \xi(n)$; likewise
+$(\xi\uparrow^d)(a) = \xi(a)$ because $a$ is a unit. So the summand attached to $\xi\uparrow^d$ is exactly
+the summand of $G_i$.
+-/)]
 lemma totient_mul_Delta_eq {q : ℕ} [NeZero q] {a : ZMod q} (ha : IsUnit a) {g : ℕ → ℝ}
     (hg : ∀ n, g n ≠ 0 → q.Coprime n) {x : ℝ} {d : ℕ} (hdq : d ∣ q) :
     (d.totient : ℂ) * ↑(Δ_[g](x; d, a.cast))
@@ -223,20 +251,17 @@ lemma totient_mul_Delta_eq {q : ℕ} [NeZero q] {a : ZMod q} (ha : IsUnit a) {g 
   rw [Finset.sum_filter]
   grind
 
-@[blueprint (latexEnv := "lemma") (statement := /--
-Let $f$ be an arithmetic function. For $r \le x$, $q > 1$ and $(a, q) = 1$,
-$$\sumstar_{\xi \pmod{q}} \bar\xi(a) \sum_{n \le y} \xi(n) f_r(n) = \sum_{d \mid q} \mu(q/d)\,\varphi(d)\,\Delta_{f_{rq}}(y;\, d,\, a)$$
+@[blueprint (latexEnv := "lemma") (title := /-- Primitive character sums via Möbius inversion -/) (statement := /--
+Let $f$ be a real arithmetic function, $r \in \N$, $q > 1$, $x \in \R$ and $a \in (\Z/q\Z)^*$. Then
+$$\sumstar_{\xi \bmod q} \overline{\xi(a)} \sum_{n \le x} \xi(n) f_r(n) = \sum_{d \mid q} \mu(q/d)\, \varphi(d)\, \Delta_{f_{rq}}(x; d, a).$$
 -/) (proof := /--
-Fix $P \in \N$ with $q \mid P$. Define $F_P$ and $G_P$ on divisors of $P$ by
-\begin{align*}
-F_P(q) &:= \sum_{\chi \ne \chi_0 \pmod{q}} \bar\chi(a) \sum_{n \le y} \chi(n) f_{rP}(n) = \Delta_{f_{rP}}(y;\, q,\, a), \\
-G_P(d) &:= \sumstar_{\xi \pmod{d}} \bar\xi(a) \sum_{n \le y} \xi(n) f_{rP}(n) \quad (d > 1),\quad G_P(1) = 0.
-\end{align*}
-Since every non-principal character mod $q$ factors through a unique primitive character, $F_P(q) = \sum_{d \mid q} G_P(d)$.
-By Möbius inversion,
-$$G_P(q) = \sum_{d \mid q} \mu(q/d)\, F_P(d) = \sum_{d \mid q} \mu(q/d)\, \Delta_{f_{rP}}(y;\, d,\, a).$$
-Set $P = q$ to conclude.
--/) (uses := [character_sum_by_conductor])]
+Put $g := f_{rq}$; then $g(n) = 0$ whenever $(n,q) > 1$. Since $\xi(n) = 0$ unless $(n, q) = 1$, and
+$f_r(n) = f_{rq}(n)$ when $(n,q) = 1$, the left-hand side equals $G_q$ in the notation of
+\Cref{totient_mul_Delta_eq}. Define $G'_i := G_i$ for $i \mid q$, $i \ne 1$, and $G'_1 := 0$, and set
+$F(d) := \sum_{i \mid d} G'_i$ for $d \mid q$. By \Cref{totient_mul_Delta_eq}, $F(d) = \varphi(d)\Delta_g(x;d,a)$.
+Möbius inversion of the relation $F = G' * 1$ on the divisors of $q$ gives
+$G'_q = \sum_{d \mid q} \mu(q/d) F(d)$, and $G'_q = G_q$ because $q \ne 1$.
+-/)]
 theorem character_sum_Mobius (f : ArithmeticFunction ℝ) {r q : ℕ} {x : ℝ} {a : ZMod q} (hq : 1 < q) (ha : IsUnit a) :
   open Classical in
     ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive, star (ξ a) * summatory (fun n ↦ ξ n * onCoprime r f n) x =
@@ -310,9 +335,26 @@ theorem onCoprime_mul_eq_of_dvd {R : Type*} [Zero R] {f : ℕ → R} {q d : ℕ}
   · rw [if_pos ⟨h, Nat.Coprime.coprime_dvd_left hdq h⟩, if_pos h]
   · rw [if_neg (fun hc => h hc.1), if_neg h]
 
-@[blueprint (latexEnv := "lemma") (statement := /--
-$$\left|\Delta_{\Lambda^\flat}(y;\, q,\, a)\right| \le \frac{1}{\varphi(q)} \left|\sum_{\substack{d \mid q \\ 1 < d \le (\log x)^C}} \sum_{s \mid d} \mu(d/s)\,\varphi(s)\,\Delta_{\Lambda^\flat_q}(y;\,s,\,a)\right| + \frac{1}{\varphi(q)} \sum_{\substack{d \mid q \\ d > (\log x)^C}} \sumstar_{\xi \pmod{d}} S_{q/d}(y, \xi)$$
--/) (uses := [character_sum_by_conductor, character_sum_Mobius, S])]
+@[blueprint (title := /-- Decomposing $\Delta_{\Lambda^\flat}$ by conductor -/) (statement := /--
+For every parameter datum, every $C \in \N$, every real $y$, every $q \ge 1$ and every $a \in (\Z/q\Z)^*$,
+$$\left| \Delta_{\Lambda^\flat}(y; q, a) \right| \le \frac{1}{\varphi(q)} \left| \sum_{\substack{d \mid q \\ 1 < d \le (\log x)^C}} \sum_{s \mid d} \mu(d/s)\, \varphi(s)\, \Delta_{\Lambda^\flat_q}(y; s, a) \right|
++ \frac{1}{\varphi(q)} \sum_{\substack{d \mid q \\ d > (\log x)^C}} \sumstar_{\xi \bmod d} S_{q/d}(y, \xi).$$
+-/) (proof := /--
+By \Cref{Delta_onCoprime_self}, $\Delta_{\Lambda^\flat}(y;q,a) = \Delta_{\Lambda^\flat_q}(y;q,a)$, and
+\Cref{totient_mul_Delta_eq} with $g = \Lambda^\flat_q$ and $d = q$ gives
+$$\varphi(q)\, \Delta_{\Lambda^\flat}(y;q,a) = \sum_{\substack{d \mid q \\ d \ne 1}} G_d, \qquad G_d = \sumstar_{\xi \bmod d} \overline{\xi(a)} \sum_{n \le y} \xi(n) \Lambda^\flat_q(n).$$
+Split the divisors $d \ne 1$ of $q$ according to whether $d \le (\log x)^C$ or $d > (\log x)^C$ and apply the
+triangle inequality to the two groups.
+
+For $1 < d \le (\log x)^C$, \Cref{character_sum_Mobius} (with modulus $d$, $r = q$ and $f = \Lambda^\flat$)
+expresses $G_d$ as $\sum_{s \mid d} \mu(d/s) \varphi(s) \Delta_{\Lambda^\flat_{qd}}(y; s, a)$, and
+$\Lambda^\flat_{qd} = \Lambda^\flat_q$ since $d \mid q$. This is the first term.
+
+For $d > (\log x)^C$ we bound $|G_d|$ termwise: $|\xi(a)| = 1$, and for a character $\xi$ modulo $d$
+one has $\xi(n) \Lambda^\flat_q(n) = \xi(n) \Lambda^\flat_{q/d}(n)$ for all $n$, because both sides vanish
+unless $(n, d) = 1$, in which case $(n, q) = 1 \iff (n, q/d) = 1$. Hence
+$|G_d| \le \sumstar_{\xi} S_{q/d}(y, \xi)$, which is the second term.
+-/)]
 theorem Delta_LambdaFlat_decomp [ProofData] {C : ℕ} {y : ℝ} (q : ℕ) (hqpos : 0 < q)
     (a : ZMod q) (ha : IsUnit a) :
   open Classical in
@@ -439,6 +481,13 @@ theorem Delta_LambdaFlat_decomp [ProofData] {C : ℕ} {y : ℝ} (q : ℕ) (hqpos
 
 /-- Divisors pair as `(d, n/d)` around `√n`, so `τ(n) ≤ 2√n`.
 (Mathlib only has `Nat.card_divisors_le_self : τ(n) ≤ n`.) -/
+@[blueprint (latexEnv := "lemma") (title := /-- Crude divisor bound -/) (statement := /--
+For every $n \in \N$, $\tau(n) \le 2\sqrt{n}$.
+-/) (proof := /--
+For $n = 0$ both sides vanish (the divisor set of $0$ is empty in Lean). For $n \ge 1$ the map
+$d \mapsto \min(d, n/d)$ sends the divisors of $n$ into $\{1, \dots, \lfloor \sqrt n \rfloor\}$, and
+each value has at most two preimages $\{d, n/d\}$. Hence $\tau(n) \le 2 \lfloor \sqrt n \rfloor \le 2\sqrt n$.
+-/)]
 theorem card_divisors_le_two_mul_sqrt (n : ℕ) :
     (n.divisors.card : ℝ) ≤ 2 * Real.sqrt n := by
   classical
@@ -496,6 +545,14 @@ theorem card_divisors_le_two_mul_sqrt (n : ℕ) :
 
 /-- For `x ≥ 1`, `δ > 0`: `(log x)^M ≤ (M/δ)^M · x^δ`. The `δ = 1/2` case recovers the
 `√x` bound; we also use `δ = 1/4` to absorb the divisor factor `τ(q) ≤ 2x^{1/4}`. -/
+@[blueprint (latexEnv := "lemma") (title := /-- Powers of $\log$ against powers of $x$ -/) (statement := /--
+For every real $x \ge 1$, every $M \in \N$ and every real $\delta > 0$,
+$$(\log x)^M \ll_{M, \delta} x^{\delta}.$$
+-/) (proof := /--
+For $M = 0$ both sides equal $1$. For $M \ge 1$ put $c = \delta/M$. Then
+$\log x = c^{-1} \log(x^c) \le c^{-1} (x^c - 1) \le c^{-1} x^c$, using $\log t \le t - 1$ for $t > 0$.
+Raising to the $M$-th power gives $(\log x)^M \le c^{-M} x^{cM} = (M/\delta)^M x^\delta$.
+-/)]
 theorem log_pow_le_const_mul_rpow {x : ℝ} (hx : 1 ≤ x) (M : ℕ) {δ : ℝ} (hδ : 0 < δ) :
     (Real.log x) ^ M ≤ ((M : ℝ) / δ) ^ M * x ^ δ := by
   have hx0 : 0 < x := by positivity
@@ -526,6 +583,7 @@ theorem log_pow_le_const_mul_rpow {x : ℝ} (hx : 1 ≤ x) (M : ℕ) {δ : ℝ} 
 
 /-- The sharp-term budget: with no constraint on `q` beyond `q ≤ √x`, the divisor factor
 `τ(q)` is absorbed by the `x^{1/4}` headroom, leaving `x/(log x)^K`. -/
+@[blueprint "log_power_absorption" (latexEnv := "lemma")]
 theorem card_divisors_mul_sqrt_mul_log_le_div [ProofData] {q : ℕ}
     (hq : (q : ℝ) ≤ √x) (K : ℕ) :
     (q.divisors.card : ℝ) * Real.sqrt x * Real.log x
@@ -615,6 +673,7 @@ theorem Delta_onCoprime_LambdaLEU_bound [ProofData] {y : ℝ} {q s : ℕ} (hs : 
   · positivity
 
 /-- Replacing `log y` by `log x` (using `√x ≤ y ≤ x`) costs at most a factor `2^N`. -/
+@[blueprint "pnt_ratio_bound" (latexEnv := "lemma")]
 theorem y_div_logy_le_x_div_logx [ProofData] {y : ℝ} (hy1 : √x ≤ y) (hy2 : y ≤ x) (N : ℕ) :
     y / (Real.log y) ^ N ≤ 2 ^ N * (x / (Real.log x) ^ N) := by
   have hlogx : 0 < Real.log x := log_x_pos
@@ -638,6 +697,26 @@ theorem y_div_logy_le_x_div_logx [ProofData] {y : ℝ} (hy1 : √x ≤ y) (hy2 :
 /-- Siegel–Walfisz bound for the coprime-restricted von Mangoldt function.
 The `q`-restriction and the `s`-correction cost only `O((log x)²)`, while the main term
 comes from Siegel–Walfisz applied at modulus `s ≤ (log y)^{C2}`. -/
+@[blueprint (latexEnv := "lemma") (title := /-- Siegel--Walfisz for $\Lambda_q$ -/) (statement := /--
+Let $A', C_2 \in \N$. For every parameter datum, every real $2 \le y \le x$, all integers $1 \le s \mid q$
+with $q \le \sqrt x$ and $s \le (\log y)^{C_2}$, and every $a \in (\Z/s\Z)^*$,
+$$\big| \Delta_{\Lambda_q}(y; s, a) \big| \ll_{A', C_2} \frac{y}{(\log y)^{A'}} + (\log x)^2 .$$
+-/) (proof := /--
+Write $\Lambda_q = \Lambda - \Lambda^{\mathrm{nc}}$ where $\Lambda^{\mathrm{nc}}(n) = \Lambda(n) 1_{(n, q) > 1}$, and
+use \Cref{Delta_linear}.
+
+\emph{The non-coprime part.} Since $\Lambda^{\mathrm{nc}} \ge 0$, \Cref{abs_Delta_le_two_summatory_abs} and
+\Cref{sum_vonMangoldt_not_coprime_le} give
+$|\Delta_{\Lambda^{\mathrm{nc}}}(y;s,a)| \le 2 \sum_{n \le y, (n,q) > 1} \Lambda(n) \ll \log q \log y \le (\log x)^2$,
+using $q \le x$ and $y \le x$.
+
+\emph{The main part.} By \Cref{Delta_Lambda_eq},
+$$\Delta_\Lambda(y;s,a) = \Big( \psi(y;s,a) - \frac{y}{\varphi(s)} \Big) + \frac{1}{\varphi(s)} \Big( y - \sum_{\substack{n \le y \\ (n, s) = 1}} \Lambda(n) \Big).$$
+The first bracket is $\ll_{A', C_2} y/(\log y)^{A'}$ by \Cref{siegel_walfisz}, since
+$1 \le s \le (\log y)^{C_2}$ and $y \ge 2$. The second is bounded, using $1/\varphi(s) \le 1$ and
+\Cref{coprime_vonMangoldt_error} with $B = A'$, by $\ll_{A'} y/(\log y)^{A'} + \log s \log y$,
+and $\log s \log y \le (\log x)^2$. Adding the three contributions gives the claim.
+-/)]
 theorem Delta_onCoprime_Lambda_bound [ProofData] (A' C2 : ℕ) {y : ℝ}
     (hy2 : 2 ≤ y) (hyx : y ≤ x)
     {q s : ℕ} (hs0 : 0 < s) (hsq : s ∣ q) (hq0 : 0 < q) (hqx : (q:ℝ) ≤ Real.sqrt x)
@@ -732,6 +811,19 @@ theorem Delta_onCoprime_Lambda_bound [ProofData] (A' C2 : ℕ) {y : ℝ}
 
 /-- A power `(log x)^j` is bounded by `K · x/(log x)^N` (with `K` depending on `j+N`),
 since `(log x)^{j+N} ≤ K·√x ≤ K·x`. -/
+@[blueprint "log_power_absorption" (latexEnv := "lemma") (title := /-- Absorbing powers of $\log x$ into $x/(\log x)^N$ -/) (statement := /--
+For every parameter datum, all $j, N \in \N$ and every $q \le \sqrt x$:
+$$(\log x)^j \ll_{j, N} \frac{x}{(\log x)^N}, \qquad
+\sqrt x\, (\log x)^j \ll_{j,N} \frac{x}{(\log x)^N}, \qquad
+\tau(q)\, \sqrt x \log x \ll_{N} \frac{x}{(\log x)^N} .$$
+-/) (proof := /--
+By \Cref{log_pow_le_const_mul_rpow} with $M = j + N$ and $\delta = 1/2$,
+$(\log x)^{j+N} \ll_{j,N} \sqrt x \le x$, which gives the first two bounds after dividing by
+$(\log x)^N$ (for the second use $\sqrt x \cdot \sqrt x = x$). For the third, use
+$\tau(q) \le 2\sqrt q \le 2 x^{1/4}$ (\Cref{card_divisors_le_two_mul_sqrt}) and
+\Cref{log_pow_le_const_mul_rpow} with $M = N+1$, $\delta = 1/4$: $(\log x)^{N+1} \ll_N x^{1/4}$;
+then $x^{1/4} \cdot \sqrt x \cdot x^{1/4} = x$.
+-/)]
 theorem log_pow_le_div [ProofData] (j N : ℕ) :
     (Real.log x) ^ j ≤ (2 * ((j + N : ℕ) : ℝ)) ^ (j + N) * (x / (Real.log x) ^ N) := by
   have hlogx : 0 < Real.log x := log_x_pos
@@ -769,6 +861,7 @@ theorem C_SW_nonneg [ProofData] (A C : ℕ) : 0 ≤ C_SW A C := by
   exact (mul_nonneg_iff_of_pos_right hpos).mp h0
 
 /-- `√x · (log x)^j` is bounded by `K · x/(log x)^N`. -/
+@[blueprint "log_power_absorption" (latexEnv := "lemma")]
 theorem sqrt_mul_log_pow_le_div [ProofData] (j N : ℕ) :
     Real.sqrt x * (Real.log x) ^ j
       ≤ (2 * ((j + N : ℕ) : ℝ)) ^ (j + N) * (x / (Real.log x) ^ N) := by
@@ -791,6 +884,29 @@ theorem sqrt_mul_log_pow_le_div [ProofData] (j N : ℕ) :
 `q ≤ √x`, decomposing `Λ♭ = Λ - Λ♯ - Λ_{≤U}` and applying Siegel–Walfisz (main term), the
 sharp bound, and the small bound gives `|Δ_{Λ♭_q}| ≪ x/(log x)^{A+2C+1}`. The divisor factor
 `τ(q)` from the sharp bound is absorbed via `τ(q) ≤ 2√q ≤ 2x^{1/4}`. -/
+@[blueprint (title := /-- Siegel--Walfisz for $\Lambda^\flat_q$ -/) (statement := /--
+Let $A, C \in \N$. For every parameter datum, every real $\sqrt x \le y \le x$, all integers $1 \le s \mid q$
+with $q \le \sqrt x$ and $s \le (\log x)^C$, and every $a \in (\Z/s\Z)^*$,
+$$\big| \Delta_{\Lambda^\flat_q}(y; s, a) \big| \ll_{A, C} \frac{x}{(\log x)^{A + 2C + 1}} .$$
+-/) (proof := /--
+Put $A' := A + 2C + 1$. By Vaughan's identity (\Cref{Lambda_decomp}) and linearity of restriction,
+$\Lambda^\flat_q = \Lambda_q - \Lambda^\sharp_q - (\Lambda_{\le U})_q$, so by \Cref{Delta_linear} it suffices to
+bound the three discrepancies separately by $\ll_{A,C} x/(\log x)^{A'}$. Note $y \ge \sqrt x \ge 2$
+and $\log y \ge \tfrac12 \log x \ge 8$ (\Cref{log_x_large}).
+
+\emph{$\Lambda_q$.} Since $(\log y)^2 \ge \tfrac14 (\log x)^2 \ge \log x$, we have $s \le (\log x)^C \le (\log y)^{2C}$, so
+\Cref{Delta_onCoprime_Lambda_bound} applies with $C_2 = 2C$. By \Cref{pnt_ratio_bound},
+$y/(\log y)^{A'} \ll_{A'} x/(\log x)^{A'}$, and by \Cref{log_power_absorption} (first bound with $j = 2$,
+$N = A'$), $(\log x)^2 \ll_{A'} x/(\log x)^{A'}$.
+
+\emph{$\Lambda^\sharp_q$.} The reduction of $a$ modulo $s$ is a unit and $q \le \sqrt x \le x$, so
+\Cref{Delta_LambdaSharp_bound} with $r = q$ gives $|\Delta_{\Lambda^\sharp_q}(y;s,a)| \ll \tau(q) UV \log x \le \tau(q) \sqrt x \log x$,
+and the third bound of \Cref{log_power_absorption} with $N = A'$ gives $\ll_{A'} x/(\log x)^{A'}$.
+
+\emph{$(\Lambda_{\le U})_q$.} As in \Cref{Delta_LambdaLEU_bound} (the restricted function is still non-negative
+with $\ell^1$ norm at most $U\log x$), $|\Delta_{(\Lambda_{\le U})_q}(y;s,a)| \le 2 U \log x \le 2 \sqrt x \log x$,
+and the second bound of \Cref{log_power_absorption} with $j = 1$, $N = A'$ gives $\ll_{A'} x/(\log x)^{A'}$.
+-/)]
 theorem Delta_onCoprime_LambdaFlat_pointwise [ProofData] (A C : ℕ) {y : ℝ}
     (hy1 : √x ≤ y) (hyx : y ≤ x)
     {q s : ℕ} (hs0 : 0 < s) (hsq : s ∣ q) (hq0 : 0 < q)
@@ -912,17 +1028,18 @@ theorem Delta_onCoprime_LambdaFlat_pointwise [ProofData] (A C : ℕ) {y : ℝ}
     rw [C_DLF]; ring
   grind
 
-@[blueprint (statement := /--
-$$\frac{1}{\varphi(q)} \left|\sum_{\substack{d \mid q \\ 1 < d \le (\log x)^C}} \sum_{s \mid d} \mu(d/s)\,\varphi(s)\,\Delta_{\Lambda^\flat_q}(y;\,s,\,a)\right| \ll_{A,C} \frac{x}{\varphi(q)\,(\log x)^{A+1}}$$
+@[blueprint (title := /-- Small conductors -/) (statement := /--
+Let $A, C \in \N$. For every parameter datum, every real $\sqrt x \le y \le x$, every integer $1 \le q \le \sqrt x$
+and every $a \in (\Z/q\Z)^*$,
+$$\left| \sum_{\substack{d \mid q \\ 1 < d \le (\log x)^C}} \sum_{s \mid d} \mu(d/s)\, \varphi(s)\, \Delta_{\Lambda^\flat_q}(y; s, a) \right| \ll_{A, C} \frac{x}{(\log x)^{A+1}} .$$
 -/) (proof := /--
-Push the absolute values inside, then
-\begin{align*}
-\sum_{d \mid q,\, d \le (\log x)^C} \sum_{s \mid d} \varphi(s)\, \left|\Delta_{\Lambda^\flat_q}(y;\, s,\, a)\right|
-&\ll_{A,C} \sum_{d \le (\log x)^C} \left(\sum_{s \mid d} \varphi(s)\right) \frac{x}{(\log x)^{A+2C+1}} \\
-&\ll \frac{x}{(\log x)^{A+2C+1}} \sum_{d \le (\log x)^C} d \\
-&\ll \frac{x}{(\log x)^{A+1}}.
-\end{align*}
--/) (uses := [Delta_LambdaFlat_decomp, siegel_walfisz])]
+Push the absolute value inside and use $|\mu(d/s)| \le 1$. For $s \mid d \mid q$ the reduction of $a$
+modulo $s$ is a unit and $s \le d \le (\log x)^C$, so \Cref{Delta_onCoprime_LambdaFlat_pointwise} bounds
+each discrepancy by $\ll_{A,C} x/(\log x)^{A+2C+1}$. Since $\sum_{s \mid d} \varphi(s) = d$, the left-hand
+side is
+$$\ll_{A,C} \frac{x}{(\log x)^{A+2C+1}} \sum_{\substack{d \mid q \\ 1 < d \le (\log x)^C}} d \le \frac{x}{(\log x)^{A+2C+1}} \cdot (\log x)^C \cdot (\log x)^C,$$
+because there are at most $(\log x)^C$ such $d$, each at most $(\log x)^C$.
+-/)]
 theorem Delta_LambdaFlat_small_conductor [ProofData] (A C : ℕ) {y : ℝ}
     (hy1 : √x ≤ y) (hyx : y ≤ x) (q : ℕ) (hq0 : 0 < q)
     (hq : (q:ℝ) ≤ √x) (a : ZMod q) (ha : IsUnit a) :
@@ -1086,6 +1203,15 @@ private theorem primePow_le {p k : ℕ} (hp : p.Prime) (hk : 1 ≤ k) :
       _ = (p ^ j * (p - 1)) ^ 2 := by ring
 
 /-- A clean lower bound for the totient: `d ≤ 2·φ(d)²` (so `φ(d) ≥ √(d/2)`).  No exceptions. -/
+@[blueprint (latexEnv := "lemma") (title := /-- A lower bound for $\varphi$ -/) (statement := /--
+For every $d \in \N$, $d \le 2\varphi(d)^2$.
+-/) (proof := /--
+Both sides are multiplicative in $d$ up to the factor $2$, so it suffices to check prime powers and to
+see that the factor $2$ is needed at most once. For $p^k$ with $k \ge 1$ one has
+$\varphi(p^k)^2 = p^{2k-2}(p-1)^2 \ge p^{k}$ unless $p = 2$, in which case
+$\varphi(2^k)^2 = 2^{2k-2} \ge 2^k/2$. Multiplying over the prime factorisation of $d$, in which $2$ appears at
+most once, gives $d \le 2 \varphi(d)^2$; the case $d = 0$ is trivial.
+-/)]
 theorem d_le_two_mul_totient_sq (d : ℕ) : d ≤ 2 * d.totient ^ 2 := by
   rcases eq_or_ne d 0 with rfl | hd0
   · positivity
@@ -1169,6 +1295,17 @@ theorem invTotientAF_isMultiplicative : invTotientAF.IsMultiplicative := by
   refine ⟨by simp [invTotientAF_apply], fun {m n} h ↦ ?_⟩
   simp only [invTotientAF_apply, Nat.totient_mul h, Nat.cast_mul, mul_inv]
 
+@[blueprint (latexEnv := "lemma") (title := /-- A convolution identity for $1/\varphi$ -/) (statement := /--
+Let $f_{AF}(d) := \mu(d)^2 / (d\, \varphi(d))$. Then, as arithmetic functions,
+$$\frac{1}{\varphi(n)} = \sum_{d e = n} f_{AF}(d) \cdot \frac{1}{e}, \qquad\text{i.e.}\qquad \frac{1}{\varphi} = f_{AF} * \frac{1}{\mathrm{id}} .$$
+Moreover $f_{AF} \ge 0$, $f_{AF}(d) \ll d^{-3/2}$ and $\sum_{d \ge 1} f_{AF}(d)$ converges.
+-/) (proof := /--
+All three functions $1/\varphi$, $f_{AF}$ and $1/\mathrm{id}$ are multiplicative, so it suffices to compare
+at prime powers $p^k$, $k \ge 1$: since $\mu(p^j)^2 = 0$ for $j \ge 2$,
+$$(f_{AF} * \tfrac{1}{\mathrm{id}})(p^k) = \frac{1}{p^k} + \frac{1}{p(p-1)} \cdot \frac{1}{p^{k-1}} = \frac{1}{p^{k-1}} \cdot \frac{p - 1 + 1}{p(p-1)} = \frac{1}{p^{k-1}(p-1)} = \frac{1}{\varphi(p^k)}.$$
+For the bound, \Cref{d_le_two_mul_totient_sq} gives $\varphi(d) \ge \sqrt{d/2}$, whence
+$f_{AF}(d) \le 1/(d \varphi(d)) \le \sqrt 2\, d^{-3/2}$, and $\sum d^{-3/2} < \infty$.
+-/)]
 theorem invTotientAF_eq_mul : invTotientAF = fAF * invAF := by
   rw [ArithmeticFunction.IsMultiplicative.eq_iff_eq_on_prime_powers invTotientAF
         invTotientAF_isMultiplicative (fAF * invAF)
@@ -1222,6 +1359,18 @@ into `2 log x` using `1 ≤ log x`). -/
 noncomputable def C_tot : ℝ := 2 * ∑' d, fAF d
 
 /-- The totient bound: `∑_{n ≤ Q} 1/φ(n) ≤ C_tot · log x`. -/
+@[blueprint (title := /-- The sum of $1/\varphi$ -/) (statement := /--
+For every parameter datum and every real $Q \le x$,
+$$\sum_{n \le Q} \frac{1}{\varphi(n)} \ll \log x,$$
+with an absolute implied constant.
+-/) (proof := /--
+By \Cref{invTotientAF_eq_mul} and the hyperbola identity
+$\sum_{n \le Q} (f * g)(n) = \sum_{d \le Q} f(d) \sum_{e \le Q/d} g(e)$,
+$$\sum_{n \le Q} \frac{1}{\varphi(n)} = \sum_{d \le Q} f_{AF}(d) \sum_{e \le Q/d} \frac{1}{e} .$$
+If $Q < 1$ the left side is $0$. Otherwise each inner sum is a harmonic number bounded by
+$1 + \log(Q/d) \le 1 + \log x \ll \log x$ (as $\log x \ge 1$ by \Cref{log_x_large}), and
+$\sum_{d \le Q} f_{AF}(d) \le \sum_{d \ge 1} f_{AF}(d) < \infty$ since $f_{AF} \ge 0$.
+-/)]
 theorem summatory_totient_inv_le [ProofData] (Q : ℝ) (hQ : Q ≤ x) :
     summatory (fun n ↦ (n.totient : ℝ)⁻¹) Q ≤ C_tot * Real.log x := by
   have hlogx : (1 : ℝ) ≤ Real.log x := one_le_log_x
@@ -1270,6 +1419,16 @@ noncomputable def C_BV_LFT (A C : ℕ) : ℝ := C_DLF A C * C_tot
 
 /-- Per-`q` bound: combine the conductor decomposition with the small-conductor estimate and
 replace each `S` by its maximum over `y`. -/
+@[blueprint (latexEnv := "lemma") (title := /-- Maximal form of the conductor decomposition -/) (statement := /--
+Let $A, C \in \N$. For every parameter datum and every integer $1 \le q \le \sqrt x$,
+$$\max_{\substack{\sqrt x \le y \le x \\ a \in (\Z/q\Z)^*}} |\Delta_{\Lambda^\flat}(y; q, a)|
+\le \frac{1}{\varphi(q)} \sum_{\substack{d \mid q \\ d > (\log x)^C}} \sumstar_{\xi \bmod d} \max_{\sqrt x \le y \le x} S_{q/d}(y, \xi) + O_{A,C}\!\left(\frac{1}{\varphi(q)}\, \frac{x}{(\log x)^{A+1}}\right).$$
+-/) (proof := /--
+By \Cref{maxya_basic} it suffices to bound $|\Delta_{\Lambda^\flat}(y;q,a)|$ for each unit $a$ and each
+$\sqrt x \le y \le x$. Apply \Cref{Delta_LambdaFlat_decomp}, bound the first term by
+\Cref{Delta_LambdaFlat_small_conductor}, and bound each $S_{q/d}(y, \xi)$ in the second term by its
+maximum over $y$ (\Cref{maxya_basic}).
+-/)]
 theorem maxya_Delta_LambdaFlat_enorm_le [ProofData] (A C : ℕ) {q : ℕ}
     (hq1 : 1 ≤ q) (hqx : (q : ℝ) ≤ √x) :
   open Classical in
@@ -1301,12 +1460,23 @@ noncomputable def gLFT [ProofData] (d r : ℕ) : ℝ≥0∞ :=
     ∑ ξ : DirichletCharacter ℂ d with ξ.IsPrimitive,
       maxy (fun y ↦ ENNReal.ofReal (S r y ξ))
 
-@[blueprint (statement := /--
-$$\sum_{q \le Q} \max_{\substack{\sqrt{x} \le y \le x \\ a \in (\Z/q\Z)^*}} \left|\Delta_{\Lambda^\flat}(y;\,q,\,a)\right| \le \sum_{r \le Q} \frac{T_r(x,Q)}{\varphi(r)} + O\!\left(\frac{x}{(\log x)^A}\right)$$
+@[blueprint (title := /-- Reduction of the Type II estimate to $T_r$ -/) (statement := /--
+Let $A, C \in \N$. For every parameter datum and every real $Q \le \sqrt x$,
+$$\sum_{q \le Q}\ \max_{\substack{\sqrt x \le y \le x \\ a \in (\Z/q\Z)^*}} |\Delta_{\Lambda^\flat}(y; q, a)| \le \sum_{r \le Q} \frac{T^{(C)}_r(Q)}{\varphi(r)} + O_{A, C}\!\left(\frac{x}{(\log x)^A}\right) .$$
 -/) (proof := /--
-Sum the error from \ref{Delta_LambdaFlat_small_conductor} over $q \le Q$ using
-$\sum_{n \le x} 1/\varphi(n) \ll \log x$, then regroup the main sum by $r = q/d$.
--/) (uses := [Delta_LambdaFlat_decomp, Delta_LambdaFlat_small_conductor, character_sum_Mobius, T])]
+Sum \Cref{maxya_Delta_LambdaFlat_enorm_le} over $1 \le q \le Q$ (each such $q$ satisfies $q \le \sqrt x$).
+
+\emph{The error term.} Its total is $\ll_{A,C} x (\log x)^{-A-1} \sum_{q \le Q} 1/\varphi(q)$, and
+\Cref{summatory_totient_inv_le} (applicable as $Q \le \sqrt x \le x$) bounds the sum by $\ll \log x$,
+giving $\ll_{A,C} x/(\log x)^A$.
+
+\emph{The main term.} For $d \mid q$ write $q = dr$. Since $\varphi(d)\varphi(r) \le \varphi(dr)$ (super-multiplicativity
+of $\varphi$), $1/\varphi(q) \le \varphi(d)^{-1}\varphi(r)^{-1}$. Hence the main term is at most
+$$\sum_{q \le Q} \sum_{\substack{d \mid q \\ d > (\log x)^C}} \frac{1}{\varphi(r)}\, \frac{1}{\varphi(d)} \sumstar_{\xi \bmod d} \max_{y} S_{r}(y, \xi), \qquad r = q/d.$$
+The map $(q, d) \mapsto (r, d) = (q/d, d)$ is injective, and its image is contained in the set of pairs
+with $1 \le r \le Q$ and $(\log x)^C < d \le Q/r$. Since all terms are non-negative, the sum is at most
+the sum over that larger set, which is $\sum_{r \le Q} T^{(C)}_r(Q)/\varphi(r)$ by definition of $T_r$ (\Cref{T}).
+-/)]
 theorem BV_LambdaFlat_via_T [ProofData] (Q : ℝ) (A C : ℕ) (hQ : Q ≤ √x) :
     (∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, maxya q fun y a ↦ ‖Δ_[Λ♭](y; q, a)‖ₑ)
       ≤ (∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊, (r.totient : ℝ≥0∞)⁻¹ * T C r Q)
@@ -1455,14 +1625,17 @@ noncomputable def bumpFn : Flat.Bump where
 the extra factor `2` absorbing `log(x+1) ≤ 2 log x` for `x ≥ 2`). -/
 noncomputable def C_LargeSieve : ℝ := 2 * @Flat.C_LSC bumpFn
 
-@[blueprint (statement := /--
-Let $f$ and $g$ be arithmetic functions supported on $[1, M]$ and $[1, N]$ respectively. For $x, Q \ge 1$,
-$$\sum_{q \le Q} \sumstar_{\chi \pmod{q}} \frac{q}{\varphi(q)} \max_{y \le x}\left|\sum_{n \le y} (f*g)(n)\chi(n)\right| \ll \left(\sqrt{MN} + \sqrt{M}\,Q + \sqrt{N}\,Q + Q^2\right)(\log x)\,\|f\|_2\,\|g\|_2$$
+@[blueprint (title := /-- Maximal large sieve for convolutions -/) (statement := /--
+Let $M, N \in \N$ and let $f, g$ be real arithmetic functions with $f(n) = 0$ for $n > M$ and $g(n) = 0$ for
+$n > N$. Then for all real $x \ge 2$ and $Q \ge 1$,
+$$\sum_{q \le Q} \sumstar_{\chi \bmod q} \frac{q}{\varphi(q)} \sup_{1 \le y \le x} \Big| \sum_{n \le y} (f * g)(n) \chi(n) \Big| \ll \big(\sqrt{NM} + \sqrt{M} Q + \sqrt{N} Q + Q^2\big) (\log x)\, \Big(\sum_{n \le M} f(n)^2\Big)^{1/2} \Big(\sum_{n \le N} g(n)^2\Big)^{1/2} ,$$
+with an implied constant depending only on the fixed bump function and on the constant in \Cref{large_sieve}.
 -/) (proof := /--
-Uses Cauchy--Schwarz and the large sieve inequality (\ref{large_sieve}).
-The proof in the book uses the classical version of Perron's integral formula as $1_{n \le x} = \int_{-T}^{T}\frac{(x/n)^{\alpha+it}}{\alpha+it} dt/(2\pi) + O(...)$
-But we have a different version in PNT+. I haven't worked out how this changes the proof yet.
--/) (uses := [large_sieve])]
+If $M = 0$ or $N = 0$ then $f * g = 0$ and the left side vanishes. Otherwise $(f, g)$, viewed as complex
+arithmetic functions, form a supported pair with the real parameters $M, N > 0$, and
+\Cref{Flat.LargeSieve_convolution_aux} gives the bound with $\log(x + 1)$ in place of $\log x$. Finally
+$\log(x+1) \le \log(x^2) = 2 \log x$ for $x \ge 2$.
+-/)]
 theorem LargeSieve_convolution {M N : ℕ} (f g : ArithmeticFunction ℝ) (hf : ∀ n > M, f n = 0) (hg : ∀ n > N, g n = 0)
     {x Q : ℝ} (hx : 2 ≤ x) (hQ : 1 ≤ Q) :
     open Classical in
@@ -1610,9 +1783,19 @@ private theorem BFlat_eq_of_gt_V [ProofData] {e : ℕ} (he : V < (e : ℝ)) :
     simp only [moebiusLEV]; exact ArithmeticFunction.on_apply_of_not_mem _ _ _ hnotmem
   rw [hval, sub_zero]
 
-@[blueprint (latexEnv := "lemma") (statement := /--
-$$\Lambda^\flat(n) = \sum_{U < 2^j \le 2x/V} (f_j * g_j)(n) \quad \text{for } n \le x,$$
-where $f_j(k) = (\Lambda_{>U} * 1)(k)\,1_{2^{j-1} < k \le 2^j}$ and $g_j(\ell) = \mu(\ell)\,1_{V < \ell \le x/2^{j-1}}$.
+@[blueprint (latexEnv := "lemma") (title := /-- Dyadic decomposition of $\Lambda^\flat$ -/) (statement := /--
+For every parameter datum and every integer $n \le x$,
+$$\Lambda^\flat(n) = \sum_{\substack{j \in \N \\ U < 2^j \le 2x/V}} (f_j * g_j)(n), \qquad
+f_j := (\Lambda_{>U} * 1)\, 1_{(2^{j-1}, 2^j]}, \quad g_j := \mu \cdot 1_{(V, x/2^{j-1}]} .$$
+-/) (proof := /--
+Expand $\Lambda^\flat(n) = \sum_{de = n} (\Lambda_{>U} * 1)(d)\, \mu_{>V}(e)$ (\Cref{LambdaFlat}) and, on the
+right, $\sum_j (f_j * g_j)(n) = \sum_{de = n} \sum_j f_j(d) g_j(e)$. Fix a pair $de = n$. If $d \le U$ then
+$(\Lambda_{>U} * 1)(d) = \sum_{k \mid d} \Lambda_{>U}(k) = 0$ and every $f_j(d) = 0$; if $e \le V$ then
+$\mu_{>V}(e) = 0$ and every $g_j(e) = 0$. Otherwise $d > U \ge 1$ and $e > V$, and there is a unique
+$j_0 \ge 1$ with $2^{j_0 - 1} < d \le 2^{j_0}$. It lies in the summation range, since
+$U < d \le 2^{j_0}$ and $2^{j_0} < 2d \le 2n/e \le 2x/V$; moreover $e = n/d \le x/d < x/2^{j_0 - 1}$, so
+$f_{j_0}(d) g_{j_0}(e) = (\Lambda_{>U}*1)(d)\mu(e) = (\Lambda_{>U}*1)(d)\mu_{>V}(e)$, while $f_j(d) = 0$ for
+$j \ne j_0$.
 -/)]
 theorem LambdaFlat_dyadic [ProofData] (n : ℕ) (hn : n ≤ x) :
     Λ♭ n = ∑ j ∈ pows2Ioc U (2*x/V), (f j * g j) n := by
@@ -2056,14 +2239,33 @@ private theorem summatory_Gterm_le [ProofData] (r j : ℕ) (Q : ℝ) (hQ : 2 ≤
         + Real.sqrt (N : ℝ) * Q + Q ^ 2) * L * af * bg) by ring]
   exact mul_le_mul_of_nonneg_left hkey hCLS
 
-@[blueprint (statement := /--
-For $x, Q \ge 2$, $U, V \in [1, x]$ and $r \in \N$,
-$$\sum_{q \le Q} \sumstar_{\chi \pmod{q}} \frac{q}{\varphi(q)}\, S_r(y, \chi) \ll \left(x + \frac{Qx}{\sqrt{U}} + \frac{Qx}{\sqrt{V}} + Q^2\sqrt{x}\right)(\log x)^3$$
+@[blueprint (title := /-- The large sieve bound for $S_r$ -/) (statement := /--
+For every parameter datum, every $r \in \N$ and every real $Q \ge 2$,
+$$\sum_{q \le Q} \sumstar_{\chi \bmod q} \frac{q}{\varphi(q)} \max_{\sqrt x \le y \le x} S_r(y, \chi) \ll \left( x + \frac{Q x}{\sqrt U} + \frac{Q x}{\sqrt V} + Q^2 \sqrt x \right) (\log x)^3 .$$
 -/) (proof := /--
-Apply the dyadic decomposition \ref{LambdaFlat_dyadic} (restricted to integers coprime to $r$)
-and apply \ref{LargeSieve_convolution} to each dyadic piece.
-When summing over $j$ note $U \le 2^j$, so $\sum_{U \le 2^j} 2^{-j/2} \ll 1/\sqrt{U}$.
--/) (uses := [LargeSieve_convolution, LambdaFlat_dyadic, S])]
+\emph{Dyadic decomposition.} Restricting \Cref{LambdaFlat_dyadic} to integers coprime to $r$ and using
+that restriction is a convolution homomorphism (\Cref{ArithmeticFunction.on_mul_of_saturated}),
+$\Lambda^\flat_r(n) = \sum_j \big((f_j)_r * (g_j)_r\big)(n)$ for $n \le x$, the sum being over the set
+$\mathcal J = \{ j : U < 2^j \le 2x/V \}$. Hence, for $\sqrt x \le y \le x$ (so $1 \le y \le x$),
+$$S_r(y, \chi) \le \sum_{j \in \mathcal J} \sup_{1 \le z \le x} \Big| \sum_{n \le z} \big((f_j)_r * (g_j)_r\big)(n)\chi(n) \Big| =: \sum_{j \in \mathcal J} \Gamma_{r,j}(\chi),$$
+and the same bound holds for the maximum over $y$.
+
+\emph{One dyadic block.} Fix $j \in \mathcal J$ and put $M_j := 2^j$, $N_j := \lfloor x/2^{j-1} \rfloor = \lfloor 2x/M_j \rfloor$.
+The function $(f_j)_r$ is supported on $[1, M_j]$ and, since $0 \le (\Lambda_{>U} * 1)(n) \le \sum_{k \mid n}\Lambda(k) = \log n \le 2\log x$
+for $n \le 2^j \le x^2$, it satisfies $\|(f_j)_r\|_2^2 \le M_j (2\log x)^2$. The function $(g_j)_r$ is supported
+on $[1, N_j]$ with $|(g_j)_r| \le 1$, so $\|(g_j)_r\|_2^2 \le N_j \le 2x/M_j$. Thus
+$\|(f_j)_r\|_2 \|(g_j)_r\|_2 \ll \log x \sqrt{x}$. By \Cref{LargeSieve_convolution} (with $x \ge 2$, $Q \ge 1$),
+$$\sum_{q \le Q} \sumstar_{\chi} \frac{q}{\varphi(q)} \Gamma_{r,j}(\chi) \ll \big( \sqrt{N_j M_j} + \sqrt{M_j} Q + \sqrt{N_j} Q + Q^2 \big) (\log x)^2 \sqrt{x} .$$
+Now $\sqrt{N_j M_j} \le \sqrt{2x}$; $\sqrt{M_j} \sqrt{x} \ll x/\sqrt V$ because $M_j \le 2x/V$; and
+$\sqrt{N_j} \sqrt{x} \ll x/\sqrt{M_j} \le x/\sqrt U$ because $M_j > U$. Hence each block contributes
+$\ll (\log x)^2 \big( x + Qx/\sqrt U + Qx/\sqrt V + Q^2 \sqrt x \big)$, uniformly in $j$.
+
+\emph{Number of blocks.} $\# \mathcal J \le \log_2(2x) \ll \log x$, since $\log x \ge \log 2$.
+
+Multiplying gives the claim. Note that the savings $1/\sqrt U$ and $1/\sqrt V$ are obtained termwise from
+$U < 2^j \le 2x/V$ rather than by summing a geometric series; this costs one factor $\log x$ (the
+number of blocks).
+-/)]
 theorem BV_char_sum_bound [ProofData] (r : ℕ) (Q : ℝ) (hQ : 2 ≤ Q) :
   open Classical in
     summatory (fun q ↦ ∑ ξ : DirichletCharacter ℂ q with ξ.IsPrimitive,
@@ -2150,11 +2352,28 @@ private theorem sum_Icc_two_le (jL jU : ℕ) :
     _ = 2^(jU+1)-1 := by rw [geom_sum_eq (by norm_num)]; ring
     _ ≤ 2 * 2^jU := by ring_nf; grind
 
-@[blueprint (statement := /--
-$$T_r(x,Q) \ll \frac{x}{(\log x)^{C-3}} + \frac{x(\log x)^4}{\sqrt{U}} + \frac{x(\log x)^4}{\sqrt{V}} + \frac{Q\sqrt{x}\,(\log x)^3}{r}$$
+@[blueprint (title := /-- The bound for $T_r$ -/) (statement := /--
+For every parameter datum, every integer $C \ge 3$, every $r \in \N$ and every real $2 \le Q \le x$,
+$$T^{(C)}_r(Q) \ll \frac{x}{(\log x)^{C-3}} + \frac{x (\log x)^4}{\sqrt U} + \frac{x(\log x)^4}{\sqrt V} + \frac{Q \sqrt x (\log x)^3}{r} ,$$
+with an implied constant independent of $C$ and $r$.
 -/) (proof := /--
-Divide the sum defining $T_r$ into dyadic intervals in $d$ and apply \ref{BV_char_sum_bound}.
--/) (uses := [BV_char_sum_bound, LambdaFlat_dyadic, T])]
+Write $B(d) := \sumstar_{\xi \bmod d} \frac{d}{\varphi(d)} \max_y S_r(y, \xi) \ge 0$, so that
+$T_r(Q) = \sum_{(\log x)^C < d \le Q/r} B(d)/d$. If the range is empty (in particular if $r = 0$) there is
+nothing to prove; otherwise $r \ge 1$ and $Q/r \le x$.
+
+\emph{Dyadic blocks in $d$.} Group the $d$ in the range by $j = \lfloor \log_2 d \rfloor$, which ranges over
+$[j_L, j_U]$ with $j_L = \lfloor \log_2 \lfloor(\log x)^C\rfloor \rfloor$ and $j_U = \lfloor \log_2 \lfloor Q/r \rfloor \rfloor$;
+each $d$ in the block $j$ satisfies $2^j \le d < 2^{j+1}$, so $1/d \le 2^{-j}$. Hence
+$$T_r(Q) \le \sum_{j = j_L}^{j_U} 2^{-j} \sum_{d \le 2^{j+1}} B(d) \ll \sum_{j = j_L}^{j_U} 2^{-j} \Big( x + \frac{2^{j+1} x}{\sqrt U} + \frac{2^{j+1} x}{\sqrt V} + 4^{j+1} \sqrt x \Big) (\log x)^3$$
+by \Cref{BV_char_sum_bound} applied with $Q' = 2^{j+1} \ge 2$.
+
+\emph{Summing over $j$.} Since $(\log x)^C < 2^{j_L + 1}$, we have $\sum_{j \ge j_L} 2^{-j} \le 2 \cdot 2^{-j_L} \le 4/(\log x)^C$,
+so the first term contributes $\ll x (\log x)^{3 - C}$. The two middle terms are
+independent of $j$ and the number of $j$ is at most $j_U + 1 \le \log_2(2Q/r) \ll \log x$ (as
+$2^{j_U} \le Q/r \le x$), contributing $\ll x (\log x)^4/\sqrt U$ and the same with $V$.
+Finally $\sum_{j \le j_U} 2^{j+1} \le 4 \cdot 2^{j_U} \le 4 Q/r$, so the last term contributes
+$\ll Q \sqrt x (\log x)^3 / r$.
+-/)]
 theorem T_r_bound [ProofData] (C : ℕ) (r : ℕ) (Q : ℝ) (hC : 3 ≤ C) (hQ : 2 ≤ Q) (hQx : Q ≤ x) :
     T C r Q ≤ ENNReal.ofReal (C_Tr * (x / (Real.log x)^(C-3) + x * (Real.log x)^4 / √U
       + x * (Real.log x)^4 / √V + Q * √x * (Real.log x)^3 / r)) := by
@@ -2413,6 +2632,15 @@ theorem T_r_bound [ProofData] (C : ℕ) (r : ℕ) (Q : ℝ) (hC : 3 ≤ C) (hQ :
 
 /-- For `L ≥ 0` and `W ≥ e^{√L}`: `L^n ≤ (2^{2n} (2n)!) · √W`.  Used with `W = U, V` to absorb
 the divisor factors: `√U, √V ≥ e^{½√log x}` beats every power of `log x`. -/
+@[blueprint (latexEnv := "lemma") (title := /-- Powers of $\log x$ against $\sqrt{U}$ -/) (statement := /--
+For every parameter datum, every real $W \ge e^{\sqrt{\log x}}$ and every $n \in \N$,
+$$(\log x)^n \ll_n \sqrt{W}.$$
+In particular this applies to $W = U$ and $W = V$.
+-/) (proof := /--
+Put $s = \sqrt{\log x} \ge 0$, so $(\log x)^n = s^{2n}$. From the Taylor series of the exponential,
+$(s/2)^{2n}/(2n)! \le e^{s/2}$, i.e. $s^{2n} \le 2^{2n} (2n)!\, e^{s/2}$. Finally
+$e^{s/2} = \sqrt{e^{s}} \le \sqrt W$.
+-/)]
 theorem log_pow_le_const_mul_sqrt [ProofData] (W : ℝ) (n : ℕ)
     (hW : Real.exp (Real.sqrt (Real.log x)) ≤ W) :
     (Real.log x) ^ n ≤ ((2 : ℝ) ^ (2 * n) * (2 * n).factorial) * Real.sqrt W := by
@@ -2471,6 +2699,13 @@ noncomputable def C_rphi : ℝ := ∑' d : ℕ, ((d : ℝ) * d.totient)⁻¹
 
 theorem C_rphi_nonneg : 0 ≤ C_rphi := tsum_nonneg (fun d ↦ by positivity)
 
+@[blueprint (latexEnv := "lemma") (title := /-- The sum of $1/(r\varphi(r))$ -/) (statement := /--
+The series $\sum_{d \ge 1} \frac{1}{d\varphi(d)}$ converges, so for every real $Q$,
+$$\sum_{r \le Q} \frac{1}{r \varphi(r)} \ll 1 .$$
+-/) (proof := /--
+By \Cref{d_le_two_mul_totient_sq}, $1/(d\varphi(d)) \le \sqrt 2\, d^{-3/2}$, so the series converges by
+comparison with $\sum d^{-3/2}$. A partial sum of a series with non-negative terms is at most its sum.
+-/)]
 theorem sum_rphiInv_le (Q : ℝ) : ∑ r ∈ Finset.Ioc 0 ⌊Q⌋₊, ((r : ℝ) * r.totient)⁻¹ ≤ C_rphi :=
   summable_rphiInv.sum_le_tsum _ (fun i _ ↦ by positivity)
 
@@ -2489,13 +2724,24 @@ theorem C_BV_LF_nonneg [ProofData] (A : ℕ) : 0 ≤ C_BV_LF A := by
       (add_nonneg (mul_nonneg hCtot (by positivity)) C_rphi_nonneg))
     (mul_nonneg (C_DLF_nonneg A (A + 4)) hCtot)
 
-@[blueprint (statement := /--
-For each fixed $A \ge 0$, $x \ge 2$ and $1 \le Q \le \sqrt{x}/(\log x)^{A+3}$,
-$$\sum_{q \le Q} \max_{\sqrt{x} \le y \le x} \max_{a \in (\Z/q\Z)^*} \left|\Delta_{\Lambda^\flat}(y;\,q,\,a)\right| \ll_A \frac{x}{(\log x)^A}$$
+@[blueprint (title := /-- The Type II part on average -/) (statement := /--
+For every parameter datum, every $A \in \N$ and every real $1 \le Q \le \sqrt x/(\log x)^{A+3}$,
+$$\sum_{q \le Q}\ \max_{\substack{\sqrt x \le y \le x \\ a \in (\Z/q\Z)^*}} |\Delta_{\Lambda^\flat}(y; q, a)| \ll_A \frac{x}{(\log x)^A} .$$
 -/) (proof := /--
-Plug the bound from \ref{T_r_bound} into \ref{BV_LambdaFlat_via_T},
-then choose $U = V = e^{\sqrt{\log x}}$ and $C = A + 4$.
--/) (uses := [BV_LambdaFlat_via_T, T_r_bound, Delta_LambdaFlat_small_conductor])]
+Since $\log x \ge 1$, $Q \le \sqrt x \le x$. Apply \Cref{BV_LambdaFlat_via_T} with $C = A + 4$; the error
+term is $\ll_A x/(\log x)^A$, and it remains to bound $\sum_{r \le Q} T^{(A+4)}_r(Q)/\varphi(r)$.
+
+\emph{Small $Q$.} If $Q < 2$ then for every $r \ge 1$ we have $Q/r < 2 \le 16 \le (\log x)^{A+4}$
+(\Cref{log_x_large}), so the range of $d$ in $T_r$ is empty and the main term vanishes.
+
+\emph{$Q \ge 2$.} By \Cref{T_r_bound} with $C = A+4$ (so $C - 3 = A + 1$ and $Q \le x$),
+$$\sum_{r \le Q} \frac{T_r(Q)}{\varphi(r)} \ll \Big( \frac{x}{(\log x)^{A+1}} + \frac{x(\log x)^4}{\sqrt U} + \frac{x (\log x)^4}{\sqrt V} \Big) \sum_{r \le Q} \frac{1}{\varphi(r)} + Q\sqrt x (\log x)^3 \sum_{r \le Q} \frac{1}{r\varphi(r)} .$$
+By \Cref{summatory_totient_inv_le}, $\sum_{r \le Q} 1/\varphi(r) \ll \log x$. The first product is then
+$\ll x/(\log x)^A$. For the second and third, \Cref{log_pow_le_const_mul_sqrt} with $n = A + 5$ and
+$W = U$ (resp. $V$) gives $(\log x)^{A+5} \ll_A \sqrt U$, i.e. $x(\log x)^5/\sqrt U \ll_A x/(\log x)^A$.
+For the last term, \Cref{sum_rphiInv_le} bounds the sum by $\ll 1$, and
+$Q \sqrt x (\log x)^3 \le \sqrt x (\log x)^{-A-3} \sqrt x (\log x)^3 = x/(\log x)^A$.
+-/)]
 theorem BV_LambdaFlat_enorm [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q)
     (hQ : Q ≤ √x / (Real.log x) ^ (A + 3)) :
     ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊,

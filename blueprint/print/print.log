@@ -1,68 +1,70 @@
-This is XeTeX, Version 3.141592653-2.6-0.999997 (TeX Live 2025) (preloaded format=xelatex 2026.2.5)  18 MAR 2026 07:22
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2026.8.13)  16 SEP 2026 16:40
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
 **print.tex
 (./print.tex
-LaTeX2e <2025-11-01>
-L3 programming layer <2026-01-19>
-(/usr/local/texlive/2025/texmf-dist/tex/latex/base/report.cls
-Document Class: report 2025/01/22 v1.4n Standard LaTeX document class
-(/usr/local/texlive/2025/texmf-dist/tex/latex/base/size10.clo
-File: size10.clo 2025/01/22 v1.4n Standard LaTeX file (size option)
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-22>
+(/usr/share/texlive/texmf-dist/tex/latex/base/report.cls
+Document Class: report 2023/05/17 v1.4n Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/size10.clo
+File: size10.clo 2023/05/17 v1.4n Standard LaTeX file (size option)
 )
-\c@part=\count271
-\c@chapter=\count272
-\c@section=\count273
-\c@subsection=\count274
-\c@subsubsection=\count275
-\c@paragraph=\count276
-\c@subparagraph=\count277
-\c@figure=\count278
-\c@table=\count279
-\abovecaptionskip=\skip49
-\belowcaptionskip=\skip50
-\bibindent=\dimen148
+\c@part=\count183
+\c@chapter=\count184
+\c@section=\count185
+\c@subsection=\count186
+\c@subsubsection=\count187
+\c@paragraph=\count188
+\c@subparagraph=\count189
+\c@figure=\count190
+\c@table=\count191
+\abovecaptionskip=\skip48
+\belowcaptionskip=\skip49
+\bibindent=\dimen140
 )
-(/usr/local/texlive/2025/texmf-dist/tex/latex/geometry/geometry.sty
+(/usr/share/texlive/texmf-dist/tex/latex/geometry/geometry.sty
 Package: geometry 2020/01/02 v5.9 Page Geometry
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/graphics/keyval.sty
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/keyval.sty
 Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
 \KV@toks@=\toks17
 )
-(/usr/local/texlive/2025/texmf-dist/tex/generic/iftex/ifvtex.sty
+(/usr/share/texlive/texmf-dist/tex/generic/iftex/ifvtex.sty
 Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 
-(/usr/local/texlive/2025/texmf-dist/tex/generic/iftex/iftex.sty
-Package: iftex 2024/12/12 v1.0g TeX engine tests
+(/usr/share/texlive/texmf-dist/tex/generic/iftex/iftex.sty
+Package: iftex 2022/02/03 v1.0f TeX engine tests
 ))
-\Gm@cnth=\count280
-\Gm@cntv=\count281
-\c@Gm@tempcnt=\count282
-\Gm@bindingoffset=\dimen149
-\Gm@wd@mp=\dimen150
-\Gm@odd@mp=\dimen151
-\Gm@even@mp=\dimen152
-\Gm@layoutwidth=\dimen153
-\Gm@layoutheight=\dimen154
-\Gm@layouthoffset=\dimen155
-\Gm@layoutvoffset=\dimen156
+\Gm@cnth=\count192
+\Gm@cntv=\count193
+\c@Gm@tempcnt=\count194
+\Gm@bindingoffset=\dimen141
+\Gm@wd@mp=\dimen142
+\Gm@odd@mp=\dimen143
+\Gm@even@mp=\dimen144
+\Gm@layoutwidth=\dimen145
+\Gm@layoutheight=\dimen146
+\Gm@layouthoffset=\dimen147
+\Gm@layoutvoffset=\dimen148
 \Gm@dimlist=\toks18
 )
-(/usr/local/texlive/2025/texmf-dist/tex/latex/l3kernel/expl3.sty
-Package: expl3 2026-01-19 L3 programming layer (loader) 
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/expl3.sty
+Package: expl3 2024-01-22 L3 programming layer (loader) 
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/l3backend/l3backend-xetex.def
-File: l3backend-xetex.def 2025-10-09 L3 backend support: XeTeX
-\g__graphics_track_int=\count283
-\g__pdfannot_backend_int=\count284
-\g__pdfannot_backend_link_int=\count285
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-xetex.def
+File: l3backend-xetex.def 2024-01-04 L3 backend support: XeTeX
+\g__graphics_track_int=\count195
+\l__pdf_internal_box=\box51
+\g__pdf_backend_object_int=\count196
+\g__pdf_backend_annotation_int=\count197
+\g__pdf_backend_link_int=\count198
 ))
-(/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty
 Package: amssymb 2013/01/14 v3.01 AMS font symbols
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty
 Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
 \@emptytoks=\toks19
 \symAMSa=\mathgroup4
@@ -71,576 +73,349 @@ LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
 LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
 (Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
 ))
-(/usr/local/texlive/2025/texmf-dist/tex/latex/amscls/amsthm.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amscls/amsthm.sty
 Package: amsthm 2020/05/29 v2.20.6
 \thm@style=\toks20
 \thm@bodyfont=\toks21
 \thm@headfont=\toks22
 \thm@notefont=\toks23
 \thm@headpunct=\toks24
-\thm@preskip=\skip51
-\thm@postskip=\skip52
-\thm@headsep=\skip53
+\thm@preskip=\skip50
+\thm@postskip=\skip51
+\thm@headsep=\skip52
 \dth@everypar=\toks25
 )
-(/usr/local/texlive/2025/texmf-dist/tex/latex/mathtools/mathtools.sty
-Package: mathtools 2024/10/04 v1.31 mathematical typesetting tools
+(/usr/share/texlive/texmf-dist/tex/latex/mathtools/mathtools.sty
+Package: mathtools 2022/06/29 v1.29 mathematical typesetting tools
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/tools/calc.sty
-Package: calc 2025/03/01 v4.3b Infix arithmetic (KKT,FJ)
-\calc@Acount=\count286
-\calc@Bcount=\count287
-\calc@Adimen=\dimen157
-\calc@Bdimen=\dimen158
-\calc@Askip=\skip54
-\calc@Bskip=\skip55
-LaTeX Info: Redefining \setlength on input line 86.
-LaTeX Info: Redefining \addtolength on input line 87.
-\calc@Ccount=\count288
-\calc@Cskip=\skip56
+(/usr/share/texlive/texmf-dist/tex/latex/tools/calc.sty
+Package: calc 2023/07/08 v4.3 Infix arithmetic (KKT,FJ)
+\calc@Acount=\count199
+\calc@Bcount=\count266
+\calc@Adimen=\dimen149
+\calc@Bdimen=\dimen150
+\calc@Askip=\skip53
+\calc@Bskip=\skip54
+LaTeX Info: Redefining \setlength on input line 80.
+LaTeX Info: Redefining \addtolength on input line 81.
+\calc@Ccount=\count267
+\calc@Cskip=\skip55
 )
-(/usr/local/texlive/2025/texmf-dist/tex/latex/mathtools/mhsetup.sty
+(/usr/share/texlive/texmf-dist/tex/latex/mathtools/mhsetup.sty
 Package: mhsetup 2021/03/18 v1.4 programming setup (MH)
 )
-(/usr/local/texlive/2025/texmf-dist/tex/latex/amsmath/amsmath.sty
-Package: amsmath 2025/07/09 v2.17z AMS math features
-\@mathmargin=\skip57
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2023/05/13 v2.17o AMS math features
+\@mathmargin=\skip56
 
 For additional information on amsmath, use the `?' option.
-(/usr/local/texlive/2025/texmf-dist/tex/latex/amsmath/amstext.sty
-Package: amstext 2024/11/17 v2.01 AMS text
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2021/08/26 v2.01 AMS text
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/amsmath/amsgen.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty
 File: amsgen.sty 1999/11/30 v2.0 generic functions
 \@emptytoks=\toks26
-\ex@=\dimen159
+\ex@=\dimen151
 ))
-(/usr/local/texlive/2025/texmf-dist/tex/latex/amsmath/amsbsy.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty
 Package: amsbsy 1999/11/29 v1.2d Bold Symbols
-\pmbraise@=\dimen160
+\pmbraise@=\dimen152
 )
-(/usr/local/texlive/2025/texmf-dist/tex/latex/amsmath/amsopn.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty
 Package: amsopn 2022/04/08 v2.04 operator names
 )
-\inf@bad=\count289
-LaTeX Info: Redefining \frac on input line 233.
-\uproot@=\count290
-\leftroot@=\count291
-LaTeX Info: Redefining \overline on input line 398.
-LaTeX Info: Redefining \colon on input line 409.
-\classnum@=\count292
-\DOTSCASE@=\count293
-LaTeX Info: Redefining \ldots on input line 495.
-LaTeX Info: Redefining \dots on input line 498.
-LaTeX Info: Redefining \cdots on input line 619.
-\Mathstrutbox@=\box53
-\strutbox@=\box54
-LaTeX Info: Redefining \big on input line 721.
-LaTeX Info: Redefining \Big on input line 722.
-LaTeX Info: Redefining \bigg on input line 723.
-LaTeX Info: Redefining \Bigg on input line 724.
-\big@size=\dimen161
-LaTeX Font Info:    Redeclaring font encoding OML on input line 742.
-LaTeX Font Info:    Redeclaring font encoding OMS on input line 743.
-\macc@depth=\count294
-LaTeX Info: Redefining \bmod on input line 904.
-LaTeX Info: Redefining \pmod on input line 909.
-LaTeX Info: Redefining \smash on input line 939.
-LaTeX Info: Redefining \relbar on input line 969.
-LaTeX Info: Redefining \Relbar on input line 970.
-\c@MaxMatrixCols=\count295
-\dotsspace@=\muskip17
-\c@parentequation=\count296
-\dspbrk@lvl=\count297
+\inf@bad=\count268
+LaTeX Info: Redefining \frac on input line 234.
+\uproot@=\count269
+\leftroot@=\count270
+LaTeX Info: Redefining \overline on input line 399.
+LaTeX Info: Redefining \colon on input line 410.
+\classnum@=\count271
+\DOTSCASE@=\count272
+LaTeX Info: Redefining \ldots on input line 496.
+LaTeX Info: Redefining \dots on input line 499.
+LaTeX Info: Redefining \cdots on input line 620.
+\Mathstrutbox@=\box52
+\strutbox@=\box53
+LaTeX Info: Redefining \big on input line 722.
+LaTeX Info: Redefining \Big on input line 723.
+LaTeX Info: Redefining \bigg on input line 724.
+LaTeX Info: Redefining \Bigg on input line 725.
+\big@size=\dimen153
+LaTeX Font Info:    Redeclaring font encoding OML on input line 743.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 744.
+\macc@depth=\count273
+LaTeX Info: Redefining \bmod on input line 905.
+LaTeX Info: Redefining \pmod on input line 910.
+LaTeX Info: Redefining \smash on input line 940.
+LaTeX Info: Redefining \relbar on input line 970.
+LaTeX Info: Redefining \Relbar on input line 971.
+\c@MaxMatrixCols=\count274
+\dotsspace@=\muskip16
+\c@parentequation=\count275
+\dspbrk@lvl=\count276
 \tag@help=\toks27
-\row@=\count298
-\column@=\count299
-\maxfields@=\count300
+\row@=\count277
+\column@=\count278
+\maxfields@=\count279
 \andhelp@=\toks28
-\eqnshift@=\dimen162
-\alignsep@=\dimen163
-\tagshift@=\dimen164
-\tagwidth@=\dimen165
-\totwidth@=\dimen166
-\lineht@=\dimen167
+\eqnshift@=\dimen154
+\alignsep@=\dimen155
+\tagshift@=\dimen156
+\tagwidth@=\dimen157
+\totwidth@=\dimen158
+\lineht@=\dimen159
 \@envbody=\toks29
-\multlinegap=\skip58
-\multlinetaggap=\skip59
+\multlinegap=\skip57
+\multlinetaggap=\skip58
 \mathdisplay@stack=\toks30
-LaTeX Info: Redefining \[ on input line 2950.
-LaTeX Info: Redefining \] on input line 2951.
+LaTeX Info: Redefining \[ on input line 2953.
+LaTeX Info: Redefining \] on input line 2954.
 )
-\g_MT_multlinerow_int=\count301
-\l_MT_multwidth_dim=\dimen168
-\origjot=\skip60
-\l_MT_shortvdotswithinadjustabove_dim=\dimen169
-\l_MT_shortvdotswithinadjustbelow_dim=\dimen170
-\l_MT_above_intertext_sep=\dimen171
-\l_MT_below_intertext_sep=\dimen172
-\l_MT_above_shortintertext_sep=\dimen173
-\l_MT_below_shortintertext_sep=\dimen174
-\xmathstrut@box=\box55
-\xmathstrut@dim=\dimen175
+\g_MT_multlinerow_int=\count280
+\l_MT_multwidth_dim=\dimen160
+\origjot=\skip59
+\l_MT_shortvdotswithinadjustabove_dim=\dimen161
+\l_MT_shortvdotswithinadjustbelow_dim=\dimen162
+\l_MT_above_intertext_sep=\dimen163
+\l_MT_below_intertext_sep=\dimen164
+\l_MT_above_shortintertext_sep=\dimen165
+\l_MT_below_shortintertext_sep=\dimen166
+\xmathstrut@box=\box54
+\xmathstrut@dim=\dimen167
 )
-(/usr/local/texlive/2025/texmf-dist/tex/latex/hyperref/hyperref.sty
-Package: hyperref 2026-01-29 v7.01p Hypertext links for LaTeX
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hyperref.sty
+Package: hyperref 2024-01-20 v7.01h Hypertext links for LaTeX
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty
+(/usr/share/texlive/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty
 Package: kvsetkeys 2022-10-05 v1.19 Key value parser (HO)
 )
-(/usr/local/texlive/2025/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty
+(/usr/share/texlive/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty
 Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
 )
-(/usr/local/texlive/2025/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+(/usr/share/texlive/texmf-dist/tex/generic/pdfescape/pdfescape.sty
 Package: pdfescape 2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
 
-(/usr/local/texlive/2025/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty
+(/usr/share/texlive/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty
 Package: ltxcmds 2023-12-04 v1.26 LaTeX kernel commands for general use (HO)
 )
-(/usr/local/texlive/2025/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(/usr/share/texlive/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
 Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO
 )
 
-(/usr/local/texlive/2025/texmf-dist/tex/generic/infwarerr/infwarerr.sty
+(/usr/share/texlive/texmf-dist/tex/generic/infwarerr/infwarerr.sty
 Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
 )
 Package pdftexcmds Info: \pdf@primitive is available.
 Package pdftexcmds Info: \pdf@ifprimitive is available.
 Package pdftexcmds Info: \pdfdraftmode not found.
 ))
-(/usr/local/texlive/2025/texmf-dist/tex/latex/hycolor/hycolor.sty
+(/usr/share/texlive/texmf-dist/tex/latex/hycolor/hycolor.sty
 Package: hycolor 2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
 )
-(/usr/local/texlive/2025/texmf-dist/tex/latex/hyperref/nameref.sty
-Package: nameref 2026-01-29 v2.58 Cross-referencing by name of section
+(/usr/share/texlive/texmf-dist/tex/latex/auxhook/auxhook.sty
+Package: auxhook 2019-12-17 v1.6 Hooks for auxiliary files (HO)
+)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
+Package: nameref 2023-11-26 v2.56 Cross-referencing by name of section
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/refcount/refcount.sty
+(/usr/share/texlive/texmf-dist/tex/latex/refcount/refcount.sty
 Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
 )
-(/usr/local/texlive/2025/texmf-dist/tex/generic/gettitlestring/gettitlestring.s
-ty
+(/usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
 Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
- (/usr/local/texlive/2025/texmf-dist/tex/latex/kvoptions/kvoptions.sty
+
+(/usr/share/texlive/texmf-dist/tex/latex/kvoptions/kvoptions.sty
 Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
 ))
-\c@section@level=\count302
+\c@section@level=\count281
 )
-(/usr/local/texlive/2025/texmf-dist/tex/latex/etoolbox/etoolbox.sty
-Package: etoolbox 2025/10/02 v2.5m e-TeX tools for LaTeX (JAW)
-\etb@tempcnta=\count303
+(/usr/share/texlive/texmf-dist/tex/latex/etoolbox/etoolbox.sty
+Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
+\etb@tempcnta=\count282
 )
-(/usr/local/texlive/2025/texmf-dist/tex/generic/stringenc/stringenc.sty
-Package: stringenc 2019/11/29 v1.12 Convert strings between diff. encodings (HO
-)
-)
-\@linkdim=\dimen176
-\Hy@linkcounter=\count304
-\Hy@pagecounter=\count305
+\@linkdim=\dimen168
+\Hy@linkcounter=\count283
+\Hy@pagecounter=\count284
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/hyperref/pd1enc.def
-File: pd1enc.def 2026-01-29 v7.01p Hyperref: PDFDocEncoding definition (HO)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/pd1enc.def
+File: pd1enc.def 2024-01-20 v7.01h Hyperref: PDFDocEncoding definition (HO)
 )
-(/usr/local/texlive/2025/texmf-dist/tex/generic/intcalc/intcalc.sty
+(/usr/share/texlive/texmf-dist/tex/generic/intcalc/intcalc.sty
 Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
 )
-\Hy@SavedSpaceFactor=\count306
+\Hy@SavedSpaceFactor=\count285
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/hyperref/puenc.def
-File: puenc.def 2026-01-29 v7.01p Hyperref: PDF Unicode definition (HO)
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/puenc.def
+File: puenc.def 2024-01-20 v7.01h Hyperref: PDF Unicode definition (HO)
 )
-Package hyperref Info: Option `unicode' set `true' on input line 4072.
-Package hyperref Info: Option `colorlinks' set `true' on input line 4072.
-Package hyperref Info: Hyper figures OFF on input line 4201.
-Package hyperref Info: Link nesting OFF on input line 4206.
-Package hyperref Info: Hyper index ON on input line 4209.
-Package hyperref Info: Plain pages OFF on input line 4216.
-Package hyperref Info: Backreferencing OFF on input line 4221.
+Package hyperref Info: Option `unicode' set `true' on input line 4062.
+Package hyperref Info: Option `colorlinks' set `true' on input line 4062.
+Package hyperref Info: Hyper figures OFF on input line 4179.
+Package hyperref Info: Link nesting OFF on input line 4184.
+Package hyperref Info: Hyper index ON on input line 4187.
+Package hyperref Info: Plain pages OFF on input line 4194.
+Package hyperref Info: Backreferencing OFF on input line 4199.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
-Package hyperref Info: Bookmarks ON on input line 4468.
-\c@Hy@tempcnt=\count307
+Package hyperref Info: Bookmarks ON on input line 4446.
+\c@Hy@tempcnt=\count286
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/url/url.sty
-\Urlmuskip=\muskip18
+(/usr/share/texlive/texmf-dist/tex/latex/url/url.sty
+\Urlmuskip=\muskip17
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
-LaTeX Info: Redefining \url on input line 4807.
-\XeTeXLinkMargin=\dimen177
+LaTeX Info: Redefining \url on input line 4784.
+\XeTeXLinkMargin=\dimen169
 
-(/usr/local/texlive/2025/texmf-dist/tex/generic/bitset/bitset.sty
+(/usr/share/texlive/texmf-dist/tex/generic/bitset/bitset.sty
 Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
 
-(/usr/local/texlive/2025/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty
+(/usr/share/texlive/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty
 Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
 )
 ))
-\Fld@menulength=\count308
-\Field@Width=\dimen178
-\Fld@charsize=\dimen179
-Package hyperref Info: Hyper figures OFF on input line 6084.
-Package hyperref Info: Link nesting OFF on input line 6089.
-Package hyperref Info: Hyper index ON on input line 6092.
-Package hyperref Info: backreferencing OFF on input line 6099.
-Package hyperref Info: Link coloring ON on input line 6102.
-Package hyperref Info: Link coloring with OCG OFF on input line 6109.
-Package hyperref Info: PDF/A mode OFF on input line 6114.
-\Hy@abspage=\count309
-\c@Item=\count310
-\c@Hfootnote=\count311
+\Fld@menulength=\count287
+\Field@Width=\dimen170
+\Fld@charsize=\dimen171
+Package hyperref Info: Hyper figures OFF on input line 6063.
+Package hyperref Info: Link nesting OFF on input line 6068.
+Package hyperref Info: Hyper index ON on input line 6071.
+Package hyperref Info: backreferencing OFF on input line 6078.
+Package hyperref Info: Link coloring ON on input line 6081.
+Package hyperref Info: Link coloring with OCG OFF on input line 6088.
+Package hyperref Info: PDF/A mode OFF on input line 6093.
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/atbegshi-ltx.sty
+Package: atbegshi-ltx 2021/01/10 v1.0c Emulation of the original atbegshi
+package with kernel methods
+)
+\Hy@abspage=\count288
+\c@Item=\count289
+\c@Hfootnote=\count290
 )
 Package hyperref Info: Driver (autodetected): hxetex.
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/hyperref/hxetex.def
-File: hxetex.def 2026-01-29 v7.01p Hyperref driver for XeTeX
-\pdfm@box=\box56
-\c@Hy@AnnotLevel=\count312
-\HyField@AnnotCount=\count313
-\Fld@listcount=\count314
-\c@bookmark@seq@number=\count315
+(/usr/share/texlive/texmf-dist/tex/latex/hyperref/hxetex.def
+File: hxetex.def 2024-01-20 v7.01h Hyperref driver for XeTeX
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
-Package: rerunfilecheck 2025-06-21 v1.11 Rerun checks for auxiliary files (HO)
+(/usr/share/texlive/texmf-dist/tex/generic/stringenc/stringenc.sty
+Package: stringenc 2019/11/29 v1.12 Convert strings between diff. encodings (HO
+)
+)
+\pdfm@box=\box55
+\c@Hy@AnnotLevel=\count291
+\HyField@AnnotCount=\count292
+\Fld@listcount=\count293
+\c@bookmark@seq@number=\count294
 
-(/usr/local/texlive/2025/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty
+(/usr/share/texlive/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+Package: rerunfilecheck 2022-07-10 v1.10 Rerun checks for auxiliary files (HO)
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/atveryend-ltx.sty
+Package: atveryend-ltx 2020/08/19 v1.0a Emulation of the original atveryend pac
+kage
+with kernel methods
+)
+(/usr/share/texlive/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty
 Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
 )
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
-84.
+85.
 )
-\Hy@SectionHShift=\skip61
-) (/usr/local/texlive/2025/texmf-dist/tex/latex/unicode-math/unicode-math.sty
+\Hy@SectionHShift=\skip60
+)
+(/usr/share/texlive/texmf-dist/tex/latex/unicode-math/unicode-math.sty
 Package: unicode-math 2023/08/13 v0.8r Unicode maths in XeLaTeX and LuaLaTeX
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/unicode-math/unicode-math-xetex.s
-ty
+(/usr/share/texlive/texmf-dist/tex/latex/unicode-math/unicode-math-xetex.sty
 Package: unicode-math-xetex 2023/08/13 v0.8r Unicode maths in XeLaTeX and LuaLa
 TeX
- (/usr/local/texlive/2025/texmf-dist/tex/latex/l3packages/xparse/xparse.sty
-Package: xparse 2025-10-09 L3 Experimental document command parser
-)
-(/usr/local/texlive/2025/texmf-dist/tex/latex/l3packages/l3keys2e/l3keys2e.sty
-Package: l3keys2e 2025-10-09 LaTeX2e option processing using LaTeX3 keys
-) (/usr/local/texlive/2025/texmf-dist/tex/latex/fontspec/fontspec.sty
-Package: fontspec 2025/09/29 v2.9g Font selection for XeLaTeX and LuaLaTeX
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/fontspec/fontspec-xetex.sty
-Package: fontspec-xetex 2025/09/29 v2.9g Font selection for XeLaTeX and LuaLaTe
+(/usr/share/texlive/texmf-dist/tex/latex/l3packages/xparse/xparse.sty
+Package: xparse 2023-10-10 L3 Experimental document command parser
+)
+(/usr/share/texlive/texmf-dist/tex/latex/l3packages/l3keys2e/l3keys2e.sty
+Package: l3keys2e 2023-10-10 LaTeX2e option processing using LaTeX3 keys
+)
+(/usr/share/texlive/texmf-dist/tex/latex/fontspec/fontspec.sty
+Package: fontspec 2022/01/15 v2.8a Font selection for XeLaTeX and LuaLaTeX
+
+(/usr/share/texlive/texmf-dist/tex/latex/fontspec/fontspec-xetex.sty
+Package: fontspec-xetex 2022/01/15 v2.8a Font selection for XeLaTeX and LuaLaTe
 X
-\l__fontspec_script_int=\count316
-\l__fontspec_language_int=\count317
-\l__fontspec_strnum_int=\count318
-\l__fontspec_tmp_int=\count319
-\l__fontspec_tmpa_int=\count320
-\l__fontspec_tmpb_int=\count321
-\l__fontspec_tmpc_int=\count322
-\l__fontspec_em_int=\count323
-\l__fontspec_emdef_int=\count324
-\l__fontspec_strong_int=\count325
-\l__fontspec_strongdef_int=\count326
-\l__fontspec_tmpa_dim=\dimen180
-\l__fontspec_tmpb_dim=\dimen181
-\l__fontspec_tmpc_dim=\dimen182
+\l__fontspec_script_int=\count295
+\l__fontspec_language_int=\count296
+\l__fontspec_strnum_int=\count297
+\l__fontspec_tmp_int=\count298
+\l__fontspec_tmpa_int=\count299
+\l__fontspec_tmpb_int=\count300
+\l__fontspec_tmpc_int=\count301
+\l__fontspec_em_int=\count302
+\l__fontspec_emdef_int=\count303
+\l__fontspec_strong_int=\count304
+\l__fontspec_strongdef_int=\count305
+\l__fontspec_tmpa_dim=\dimen172
+\l__fontspec_tmpb_dim=\dimen173
+\l__fontspec_tmpc_dim=\dimen174
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/base/fontenc.sty
-Package: fontenc 2025/07/18 v2.1d Standard LaTeX package
+(/usr/share/texlive/texmf-dist/tex/latex/base/fontenc.sty
+Package: fontenc 2021/04/29 v2.0v Standard LaTeX package
 )
-(/usr/local/texlive/2025/texmf-dist/tex/latex/fontspec/fontspec.cfg)))
-(/usr/local/texlive/2025/texmf-dist/tex/latex/base/fix-cm.sty
+(/usr/share/texlive/texmf-dist/tex/latex/fontspec/fontspec.cfg)))
+(/usr/share/texlive/texmf-dist/tex/latex/base/fix-cm.sty
 Package: fix-cm 2020/11/24 v1.1t fixes to LaTeX
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/base/ts1enc.def
+(/usr/share/texlive/texmf-dist/tex/latex/base/ts1enc.def
 File: ts1enc.def 2001/06/05 v3.0e (jk/car/fm) Standard LaTeX file
 LaTeX Font Info:    Redeclaring font encoding TS1 on input line 47.
-LaTeX Encoding Info:    Redeclaring text command \capitalcedilla (encoding TS1)
- on input line 49.
-LaTeX Encoding Info:    Redeclaring text command \capitalogonek (encoding TS1) 
-on input line 52.
-LaTeX Encoding Info:    Redeclaring text command \capitalgrave (encoding TS1) o
-n input line 55.
-LaTeX Encoding Info:    Redeclaring text command \capitalacute (encoding TS1) o
-n input line 56.
-LaTeX Encoding Info:    Redeclaring text command \capitalcircumflex (encoding T
-S1) on input line 57.
-LaTeX Encoding Info:    Redeclaring text command \capitaltilde (encoding TS1) o
-n input line 58.
-LaTeX Encoding Info:    Redeclaring text command \capitaldieresis (encoding TS1
-) on input line 59.
-LaTeX Encoding Info:    Redeclaring text command \capitalhungarumlaut (encoding
- TS1) on input line 60.
-LaTeX Encoding Info:    Redeclaring text command \capitalring (encoding TS1) on
- input line 61.
-LaTeX Encoding Info:    Redeclaring text command \capitalcaron (encoding TS1) o
-n input line 62.
-LaTeX Encoding Info:    Redeclaring text command \capitalbreve (encoding TS1) o
-n input line 63.
-LaTeX Encoding Info:    Redeclaring text command \capitalmacron (encoding TS1) 
-on input line 64.
-LaTeX Encoding Info:    Redeclaring text command \capitaldotaccent (encoding TS
-1) on input line 65.
-LaTeX Encoding Info:    Redeclaring text command \t (encoding TS1) on input lin
-e 66.
-LaTeX Encoding Info:    Redeclaring text command \capitaltie (encoding TS1) on 
-input line 67.
-LaTeX Encoding Info:    Redeclaring text command \newtie (encoding TS1) on inpu
-t line 68.
-LaTeX Encoding Info:    Redeclaring text command \capitalnewtie (encoding TS1) 
-on input line 69.
-LaTeX Encoding Info:    Redeclaring text symbol \textcapitalcompwordmark (encod
-ing TS1) on input line 70.
-LaTeX Encoding Info:    Redeclaring text symbol \textascendercompwordmark (enco
-ding TS1) on input line 71.
-LaTeX Encoding Info:    Redeclaring text symbol \textquotestraightbase (encodin
-g TS1) on input line 72.
-LaTeX Encoding Info:    Redeclaring text symbol \textquotestraightdblbase (enco
-ding TS1) on input line 73.
-LaTeX Encoding Info:    Redeclaring text symbol \texttwelveudash (encoding TS1)
- on input line 74.
-LaTeX Encoding Info:    Redeclaring text symbol \textthreequartersemdash (encod
-ing TS1) on input line 75.
-LaTeX Encoding Info:    Redeclaring text symbol \textleftarrow (encoding TS1) o
-n input line 76.
-LaTeX Encoding Info:    Redeclaring text symbol \textrightarrow (encoding TS1) 
-on input line 77.
-LaTeX Encoding Info:    Redeclaring text symbol \textblank (encoding TS1) on in
-put line 78.
-LaTeX Encoding Info:    Redeclaring text symbol \textdollar (encoding TS1) on i
-nput line 79.
-LaTeX Encoding Info:    Redeclaring text symbol \textquotesingle (encoding TS1)
- on input line 80.
-LaTeX Encoding Info:    Redeclaring text command \textasteriskcentered (encodin
-g TS1) on input line 81.
-LaTeX Encoding Info:    Redeclaring text symbol \textdblhyphen (encoding TS1) o
-n input line 92.
-LaTeX Encoding Info:    Redeclaring text symbol \textfractionsolidus (encoding 
-TS1) on input line 93.
-LaTeX Encoding Info:    Redeclaring text symbol \textzerooldstyle (encoding TS1
-) on input line 94.
-LaTeX Encoding Info:    Redeclaring text symbol \textoneoldstyle (encoding TS1)
- on input line 95.
-LaTeX Encoding Info:    Redeclaring text symbol \texttwooldstyle (encoding TS1)
- on input line 96.
-LaTeX Encoding Info:    Redeclaring text symbol \textthreeoldstyle (encoding TS
-1) on input line 97.
-LaTeX Encoding Info:    Redeclaring text symbol \textfouroldstyle (encoding TS1
-) on input line 98.
-LaTeX Encoding Info:    Redeclaring text symbol \textfiveoldstyle (encoding TS1
-) on input line 99.
-LaTeX Encoding Info:    Redeclaring text symbol \textsixoldstyle (encoding TS1)
- on input line 100.
-LaTeX Encoding Info:    Redeclaring text symbol \textsevenoldstyle (encoding TS
-1) on input line 101.
-LaTeX Encoding Info:    Redeclaring text symbol \texteightoldstyle (encoding TS
-1) on input line 102.
-LaTeX Encoding Info:    Redeclaring text symbol \textnineoldstyle (encoding TS1
-) on input line 103.
-LaTeX Encoding Info:    Redeclaring text symbol \textlangle (encoding TS1) on i
-nput line 104.
-LaTeX Encoding Info:    Redeclaring text symbol \textminus (encoding TS1) on in
-put line 105.
-LaTeX Encoding Info:    Redeclaring text symbol \textrangle (encoding TS1) on i
-nput line 106.
-LaTeX Encoding Info:    Redeclaring text symbol \textmho (encoding TS1) on inpu
-t line 107.
-LaTeX Encoding Info:    Redeclaring text symbol \textbigcircle (encoding TS1) o
-n input line 108.
-LaTeX Encoding Info:    Redeclaring text command \textcircled (encoding TS1) on
- input line 109.
-LaTeX Encoding Info:    Redeclaring text symbol \textohm (encoding TS1) on inpu
-t line 115.
-LaTeX Encoding Info:    Redeclaring text symbol \textlbrackdbl (encoding TS1) o
-n input line 116.
-LaTeX Encoding Info:    Redeclaring text symbol \textrbrackdbl (encoding TS1) o
-n input line 117.
-LaTeX Encoding Info:    Redeclaring text symbol \textuparrow (encoding TS1) on 
-input line 118.
-LaTeX Encoding Info:    Redeclaring text symbol \textdownarrow (encoding TS1) o
-n input line 119.
-LaTeX Encoding Info:    Redeclaring text symbol \textasciigrave (encoding TS1) 
-on input line 120.
-LaTeX Encoding Info:    Redeclaring text symbol \textborn (encoding TS1) on inp
-ut line 121.
-LaTeX Encoding Info:    Redeclaring text symbol \textdivorced (encoding TS1) on
- input line 122.
-LaTeX Encoding Info:    Redeclaring text symbol \textdied (encoding TS1) on inp
-ut line 123.
-LaTeX Encoding Info:    Redeclaring text symbol \textleaf (encoding TS1) on inp
-ut line 124.
-LaTeX Encoding Info:    Redeclaring text symbol \textmarried (encoding TS1) on 
-input line 125.
-LaTeX Encoding Info:    Redeclaring text symbol \textmusicalnote (encoding TS1)
- on input line 126.
-LaTeX Encoding Info:    Redeclaring text symbol \texttildelow (encoding TS1) on
- input line 127.
-LaTeX Encoding Info:    Redeclaring text symbol \textdblhyphenchar (encoding TS
-1) on input line 128.
-LaTeX Encoding Info:    Redeclaring text symbol \textasciibreve (encoding TS1) 
-on input line 129.
-LaTeX Encoding Info:    Redeclaring text symbol \textasciicaron (encoding TS1) 
-on input line 130.
-LaTeX Encoding Info:    Redeclaring text symbol \textacutedbl (encoding TS1) on
- input line 131.
-LaTeX Encoding Info:    Redeclaring text symbol \textgravedbl (encoding TS1) on
- input line 132.
-LaTeX Encoding Info:    Redeclaring text symbol \textdagger (encoding TS1) on i
-nput line 133.
-LaTeX Encoding Info:    Redeclaring text symbol \textdaggerdbl (encoding TS1) o
-n input line 134.
-LaTeX Encoding Info:    Redeclaring text symbol \textbardbl (encoding TS1) on i
-nput line 135.
-LaTeX Encoding Info:    Redeclaring text symbol \textperthousand (encoding TS1)
- on input line 136.
-LaTeX Encoding Info:    Redeclaring text symbol \textbullet (encoding TS1) on i
-nput line 137.
-LaTeX Encoding Info:    Redeclaring text symbol \textcelsius (encoding TS1) on 
-input line 138.
-LaTeX Encoding Info:    Redeclaring text symbol \textdollaroldstyle (encoding T
-S1) on input line 139.
-LaTeX Encoding Info:    Redeclaring text symbol \textcentoldstyle (encoding TS1
-) on input line 140.
-LaTeX Encoding Info:    Redeclaring text symbol \textflorin (encoding TS1) on i
-nput line 141.
-LaTeX Encoding Info:    Redeclaring text symbol \textcolonmonetary (encoding TS
-1) on input line 142.
-LaTeX Encoding Info:    Redeclaring text symbol \textwon (encoding TS1) on inpu
-t line 143.
-LaTeX Encoding Info:    Redeclaring text symbol \textnaira (encoding TS1) on in
-put line 144.
-LaTeX Encoding Info:    Redeclaring text symbol \textguarani (encoding TS1) on 
-input line 145.
-LaTeX Encoding Info:    Redeclaring text symbol \textpeso (encoding TS1) on inp
-ut line 146.
-LaTeX Encoding Info:    Redeclaring text symbol \textlira (encoding TS1) on inp
-ut line 147.
-LaTeX Encoding Info:    Redeclaring text symbol \textrecipe (encoding TS1) on i
-nput line 148.
-LaTeX Encoding Info:    Redeclaring text symbol \textinterrobang (encoding TS1)
- on input line 149.
-LaTeX Encoding Info:    Redeclaring text symbol \textinterrobangdown (encoding 
-TS1) on input line 150.
-LaTeX Encoding Info:    Redeclaring text symbol \textdong (encoding TS1) on inp
-ut line 151.
-LaTeX Encoding Info:    Redeclaring text symbol \texttrademark (encoding TS1) o
-n input line 152.
-LaTeX Encoding Info:    Redeclaring text symbol \textpertenthousand (encoding T
-S1) on input line 153.
-LaTeX Encoding Info:    Redeclaring text symbol \textpilcrow (encoding TS1) on 
-input line 154.
-LaTeX Encoding Info:    Redeclaring text symbol \textbaht (encoding TS1) on inp
-ut line 155.
-LaTeX Encoding Info:    Redeclaring text symbol \textnumero (encoding TS1) on i
-nput line 156.
-LaTeX Encoding Info:    Redeclaring text symbol \textdiscount (encoding TS1) on
- input line 157.
-LaTeX Encoding Info:    Redeclaring text symbol \textestimated (encoding TS1) o
-n input line 158.
-LaTeX Encoding Info:    Redeclaring text symbol \textopenbullet (encoding TS1) 
-on input line 159.
-LaTeX Encoding Info:    Redeclaring text symbol \textservicemark (encoding TS1)
- on input line 160.
-LaTeX Encoding Info:    Redeclaring text symbol \textlquill (encoding TS1) on i
-nput line 161.
-LaTeX Encoding Info:    Redeclaring text symbol \textrquill (encoding TS1) on i
-nput line 162.
-LaTeX Encoding Info:    Redeclaring text symbol \textcent (encoding TS1) on inp
-ut line 163.
-LaTeX Encoding Info:    Redeclaring text symbol \textsterling (encoding TS1) on
- input line 164.
-LaTeX Encoding Info:    Redeclaring text symbol \textcurrency (encoding TS1) on
- input line 165.
-LaTeX Encoding Info:    Redeclaring text symbol \textyen (encoding TS1) on inpu
-t line 166.
-LaTeX Encoding Info:    Redeclaring text symbol \textbrokenbar (encoding TS1) o
-n input line 167.
-LaTeX Encoding Info:    Redeclaring text symbol \textsection (encoding TS1) on 
-input line 168.
-LaTeX Encoding Info:    Redeclaring text symbol \textasciidieresis (encoding TS
-1) on input line 169.
-LaTeX Encoding Info:    Redeclaring text symbol \textcopyright (encoding TS1) o
-n input line 170.
-LaTeX Encoding Info:    Redeclaring text symbol \textordfeminine (encoding TS1)
- on input line 171.
-LaTeX Encoding Info:    Redeclaring text symbol \textcopyleft (encoding TS1) on
- input line 172.
-LaTeX Encoding Info:    Redeclaring text symbol \textlnot (encoding TS1) on inp
-ut line 173.
-LaTeX Encoding Info:    Redeclaring text symbol \textcircledP (encoding TS1) on
- input line 174.
-LaTeX Encoding Info:    Redeclaring text symbol \textregistered (encoding TS1) 
-on input line 175.
-LaTeX Encoding Info:    Redeclaring text symbol \textasciimacron (encoding TS1)
- on input line 176.
-LaTeX Encoding Info:    Redeclaring text symbol \textdegree (encoding TS1) on i
-nput line 177.
-LaTeX Encoding Info:    Redeclaring text symbol \textpm (encoding TS1) on input
- line 178.
-LaTeX Encoding Info:    Redeclaring text symbol \texttwosuperior (encoding TS1)
- on input line 179.
-LaTeX Encoding Info:    Redeclaring text symbol \textthreesuperior (encoding TS
-1) on input line 180.
-LaTeX Encoding Info:    Redeclaring text symbol \textasciiacute (encoding TS1) 
-on input line 181.
-LaTeX Encoding Info:    Redeclaring text symbol \textmu (encoding TS1) on input
- line 182.
-LaTeX Encoding Info:    Redeclaring text symbol \textparagraph (encoding TS1) o
-n input line 183.
-LaTeX Encoding Info:    Redeclaring text symbol \textperiodcentered (encoding T
-S1) on input line 184.
-LaTeX Encoding Info:    Redeclaring text symbol \textreferencemark (encoding TS
-1) on input line 185.
-LaTeX Encoding Info:    Redeclaring text symbol \textonesuperior (encoding TS1)
- on input line 186.
-LaTeX Encoding Info:    Redeclaring text symbol \textordmasculine (encoding TS1
-) on input line 187.
-LaTeX Encoding Info:    Redeclaring text symbol \textsurd (encoding TS1) on inp
-ut line 188.
-LaTeX Encoding Info:    Redeclaring text symbol \textonequarter (encoding TS1) 
-on input line 189.
-LaTeX Encoding Info:    Redeclaring text symbol \textonehalf (encoding TS1) on 
-input line 190.
-LaTeX Encoding Info:    Redeclaring text symbol \textthreequarters (encoding TS
-1) on input line 191.
-LaTeX Encoding Info:    Redeclaring text symbol \texteuro (encoding TS1) on inp
-ut line 192.
-LaTeX Encoding Info:    Redeclaring text symbol \texttimes (encoding TS1) on in
-put line 193.
-LaTeX Encoding Info:    Redeclaring text symbol \textdiv (encoding TS1) on inpu
-t line 194.
 ))
-\g__um_fam_int=\count327
-\g__um_fonts_used_int=\count328
-\l__um_primecount_int=\count329
-\g__um_primekern_muskip=\muskip19
+\g__um_fam_int=\count306
+\g__um_fonts_used_int=\count307
+\l__um_primecount_int=\count308
+\g__um_primekern_muskip=\muskip18
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/unicode-math/unicode-math-table.t
-ex))) (./macros/common.tex
-\c@theorem=\count330
-) (./macros/print.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/blueprint/print/print.aux
-
-LaTeX Warning: Label `BombieriVinogradov.BV_Delta_1P' multiply defined.
-
+(/usr/share/texlive/texmf-dist/tex/latex/unicode-math/unicode-math-table.tex)))
+(/usr/share/texlive/texmf-dist/tex/latex/cleveref/cleveref.sty
+Package: cleveref 2018/03/27 v0.21.4 Intelligent cross-referencing
+Package cleveref Info: `hyperref' support loaded on input line 2370.
+LaTeX Info: Redefining \cref on input line 2370.
+LaTeX Info: Redefining \Cref on input line 2370.
+LaTeX Info: Redefining \crefrange on input line 2370.
+LaTeX Info: Redefining \Crefrange on input line 2370.
+LaTeX Info: Redefining \cpageref on input line 2370.
+LaTeX Info: Redefining \Cpageref on input line 2370.
+LaTeX Info: Redefining \cpagerefrange on input line 2370.
+LaTeX Info: Redefining \Cpagerefrange on input line 2370.
+LaTeX Info: Redefining \labelcref on input line 2370.
+LaTeX Info: Redefining \labelcpageref on input line 2370.
+Package cleveref Info: `amsthm' support loaded on input line 3026.
 )
+(./macros/common.tex
+\c@theorem=\count309
+) (./macros/print.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/blueprint/print/print.aux)
 \openout1 = `print.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: xetex
@@ -676,59 +451,58 @@ LaTeX Font Info:    ... okay on input line 30.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/graphics/graphicx.sty
-Package: graphicx 2024/12/31 v1.2e Enhanced LaTeX Graphics (DPC,SPQR)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/graphics/graphics.sty
-Package: graphics 2024/08/06 v1.4g Standard LaTeX Graphics (DPC,SPQR)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2022/03/10 v1.4e Standard LaTeX Graphics (DPC,SPQR)
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/graphics/trig.sty
-Package: trig 2023/12/02 v1.11 sin cos tan (DPC)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2021/08/11 v1.11 sin cos tan (DPC)
 )
-(/usr/local/texlive/2025/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
 File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
-Package graphics Info: Driver file: xetex.def on input line 106.
+Package graphics Info: Driver file: xetex.def on input line 107.
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/graphics-def/xetex.def
-File: xetex.def 2025/11/01 v5.0p Graphics/color driver for xetex
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-def/xetex.def
+File: xetex.def 2022/09/22 v5.0n Graphics/color driver for xetex
 ))
-\Gin@req@height=\dimen183
-\Gin@req@width=\dimen184
+\Gin@req@height=\dimen175
+\Gin@req@width=\dimen176
 )
-(/usr/local/texlive/2025/texmf-dist/tex/latex/graphics/color.sty
-Package: color 2025/01/14 v1.3e Standard LaTeX Color (DPC)
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/color.sty
+Package: color 2022/01/06 v1.3d Standard LaTeX Color (DPC)
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/graphics-cfg/color.cfg
+(/usr/share/texlive/texmf-dist/tex/latex/graphics-cfg/color.cfg
 File: color.cfg 2016/01/02 v1.6 sample color configuration
 )
 Package color Info: Driver file: xetex.def on input line 149.
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/graphics/mathcolor.ltx))
-Package hyperref Info: Link coloring ON on input line 30.
+(/usr/share/texlive/texmf-dist/tex/latex/graphics/mathcolor.ltx))
+Package hyperref Info: Link coloring ON on input line 34.
 
-(/home/arend/lean/lean-bombieri-vinogradov/blueprint/print/print.out)
-(/home/arend/lean/lean-bombieri-vinogradov/blueprint/print/print.out)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/blueprint/print/print.out)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/blueprint/print/print.out)
 \@outlinefile=\write3
 \openout3 = `print.out'.
 
 LaTeX Font Info:    Overwriting math alphabet `\mathrm' in version `normal'
-(Font)                  OT1/cmr/m/n --> TU/lmr/m/n on input line 30.
+(Font)                  OT1/cmr/m/n --> TU/lmr/m/n on input line 34.
 LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
-(Font)                  OT1/cmr/m/it --> TU/lmr/m/it on input line 30.
+(Font)                  OT1/cmr/m/it --> TU/lmr/m/it on input line 34.
 LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
-(Font)                  OT1/cmr/bx/n --> TU/lmr/bx/n on input line 30.
+(Font)                  OT1/cmr/bx/n --> TU/lmr/bx/n on input line 34.
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `normal'
-(Font)                  OT1/cmss/m/n --> TU/lmss/m/n on input line 30.
+(Font)                  OT1/cmss/m/n --> TU/lmss/m/n on input line 34.
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
-(Font)                  OT1/cmss/bx/n --> TU/lmss/bx/n on input line 30.
+(Font)                  OT1/cmss/bx/n --> TU/lmss/bx/n on input line 34.
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `normal'
-(Font)                  OT1/cmtt/m/n --> TU/lmtt/m/n on input line 30.
+(Font)                  OT1/cmtt/m/n --> TU/lmtt/m/n on input line 34.
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
-(Font)                  OT1/cmtt/m/n --> TU/lmtt/bx/n on input line 30.
+(Font)                  OT1/cmtt/m/n --> TU/lmtt/bx/n on input line 34.
 
-Package fontspec Info: 
-(fontspec)             Font family 'latinmodern-math.otf(0)' created for font
+Package fontspec Info: Font family 'latinmodern-math.otf(0)' created for font
 (fontspec)             'latinmodern-math.otf' with options
 (fontspec)             [BoldItalicFont={},ItalicFont={},SmallCapsFont={},Script
 =Math,BoldFont={latinmodern-math.otf}].
@@ -739,13 +513,14 @@ Package fontspec Info:
 (fontspec)             - 'normal' (m/n) with NFSS spec.:
 (fontspec)             <->"[latinmodern-math.otf]/OT:script=math;language=dflt;
 "
+(fontspec)             - 'small caps'  (m/sc) with NFSS spec.: 
 (fontspec)             - 'bold' (b/n) with NFSS spec.:
 (fontspec)             <->"[latinmodern-math.otf]/OT:script=math;language=dflt;
 "
+(fontspec)             - 'bold small caps'  (b/sc) with NFSS spec.: 
 
 
-Package fontspec Info: 
-(fontspec)             Font family 'latinmodern-math.otf(1)' created for font
+Package fontspec Info: Font family 'latinmodern-math.otf(1)' created for font
 (fontspec)             'latinmodern-math.otf' with options
 (fontspec)             [BoldItalicFont={},ItalicFont={},SmallCapsFont={},Script
 =Math,SizeFeatures={{Size=8.5-},{Size=6-8.5,Font=latinmodern-math.otf,Style=Mat
@@ -759,43 +534,39 @@ latinmodern-math.otf}].
 (fontspec)             <8.5->"[latinmodern-math.otf]/OT:script=math;language=df
 lt;"<6-8.5>"[latinmodern-math.otf]/OT:script=math;language=dflt;+ssty=0;"<-6>"[
 latinmodern-math.otf]/OT:script=math;language=dflt;+ssty=1;"
+(fontspec)             - 'small caps'  (m/sc) with NFSS spec.: 
 (fontspec)             - 'bold' (b/n) with NFSS spec.:
 (fontspec)             <->"[latinmodern-math.otf]/OT:script=math;language=dflt;
 "
+(fontspec)             - 'bold small caps'  (b/sc) with NFSS spec.: 
 
 LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
-(Font)              `operators' in the math version `normal' on input line 30.
+(Font)              `operators' in the math version `normal' on input line 34.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
 (Font)                  OT1/cmr/m/n --> TU/latinmodern-math.otf(1)/m/n on input
- line 30.
+ line 34.
 LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
-(Font)              `operators' in the math version `bold' on input line 30.
+(Font)              `operators' in the math version `bold' on input line 34.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
 (Font)                  OT1/cmr/bx/n --> TU/latinmodern-math.otf(1)/b/n on inpu
-t line 30.
+t line 34.
 
-Package fontspec Info: 
-(fontspec)             latinmodern-math scale = 1.0001.
-
-
-Package fontspec Info: 
-(fontspec)             latinmodern-math scale = 1.0001.
+Package fontspec Info: latinmodern-math scale = 1.0001.
 
 
-Package fontspec Info: 
-(fontspec)             latinmodern-math scale = 1.0001.
+Package fontspec Info: latinmodern-math scale = 1.0001.
 
 
-Package fontspec Info: 
-(fontspec)             latinmodern-math scale = 1.0001.
+Package fontspec Info: latinmodern-math scale = 1.0001.
 
 
-Package fontspec Info: 
-(fontspec)             latinmodern-math scale = 1.0001.
+Package fontspec Info: latinmodern-math scale = 1.0001.
 
 
-Package fontspec Info: 
-(fontspec)             Font family 'latinmodern-math.otf(2)' created for font
+Package fontspec Info: latinmodern-math scale = 1.0001.
+
+
+Package fontspec Info: Font family 'latinmodern-math.otf(2)' created for font
 (fontspec)             'latinmodern-math.otf' with options
 (fontspec)             [BoldItalicFont={},ItalicFont={},SmallCapsFont={},Script
 =Math,SizeFeatures={{Size=8.5-},{Size=6-8.5,Font=latinmodern-math.otf,Style=Mat
@@ -820,43 +591,61 @@ latinmodern-math.otf},ScaleAgain=1.0001,FontAdjustment={\fontdimen
 anguage=dflt;"<6-8.5>s*[1.0001]"[latinmodern-math.otf]/OT:script=math;language=
 dflt;+ssty=0;"<-6>s*[1.0001]"[latinmodern-math.otf]/OT:script=math;language=dfl
 t;+ssty=1;"
+(fontspec)             - 'small caps'  (m/sc) with NFSS spec.: 
+(fontspec)             and font adjustment code:
+(fontspec)             \fontdimen 8\font =6.77pt\relax \fontdimen 9\font
+(fontspec)             =3.94pt\relax \fontdimen 10\font =4.44pt\relax
+(fontspec)             \fontdimen 11\font =6.86pt\relax \fontdimen 12\font
+(fontspec)             =3.45pt\relax \fontdimen 13\font =3.63pt\relax
+(fontspec)             \fontdimen 14\font =3.63pt\relax \fontdimen 15\font
+(fontspec)             =2.89pt\relax \fontdimen 16\font =2.47pt\relax
+(fontspec)             \fontdimen 17\font =2.47pt\relax \fontdimen 18\font
+(fontspec)             =2.5pt\relax \fontdimen 19\font =2.0pt\relax \fontdimen
+(fontspec)             22\font =2.5pt\relax \fontdimen 20\font =0pt\relax
+(fontspec)             \fontdimen 21\font =0pt\relax 
 (fontspec)             - 'bold' (b/n) with NFSS spec.:
 (fontspec)             <->s*[1.0001]"[latinmodern-math.otf]/OT:script=math;lang
 uage=dflt;"
+(fontspec)             - 'bold small caps'  (b/sc) with NFSS spec.: 
+(fontspec)             and font adjustment code:
+(fontspec)             \fontdimen 8\font =6.77pt\relax \fontdimen 9\font
+(fontspec)             =3.94pt\relax \fontdimen 10\font =4.44pt\relax
+(fontspec)             \fontdimen 11\font =6.86pt\relax \fontdimen 12\font
+(fontspec)             =3.45pt\relax \fontdimen 13\font =3.63pt\relax
+(fontspec)             \fontdimen 14\font =3.63pt\relax \fontdimen 15\font
+(fontspec)             =2.89pt\relax \fontdimen 16\font =2.47pt\relax
+(fontspec)             \fontdimen 17\font =2.47pt\relax \fontdimen 18\font
+(fontspec)             =2.5pt\relax \fontdimen 19\font =2.0pt\relax \fontdimen
+(fontspec)             22\font =2.5pt\relax \fontdimen 20\font =0pt\relax
+(fontspec)             \fontdimen 21\font =0pt\relax 
 
 LaTeX Font Info:    Encoding `OMS' has changed to `TU' for symbol font
-(Font)              `symbols' in the math version `normal' on input line 30.
+(Font)              `symbols' in the math version `normal' on input line 34.
 LaTeX Font Info:    Overwriting symbol font `symbols' in version `normal'
 (Font)                  OMS/cmsy/m/n --> TU/latinmodern-math.otf(2)/m/n on inpu
-t line 30.
+t line 34.
 LaTeX Font Info:    Encoding `OMS' has changed to `TU' for symbol font
-(Font)              `symbols' in the math version `bold' on input line 30.
+(Font)              `symbols' in the math version `bold' on input line 34.
 LaTeX Font Info:    Overwriting symbol font `symbols' in version `bold'
 (Font)                  OMS/cmsy/b/n --> TU/latinmodern-math.otf(2)/b/n on inpu
-t line 30.
+t line 34.
 
-Package fontspec Info: 
-(fontspec)             latinmodern-math scale = 0.9999.
-
-
-Package fontspec Info: 
-(fontspec)             latinmodern-math scale = 0.9999.
+Package fontspec Info: latinmodern-math scale = 0.9999.
 
 
-Package fontspec Info: 
-(fontspec)             latinmodern-math scale = 0.9999.
+Package fontspec Info: latinmodern-math scale = 0.9999.
 
 
-Package fontspec Info: 
-(fontspec)             latinmodern-math scale = 0.9999.
+Package fontspec Info: latinmodern-math scale = 0.9999.
 
 
-Package fontspec Info: 
-(fontspec)             latinmodern-math scale = 0.9999.
+Package fontspec Info: latinmodern-math scale = 0.9999.
 
 
-Package fontspec Info: 
-(fontspec)             Font family 'latinmodern-math.otf(3)' created for font
+Package fontspec Info: latinmodern-math scale = 0.9999.
+
+
+Package fontspec Info: Font family 'latinmodern-math.otf(3)' created for font
 (fontspec)             'latinmodern-math.otf' with options
 (fontspec)             [BoldItalicFont={},ItalicFont={},SmallCapsFont={},Script
 =Math,SizeFeatures={{Size=8.5-},{Size=6-8.5,Font=latinmodern-math.otf,Style=Mat
@@ -875,185 +664,432 @@ latinmodern-math.otf},ScaleAgain=0.9999,FontAdjustment={\fontdimen
 anguage=dflt;"<6-8.5>s*[0.9999]"[latinmodern-math.otf]/OT:script=math;language=
 dflt;+ssty=0;"<-6>s*[0.9999]"[latinmodern-math.otf]/OT:script=math;language=dfl
 t;+ssty=1;"
+(fontspec)             - 'small caps'  (m/sc) with NFSS spec.: 
+(fontspec)             and font adjustment code:
+(fontspec)             \fontdimen 8\font =0.4pt\relax \fontdimen 9\font
+(fontspec)             =2.0pt\relax \fontdimen 10\font =1.67pt\relax
+(fontspec)             \fontdimen 11\font =1.11pt\relax \fontdimen 12\font
+(fontspec)             =6.0pt\relax \fontdimen 13\font =0pt\relax 
 (fontspec)             - 'bold' (b/n) with NFSS spec.:
 (fontspec)             <->s*[0.9999]"[latinmodern-math.otf]/OT:script=math;lang
 uage=dflt;"
+(fontspec)             - 'bold small caps'  (b/sc) with NFSS spec.: 
+(fontspec)             and font adjustment code:
+(fontspec)             \fontdimen 8\font =0.4pt\relax \fontdimen 9\font
+(fontspec)             =2.0pt\relax \fontdimen 10\font =1.67pt\relax
+(fontspec)             \fontdimen 11\font =1.11pt\relax \fontdimen 12\font
+(fontspec)             =6.0pt\relax \fontdimen 13\font =0pt\relax 
 
 LaTeX Font Info:    Encoding `OMX' has changed to `TU' for symbol font
 (Font)              `largesymbols' in the math version `normal' on input line 3
-0.
+4.
 LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `normal'
 (Font)                  OMX/cmex/m/n --> TU/latinmodern-math.otf(3)/m/n on inpu
-t line 30.
+t line 34.
 LaTeX Font Info:    Encoding `OMX' has changed to `TU' for symbol font
-(Font)              `largesymbols' in the math version `bold' on input line 30.
+(Font)              `largesymbols' in the math version `bold' on input line 34.
 
 LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `bold'
 (Font)                  OMX/cmex/m/n --> TU/latinmodern-math.otf(3)/b/n on inpu
-t line 30.
+t line 34.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 12.00128pt on input line 32.
+(Font)              scaled to size 12.00128pt on input line 36.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 8.00085pt on input line 32.
+(Font)              scaled to size 8.00085pt on input line 36.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 6.00064pt on input line 32.
+(Font)              scaled to size 6.00064pt on input line 36.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 11.99872pt on input line 32.
+(Font)              scaled to size 11.99872pt on input line 36.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 7.99915pt on input line 32.
+(Font)              scaled to size 7.99915pt on input line 36.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 5.99936pt on input line 32.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 32.
+(Font)              scaled to size 5.99936pt on input line 36.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 36.
 
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsa.fd
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 32.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 36.
 
 
-(/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsb.fd
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
 
-]
-(./content.tex
-(/home/arend/lean/lean-bombieri-vinogradov/blueprint/print/../../.lake/build/bl
-ueprint/library/BV.tex
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Defs
-.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daLE.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daSharp.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Axio
-ms.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daFlat.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Main
-Results.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV.tex)
-)
+] (./content.tex
+(/home/arend/lean/lean-bombieri-vinogradov-dev/blueprint/print/../../.lake/buil
+d/blueprint/library/BV.tex
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+ForMathlib/IsLocallyBounded.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Summatory.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Chebyshev.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Axioms.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Defs.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Mathlib/MeasureTheory/Function/LocallyIntegrable.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Mathlib/Analysis/Calculus/Deriv/Slope.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+ForMathlib/Indicator.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+ForMathlib/RCLikeToComplex.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Maximal.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+VonMangoldt.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+SiegelWalfisz.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Delta.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaLE.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Dilate.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaSharp.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Mellin.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Flat/Perron.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+ForMathlib/Log.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+MainResults.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV.
+tex))
 Chapter 1.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
+(Font)              scaled to size 10.00107pt on input line 13.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
+(Font)              scaled to size 7.00075pt on input line 13.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
+(Font)              scaled to size 5.00053pt on input line 13.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
+(Font)              scaled to size 9.99893pt on input line 13.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
+(Font)              scaled to size 6.99925pt on input line 13.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
+(Font)              scaled to size 4.99947pt on input line 13.
 
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Main
-Results.artifacts/Bombieri-Vinogradov.tex
+Overfull \hbox (8.1459pt too wide) detected at line 23
+[] [] [] [] [][] [] [][] [] [][][] [] [] [] [][]
+ []
+
+[1
+
+] [2]
+Chapter 2.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 10.00107pt on input line 6.
-LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 7.00075pt on input line 6.
-LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 5.00053pt on input line 6.
+(Font)              scaled to size 14.40152pt on input line 53.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 9.99893pt on input line 6.
-LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 6.99925pt on input line 6.
-LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 4.99947pt on input line 6.
-)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Main
-Results.artifacts/BombieriVinogradov.BV_Delta_1P.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Axio
-ms.artifacts/siegel_walfisz.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Axio
-ms.artifacts/large_sieve.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Defs
-.artifacts/logIntegral.tex [1
+(Font)              scaled to size 14.39845pt on input line 53.
+
+Overfull \hbox (69.57617pt too wide) in paragraph at lines 56--66
+\TU/lmr/m/n/10 (Definition [][]3.7[][]). For $[] [] []$ the difference between 
+$[][][][] [][] [][] [] [][][][][][]$ and $[][][][][] [][] [][]$ is $[][][][][][
+] [][] [][][][] []
+ []
+
+
+Overfull \hbox (20.33522pt too wide) in paragraph at lines 56--66
+\TU/lmr/m/n/10 Siegel–Walfisz, Theorem [][]4.2[][]) together with the elementar
+y bound $[][] [][][][] [] [] [] [] [][] [] []$
+ []
+
+[3
+
+] [4]
+Chapter 3.
+
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Summatory.artifacts/summatory.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Chebyshev.artifacts/Nat.modEqs.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Chebyshev.artifacts/Chebyshev.psiMod.tex [5
 
 ])
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Defs
-.artifacts/Delta.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Defs
-.artifacts/Delta_eq_sum_char.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Defs
-.artifacts/onCoprime.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Defs.artifacts/onCoprime.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Defs.artifacts/ArithmeticFunction.on.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Dilate.artifacts/dilate.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Delta.artifacts/Delta.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Delta.artifacts/Delta_linear.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Delta.artifacts/abs_Delta_le_two_summatory_abs.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Delta.artifacts/Delta_onCoprime_self.tex [6])
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Delta.artifacts/Delta_eq_sum_char.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Delta.artifacts/Delta_Lambda_eq.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Defs.artifacts/ProofData.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Defs.artifacts/log_x_large.tex [7])
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Defs.artifacts/UV_range.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Maximal.artifacts/BV.maxy.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Maximal.artifacts/BV.maxya.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Maximal.artifacts/maxya_basic.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Delta.artifacts/maxya_Delta_enorm_le_of_abs_le.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Delta.artifacts/maxya_Delta_add_le.tex [8]) [9]
+Chapter 4.
+
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Axioms.artifacts/siegel_walfisz.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+SiegelWalfisz.artifacts/PNT.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+VonMangoldt.artifacts/sum_vonMangoldt_not_coprime_le.tex [10
+
+])
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+SiegelWalfisz.artifacts/coprime_vonMangoldt_error.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+ForMathlib/Log.artifacts/pnt_ratio_bound.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Axioms.artifacts/large_sieve.tex) [11]
+Chapter 5.
+
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Chebyshev.artifacts/Chebyshev.abs_psiMod_sub_div_le_const.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaSharp.artifacts/sum_divisors_card_le.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.artifacts/card_divisors_le_two_mul_sqrt.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.artifacts/d_le_two_mul_totient_sq.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.artifacts/invTotientAF_eq_mul.tex [12
+
+])
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.artifacts/summatory_totient_inv_le.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.artifacts/sum_rphiInv_le.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.artifacts/log_pow_le_const_mul_rpow.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.artifacts/log_power_absorption.tex [13])
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.artifacts/log_pow_le_const_mul_sqrt.tex) [14]
+Chapter 6.
+
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Defs.artifacts/LambdaLEU.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Defs.artifacts/moebiusLEV.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Defs.artifacts/LambdaSharp.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Defs.artifacts/LambdaFlat.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Defs.artifacts/Lambda_decomp.tex) [15
+
+]
+Chapter 7.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 14.40152pt on input line 32.
+(Font)              scaled to size 24.88266pt on input line 207.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
+(Font)              scaled to size 20.74222pt on input line 207.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
+(Font)              scaled to size 17.28183pt on input line 207.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 14.39845pt on input line 32.
+(Font)              scaled to size 24.87733pt on input line 207.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
+(Font)              scaled to size 20.73778pt on input line 207.
+LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
+(Font)              scaled to size 17.27815pt on input line 207.
 
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Main
-Results.artifacts/BombieriVinogradov.Delta_primeIndicator_eq.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Main
-Results.artifacts/BombieriVinogradov.sum_primes_not_dvd_eq_li.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Main
-Results.artifacts/BombieriVinogradov.max_Delta_1P_le_max_Delta_Lambda.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Main
-Results.artifacts/BombieriVinogradov.BV_Delta_1P.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Main
-Results.artifacts/BombieriVinogradov.BV_Delta_Lambda.tex [2])
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Defs
-.artifacts/LambdaSharp.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Defs
-.artifacts/LambdaFlat.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Defs
-.artifacts/LambdaLE.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Defs
-.artifacts/Lambda_decomp.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daLE.artifacts/sum_vonMangoldt_le.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daLE.artifacts/Delta_LambdaLE_bound.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daLE.artifacts/BV_LambdaLE.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daSharp.artifacts/Delta_convolution_eq.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daSharp.artifacts/Delta_one_bound.tex [3])
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daSharp.artifacts/Delta_abel_summation.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daSharp.artifacts/Delta_monotone_bound.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daSharp.artifacts/Delta_flog_bound.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daSharp.artifacts/Delta_LambdaSharp_bound.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daSharp.artifacts/BV_LambdaSharp.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daFlat.artifacts/S_r.tex [4])
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daFlat.artifacts/T_r.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daFlat.artifacts/character_sum_by_conductor.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daFlat.artifacts/character_sum_Mobius.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daFlat.artifacts/Delta_LambdaFlat_decomp.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daFlat.artifacts/Delta_LambdaFlat_small_conductor.tex [5])
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daFlat.artifacts/BV_LambdaFlat_via_T.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daFlat.artifacts/LargeSieve_convolution.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daFlat.artifacts/LambdaFlat_dyadic.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daFlat.artifacts/BV_char_sum_bound.tex)
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daFlat.artifacts/T_r_bound.tex [6])
-(/home/arend/lean/lean-bombieri-vinogradov/.lake/build/blueprint/module/BV/Lamb
-daFlat.artifacts/BV_LambdaFlat.tex)) [7]
-(/home/arend/lean/lean-bombieri-vinogradov/blueprint/print/print.aux)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaLE.artifacts/sum_LambdaLEU_le.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaLE.artifacts/Delta_LambdaLEU_bound.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaLE.artifacts/BV_LambdaLE_enorm.tex) [16
+
+]
+Chapter 8.
+
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Delta.artifacts/Delta_convolution_eq.tex
+Overfull \hbox (5.77371pt too wide) in paragraph at lines 13--19
+[][][][][][][][][] [] [][][][][] [] [][][][][][][][]$\TU/lmr/m/n/10 , and the h
+yperbola identity $[][][][] [] [][][][][] [] [][] [][][][] [][] [][][][]$
+ []
+
+)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Delta.artifacts/Delta_one_bound.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Delta.artifacts/Delta_abel_summation.tex [17
+
+])
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Delta.artifacts/Delta_monotone_bound.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Delta.artifacts/Delta_flog_bound.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Dilate.artifacts/ArithmeticFunction.on_mul_of_saturated.tex [18])
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaSharp.artifacts/mul_dilate.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Dilate.artifacts/summatory_abs_dilate_le.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Dilate.artifacts/summatory_abs_mul_le.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaSharp.artifacts/moebius_coprime_indicator.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaSharp.artifacts/zeta_on_coprime_apply.tex [19])
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaSharp.artifacts/mul_on_coprime_expansion.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaSharp.artifacts/Delta_dilate_flog_bound.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaSharp.artifacts/l1_norms_coefficients.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaSharp.artifacts/Delta_term1_bound.tex [20])
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaSharp.artifacts/Delta_term2_bound.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaSharp.artifacts/Delta_LambdaSharp_bound.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaSharp.artifacts/BV_LambdaSharp_enorm.tex [21]) [22]
+Chapter 9.
+
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.artifacts/S.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.artifacts/T.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.artifacts/character_sum_by_conductor.tex [23
+
+])
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.artifacts/totient_mul_Delta_eq.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.artifacts/character_sum_Mobius.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.artifacts/Delta_LambdaFlat_decomp.tex [24])
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.artifacts/Delta_onCoprime_Lambda_bound.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.artifacts/Delta_onCoprime_LambdaFlat_pointwise.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.artifacts/Delta_LambdaFlat_small_conductor.tex [25])
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.artifacts/maxya_Delta_LambdaFlat_enorm_le.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.artifacts/BV_LambdaFlat_via_T.tex) [26] [27]
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Flat/Perron.artifacts/Flat.Bump.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Flat/Perron.artifacts/Flat.FG.tex
+Overfull \hbox (19.3776pt too wide) in paragraph at lines 9--12
+\TU/lmr/m/n/10 for the associated Dirichlet polynomials, and $[][][][] [][] [] 
+[][] [][][][][][][][][]$, $[][][][] [][] [] [][] [][][][][][][][][]$. 
+ []
+
+)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Flat/Perron.artifacts/Flat.T.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Mellin.artifacts/mellin_bump_bounded.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Mellin.artifacts/Smooth1_mellinInv_mellin_eq.tex [28])
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Flat/Perron.artifacts/mellin_smooth1_bounds.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Flat/Perron.artifacts/Flat.mellin_J_bound.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Flat/Perron.artifacts/Flat.sup_summatory_eq_sup_nat.tex [29])
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Flat/Perron.artifacts/Flat.FG.summatory_mul_char.tex
+Overfull \hbox (2.43193pt too wide) in paragraph at lines 12--17
+[][]$ \TU/lmr/m/n/10 (using complete multiplicativity of $[]$) writes the left 
+side as $[][] [][] [][][][][][][][][][][][][][][][]$.
+ []
+
+)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Flat/Perron.artifacts/Flat.T_eq_sharp.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Flat/Perron.artifacts/Flat.T_mellin_representation.tex [30])
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Flat/Perron.artifacts/Flat.largeSieve_factor.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Flat/Perron.artifacts/Flat.largeSieve_char_bound.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Flat/Perron.artifacts/Flat.summatory_T_ll.tex [31])
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Flat/Perron.artifacts/Flat.LargeSieve_convolution_aux.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.artifacts/LargeSieve_convolution.tex
+Overfull \hbox (66.00938pt too wide) detected at line 9
+[] [] [] [] [] [][][] [] [][][][][][][][][][] [] [][] [] [][] [] [][] [] [][][]
+[][] [][] [] [] [][][][][][][][] [] [][][][][][][][]
+ []
+
+)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.artifacts/LambdaFlat_dyadic.tex [32])
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.artifacts/BV_char_sum_bound.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.artifacts/T_r_bound.tex [33])
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.artifacts/BV_LambdaFlat_enorm.tex) [34]
+Chapter 10.
+
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+MainResults.artifacts/maxya_Delta_Lambda_enorm_le.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+MainResults.artifacts/BV_Delta_Lambda_enorm.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+MainResults.artifacts/psiMaxEnorm.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+MainResults.artifacts/BV_compact_enorm.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+MainResults.artifacts/BV_large_enorm.tex [35
+
+])
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+MainResults.artifacts/Bombieri-Vinogradov.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+MainResults.artifacts/bombieri_vinogradov.tex)) [36]
+(/home/arend/lean/lean-bombieri-vinogradov-dev/blueprint/print/print.aux)
  ***********
-LaTeX2e <2025-11-01>
-L3 programming layer <2026-01-19>
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-01-22>
  ***********
-
-
-LaTeX Warning: There were multiply-defined labels.
-
 Package rerunfilecheck Info: File `print.out' has not changed.
-(rerunfilecheck)             Checksum: 1C48B5710C687F50762B1EFE096B45DF;1895.
+(rerunfilecheck)             Checksum: BB4864F3FC2BA479690E2DE95BE8C7BD;6258.
  ) 
 Here is how much of TeX's memory you used:
- 17148 strings out of 468174
- 346182 string characters out of 5433151
- 928661 words of memory out of 5000000
- 45517 multiletter control sequences out of 15000+600000
- 634077 words of font info for 98 fonts, out of 8000000 for 9000
+ 19800 strings out of 474878
+ 455760 string characters out of 5762516
+ 1964627 words of memory out of 5000000
+ 41208 multiletter control sequences out of 15000+600000
+ 567324 words of font info for 114 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 90i,14n,107p,542b,495s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 90i,9n,114p,418b,477s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on /home/arend/lean/lean-bombieri-vinogradov/blueprint/print/pri
-nt.pdf (8 pages).
+Output written on /home/arend/lean/lean-bombieri-vinogradov-dev/blueprint/print
+/print.pdf (37 pages).

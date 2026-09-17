@@ -10,6 +10,13 @@ open ArithmeticFunction
 noncomputable def C_D1 (A : ℕ) : ℝ := C_SW A 0
 
 /-- The prime number theorem consequence of Siegel–Walfisz at an explicit endpoint. -/
+@[blueprint (title := /-- The prime number theorem with logarithmic savings -/) (statement := /--
+For every $A \in \N$ and every real $z \ge 2$,
+$$\sum_{n \le z} \Lambda(n) = z + O_A\!\left(\frac{z}{(\log z)^A}\right).$$
+-/) (proof := /--
+Apply \Cref{siegel_walfisz} with $C = 0$, $q = 1$ (note $1 \le (\log z)^0 = 1$) and $a = 1$: then
+$\psi(z; 1, 1) = \sum_{n \le z} \Lambda(n)$ and $\varphi(1) = 1$.
+-/)]
 lemma PNT (A : ℕ) {z : ℝ} (hz : 2 ≤ z) :
     |summatory (fun n ↦ Λ n) z - z| ≤ C_D1 A * (z / Real.log z ^ A) := by
   have h := siegel_walfisz A 0 hz (q := 1) (by positivity) (by simp)
@@ -33,6 +40,15 @@ lemma sum_vonMangoldt_not_coprime_ll_logq {z : ℝ} (hz : 2 ≤ z)
   · positivity
 
 /-- Public generic coprime-error consequence of Siegel–Walfisz. -/
+@[blueprint (title := /-- Prime number theorem for integers coprime to $q$ -/) (statement := /--
+For every $B \in \N$, every real $z \ge 2$ and every integer $q \ge 1$,
+$$\sum_{\substack{n \le z \\ (n, q) = 1}} \Lambda(n) = z + O_B\!\left(\frac{z}{(\log z)^B}\right) + O\big(\log q \cdot \log z\big),$$
+the second error term having an absolute implied constant.
+-/) (proof := /--
+Write $\sum_{n \le z, (n,q) = 1} \Lambda(n) - z = \big(\sum_{n \le z} \Lambda(n) - z\big) - \sum_{n \le z, (n, q) > 1} \Lambda(n)$
+and apply the triangle inequality: the first term is bounded by \Cref{PNT} and the second by
+\Cref{sum_vonMangoldt_not_coprime_le}.
+-/)]
 lemma coprime_vonMangoldt_error (B : ℕ) {z : ℝ} (hz : 2 ≤ z)
     {q : ℕ} (hq : 0 < q) :
     |summatory (fun n ↦ if q.Coprime n then Λ n else 0) z - z| ≤

@@ -41,8 +41,13 @@ theorem summatory_mono {f : ℕ → ℝ} {x y : ℝ} (hxy : x ≤ y) (hf : ∀ n
     exact_mod_cast calc n ≤ (⌊y⌋₊ : ℝ) := mod_cast hn.2
       _ ≤ y := Nat.floor_le hy0
 
-@[blueprint (latexEnv := "lemma") (statement := /--
-$$\sum_{n \le y} \Lambda(n) \ll U \log{x}$$
+@[blueprint (latexEnv := "lemma") (title := /-- The $\ell^1$ norm of $\Lambda_{\le U}$ -/) (statement := /--
+For every parameter datum and every real $y$,
+$$\sum_{n \le y} \Lambda_{\le U}(n) \le U \log x.$$
+-/) (proof := /--
+The function $\Lambda_{\le U}$ is non-negative, supported on the at most $U$ integers $1 \le n \le U$, and
+on its support $\Lambda_{\le U}(n) = \Lambda(n) \le \log n \le \log U \le \log x$ by \Cref{UV_range}.
+Hence the sum over any range is at most $U \log x$.
 -/)]
 theorem sum_LambdaLEU_le {y : ℝ} : summatory Λ≤U y ≤ U * Real.log x := by
   trans ‖summatory Λ≤U y‖
@@ -61,10 +66,14 @@ theorem sum_LambdaLEU_le {y : ℝ} : summatory Λ≤U y ≤ U * Real.log x := by
     apply U_le_x
   · simp +contextual
 
-@[blueprint (latexEnv := "lemma") (statement := /--
-For $y, U > 0$, $q \in \N$ and $a \in \Z/q\Z$,
-$$|\Delta_{\Lambda_{\le U}}(y;\, q,\, a)| \ll U \log{x} $$
--/) (uses := [sum_LambdaLEU_le])]
+@[blueprint (latexEnv := "lemma") (title := /-- Pointwise bound for $\Delta_{\Lambda_{\le U}}$ -/) (statement := /--
+For every parameter datum, every real $y$, every $q \ge 1$ and every $a \in \Z/q\Z$,
+$$|\Delta_{\Lambda_{\le U}}(y; q, a)| \le 2 U \log x.$$
+-/) (proof := /--
+Both sums in the definition of $\Delta_{\Lambda_{\le U}}(y;q,a)$ are sums of non-negative terms
+bounded by $\sum_{n \le y} \Lambda_{\le U}(n) \le U \log x$ (\Cref{sum_LambdaLEU_le}), and
+$1/\varphi(q) \le 1$. Hence the difference has absolute value at most $2U\log x$.
+-/)]
 theorem Delta_LambdaLEU_bound {y : ℝ} {q : ℕ} (hq : 0 < q) {a : ZMod q} :
     |Δ_[Λ≤U](y; q, a)| ≤ 2 * U * Real.log x := by
   rw [Delta]
@@ -88,10 +97,15 @@ theorem Delta_LambdaLEU_bound {y : ℝ} {q : ℕ} (hq : 0 < q) {a : ZMod q} :
   · positivity
 
 /-- Canonical `ℝ≥0∞` form of the small-factor estimate. -/
-@[blueprint (statement := /--
-For each fixed $A \ge 0$, $x \ge 2$ and $1 \le Q \le \sqrt{x}/(\log x)^{A+3}$,
-$$\sum_{q \le Q} \max_{\sqrt{x} \le y \le x} \max_{a \in (\Z/q\Z)^*} |\Delta_{\Lambda_{\le U}}(y;\,q,\,a)| \le Q\sqrt{x} \ll_A \frac{x}{(\log x)^{A+2}}$$
--/) (uses := [Delta_LambdaLEU_bound])]
+@[blueprint (title := /-- The small part on average -/) (statement := /--
+For every parameter datum, every $A \in \N$ and every real $0 \le Q \le \sqrt{x}/(\log x)^{A+3}$,
+$$\sum_{q \le Q}\ \max_{\substack{\sqrt x \le y \le x \\ a \in (\Z/q\Z)^*}} |\Delta_{\Lambda_{\le U}}(y; q, a)| \le \frac{2x}{(\log x)^{A+2}}.$$
+-/) (proof := /--
+By \Cref{Delta_LambdaLEU_bound} and \Cref{maxya_Delta_enorm_le_of_abs_le}, each of the
+$\lfloor Q \rfloor \le Q$ summands is at most $2U \log x$. Using $U \le \sqrt x$ (\Cref{UV_range}) and the
+hypothesis on $Q$,
+$$Q \cdot 2 U \log x \le \frac{\sqrt x}{(\log x)^{A+3}} \cdot 2 \sqrt x \log x = \frac{2x}{(\log x)^{A+2}}.$$
+-/)]
 theorem BV_LambdaLE_enorm {A : ℕ} (Q : ℝ) (hQ_nonneg : 0 ≤ Q)
     (hQ : Q ≤ √x / (Real.log x) ^ (A + 3)) :
     ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊,

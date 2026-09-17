@@ -28,6 +28,14 @@ a fundamental result in analytic number theory.
 
 /-- Canonical per-conductor triangle inequality from
 `Λ = Λ♯ + Λ♭ + Λ≤U`. -/
+@[blueprint (latexEnv := "lemma") (title := /-- Splitting $\Delta_\Lambda$ into three parts -/) (statement := /--
+For every parameter datum and every $q \in \N$,
+$$\max_{\substack{\sqrt x \le y \le x \\ a \in (\Z/q\Z)^*}} |\Delta_{\Lambda}(y; q, a)| \le
+\max_{y, a} |\Delta_{\Lambda^\sharp}(y; q, a)| + \max_{y, a} |\Delta_{\Lambda^\flat}(y; q, a)| + \max_{y, a} |\Delta_{\Lambda_{\le U}}(y; q, a)| .$$
+-/) (proof := /--
+By Vaughan's identity (\Cref{Lambda_decomp}), $\Lambda = (\Lambda^\sharp + \Lambda^\flat) + \Lambda_{\le U}$ as
+functions on $\N$; apply the maximal triangle inequality \Cref{maxya_Delta_add_le} twice.
+-/)]
 theorem maxya_Delta_Lambda_enorm_le [ProofData] (q : ℕ) :
     maxya q (fun y a ↦ ‖Δ_[Λ](y; q, a)‖ₑ) ≤
       maxya q (fun y a ↦ ‖Δ_[Λ♯](y; q, a)‖ₑ) +
@@ -42,16 +50,14 @@ theorem maxya_Delta_Lambda_enorm_le [ProofData] (q : ℕ) :
 def C_BV_L (A : ℕ) : ℝ := C_BVLS + C_BV_LF A + 2
 
 open ProofData in
-@[blueprint (statement :=
-/--
-For each fixed $A \ge 0$ we have
-$$\sum_{q\le Q} \max_{\sqrt x \le y \le x} \max_{a \in (\mathbb{Z}/q\mathbb{Z})^*} \left| \Delta_{\Lambda}(y; q,a) \right| \ll_A \frac{x}{(\log x)^{A}}$$
-uniformly for $x \ge 2$ and $1 \le Q \le \sqrt{x}/(\log (x))^{A+3}$
--/
-) (proof := /--
-Follows from \ref{Lambda_decomp} and the triangle inequality, combining the canonical bounds
-\ref{BV_LambdaLE_enorm}, \ref{BV_LambdaSharp_enorm}, and \ref{BV_LambdaFlat_enorm}.
--/) (uses := [BV_LambdaLE_enorm, BV_LambdaSharp_enorm, BV_LambdaFlat_enorm, Lambda_decomp])]
+@[blueprint (title := /-- Bombieri--Vinogradov for $\Delta_\Lambda$ -/) (statement := /--
+For every parameter datum, every $A \in \N$ and every real $1 \le Q \le \sqrt x/(\log x)^{A+3}$,
+$$\sum_{q \le Q}\ \max_{\substack{\sqrt x \le y \le x \\ a \in (\Z/q\Z)^*}} |\Delta_{\Lambda}(y; q, a)| \ll_A \frac{x}{(\log x)^A} .$$
+-/) (proof := /--
+Sum \Cref{maxya_Delta_Lambda_enorm_le} over $q \le Q$ and bound the three resulting sums by
+\Cref{BV_LambdaSharp_enorm}, \Cref{BV_LambdaFlat_enorm} and \Cref{BV_LambdaLE_enorm} (the last gives
+$\ll x/(\log x)^{A+2} \le x/(\log x)^A$, as $\log x \ge 1$).
+-/)]
 theorem BV_Delta_Lambda_enorm [ProofData] (A : ℕ) (Q : ℝ) (h1Q : 1 ≤ Q)
     (hQ : Q ≤ √x / (Real.log x) ^ (A + 3)) :
     ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊,
@@ -113,6 +119,13 @@ noncomputable def C_BV (A : ℕ) : ℝ :=
     (Real.log 4 + 5) * Real.exp 16 * 32 ^ A / (Real.log 2) ^ (A + 3)
 
 /-- Canonical maximum of the modular Chebyshev error on `[1,x]`. -/
+@[blueprint (title := /-- The maximal Chebyshev error -/) (statement := /--
+For a real $x$ and $q \in \N$ set
+$$E(x; q) := \sup_{1 \le y \le x}\ \sup_{a \in (\Z/q\Z)^*} \left| \psi(y; q, a) - \frac{y}{\varphi(q)} \right| \in [0, \infty] .$$
+Note that here $y$ ranges over all of $[1, x]$, not only over $[\sqrt x, x]$, and that $x \ge 2$ is
+arbitrary (no parameter datum is involved). For $q \ge 1$, $E(x;q) \ll x$ by
+\Cref{Chebyshev.abs_psiMod_sub_div_le_const}, so $E(x; q)$ is finite.
+-/)]
 noncomputable def psiMaxEnorm (x : ℝ) (q : ℕ) : ℝ≥0∞ :=
   ⨆ y : ℝ, ⨆ (_ : y ∈ Set.Icc 1 x), ⨆ a : (ZMod q)ˣ,
     ‖ψ (q := q) y a - y / q.totient‖ₑ
@@ -147,7 +160,15 @@ theorem psiMaxEnorm_toReal (x : ℝ) (q : ℕ) :
   · intro _
     exact iSup_ne_top fun _ ↦ iSup_ne_top fun _ ↦ enorm_ne_top
 
-private lemma BV_compact_enorm (A : ℕ) {x Q : ℝ} (hx : 2 ≤ x)
+@[blueprint (latexEnv := "lemma") (title := /-- The compact range $x \le e^{32}$ -/) (statement := /--
+Let $A \in \N$ and let $2 \le x \le e^{32}$ and $1 \le Q \le \sqrt x/(\log x)^{A+3}$ be real. Then
+$$\sum_{q \le Q} E(x; q) \ll_A \frac{x}{(\log x)^A} .$$
+-/) (proof := /--
+By \Cref{Chebyshev.abs_psiMod_sub_div_le_const}, $E(x;q) \ll x$ for every $q \ge 1$, so the sum is
+$\ll Q x$. Since $\sqrt x \le e^{16}$ and $\log x \ge \log 2$, the hypothesis gives
+$Q \le e^{16}/(\log 2)^{A+3} \ll_A 1$. Finally $(\log x)^A \le 32^A$, i.e. $1 \ll_A (\log x)^{-A}$.
+-/)]
+lemma BV_compact_enorm (A : ℕ) {x Q : ℝ} (hx : 2 ≤ x)
     (hxE : x ≤ Real.exp 32) (hQ0 : 1 ≤ Q)
     (hQ : Q ≤ √x / (Real.log x) ^ (A + 3)) :
     ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, psiMaxEnorm x q ≤
@@ -207,7 +228,27 @@ private lemma BV_compact_enorm (A : ℕ) {x Q : ℝ} (hx : 2 ≤ x)
       dsimp [K] at hreal ⊢
       exact ENNReal.ofReal_le_ofReal hreal
 
-private lemma BV_large_enorm [ProofData] (A : ℕ) {Q : ℝ} (hQ0 : 1 ≤ Q)
+@[blueprint (latexEnv := "lemma") (title := /-- From $\Delta_\Lambda$ to the Chebyshev error -/) (statement := /--
+Let $A \in \N$. For every parameter datum and every real $1 \le Q \le \sqrt x/(\log x)^{A+3}$,
+$$\sum_{q \le Q} E(x; q) \ll_A \frac{x}{(\log x)^A} .$$
+-/) (proof := /--
+Write $L := \log x \ge 1$ and note $Q \le \sqrt x \le x$ and $\sqrt x \ge 2$ (\Cref{log_x_large}).
+
+\emph{Pointwise bound.} Fix $1 \le q \le Q$, a unit $a$ and $1 \le z \le x$. If $z < \sqrt x$, then
+\Cref{Chebyshev.abs_psiMod_sub_div_le_const} gives $|\psi(z;q,a) - z/\varphi(q)| \ll z \le \sqrt x$. If
+$z \ge \sqrt x$ (so $z \ge 2$), \Cref{Delta_Lambda_eq} gives
+$$\psi(z;q,a) - \frac{z}{\varphi(q)} = \Delta_\Lambda(z; q, a) + \frac{1}{\varphi(q)} \Big( \sum_{\substack{n \le z \\ (n,q) = 1}} \Lambda(n) - z \Big),$$
+and by \Cref{coprime_vonMangoldt_error} with $B = A+2$, \Cref{pnt_ratio_bound}, $\log q \le L$ and
+$\log z \le L$, the bracket is $\ll_A R := x/L^{A+2} + L^2$ in absolute value. Hence, using \Cref{maxya_basic},
+$$E(x; q) \ll_A \max_{\substack{\sqrt x \le z \le x \\ a}} |\Delta_\Lambda(z;q,a)| + \frac{R}{\varphi(q)} + \sqrt x .$$
+
+\emph{Summation.} Sum over $q \le Q$: the first terms are bounded by \Cref{BV_Delta_Lambda_enorm}, i.e. by
+$\ll_A x/L^A$; by \Cref{summatory_totient_inv_le} the second terms sum to $\ll R\, L$; and the third
+terms sum to $\ll Q \sqrt x \le x/L^{A+3} \le x/L^A$. Finally
+$$R\, L = \frac{x}{L^{A+1}} + L^3 \le \frac{x}{L^{A}} + (A+3)!\, \frac{x}{L^A},$$
+where the last step uses $L^{A+3}/(A+3)! \le e^{L} = x$.
+-/)]
+lemma BV_large_enorm [ProofData] (A : ℕ) {Q : ℝ} (hQ0 : 1 ≤ Q)
     (hQ : Q ≤ √x / (Real.log x) ^ (A + 3)) :
     ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, psiMaxEnorm x q ≤
       ENNReal.ofReal ((|C_BV_L A| + (Real.log 4 + 5) +
@@ -428,15 +469,19 @@ private lemma BV_large_enorm [ProofData] (A : ℕ) {Q : ℝ} (hQ0 : 1 ≤ Q)
 
 open Nat
 
-@[blueprint "Bombieri-Vinogradov" (statement :=
-/--
-For each fixed $A \geq 0$,
-$$\sum_{q \le Q} \max_{y \le x} \max_{a \in (\mathbb{Z}/q\mathbb{Z})^*} \left| \psi(y; q, a) - \frac{y}{\varphi(q)} \right| \ll_A \frac{x}{(\log x)^{A}}$$
+@[blueprint "Bombieri-Vinogradov" (title := /-- The Bombieri--Vinogradov theorem -/) (statement := /--
+For every $A \in \N$, all real $x \ge 2$ and all real $1 \le Q \le \sqrt{x}/(\log x)^{A+3}$,
+$$\sum_{q \le Q}\ \sup_{1 \le y \le x}\ \max_{a \in (\Z/q\Z)^*} \left| \psi(y; q, a) - \frac{y}{\varphi(q)} \right| \ll_A \frac{x}{(\log x)^A} .$$
+In Lean the left-hand side is a sum of the extended-real quantities $E(x;q)$ of \Cref{psiMaxEnorm}; the
+real-valued form is \Cref{bombieri_vinogradov}.
+-/) (proof := /--
+If $x \le e^{32}$, apply \Cref{BV_compact_enorm}.
 
-uniformly for all $x \ge 2$ and $1 \le Q \le \frac{\sqrt{x}}{(\log x)^{A+3}}$. -/
-) (proof := /--
-Apply \ref{BV_Delta_Lambda_enorm} and absorb the explicit coprimality error.
--/) (uses := [BV_Delta_Lambda_enorm, coprime_vonMangoldt_error])]
+If $x > e^{32}$, then $L := \log x \ge 32$. Put $U = V := e^{\sqrt L}$. Then $(x, U, V)$ is a parameter
+datum (\Cref{ProofData}): $x \ge 2$, $U, V \ge e^{\sqrt L}$ trivially, and
+$UV = e^{2\sqrt L} \le e^{L/2} = \sqrt x$ because $2\sqrt L \le L/2$ for $L \ge 16$. Now
+\Cref{BV_large_enorm} gives the bound.
+-/)]
 theorem bombieri_vinogradov_enorm (A : ℕ) {x : ℝ} (hx : 2 ≤ x) {Q : ℝ} (hle_Q : 1 ≤ Q)
     (hQ : Q ≤ √x / (Real.log x)^(A+3)) :
     ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ⨆ y : ℝ, ⨆ (_ : y ∈ Set.Icc 1 x), ⨆ a : (ZMod q)ˣ,
@@ -507,6 +552,15 @@ theorem bombieri_vinogradov_enorm (A : ℕ) {x : ℝ} (hx : 2 ≤ x) {Q : ℝ} (
       _ = C_BV A * x / Real.log x ^ A := by ring
 
 /-- Finite real view of `bombieri_vinogradov_enorm`. -/
+@[blueprint (latexEnv := "corollary") (title := /-- Bombieri--Vinogradov, real form -/) (statement := /--
+For every $A \in \N$, all real $x \ge 2$ and $1 \le Q \le \sqrt x/(\log x)^{A+3}$,
+$$\sum_{q \le Q}\ \sup_{1 \le y \le x}\ \max_{a \in (\Z/q\Z)^*} \left| \psi(y; q, a) - \frac{y}{\varphi(q)} \right| \ll_A \frac{x}{(\log x)^A},$$
+where now the suprema are taken in $\R$.
+-/) (proof := /--
+Each $E(x; q)$ with $q \ge 1$ is finite (\Cref{psiMaxEnorm}), so the extended-real inequality of
+\Cref{Bombieri-Vinogradov} may be transported to $\R$ by taking real parts (\texttt{ENNReal.toReal}) on both
+sides.
+-/)]
 theorem bombieri_vinogradov (A : ℕ) {x : ℝ} (hx : 2 ≤ x) {Q : ℝ}
     (hle_Q : 1 ≤ Q) (hQ : Q ≤ √x / (Real.log x) ^ (A + 3)) :
     ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, ⨆ y ∈ Set.Icc 1 x, ⨆ a : (ZMod q)ˣ,

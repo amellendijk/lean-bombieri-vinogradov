@@ -63,6 +63,103 @@
 <div id="statements">
 
     
+    <div class="dep-modal-container" id="abs_Delta_le_two_summatory_abs_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="abs_Delta_le_two_summatory_abs" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">3.9</span><span class="lemma_thmtitle">Trivial bound for \(\Delta _f\)</span></div>
+    <div class="thm_thmcontent"><p>    For every \(f : \mathbb {N}\to \mathbb {R}\), every real \(z\), every \(q \in \mathbb {N}\) and every \(a \in \mathbb {Z}/q\mathbb {Z}\), </p>
+<div class="displaymath" id="a0000000038">
+  \[ |\Delta _f(z; q, a)| \le 2 \sum _{n \le z} |f(n)|. \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-prelim.html#abs_Delta_le_two_summatory_abs">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/abs_Delta_le_two_summatory_abs">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="ArithmeticFunction.on_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="ArithmeticFunction.on" style="display: none">
+    <div class="thm_thmheading">
+      <span class="definition_thmcaption">
+      Definition
+      </span>
+      <span class="definition_thmlabel">3.5</span><span class="definition_thmtitle">Restriction of an arithmetic function to a set</span></div>
+    <div class="thm_thmcontent"><p>   For an arithmetic function \(f\) and a set \(S \subseteq \mathbb {N}\), let \(f|_S\) denote the arithmetic function \(f|_S(n) := f(n) 1_{n \in S}\). In particular \(f_r = f|_{\{ n : (n, r) = 1\} }\) in the notation of <a href="ch-prelim.html#onCoprime">Definition 3.4</a>, and \(f 1_{[1, U]} = f|_{\{ 1, \dots , \lfloor U \rfloor \} }\). </p>
+</div>
+
+    <a class="latex_link" href="ch-prelim.html#ArithmeticFunction.on">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/ArithmeticFunction.on">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="ArithmeticFunction.on_mul_of_saturated_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="ArithmeticFunction.on_mul_of_saturated" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">8.6</span><span class="lemma_thmtitle">Restriction is a convolution homomorphism</span></div>
+    <div class="thm_thmcontent"><p>    Let \(S \subseteq \mathbb {N}\) be <em>multiplicatively saturated</em>: \(ab \in S\) if and only if \(a \in S\) and \(b \in S\). Then for all arithmetic functions \(f, g\) (with values in a semiring), </p>
+<div class="displaymath" id="a0000000114">
+  \[ (f * g)|_S = f|_S * g|_S . \]
+</div>
+<p> In particular, since \((ab, r) = 1\) if and only if \((a, r) = 1\) and \((b, r) = 1\), this applies to \(S = \{ n : (n, r) = 1\} \): \((f * g)_r = f_r * g_r\) for every \(r \in \mathbb {N}\). </p>
+</div>
+
+    <a class="latex_link" href="ch-typeI.html#ArithmeticFunction.on_mul_of_saturated">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/ArithmeticFunction.on_mul_of_saturated">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
     <div class="dep-modal-container" id="Bombieri-Vinogradov_modal">
       <div class="dep-modal-content">
           <button class="dep-closebtn">
@@ -74,18 +171,18 @@
       <span class="theorem_thmcaption">
       Theorem
       </span>
-      <span class="theorem_thmlabel">1</span></div>
-    <div class="thm_thmcontent"><p>   For each fixed \(A \geq 0\), </p>
-<div class="displaymath" id="a0000000005">
-  \[ \sum _{q \le Q} \max _{y \le x} \max _{a \in (\mathbb {Z}/q\mathbb {Z})^*} \left| \psi (y; q, a) - \frac{y}{\varphi (q)} \right| \ll _A \frac{x}{(\log x)^{A}} \]
+      <span class="theorem_thmlabel">10.6</span><span class="theorem_thmtitle">The Bombieri–Vinogradov theorem</span></div>
+    <div class="thm_thmcontent"><p>    For every \(A \in \mathbb {N}\), all real \(x \ge 2\) and all real \(1 \le Q \le \sqrt{x}/(\log x)^{A+3}\), </p>
+<div class="displaymath" id="a0000000239">
+  \[ \sum _{q \le Q}\  \sup _{1 \le y \le x}\  \max _{a \in (\mathbb {Z}/q\mathbb {Z})^*} \left| \psi (y; q, a) - \frac{y}{\varphi (q)} \right| \ll _A \frac{x}{(\log x)^A} . \]
 </div>
-<p>uniformly for all \(x \ge 2\) and \(1 \le Q \le \frac{\sqrt{x}}{(\log x)^{A+3}}\). </p>
+<p> In Lean the left-hand side is a sum of the extended-real quantities \(E(x;q)\) of <a href="ch-assembly.html#psiMaxEnorm">Definition 10.3</a>; the real-valued form is <a href="ch-assembly.html#bombieri_vinogradov">Corollary 10.7</a>. </p>
 </div>
 
-    <a class="latex_link" href="sect0001.html#Bombieri-Vinogradov">LaTeX</a>
+    <a class="latex_link" href="ch-assembly.html#Bombieri-Vinogradov">LaTeX</a>
     
     
-  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/BombieriVinogradov.bombieri_vinogradov">Lean</a>
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/bombieri_vinogradov_enorm">Lean</a>
     
     
   
@@ -97,29 +194,29 @@
 
 
     
-    <div class="dep-modal-container" id="BombieriVinogradov.BV_Delta_1P_modal">
+    <div class="dep-modal-container" id="bombieri_vinogradov_modal">
       <div class="dep-modal-content">
           <button class="dep-closebtn">
 <svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
 </button>
         
-  <div class="thm" id="BombieriVinogradov.BV_Delta_1P" style="display: none">
+  <div class="thm" id="bombieri_vinogradov" style="display: none">
     <div class="thm_thmheading">
-      <span class="theorem_thmcaption">
-      Theorem
+      <span class="corollary_thmcaption">
+      Corollary
       </span>
-      <span class="theorem_thmlabel">2</span></div>
-    <div class="thm_thmcontent"><p>  For each fixed \(A \ge 0\) we have </p>
-<div class="displaymath" id="a0000000007">
-  \[ \sum _{q\le Q} \max _{y \le x} \max _{a \in (\mathbb {Z}/q\mathbb {Z})^*} \left| \Delta _{1_P}(y; q,a) \right| \ll _A \frac{x}{(\log x)^{A+1}} \]
+      <span class="corollary_thmlabel">10.7</span><span class="corollary_thmtitle">Bombieri–Vinogradov, real form</span></div>
+    <div class="thm_thmcontent"><p>    For every \(A \in \mathbb {N}\), all real \(x \ge 2\) and \(1 \le Q \le \sqrt x/(\log x)^{A+3}\), </p>
+<div class="displaymath" id="a0000000241">
+  \[ \sum _{q \le Q}\  \sup _{1 \le y \le x}\  \max _{a \in (\mathbb {Z}/q\mathbb {Z})^*} \left| \psi (y; q, a) - \frac{y}{\varphi (q)} \right| \ll _A \frac{x}{(\log x)^A}, \]
 </div>
-<p> uniformly for \(x \ge 2\) and \(1 \le Q \le \sqrt{x}/(\log (x))^{A+3}\) </p>
+<p> where now the suprema are taken in \(\mathbb {R}\). </p>
 </div>
 
-    <a class="latex_link" href="sect0001.html#BombieriVinogradov.BV_Delta_1P">LaTeX</a>
+    <a class="latex_link" href="ch-assembly.html#bombieri_vinogradov">LaTeX</a>
     
     
-  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/BombieriVinogradov.BV_Delta_1P">Lean</a>
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/bombieri_vinogradov">Lean</a>
     
     
   
@@ -131,29 +228,29 @@
 
 
     
-    <div class="dep-modal-container" id="BombieriVinogradov.BV_Delta_1P_modal">
+    <div class="dep-modal-container" id="BV.maxy_modal">
       <div class="dep-modal-content">
           <button class="dep-closebtn">
 <svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
 </button>
         
-  <div class="thm" id="BombieriVinogradov.BV_Delta_1P" style="display: none">
+  <div class="thm" id="BV.maxy" style="display: none">
     <div class="thm_thmheading">
-      <span class="theorem_thmcaption">
-      Theorem
+      <span class="definition_thmcaption">
+      Definition
       </span>
-      <span class="theorem_thmlabel">12</span></div>
-    <div class="thm_thmcontent"><p>  For each fixed \(A \ge 0\) we have </p>
-<div class="displaymath" id="a0000000023">
-  \[ \sum _{q\le Q} \max _{y \le x} \max _{a \in (\mathbb {Z}/q\mathbb {Z})^*} \left| \Delta _{1_P}(y; q,a) \right| \ll _A \frac{x}{(\log x)^{A+1}} \]
+      <span class="definition_thmlabel">3.16</span><span class="definition_thmtitle">Maximum over \(\sqrt x \le y \le x\)</span></div>
+    <div class="thm_thmcontent"><p>    For a function \(F : \mathbb {R}\to [0, \infty ]\) we write </p>
+<div class="displaymath" id="a0000000049">
+  \[ \max _{\sqrt x \le y \le x} F(y) := \sup \{  F(y) : \sqrt{x} \le y \le x \}  \in [0, \infty ]. \]
 </div>
-<p> uniformly for \(x \ge 2\) and \(1 \le Q \le \sqrt{x}/(\log (x))^{A+3}\) </p>
+<p> The supremum is taken in the extended non-negative reals, so it always exists; all the maxima appearing in the estimates below are of this form (or the analogous <a href="ch-prelim.html#BV.maxya">Definition 3.17</a>), and it is part of each estimate that the supremum is finite. </p>
 </div>
 
-    <a class="latex_link" href="sect0001.html#BombieriVinogradov.BV_Delta_1P">LaTeX</a>
+    <a class="latex_link" href="ch-prelim.html#BV.maxy">LaTeX</a>
     
     
-  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/BombieriVinogradov.BV_Delta_1P">Lean</a>
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/BV.maxy">Lean</a>
     
     
   
@@ -165,128 +262,29 @@
 
 
     
-    <div class="dep-modal-container" id="BombieriVinogradov.BV_Delta_Lambda_modal">
+    <div class="dep-modal-container" id="BV.maxya_modal">
       <div class="dep-modal-content">
           <button class="dep-closebtn">
 <svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
 </button>
         
-  <div class="thm" id="BombieriVinogradov.BV_Delta_Lambda" style="display: none">
+  <div class="thm" id="BV.maxya" style="display: none">
     <div class="thm_thmheading">
-      <span class="theorem_thmcaption">
-      Theorem
+      <span class="definition_thmcaption">
+      Definition
       </span>
-      <span class="theorem_thmlabel">13</span></div>
-    <div class="thm_thmcontent"><p>   For each fixed \(A \ge 0\) we have </p>
-<div class="displaymath" id="a0000000025">
-  \[ \sum _{q\le Q} \max _{\sqrt x \le y \le x} \max _{a \in (\mathbb {Z}/q\mathbb {Z})^*} \left| \Delta _{\Lambda }(y; q,a) \right| \ll _A \frac{x}{(\log x)^{A}} \]
+      <span class="definition_thmlabel">3.17</span><span class="definition_thmtitle">Maximum over \(y\) and over reduced residues</span></div>
+    <div class="thm_thmcontent"><p>    For \(q \in \mathbb {N}\) and \(F : \mathbb {R}\times \mathbb {Z}/q\mathbb {Z}\to [0, \infty ]\) we write </p>
+<div class="displaymath" id="a0000000050">
+  \[ \max _{\substack {\sqrt x \le y \le x \\ a \in (\mathbb {Z}/q\mathbb {Z})^*}} F(y, a) := \sup _{a \in (\mathbb {Z}/q\mathbb {Z})^*} \  \sup _{\sqrt x \le y \le x} F(y, a) \in [0,\infty ], \]
 </div>
-<p> uniformly for \(x \ge 2\) and \(1 \le Q \le \sqrt{x}/(\log (x))^{A+3}\) </p>
-</div>
-
-    <a class="latex_link" href="sect0001.html#BombieriVinogradov.BV_Delta_Lambda">LaTeX</a>
-    
-    
-  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/BombieriVinogradov.BV_Delta_Lambda">Lean</a>
-    
-    
-  
-    
-  </div>
-    
-      </div>
-    </div>
-
-
-    
-    <div class="dep-modal-container" id="BombieriVinogradov.Delta_primeIndicator_eq_modal">
-      <div class="dep-modal-content">
-          <button class="dep-closebtn">
-<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
-</button>
-        
-  <div class="thm" id="BombieriVinogradov.Delta_primeIndicator_eq" style="display: none">
-    <div class="thm_thmheading">
-      <span class="theorem_thmcaption">
-      Theorem
-      </span>
-      <span class="theorem_thmlabel">9</span></div>
-    <div class="thm_thmcontent">
-<div class="displaymath" id="a0000000016">
-  \[ \Delta _{1_P}(x; q, a) = \pi (x; q,a) - \frac{1}{\varphi (q)} \sum _{p \le x, p \not\mid q} 1  \]
-</div>
+<p> the inner supremum being <a href="ch-prelim.html#BV.maxy">Definition 3.16</a>. The residue \(a\) ranges over the units of \(\mathbb {Z}/q\mathbb {Z}\) only. </p>
 </div>
 
-    <a class="latex_link" href="sect0001.html#BombieriVinogradov.Delta_primeIndicator_eq">LaTeX</a>
+    <a class="latex_link" href="ch-prelim.html#BV.maxya">LaTeX</a>
     
     
-  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/BombieriVinogradov.Delta_primeIndicator_eq">Lean</a>
-    
-    
-  
-    
-  </div>
-    
-      </div>
-    </div>
-
-
-    
-    <div class="dep-modal-container" id="BombieriVinogradov.max_Delta_1P_le_max_Delta_Lambda_modal">
-      <div class="dep-modal-content">
-          <button class="dep-closebtn">
-<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
-</button>
-        
-  <div class="thm" id="BombieriVinogradov.max_Delta_1P_le_max_Delta_Lambda" style="display: none">
-    <div class="thm_thmheading">
-      <span class="theorem_thmcaption">
-      Theorem
-      </span>
-      <span class="theorem_thmlabel">11</span></div>
-    <div class="thm_thmcontent"><p>  For \(x \ge 2\), \(q \in \mathbb {N}\) and \(a \in (\mathbb {Z}/ q\mathbb {Z})^*\) we have </p>
-<div class="displaymath" id="a0000000021">
-  \[  \max _{y \le x} \left| \Delta _{1_P}(y; q, a) \right| \ll \frac{1}{\log x} \left(\max _{\sqrt x \le y \le x} \left|\Delta _\Lambda (y; q, a)\right| + \sqrt x \right) \]
-</div>
-</div>
-
-    <a class="latex_link" href="sect0001.html#BombieriVinogradov.max_Delta_1P_le_max_Delta_Lambda">LaTeX</a>
-    
-    
-  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/BombieriVinogradov.max_Delta_1P_le_max_Delta_Lambda">Lean</a>
-    
-    
-  
-    
-  </div>
-    
-      </div>
-    </div>
-
-
-    
-    <div class="dep-modal-container" id="BombieriVinogradov.sum_primes_not_dvd_eq_li_modal">
-      <div class="dep-modal-content">
-          <button class="dep-closebtn">
-<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
-</button>
-        
-  <div class="thm" id="BombieriVinogradov.sum_primes_not_dvd_eq_li" style="display: none">
-    <div class="thm_thmheading">
-      <span class="theorem_thmcaption">
-      Theorem
-      </span>
-      <span class="theorem_thmlabel">10</span></div>
-    <div class="thm_thmcontent">
-<div class="displaymath" id="a0000000018">
-  \[  \sum _{p \le x, p \not\mid q} 1 = li(x) + O(xe^{-c\sqrt{\log x}}+\log q) \]
-</div>
-</div>
-
-    <a class="latex_link" href="sect0001.html#BombieriVinogradov.sum_primes_not_dvd_eq_li">LaTeX</a>
-    
-    
-  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/BombieriVinogradov.sum_primes_not_dvd_eq_li">Lean</a>
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/BV.maxya">Lean</a>
     
     
   
@@ -309,14 +307,14 @@
       <span class="theorem_thmcaption">
       Theorem
       </span>
-      <span class="theorem_thmlabel">37</span></div>
-    <div class="thm_thmcontent"><p>   For \(x, Q \ge 2\), \(U, V \in [1, x]\) and \(r \in \mathbb {N}\), </p>
-<div class="displaymath" id="a0000000075">
-  \[ \sum _{q \le Q} \mathop{{\sum \nolimits ^{*}}}_{\chi \pmod{q}} \frac{q}{\varphi (q)}\,  S_r(y, \chi ) \ll \left(x + \frac{Qx}{\sqrt{U}} + \frac{Qx}{\sqrt{V}} + Q^2\sqrt{x}\right)(\log x)^3 \]
+      <span class="theorem_thmlabel">9.39</span><span class="theorem_thmtitle">The large sieve bound for \(S_r\)</span></div>
+    <div class="thm_thmcontent"><p>    For every parameter datum, every \(r \in \mathbb {N}\) and every real \(Q \ge 2\), </p>
+<div class="displaymath" id="a0000000217">
+  \[ \sum _{q \le Q} \mathop{{\sum \nolimits ^{*}}}_{\chi \bmod q} \frac{q}{\varphi (q)} \max _{\sqrt x \le y \le x} S_r(y, \chi ) \ll \left( x + \frac{Q x}{\sqrt U} + \frac{Q x}{\sqrt V} + Q^2 \sqrt x \right) (\log x)^3 . \]
 </div>
 </div>
 
-    <a class="latex_link" href="sect0001.html#BV_char_sum_bound">LaTeX</a>
+    <a class="latex_link" href="ch-typeII.html#BV_char_sum_bound">LaTeX</a>
     
     
   <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/BV_char_sum_bound">Lean</a>
@@ -331,28 +329,94 @@
 
 
     
-    <div class="dep-modal-container" id="BV_LambdaFlat_modal">
+    <div class="dep-modal-container" id="BV_compact_enorm_modal">
       <div class="dep-modal-content">
           <button class="dep-closebtn">
 <svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
 </button>
         
-  <div class="thm" id="BV_LambdaFlat" style="display: none">
+  <div class="thm" id="BV_compact_enorm" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">10.4</span><span class="lemma_thmtitle">The compact range \(x \le e^{32}\)</span></div>
+    <div class="thm_thmcontent"><p>    Let \(A \in \mathbb {N}\) and let \(2 \le x \le e^{32}\) and \(1 \le Q \le \sqrt x/(\log x)^{A+3}\) be real. Then </p>
+<div class="displaymath" id="a0000000232">
+  \[ \sum _{q \le Q} E(x; q) \ll _A \frac{x}{(\log x)^A} . \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-assembly.html#BV_compact_enorm">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/BV_compact_enorm">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="BV_Delta_Lambda_enorm_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="BV_Delta_Lambda_enorm" style="display: none">
     <div class="thm_thmheading">
       <span class="theorem_thmcaption">
       Theorem
       </span>
-      <span class="theorem_thmlabel">39</span></div>
-    <div class="thm_thmcontent"><p>   For each fixed \(A \ge 0\), \(x \ge 2\) and \(1 \le Q \le \sqrt{x}/(\log x)^{A+3}\), </p>
-<div class="displaymath" id="a0000000079">
-  \[ \sum _{q \le Q} \max _{\sqrt{x} \le y \le x} \max _{a \in (\mathbb {Z}/q\mathbb {Z})^*} \left|\Delta _{\Lambda ^\flat }(y;\, q,\, a)\right| \ll _A \frac{x}{(\log x)^A} \]
+      <span class="theorem_thmlabel">10.2</span><span class="theorem_thmtitle">Bombieri–Vinogradov for \(\Delta _\Lambda \)</span></div>
+    <div class="thm_thmcontent"><p>    For every parameter datum, every \(A \in \mathbb {N}\) and every real \(1 \le Q \le \sqrt x/(\log x)^{A+3}\), </p>
+<div class="displaymath" id="a0000000229">
+  \[ \sum _{q \le Q}\  \max _{\substack {\sqrt x \le y \le x \\ a \in (\mathbb {Z}/q\mathbb {Z})^*}} |\Delta _{\Lambda }(y; q, a)| \ll _A \frac{x}{(\log x)^A} . \]
 </div>
 </div>
 
-    <a class="latex_link" href="sect0001.html#BV_LambdaFlat">LaTeX</a>
+    <a class="latex_link" href="ch-assembly.html#BV_Delta_Lambda_enorm">LaTeX</a>
     
     
-  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/BV_LambdaFlat">Lean</a>
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/BV_Delta_Lambda_enorm">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="BV_LambdaFlat_enorm_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="BV_LambdaFlat_enorm" style="display: none">
+    <div class="thm_thmheading">
+      <span class="theorem_thmcaption">
+      Theorem
+      </span>
+      <span class="theorem_thmlabel">9.41</span><span class="theorem_thmtitle">The Type II part on average</span></div>
+    <div class="thm_thmcontent"><p>    For every parameter datum, every \(A \in \mathbb {N}\) and every real \(1 \le Q \le \sqrt x/(\log x)^{A+3}\), </p>
+<div class="displaymath" id="a0000000224">
+  \[ \sum _{q \le Q}\  \max _{\substack {\sqrt x \le y \le x \\ a \in (\mathbb {Z}/q\mathbb {Z})^*}} |\Delta _{\Lambda ^\flat }(y; q, a)| \ll _A \frac{x}{(\log x)^A} . \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#BV_LambdaFlat_enorm">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/BV_LambdaFlat_enorm">Lean</a>
     
     
   
@@ -375,14 +439,14 @@
       <span class="theorem_thmcaption">
       Theorem
       </span>
-      <span class="theorem_thmlabel">34</span></div>
-    <div class="thm_thmcontent">
-<div class="displaymath" id="a0000000068">
-  \[ \sum _{q \le Q} \max _{\substack {\sqrt{x} \le y \le x \\ a \in (\mathbb {Z}/q\mathbb {Z})^*}} \left|\Delta _{\Lambda ^\flat }(y;\, q,\, a)\right| \le \sum _{r \le Q} \frac{T_r(x,Q)}{\varphi (r)} + O\! \left(\frac{x}{(\log x)^A}\right) \]
+      <span class="theorem_thmlabel">9.11</span><span class="theorem_thmtitle">Reduction of the Type II estimate to \(T_r\)</span></div>
+    <div class="thm_thmcontent"><p>    Let \(A, C \in \mathbb {N}\). For every parameter datum and every real \(Q \le \sqrt x\), </p>
+<div class="displaymath" id="a0000000168">
+  \[ \sum _{q \le Q}\  \max _{\substack {\sqrt x \le y \le x \\ a \in (\mathbb {Z}/q\mathbb {Z})^*}} |\Delta _{\Lambda ^\flat }(y; q, a)| \le \sum _{r \le Q} \frac{T^{(C)}_r(Q)}{\varphi (r)} + O_{A, C}\! \left(\frac{x}{(\log x)^A}\right) . \]
 </div>
 </div>
 
-    <a class="latex_link" href="sect0001.html#BV_LambdaFlat_via_T">LaTeX</a>
+    <a class="latex_link" href="ch-typeII.html#BV_LambdaFlat_via_T">LaTeX</a>
     
     
   <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/BV_LambdaFlat_via_T">Lean</a>
@@ -397,28 +461,28 @@
 
 
     
-    <div class="dep-modal-container" id="BV_LambdaLE_modal">
+    <div class="dep-modal-container" id="BV_LambdaLE_enorm_modal">
       <div class="dep-modal-content">
           <button class="dep-closebtn">
 <svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
 </button>
         
-  <div class="thm" id="BV_LambdaLE" style="display: none">
+  <div class="thm" id="BV_LambdaLE_enorm" style="display: none">
     <div class="thm_thmheading">
       <span class="theorem_thmcaption">
       Theorem
       </span>
-      <span class="theorem_thmlabel">20</span></div>
-    <div class="thm_thmcontent"><p>   For each fixed \(A \ge 0\), \(x \ge 2\) and \(1 \le Q \le \sqrt{x}/(\log x)^{A+3}\), </p>
-<div class="displaymath" id="a0000000033">
-  \[ \sum _{q \le Q} \max _{\sqrt{x} \le y \le x} \max _{a \in (\mathbb {Z}/q\mathbb {Z})^*} |\Delta _{\Lambda _{\le U}}(y;\, q,\, a)| \le Q\sqrt{x} \ll _A \frac{x}{(\log x)^{A+2}} \]
+      <span class="theorem_thmlabel">7.3</span><span class="theorem_thmtitle">The small part on average</span></div>
+    <div class="thm_thmcontent"><p>    For every parameter datum, every \(A \in \mathbb {N}\) and every real \(0 \le Q \le \sqrt{x}/(\log x)^{A+3}\), </p>
+<div class="displaymath" id="a0000000097">
+  \[ \sum _{q \le Q}\  \max _{\substack {\sqrt x \le y \le x \\ a \in (\mathbb {Z}/q\mathbb {Z})^*}} |\Delta _{\Lambda _{\le U}}(y; q, a)| \le \frac{2x}{(\log x)^{A+2}}. \]
 </div>
 </div>
 
-    <a class="latex_link" href="sect0001.html#BV_LambdaLE">LaTeX</a>
+    <a class="latex_link" href="ch-small.html#BV_LambdaLE_enorm">LaTeX</a>
     
     
-  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/BV_LambdaLE">Lean</a>
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/BV_LambdaLE_enorm">Lean</a>
     
     
   
@@ -430,28 +494,92 @@
 
 
     
-    <div class="dep-modal-container" id="BV_LambdaSharp_modal">
+    <div class="dep-modal-container" id="BV_LambdaSharp_enorm_modal">
       <div class="dep-modal-content">
           <button class="dep-closebtn">
 <svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
 </button>
         
-  <div class="thm" id="BV_LambdaSharp" style="display: none">
+  <div class="thm" id="BV_LambdaSharp_enorm" style="display: none">
     <div class="thm_thmheading">
       <span class="theorem_thmcaption">
       Theorem
       </span>
-      <span class="theorem_thmlabel">27</span></div>
-    <div class="thm_thmcontent"><p>   For each fixed \(A \ge 0\), \(x \ge 2\) and \(1 \le Q \le \sqrt{x}/(\log x)^{A+3}\), </p>
-<div class="displaymath" id="a0000000049">
-  \[ \sum _{q \le Q} \max _{\sqrt{x} \le y \le x} \max _{a \in (\mathbb {Z}/q\mathbb {Z})^*} |\Delta _{\Lambda ^\sharp }(y;\,  q,\,  a)| \ll _A \frac{x}{(\log x)^A} \]
+      <span class="theorem_thmlabel">8.18</span><span class="theorem_thmtitle">The Type I part on average</span></div>
+    <div class="thm_thmcontent"><p>    For every parameter datum, every \(A \in \mathbb {N}\) and every real \(1 \le Q \le \sqrt{x}/(\log x)^{A+3}\), </p>
+<div class="displaymath" id="a0000000142">
+  \[ \sum _{q \le Q}\  \max _{\substack {\sqrt x \le y \le x \\ a \in (\mathbb {Z}/q\mathbb {Z})^*}} |\Delta _{\Lambda ^\sharp }(y; q, a)| \ll \frac{x}{(\log x)^{A}}, \]
+</div>
+<p> with an absolute implied constant. </p>
+</div>
+
+    <a class="latex_link" href="ch-typeI.html#BV_LambdaSharp_enorm">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/BV_LambdaSharp_enorm">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="BV_large_enorm_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="BV_large_enorm" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">10.5</span><span class="lemma_thmtitle">From \(\Delta _\Lambda \) to the Chebyshev error</span></div>
+    <div class="thm_thmcontent"><p>    Let \(A \in \mathbb {N}\). For every parameter datum and every real \(1 \le Q \le \sqrt x/(\log x)^{A+3}\), </p>
+<div class="displaymath" id="a0000000234">
+  \[ \sum _{q \le Q} E(x; q) \ll _A \frac{x}{(\log x)^A} . \]
 </div>
 </div>
 
-    <a class="latex_link" href="sect0001.html#BV_LambdaSharp">LaTeX</a>
+    <a class="latex_link" href="ch-assembly.html#BV_large_enorm">LaTeX</a>
     
     
-  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/BV_LambdaSharp">Lean</a>
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/BV_large_enorm">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="card_divisors_le_two_mul_sqrt_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="card_divisors_le_two_mul_sqrt" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">5.3</span><span class="lemma_thmtitle">Crude divisor bound</span></div>
+    <div class="thm_thmcontent"><p>   For every \(n \in \mathbb {N}\), \(\tau (n) \le 2\sqrt{n}\). </p>
+</div>
+
+    <a class="latex_link" href="ch-aux.html#card_divisors_le_two_mul_sqrt">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/card_divisors_le_two_mul_sqrt">Lean</a>
     
     
   
@@ -474,17 +602,27 @@
       <span class="lemma_thmcaption">
       Lemma
       </span>
-      <span class="lemma_thmlabel">30</span></div>
-    <div class="thm_thmcontent"><p>  This is a standard result. Let \(f\) be a function from Dirichlet characters. Then </p>
-<div class="displaymath" id="a0000000056">
-  \[ \sum _{\substack {\chi \pmod{q} \\ \chi \ne \chi _0}} f(\chi ) = \sum _{d \mid q} \mathop{{\sum \nolimits ^{*}}}_{\xi \pmod{d}} f(1_{(n,q)=1}\xi ) \]
+      <span class="lemma_thmlabel">9.3</span><span class="lemma_thmtitle">Grouping characters by conductor</span></div>
+    <div class="thm_thmcontent"><p>   Let \(q \ge 1\) and let \(f\) be a function on the Dirichlet characters modulo \(q\) with values in an additive commutative monoid. Then </p>
+<div class="displaymath" id="a0000000148">
+  \[ \sum _{\substack {\chi \bmod q \\ \chi \ne \chi _0}} f(\chi ) = \sum _{\substack {d \mid q \\ d \ne 1}}\  \mathop{{\sum \nolimits ^{*}}}_{\xi \bmod d} f(\xi \uparrow ^q), \]
 </div>
+<p> where \(\xi \uparrow ^q\) denotes the character modulo \(q\) induced by \(\xi \), i.e. \((\xi \uparrow ^q)(n) = \xi (n) 1_{(n, q) = 1}\). </p>
 </div>
 
-    <a class="latex_link" href="sect0001.html#character_sum_by_conductor">LaTeX</a>
+    <a class="latex_link" href="ch-typeII.html#character_sum_by_conductor">LaTeX</a>
     
     
-  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/character_sum_by_conductor">Lean</a>
+  <div class="tooltip">
+      <span class="lean_link">Lean</span>
+      <ul class="tooltip_list">
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/sum_conductor_fiber" class="lean_decl">sum_conductor_fiber</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/character_sum_by_conductor" class="lean_decl">character_sum_by_conductor</a></li>
+        
+      </ul>
+  </div>
     
     
   
@@ -507,17 +645,149 @@
       <span class="lemma_thmcaption">
       Lemma
       </span>
-      <span class="lemma_thmlabel">31</span></div>
-    <div class="thm_thmcontent"><p>   Let \(f\) be an arithmetic function. For \(r \le x\), \(q {\gt} 1\) and \((a, q) = 1\), </p>
-<div class="displaymath" id="a0000000059">
-  \[ \mathop{{\sum \nolimits ^{*}}}_{\xi \pmod{q}} \bar\xi (a) \sum _{n \le y} \xi (n) f_r(n) = \sum _{d \mid q} \mu (q/d)\, \varphi (d)\, \Delta _{f_{rq}}(y;\,  d,\,  a) \]
+      <span class="lemma_thmlabel">9.5</span><span class="lemma_thmtitle">Primitive character sums via Möbius inversion</span></div>
+    <div class="thm_thmcontent"><p>    Let \(f\) be a real arithmetic function, \(r \in \mathbb {N}\), \(q {\gt} 1\), \(x \in \mathbb {R}\) and \(a \in (\mathbb {Z}/q\mathbb {Z})^*\). Then </p>
+<div class="displaymath" id="a0000000153">
+  \[ \mathop{{\sum \nolimits ^{*}}}_{\xi \bmod q} \overline{\xi (a)} \sum _{n \le x} \xi (n) f_r(n) = \sum _{d \mid q} \mu (q/d)\,  \varphi (d)\,  \Delta _{f_{rq}}(x; d, a). \]
 </div>
 </div>
 
-    <a class="latex_link" href="sect0001.html#character_sum_Mobius">LaTeX</a>
+    <a class="latex_link" href="ch-typeII.html#character_sum_Mobius">LaTeX</a>
     
     
   <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/character_sum_Mobius">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Chebyshev.abs_psiMod_sub_div_le_const_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Chebyshev.abs_psiMod_sub_div_le_const" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">5.1</span><span class="lemma_thmtitle">Trivial bound for the modular Chebyshev error</span></div>
+    <div class="thm_thmcontent"><p>    Let \(q \ge 1\), let \(a \in \mathbb {Z}/q\mathbb {Z}\) and let \(z \ge 1\) be real. Then </p>
+<div class="displaymath" id="a0000000068">
+  \[ \left| \psi (z; q, a) - \frac{z}{\varphi (q)} \right| \ll z , \]
+</div>
+<p> with an absolute implied constant. </p>
+</div>
+
+    <a class="latex_link" href="ch-aux.html#Chebyshev.abs_psiMod_sub_div_le_const">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Chebyshev.abs_psiMod_sub_div_le_const">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Chebyshev.psiMod_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Chebyshev.psiMod" style="display: none">
+    <div class="thm_thmheading">
+      <span class="definition_thmcaption">
+      Definition
+      </span>
+      <span class="definition_thmlabel">3.3</span><span class="definition_thmtitle">Chebyshev’s function in arithmetic progressions</span></div>
+    <div class="thm_thmcontent"><p>   For a real number \(x\), a modulus \(q \in \mathbb {N}\) and a residue class \(a \in \mathbb {Z}/q\mathbb {Z}\), set </p>
+<div class="displaymath" id="a0000000032">
+  \[ \psi (x; q, a) := \sum _{\substack {n \le x \\ n \equiv a \pmod q}} \Lambda (n), \]
+</div>
+<p> where \(\Lambda \) is the von Mangoldt function. We do not require \(a\) to be coprime to \(q\) in the definition. For \(q = 1\) this is the classical Chebyshev function \(\psi (x) = \sum _{n \le x} \Lambda (n)\). </p>
+</div>
+
+    <a class="latex_link" href="ch-prelim.html#Chebyshev.psiMod">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Chebyshev.psiMod">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="coprime_vonMangoldt_error_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="coprime_vonMangoldt_error" style="display: none">
+    <div class="thm_thmheading">
+      <span class="theorem_thmcaption">
+      Theorem
+      </span>
+      <span class="theorem_thmlabel">4.4</span><span class="theorem_thmtitle">Prime number theorem for integers coprime to \(q\)</span></div>
+    <div class="thm_thmcontent"><p>    For every \(B \in \mathbb {N}\), every real \(z \ge 2\) and every integer \(q \ge 1\), </p>
+<div class="displaymath" id="a0000000063">
+  \[ \sum _{\substack {n \le z \\ (n, q) = 1}} \Lambda (n) = z + O_B\! \left(\frac{z}{(\log z)^B}\right) + O\big(\log q \cdot \log z\big), \]
+</div>
+<p> the second error term having an absolute implied constant. </p>
+</div>
+
+    <a class="latex_link" href="ch-axioms.html#coprime_vonMangoldt_error">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/coprime_vonMangoldt_error">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="d_le_two_mul_totient_sq_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="d_le_two_mul_totient_sq" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">5.4</span><span class="lemma_thmtitle">A lower bound for \(\varphi \)</span></div>
+    <div class="thm_thmcontent"><p>   For every \(d \in \mathbb {N}\), \(d \le 2\varphi (d)^2\). </p>
+</div>
+
+    <a class="latex_link" href="ch-aux.html#d_le_two_mul_totient_sq">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/d_le_two_mul_totient_sq">Lean</a>
     
     
   
@@ -540,15 +810,15 @@
       <span class="definition_thmcaption">
       Definition
       </span>
-      <span class="definition_thmlabel">6</span></div>
-    <div class="thm_thmcontent">
-<div class="displaymath" id="a0000000012">
-  \[ \Delta _f(x ;q, a) := \sum _{n \le x, ~  n \equiv a \pmod q} f(n) ~  - \frac{1}{\varphi (q)} \sum _{n \le x, (n, q) = 1} f(n)  \]
+      <span class="definition_thmlabel">3.7</span><span class="definition_thmtitle">The discrepancy \(\Delta _f\)</span></div>
+    <div class="thm_thmcontent"><p>    Let \(R\) be a field, \(f : \mathbb {N}\to R\), \(x \in \mathbb {R}\), \(q \in \mathbb {N}\) and \(a \in \mathbb {Z}/q\mathbb {Z}\). The <em>discrepancy</em> of \(f\) in the progression \(a \bmod q\) up to \(x\) is </p>
+<div class="displaymath" id="a0000000035">
+  \[ \Delta _f(x; q, a) := \sum _{\substack {n \le x \\ n \equiv a \pmod q}} f(n) - \frac{1}{\varphi (q)} \sum _{\substack {n \le x \\ (n, q) = 1}} f(n). \]
 </div>
-<p> for \(x \ge 1\), \(q \in \mathbb {N}\) </p>
+<p> Here \(\varphi \) is Euler’s totient function, and \(1/\varphi (0)\) is read as \(0\) (as is customary in Lean), so that for \(q = 0\) only the first sum survives; all estimates below assume \(q \ge 1\). </p>
 </div>
 
-    <a class="latex_link" href="sect0001.html#Delta">LaTeX</a>
+    <a class="latex_link" href="ch-prelim.html#Delta">LaTeX</a>
     
     
   <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Delta">Lean</a>
@@ -574,14 +844,15 @@
       <span class="lemma_thmcaption">
       Lemma
       </span>
-      <span class="lemma_thmlabel">23</span></div>
-    <div class="thm_thmcontent"><p>   If \(g\) is continuously differentiable on \([1, x]\) then </p>
-<div class="displaymath" id="a0000000042">
-  \[ \Delta _g(x;\, q,\, a) = \Delta _1(x;\, q,\, a)\, g(x) - \int _1^x \Delta _1(t;\, q,\, a)\, g'(t)\, \mathrm{d}t \]
+      <span class="lemma_thmlabel">8.3</span><span class="lemma_thmtitle">Abel summation for \(\Delta \)</span></div>
+    <div class="thm_thmcontent"><p>    Let \(q \ge 1\), \(a \in (\mathbb {Z}/q\mathbb {Z})^*\) and \(x \ge 1\). Let \(g, g' : \mathbb {R}\to \mathbb {C}\) be such that \(g\) has derivative \(g'(t)\) at every \(t \in [1, x]\), \(g'\) is locally integrable on \([1, x]\), and \(g(1) = 0\). Then </p>
+<div class="displaymath" id="a0000000106">
+  \[ \Delta _{g}(x; q, a) = \Delta _1(x; q, a)\,  g(x) - \int _1^x \Delta _1(t; q, a)\,  g'(t)\,  \mathrm{d}t, \]
 </div>
+<p> where \(\Delta _g\) is the discrepancy of the arithmetic function \(n \mapsto g(n)\). </p>
 </div>
 
-    <a class="latex_link" href="sect0001.html#Delta_abel_summation">LaTeX</a>
+    <a class="latex_link" href="ch-typeI.html#Delta_abel_summation">LaTeX</a>
     
     
   <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Delta_abel_summation">Lean</a>
@@ -607,17 +878,51 @@
       <span class="lemma_thmcaption">
       Lemma
       </span>
-      <span class="lemma_thmlabel">21</span></div>
-    <div class="thm_thmcontent"><p>  If \(f\) is an arithmetic function supported on \([1, y]\) then </p>
-<div class="displaymath" id="a0000000036">
-  \[ \Delta _{f*g}(x;\, q,\, a) = \sum _{\substack {k \le y \\ (k,q)=1}} f(k)\,  \Delta _g\! \left(\frac{x}{k};\,  q,\,  a\bar{k}\right) \]
+      <span class="lemma_thmlabel">8.1</span><span class="lemma_thmtitle">\(\Delta \) of a Dirichlet convolution</span></div>
+    <div class="thm_thmcontent"><p>    Let \(\mathbb K\) be a field with an algebra map to \(\mathbb {C}\), let \(f, g\) be arithmetic functions with values in \(\mathbb K\), let \(y \in \mathbb {R}\), \(q \ge 1\) and \(a \in (\mathbb {Z}/q\mathbb {Z})^*\). Then </p>
+<div class="displaymath" id="a0000000100">
+  \[ \Delta _{f * g}(y; q, a) = \sum _{\substack {k \le y \\ (k, q) = 1}} f(k)\,  \Delta _g\! \left(\frac{y}{k};\,  q,\,  a \bar k\right), \]
 </div>
+<p> where \(\bar k\) denotes the inverse of \(k\) in \((\mathbb {Z}/q\mathbb {Z})^*\). </p>
 </div>
 
-    <a class="latex_link" href="sect0001.html#Delta_convolution_eq">LaTeX</a>
+    <a class="latex_link" href="ch-typeI.html#Delta_convolution_eq">LaTeX</a>
     
     
   <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Delta_convolution_eq">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Delta_dilate_flog_bound_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Delta_dilate_flog_bound" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">8.13</span><span class="lemma_thmtitle">Type I estimate for a dilated coefficient function</span></div>
+    <div class="thm_thmcontent"><p>    Let \(v \in \mathbb {N}\), \(e \ge 1\), let \(h\) be a real arithmetic function, \(x \ge 2\), \(q \ge 1\) and \(a \in (\mathbb {Z}/q\mathbb {Z})^*\). Then </p>
+<div class="displaymath" id="a0000000128">
+  \[ \big| \Delta _{(\delta _e * h) * \log ^v}(x; q, a) \big| \le 2 (\log x)^v \sum _{k \le x} |h(k)|. \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-typeI.html#Delta_dilate_flog_bound">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Delta_dilate_flog_bound">Lean</a>
     
     
   
@@ -637,17 +942,18 @@
         
   <div class="thm" id="Delta_eq_sum_char" style="display: none">
     <div class="thm_thmheading">
-      <span class="theorem_thmcaption">
-      Theorem
+      <span class="lemma_thmcaption">
+      Lemma
       </span>
-      <span class="theorem_thmlabel">7</span></div>
-    <div class="thm_thmcontent">
-<div class="displaymath" id="a0000000013">
-  \[ \Delta _f(y ;q, a) = \frac{1}{\varphi (q)} \sum _{\chi \pmod{q}, \chi \ne \chi _0} \bar\chi (a) \sum _{n \le y} f(n) \chi (n)  \]
+      <span class="lemma_thmlabel">3.11</span><span class="lemma_thmtitle">\(\Delta _f\) via Dirichlet characters</span></div>
+    <div class="thm_thmcontent"><p>    Let \(\mathbb {K}\) be a field equipped with an algebra map \(\mathbb K \to \mathbb {C}\) (in practice \(\mathbb K = \mathbb {R}\) or \(\mathbb {C}\)), \(f : \mathbb {N}\to \mathbb K\), \(y \in \mathbb {R}\), \(q \ge 1\) and \(a \in (\mathbb {Z}/q\mathbb {Z})^*\). Then, in \(\mathbb {C}\), </p>
+<div class="displaymath" id="a0000000042">
+  \[ \Delta _f(y; q, a) = \frac{1}{\varphi (q)} \sum _{\substack {\chi \bmod q \\ \chi \ne \chi _0}} \overline{\chi (a)} \sum _{n \le y} f(n) \chi (n), \]
 </div>
+<p> where \(\chi _0\) is the principal character modulo \(q\). </p>
 </div>
 
-    <a class="latex_link" href="sect0001.html#Delta_eq_sum_char">LaTeX</a>
+    <a class="latex_link" href="ch-prelim.html#Delta_eq_sum_char">LaTeX</a>
     
     
   <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Delta_eq_sum_char">Lean</a>
@@ -673,17 +979,64 @@
       <span class="theorem_thmcaption">
       Theorem
       </span>
-      <span class="theorem_thmlabel">25</span></div>
-    <div class="thm_thmcontent"><p>   Let \(v \ge 0\) and let \(f\) be an arithmetic function supported on \([1, y]\). For \(x \ge 2\), \(q \in \mathbb {N}\) and \(a \in (\mathbb {Z}/q\mathbb {Z})^*\), </p>
-<div class="displaymath" id="a0000000046">
-  \[ |\Delta _{f * \log ^v}(x;\,  q,\,  a)| \le 2(\log x)^v \sum _{k \le y} |f(k)| \]
+      <span class="theorem_thmlabel">8.5</span><span class="theorem_thmtitle">Type I estimate: \(\Delta \) of \(f * \log ^v\)</span></div>
+    <div class="thm_thmcontent"><p>    Let \(v \in \mathbb {N}\) and let \(f\) be a real arithmetic function. For every real \(x \ge 2\), every \(q \ge 1\) and every \(a \in (\mathbb {Z}/q\mathbb {Z})^*\), </p>
+<div class="displaymath" id="a0000000112">
+  \[ \big|\Delta _{f * \log ^v}(x; q, a)\big| \le 2 (\log x)^v \sum _{k \le x} |f(k)|, \]
 </div>
+<p> where \(\log ^v\) denotes the arithmetic function \(n \mapsto (\log n)^v\) (so \(\log ^0 = 1\)). </p>
 </div>
 
-    <a class="latex_link" href="sect0001.html#Delta_flog_bound">LaTeX</a>
+    <a class="latex_link" href="ch-typeI.html#Delta_flog_bound">LaTeX</a>
     
     
   <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Delta_flog_bound">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Delta_Lambda_eq_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Delta_Lambda_eq" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">3.12</span><span class="lemma_thmtitle">\(\Delta _\Lambda \) and the Chebyshev error</span></div>
+    <div class="thm_thmcontent"><p>    For all \(z \in \mathbb {R}\), \(q \in \mathbb {N}\) and \(a \in \mathbb {Z}/q\mathbb {Z}\), </p>
+<div class="displaymath" id="a0000000044">
+  \[ \Delta _\Lambda (z; q, a) = \psi (z; q, a) - \frac{1}{\varphi (q)} \sum _{\substack {n \le z \\ (n, q) = 1}} \Lambda (n), \]
+</div>
+<p> and consequently </p>
+<div class="displaymath" id="a0000000045">
+  \[ \psi (z; q, a) - \frac{z}{\varphi (q)} = \Delta _\Lambda (z; q, a) + \frac{1}{\varphi (q)} \Big( \sum _{\substack {n \le z \\ (n, q) = 1}} \Lambda (n) - z \Big). \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-prelim.html#Delta_Lambda_eq">LaTeX</a>
+    
+    
+  <div class="tooltip">
+      <span class="lean_link">Lean</span>
+      <ul class="tooltip_list">
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Delta_Lambda_eq" class="lean_decl">Delta_Lambda_eq</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/psi_sub_div_eq_Delta_add" class="lean_decl">psi_sub_div_eq_Delta_add</a></li>
+        
+      </ul>
+  </div>
     
     
   
@@ -703,17 +1056,17 @@
         
   <div class="thm" id="Delta_LambdaFlat_decomp" style="display: none">
     <div class="thm_thmheading">
-      <span class="lemma_thmcaption">
-      Lemma
+      <span class="theorem_thmcaption">
+      Theorem
       </span>
-      <span class="lemma_thmlabel">32</span></div>
-    <div class="thm_thmcontent">
-<div class="displaymath" id="a0000000062">
-  \[ \left|\Delta _{\Lambda ^\flat }(y;\,  q,\,  a)\right| \le \frac{1}{\varphi (q)} \left|\sum _{\substack {d \mid q \\ 1 {\lt} d \le (\log x)^C}} \sum _{s \mid d} \mu (d/s)\, \varphi (s)\, \Delta _{\Lambda ^\flat _q}(y;\, s,\, a)\right| + \frac{1}{\varphi (q)} \sum _{\substack {d \mid q \\ d {\gt} (\log x)^C}} \mathop{{\sum \nolimits ^{*}}}_{\xi \pmod{d}} S_{q/d}(y, \xi ) \]
+      <span class="theorem_thmlabel">9.6</span><span class="theorem_thmtitle">Decomposing \(\Delta _{\Lambda ^\flat }\) by conductor</span></div>
+    <div class="thm_thmcontent"><p>    For every parameter datum, every \(C \in \mathbb {N}\), every real \(y\), every \(q \ge 1\) and every \(a \in (\mathbb {Z}/q\mathbb {Z})^*\), </p>
+<div class="displaymath" id="a0000000155">
+  \[ \left| \Delta _{\Lambda ^\flat }(y; q, a) \right| \le \frac{1}{\varphi (q)} \left| \sum _{\substack {d \mid q \\ 1 {\lt} d \le (\log x)^C}} \sum _{s \mid d} \mu (d/s)\,  \varphi (s)\,  \Delta _{\Lambda ^\flat _q}(y; s, a) \right| + \frac{1}{\varphi (q)} \sum _{\substack {d \mid q \\ d {\gt} (\log x)^C}} \mathop{{\sum \nolimits ^{*}}}_{\xi \bmod d} S_{q/d}(y, \xi ). \]
 </div>
 </div>
 
-    <a class="latex_link" href="sect0001.html#Delta_LambdaFlat_decomp">LaTeX</a>
+    <a class="latex_link" href="ch-typeII.html#Delta_LambdaFlat_decomp">LaTeX</a>
     
     
   <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Delta_LambdaFlat_decomp">Lean</a>
@@ -739,14 +1092,14 @@
       <span class="theorem_thmcaption">
       Theorem
       </span>
-      <span class="theorem_thmlabel">33</span></div>
-    <div class="thm_thmcontent">
-<div class="displaymath" id="a0000000065">
-  \[ \frac{1}{\varphi (q)} \left|\sum _{\substack {d \mid q \\ 1 {\lt} d \le (\log x)^C}} \sum _{s \mid d} \mu (d/s)\, \varphi (s)\, \Delta _{\Lambda ^\flat _q}(y;\, s,\, a)\right| \ll _{A,C} \frac{x}{\varphi (q)\, (\log x)^{A+1}} \]
+      <span class="theorem_thmlabel">9.9</span><span class="theorem_thmtitle">Small conductors</span></div>
+    <div class="thm_thmcontent"><p>    Let \(A, C \in \mathbb {N}\). For every parameter datum, every real \(\sqrt x \le y \le x\), every integer \(1 \le q \le \sqrt x\) and every \(a \in (\mathbb {Z}/q\mathbb {Z})^*\), </p>
+<div class="displaymath" id="a0000000163">
+  \[ \left| \sum _{\substack {d \mid q \\ 1 {\lt} d \le (\log x)^C}} \sum _{s \mid d} \mu (d/s)\,  \varphi (s)\,  \Delta _{\Lambda ^\flat _q}(y; s, a) \right| \ll _{A, C} \frac{x}{(\log x)^{A+1}} . \]
 </div>
 </div>
 
-    <a class="latex_link" href="sect0001.html#Delta_LambdaFlat_small_conductor">LaTeX</a>
+    <a class="latex_link" href="ch-typeII.html#Delta_LambdaFlat_small_conductor">LaTeX</a>
     
     
   <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Delta_LambdaFlat_small_conductor">Lean</a>
@@ -761,28 +1114,28 @@
 
 
     
-    <div class="dep-modal-container" id="Delta_LambdaLE_bound_modal">
+    <div class="dep-modal-container" id="Delta_LambdaLEU_bound_modal">
       <div class="dep-modal-content">
           <button class="dep-closebtn">
 <svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
 </button>
         
-  <div class="thm" id="Delta_LambdaLE_bound" style="display: none">
+  <div class="thm" id="Delta_LambdaLEU_bound" style="display: none">
     <div class="thm_thmheading">
       <span class="lemma_thmcaption">
       Lemma
       </span>
-      <span class="lemma_thmlabel">19</span></div>
-    <div class="thm_thmcontent"><p>   For \(y, U {\gt} 0\), \(q \in \mathbb {N}\) and \(a \in \mathbb {Z}/q\mathbb {Z}\), </p>
-<div class="displaymath" id="a0000000031">
-  \[ |\Delta _{\Lambda _{\le U}}(y;\,  q,\,  a)| \ll U \]
+      <span class="lemma_thmlabel">7.2</span><span class="lemma_thmtitle">Pointwise bound for \(\Delta _{\Lambda _{\le U}}\)</span></div>
+    <div class="thm_thmcontent"><p>    For every parameter datum, every real \(y\), every \(q \ge 1\) and every \(a \in \mathbb {Z}/q\mathbb {Z}\), </p>
+<div class="displaymath" id="a0000000095">
+  \[ |\Delta _{\Lambda _{\le U}}(y; q, a)| \le 2 U \log x. \]
 </div>
 </div>
 
-    <a class="latex_link" href="sect0001.html#Delta_LambdaLE_bound">LaTeX</a>
+    <a class="latex_link" href="ch-small.html#Delta_LambdaLEU_bound">LaTeX</a>
     
     
-  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Delta_LambdaLE_bound">Lean</a>
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Delta_LambdaLEU_bound">Lean</a>
     
     
   
@@ -805,17 +1158,61 @@
       <span class="theorem_thmcaption">
       Theorem
       </span>
-      <span class="theorem_thmlabel">26</span></div>
-    <div class="thm_thmcontent"><p>   For \(U, V \ge 1\), \(x \ge 2\), \(q \in \mathbb {N}\), \(r \le x\) and \(a \in (\mathbb {Z}/q\mathbb {Z})^*\), </p>
-<div class="displaymath" id="a0000000048">
-  \[ \max _{y \le x} \max _{a \in (\mathbb {Z}/q\mathbb {Z})^*} |\Delta _{\Lambda ^\sharp _r}(y;\,  q,\,  a)| \ll UV \log x \]
+      <span class="theorem_thmlabel">8.17</span><span class="theorem_thmtitle">Pointwise Type I bound for \(\Lambda ^\sharp _r\)</span></div>
+    <div class="thm_thmcontent"><p>    For every parameter datum, every \(q \ge 1\), \(a \in (\mathbb {Z}/q\mathbb {Z})^*\), every \(r \in \mathbb {N}\) with \(r \le x\) and every real \(2 \le y \le x\), </p>
+<div class="displaymath" id="a0000000140">
+  \[ \big| \Delta _{\Lambda ^\sharp _r}(y; q, a) \big| \ll \tau (r)\,  U V \log x , \]
 </div>
+<p> with an absolute implied constant. The factor \(\tau (r)\) cannot be dropped: the discrepancy of \(\log _r\) is a signed combination of \(2^{\omega (r)}\) residue-class counts with no cancellation in general, and the Möbius expansion above records this honestly. Downstream it is harmless because \(\tau \) is only ever <em>averaged</em> over the modulus (<a href="ch-typeI.html#BV_LambdaSharp_enorm">Theorem 8.18</a>) or bounded by \(2x^{1/4}\) (<a href="ch-typeII.html#Delta_onCoprime_LambdaFlat_pointwise">Theorem 9.8</a>). </p>
 </div>
 
-    <a class="latex_link" href="sect0001.html#Delta_LambdaSharp_bound">LaTeX</a>
+    <a class="latex_link" href="ch-typeI.html#Delta_LambdaSharp_bound">LaTeX</a>
     
     
   <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Delta_LambdaSharp_bound">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Delta_linear_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Delta_linear" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">3.8</span><span class="lemma_thmtitle">Linearity of \(\Delta \)</span></div>
+    <div class="thm_thmcontent"><p>    For fixed \(x, q, a\) the map \(f \mapsto \Delta _f(x; q, a)\) is \(R\)-linear: \(\Delta _{f + g} = \Delta _f + \Delta _g\), \(\Delta _{f - g} = \Delta _f - \Delta _g\), \(\Delta _{c f} = c\,  \Delta _f\) for \(c \in R\), and \(\Delta _{\sum _{i \in I} f_i} = \sum _{i \in I} \Delta _{f_i}\) for every finite index set \(I\). </p>
+</div>
+
+    <a class="latex_link" href="ch-prelim.html#Delta_linear">LaTeX</a>
+    
+    
+  <div class="tooltip">
+      <span class="lean_link">Lean</span>
+      <ul class="tooltip_list">
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Delta_sub" class="lean_decl">Delta_sub</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Delta_smul" class="lean_decl">Delta_smul</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Delta_add" class="lean_decl">Delta_add</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Delta_finset_sum" class="lean_decl">Delta_finset_sum</a></li>
+        
+      </ul>
+  </div>
     
     
   
@@ -838,17 +1235,117 @@
       <span class="lemma_thmcaption">
       Lemma
       </span>
-      <span class="lemma_thmlabel">24</span></div>
-    <div class="thm_thmcontent"><p>   If \(g\) is continuously differentiable and monotone on \([1, y]\) with \(g(0) = 0\), then for all \(t \ge 1\) and \(a \in (\mathbb {Z}/q\mathbb {Z})^*\), </p>
-<div class="displaymath" id="a0000000043">
-  \[ |\Delta _g(x;\,  q,\,  a)| \le 2g(t) \]
+      <span class="lemma_thmlabel">8.4</span><span class="lemma_thmtitle">Discrepancy of a monotone weight</span></div>
+    <div class="thm_thmcontent"><p>    Let \(q \ge 1\), \(a \in (\mathbb {Z}/q\mathbb {Z})^*\) and \(x \ge 1\). Let \(g : \mathbb {R}\to \mathbb {R}\) be differentiable at every point of \([1, x]\), with \(g'\) locally integrable on \([1, x]\), monotone increasing on \([1, x]\) and \(g(1) = 0\). Then </p>
+<div class="displaymath" id="a0000000109">
+  \[ |\Delta _g(x; q, a)| \le 2 g(x). \]
 </div>
 </div>
 
-    <a class="latex_link" href="sect0001.html#Delta_monotone_bound">LaTeX</a>
+    <a class="latex_link" href="ch-typeI.html#Delta_monotone_bound">LaTeX</a>
     
     
   <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Delta_monotone_bound">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Delta_onCoprime_Lambda_bound_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Delta_onCoprime_Lambda_bound" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">9.7</span><span class="lemma_thmtitle">Siegel–Walfisz for \(\Lambda _q\)</span></div>
+    <div class="thm_thmcontent"><p>    Let \(A', C_2 \in \mathbb {N}\). For every parameter datum, every real \(2 \le y \le x\), all integers \(1 \le s \mid q\) with \(q \le \sqrt x\) and \(s \le (\log y)^{C_2}\), and every \(a \in (\mathbb {Z}/s\mathbb {Z})^*\), </p>
+<div class="displaymath" id="a0000000158">
+  \[ \big| \Delta _{\Lambda _q}(y; s, a) \big| \ll _{A', C_2} \frac{y}{(\log y)^{A'}} + (\log x)^2 . \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#Delta_onCoprime_Lambda_bound">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Delta_onCoprime_Lambda_bound">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Delta_onCoprime_LambdaFlat_pointwise_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Delta_onCoprime_LambdaFlat_pointwise" style="display: none">
+    <div class="thm_thmheading">
+      <span class="theorem_thmcaption">
+      Theorem
+      </span>
+      <span class="theorem_thmlabel">9.8</span><span class="theorem_thmtitle">Siegel–Walfisz for \(\Lambda ^\flat _q\)</span></div>
+    <div class="thm_thmcontent"><p>    Let \(A, C \in \mathbb {N}\). For every parameter datum, every real \(\sqrt x \le y \le x\), all integers \(1 \le s \mid q\) with \(q \le \sqrt x\) and \(s \le (\log x)^C\), and every \(a \in (\mathbb {Z}/s\mathbb {Z})^*\), </p>
+<div class="displaymath" id="a0000000161">
+  \[ \big| \Delta _{\Lambda ^\flat _q}(y; s, a) \big| \ll _{A, C} \frac{x}{(\log x)^{A + 2C + 1}} . \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#Delta_onCoprime_LambdaFlat_pointwise">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Delta_onCoprime_LambdaFlat_pointwise">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Delta_onCoprime_self_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Delta_onCoprime_self" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">3.10</span><span class="lemma_thmtitle">Restricting to integers coprime to the modulus</span></div>
+    <div class="thm_thmcontent"><p>    Let \(f : \mathbb {N}\to R\) (\(R\) a field), \(y \in \mathbb {R}\), \(q \in \mathbb {N}\) and \(a \in (\mathbb {Z}/q\mathbb {Z})^*\). Then </p>
+<div class="displaymath" id="a0000000040">
+  \[ \Delta _{f_q}(y; q, a) = \Delta _f(y; q, a), \]
+</div>
+<p> with \(f_q\) as in <a href="ch-prelim.html#onCoprime">Definition 3.4</a>. </p>
+</div>
+
+    <a class="latex_link" href="ch-prelim.html#Delta_onCoprime_self">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Delta_onCoprime_self">Lean</a>
     
     
   
@@ -871,17 +1368,642 @@
       <span class="lemma_thmcaption">
       Lemma
       </span>
-      <span class="lemma_thmlabel">22</span></div>
-    <div class="thm_thmcontent"><p>  For \(x \ge 1\), \(q \in \mathbb {N}\) and \(a \in (\mathbb {Z}/q\mathbb {Z})^*\), </p>
-<div class="displaymath" id="a0000000039">
-  \[ |\Delta _1(x;\,  q,\,  a)| \le 1 \]
+      <span class="lemma_thmlabel">8.2</span><span class="lemma_thmtitle">The discrepancy of the constant function \(1\)</span></div>
+    <div class="thm_thmcontent"><p>    For every real \(x\), every \(q \ge 1\) and every \(a \in \mathbb {Z}/q\mathbb {Z}\) (not necessarily a unit), </p>
+<div class="displaymath" id="a0000000103">
+  \[ |\Delta _1(x; q, a)| \le 1 . \]
 </div>
 </div>
 
-    <a class="latex_link" href="sect0001.html#Delta_one_bound">LaTeX</a>
+    <a class="latex_link" href="ch-typeI.html#Delta_one_bound">LaTeX</a>
     
     
   <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Delta_one_bound">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Delta_term1_bound_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Delta_term1_bound" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">8.15</span><span class="lemma_thmtitle">The first term of \(\Lambda ^\sharp _r\)</span></div>
+    <div class="thm_thmcontent"><p>    For every parameter datum, every \(q \ge 1\), \(a \in (\mathbb {Z}/q\mathbb {Z})^*\), every \(r \in \mathbb {N}\) with \(r \le x\) and every real \(2 \le y \le x\), </p>
+<div class="displaymath" id="a0000000132">
+  \[ \big| \Delta _{(\mu _{\le V} * \log )_r}(y; q, a) \big| \le 4\,  \tau (r)\,  V \log x . \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-typeI.html#Delta_term1_bound">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Delta_term1_bound">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Delta_term2_bound_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Delta_term2_bound" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">8.16</span><span class="lemma_thmtitle">The second term of \(\Lambda ^\sharp _r\)</span></div>
+    <div class="thm_thmcontent"><p>    For every parameter datum, every \(q \ge 1\), \(a \in (\mathbb {Z}/q\mathbb {Z})^*\), every \(r \in \mathbb {N}\) with \(r \le x\) and every real \(2 \le y \le x\), </p>
+<div class="displaymath" id="a0000000136">
+  \[ \big| \Delta _{(\Lambda _{\le U} * \mu _{\le V} * 1)_r}(y; q, a) \big| \le 2\,  \tau (r)\,  U V \log x . \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-typeI.html#Delta_term2_bound">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Delta_term2_bound">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="dilate_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="dilate" style="display: none">
+    <div class="thm_thmheading">
+      <span class="definition_thmcaption">
+      Definition
+      </span>
+      <span class="definition_thmlabel">3.6</span><span class="definition_thmtitle">Dilation of an arithmetic function</span></div>
+    <div class="thm_thmcontent"><p>   For \(e \ge 1\) and an arithmetic function \(f\), the <em>dilation</em> of \(f\) by \(e\) is the arithmetic function </p>
+<div class="displaymath" id="a0000000034">
+  \[ (\delta _e * f)(n) := 1_{e \mid n}\,  f(n/e), \]
+</div>
+<p> i.e. the Dirichlet convolution of \(f\) with the indicator \(\delta _e\) of the singleton \(\{ e\} \). </p>
+</div>
+
+    <a class="latex_link" href="ch-prelim.html#dilate">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/dilate">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Flat.Bump_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Flat.Bump" style="display: none">
+    <div class="thm_thmheading">
+      <span class="definition_thmcaption">
+      Definition
+      </span>
+      <span class="definition_thmlabel">9.22</span><span class="definition_thmtitle">Bump functions and the smoothed cutoff</span></div>
+    <div class="thm_thmcontent"><p>   A <em>bump function</em> is a function \(\nu : \mathbb {R}\to \mathbb {R}\) that is \(C^\infty \), supported in \([1/2, 2]\), non-negative, and normalised by \(\int _0^\infty \nu (t)\,  \frac{\mathrm{d}t}{t} = 1\). Such functions exist (<a href="ch-typeII.html#SmoothExistence">Theorem 9.12</a>); one is fixed once and for all, and the implied constants in this section may depend on this choice. For \(\varepsilon {\gt} 0\) we write \(\widetilde{1}_\varepsilon \) for the smoothed cutoff of <a href="ch-typeII.html#Smooth1">Definition 9.13</a> built from \(\nu \); it satisfies \(0 \le \widetilde1_\varepsilon \le 1\) (<a href="ch-typeII.html#Smooth1Nonneg">Lemma 9.16</a>), equals \(1\) on \((0, 1 - (\log 2)\varepsilon ]\) and \(0\) on \([1 + 2(\log 2)\varepsilon , \infty )\) when \(\varepsilon {\lt} 1\) (<a href="ch-typeII.html#Smooth1Properties_below">Lemma 9.14</a>), and has Mellin transform \(\mathcal{M}[\widetilde1_\varepsilon ](s) = s^{-1} \mathcal{M}[\nu ](\varepsilon s)\) for \(\Re s {\gt} 0\) (<a href="ch-typeII.html#MellinOfSmooth1a">Lemma 9.19</a>). </p>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#Flat.Bump">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Flat.Bump">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Flat.FG_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Flat.FG" style="display: none">
+    <div class="thm_thmheading">
+      <span class="definition_thmcaption">
+      Definition
+      </span>
+      <span class="definition_thmlabel">9.23</span><span class="definition_thmtitle">Supported pairs of arithmetic functions</span></div>
+    <div class="thm_thmcontent"><p>   A <em>supported pair</em> consists of complex arithmetic functions \(f, g\) and real numbers \(M, N {\gt} 0\) with \(f(n) = 0\) for \(n {\gt} M\) and \(g(n) = 0\) for \(n {\gt} N\). For such a pair, a character \(\chi \) and \(s \in \mathbb {C}\) we write </p>
+<div class="displaymath" id="a0000000182">
+  \[ F_s(\chi ) := \sum _{m \le M} f(m)\chi (m) m^{-s}, \qquad G_s(\chi ) := \sum _{n \le N} g(n)\chi (n) n^{-s} \]
+</div>
+<p> for the associated Dirichlet polynomials, and \(\| f\| _2 := \big(\sum _{m \le M} |f(m)|^2\big)^{1/2}\), \(\| g\| _2 := \big(\sum _{n \le N} |g(n)|^2\big)^{1/2}\). </p>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#Flat.FG">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Flat.FG">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Flat.FG.summatory_mul_char_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Flat.FG.summatory_mul_char" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">9.30</span><span class="lemma_thmtitle">Partial sums of a convolution as a double sum</span></div>
+    <div class="thm_thmcontent"><p>    For a supported pair \((f, g)\) (<a href="ch-typeII.html#Flat.FG">Definition 9.23</a>), a character \(\chi \) and every real \(y\), </p>
+<div class="displaymath" id="a0000000195">
+  \[ \sum _{n \le y} (f * g)(n) \chi (n) = \sum _{m \le M} \sum _{n \le N} 1_{mn \le y}\,  f(m)\chi (m)\,  g(n)\chi (n). \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#Flat.FG.summatory_mul_char">LaTeX</a>
+    
+    
+  <div class="tooltip">
+      <span class="lean_link">Lean</span>
+      <ul class="tooltip_list">
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Flat.FG.summatory_mul" class="lean_decl">Flat.FG.summatory_mul</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Flat.FG.summatory_mul_char" class="lean_decl">Flat.FG.summatory_mul_char</a></li>
+        
+      </ul>
+  </div>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Flat.largeSieve_char_bound_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Flat.largeSieve_char_bound" style="display: none">
+    <div class="thm_thmheading">
+      <span class="theorem_thmcaption">
+      Theorem
+      </span>
+      <span class="theorem_thmlabel">9.34</span><span class="theorem_thmtitle">Cauchy–Schwarz and the large sieve twice</span></div>
+    <div class="thm_thmcontent"><p>    Let \((f, g)\) be a supported pair (<a href="ch-typeII.html#Flat.FG">Definition 9.23</a>), \(Q \ge 1\), \(\sigma {\gt} 0\) and \(t \in \mathbb {R}\). Then </p>
+<div class="displaymath" id="a0000000205">
+  \[ \sum _{q \le Q} \mathop{{\sum \nolimits ^{*}}}_{\chi \bmod q} \frac{q}{\varphi (q)} \| F_{\sigma +it}(\chi )\| \,  \| G_{\sigma +it}(\chi )\|  \ll \big( \sqrt{NM} + \sqrt{M}\,  Q + \sqrt{N}\,  Q + Q^2 \big)\,  \| f\| _2 \| g\| _2 , \]
+</div>
+<p> with the implied constant of <a href="ch-axioms.html#large_sieve">Assumption 4.6</a>; in particular it is uniform in \(t\) and \(\sigma \). </p>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#Flat.largeSieve_char_bound">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Flat.largeSieve_char_bound">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Flat.LargeSieve_convolution_aux_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Flat.LargeSieve_convolution_aux" style="display: none">
+    <div class="thm_thmheading">
+      <span class="theorem_thmcaption">
+      Theorem
+      </span>
+      <span class="theorem_thmlabel">9.36</span><span class="theorem_thmtitle">Maximal large sieve for convolutions (smoothed form)</span></div>
+    <div class="thm_thmcontent"><p>    Let \((f, g)\) be a supported pair (<a href="ch-typeII.html#Flat.FG">Definition 9.23</a>), \(\nu \) a bump function, \(x \ge 1\) and \(Q \ge 1\). Then </p>
+<div class="displaymath" id="a0000000211">
+  \[ \sum _{q \le Q} \mathop{{\sum \nolimits ^{*}}}_{\chi \bmod q} \frac{q}{\varphi (q)} \sup _{1 \le y \le x} \Big\|  \sum _{n \le y} (f * g)(n) \chi (n) \Big\|  \ll \big(\sqrt{NM} + \sqrt M Q + \sqrt N Q + Q^2\big)\,  \| f\| _2 \| g\| _2\,  \log (x+1) . \]
+</div>
+<p> This is Theorem 26.6 of Koukoulopoulos, proved with a smoothed cutoff instead of the truncated Perron formula; the implied constant depends only on the bump \(\nu \) and on the constant in <a href="ch-axioms.html#large_sieve">Assumption 4.6</a>. </p>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#Flat.LargeSieve_convolution_aux">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Flat.LargeSieve_convolution_aux">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Flat.largeSieve_factor_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Flat.largeSieve_factor" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">9.33</span><span class="lemma_thmtitle">The large sieve for a Dirichlet polynomial</span></div>
+    <div class="thm_thmcontent"><p>    Let \(Q \ge 1\), \(\sigma {\gt} 0\), \(t \in \mathbb {R}\), \(h : \mathbb {N}\to \mathbb {C}\) and \(P \in \mathbb {R}\). Then </p>
+<div class="displaymath" id="a0000000203">
+  \[ \sum _{q \le Q} \mathop{{\sum \nolimits ^{*}}}_{\chi \bmod q} \frac{q}{\varphi (q)} \Big\|  \sum _{m \le P} h(m) \chi (m) m^{-(\sigma + it)} \Big\| ^2 \ll (P + Q^2) \sum _{m \le P} |h(m)|^2 , \]
+</div>
+<p> with the implied constant of <a href="ch-axioms.html#large_sieve">Assumption 4.6</a>. </p>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#Flat.largeSieve_factor">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Flat.largeSieve_factor">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Flat.mellin_J_bound_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Flat.mellin_J_bound" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">9.28</span><span class="lemma_thmtitle">The kernel integral \(J\)</span></div>
+    <div class="thm_thmcontent"><p>    Let \(\nu \) be a bump function. Let \(x \ge 1\), \(\sigma := 1/\log (x+1)\) and \(\varepsilon := \frac{1}{6 \log 2} \cdot \frac{1}{x}\) (so that \(0 {\lt} \varepsilon {\lt} 1\) and \(0 {\lt} \sigma \le 2\)). Then </p>
+<div class="displaymath" id="a0000000190">
+  \[ J := \int _{-\infty }^{\infty } \big\|  \mathcal M[\widetilde1_\varepsilon ](\sigma + it) \big\| \,  \mathrm{d}t \ll \log (x + 1), \]
+</div>
+<p> the implied constant depending only on \(\nu \). </p>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#Flat.mellin_J_bound">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Flat.mellin_J_bound">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Flat.summatory_T_ll_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Flat.summatory_T_ll" style="display: none">
+    <div class="thm_thmheading">
+      <span class="theorem_thmcaption">
+      Theorem
+      </span>
+      <span class="theorem_thmlabel">9.35</span><span class="theorem_thmtitle">The smoothed bilinear sums on average</span></div>
+    <div class="thm_thmcontent"><p>    Let \((f, g)\) be a supported pair, \(\nu \) a bump function, \(Q \ge 1\), \(x \ge 1\) and \(\varepsilon := \frac{1}{6 \log 2} \cdot \frac{1}{x}\). Then </p>
+<div class="displaymath" id="a0000000208">
+  \[ \sum _{q \le Q} \mathop{{\sum \nolimits ^{*}}}_{\chi \bmod q} \frac{q}{\varphi (q)} \sup _{1 \le y \le x+1} \| T_\varepsilon (y, \chi )\|  \ll \big(\sqrt{NM} + \sqrt M Q + \sqrt N Q + Q^2\big)\,  \| f\| _2 \| g\| _2\,  \log (x+1), \]
+</div>
+<p> and the same bound holds with the supremum replaced by \(\max _{1 \le K \le \lfloor x \rfloor } \| T_\varepsilon (K + \tfrac 12, \chi )\| \). The implied constant depends only on \(\nu \) and on the constant in <a href="ch-axioms.html#large_sieve">Assumption 4.6</a>. </p>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#Flat.summatory_T_ll">LaTeX</a>
+    
+    
+  <div class="tooltip">
+      <span class="lean_link">Lean</span>
+      <ul class="tooltip_list">
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Flat.summatory_T_ll" class="lean_decl">Flat.summatory_T_ll</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Flat.summatory_T_ll_nat" class="lean_decl">Flat.summatory_T_ll_nat</a></li>
+        
+      </ul>
+  </div>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Flat.sup_summatory_eq_sup_nat_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Flat.sup_summatory_eq_sup_nat" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">9.29</span><span class="lemma_thmtitle">Reduction of \(\max _{y \le x}\) to half-integers</span></div>
+    <div class="thm_thmcontent"><p>    For \(x \ge 1\) and \(f : \mathbb {N}\to \mathbb {C}\), </p>
+<div class="displaymath" id="a0000000192">
+  \[ \sup _{1 \le y \le x} \Big\|  \sum _{n \le y} f(n) \Big\|  = \max _{1 \le K \le \lfloor x \rfloor } \Big\|  \sum _{n \le K + 1/2} f(n) \Big\|  . \]
+</div>
+<p> Consequently, for every supported pair \((f,g)\) (<a href="ch-typeII.html#Flat.FG">Definition 9.23</a>) and \(Q \ge 1\), </p>
+<div class="displaymath" id="a0000000193">
+  \[ \sum _{q \le Q} \mathop{{\sum \nolimits ^{*}}}_{\chi \bmod q} \frac{q}{\varphi (q)} \sup _{1 \le y \le x} \Big\|  \sum _{n \le y} (f*g)(n)\chi (n) \Big\|  = \sum _{q \le Q} \mathop{{\sum \nolimits ^{*}}}_{\chi \bmod q} \frac{q}{\varphi (q)} \max _{1 \le K \le \lfloor x \rfloor } \Big\|  \sum _{n \le K + 1/2} (f*g)(n) \chi (n) \Big\|  . \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#Flat.sup_summatory_eq_sup_nat">LaTeX</a>
+    
+    
+  <div class="tooltip">
+      <span class="lean_link">Lean</span>
+      <ul class="tooltip_list">
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Flat.sup_summatory_eq_sup_nat" class="lean_decl">Flat.sup_summatory_eq_sup_nat</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Flat.temp" class="lean_decl">Flat.temp</a></li>
+        
+      </ul>
+  </div>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Flat.T_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Flat.T" style="display: none">
+    <div class="thm_thmheading">
+      <span class="definition_thmcaption">
+      Definition
+      </span>
+      <span class="definition_thmlabel">9.24</span><span class="definition_thmtitle">The smoothed bilinear sums \(T_\varepsilon (y, \chi )\)</span></div>
+    <div class="thm_thmcontent"><p>    For a supported pair \((f, g)\), a bump function \(\nu \), \(\varepsilon {\gt} 0\), \(y {\gt} 0\) and a Dirichlet character \(\chi \), set </p>
+<div class="displaymath" id="a0000000183">
+  \[ T_\varepsilon (y, \chi ) := \sum _{m \le M} \sum _{n \le N} f(m)\chi (m)\,  g(n) \chi (n)\,  \widetilde{1}_\varepsilon \! \Big(\frac{mn}{y}\Big). \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#Flat.T">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Flat.T">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Flat.T_eq_sharp_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Flat.T_eq_sharp" style="display: none">
+    <div class="thm_thmheading">
+      <span class="theorem_thmcaption">
+      Theorem
+      </span>
+      <span class="theorem_thmlabel">9.31</span><span class="theorem_thmtitle">The smoothed sum is sharp at half-integers</span></div>
+    <div class="thm_thmcontent"><p>    Let \(x \ge 1\), let \((f, g)\) be a supported pair, \(\nu \) a bump function, \(\chi \) a Dirichlet character, and let \(0 {\lt} \varepsilon \le \frac{1}{6\log 2} \cdot \frac{1}{x}\). Then for every integer \(0 \le K \le x\), </p>
+<div class="displaymath" id="a0000000197">
+  \[ T_\varepsilon \big(K + \tfrac 12, \chi \big) = \sum _{m \le M} \sum _{n \le N} 1_{mn \le K + 1/2}\,  f(m)\chi (m)\,  g(n)\chi (n) . \]
+</div>
+<p> In words: with this choice of \(\varepsilon \) the smoothed cutoff \(\widetilde1_\varepsilon (mn/(K+\tfrac 12))\) agrees with the sharp cutoff \(1_{mn \le K + 1/2}\) at every integer \(mn\), so no error term arises. </p>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#Flat.T_eq_sharp">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Flat.T_eq_sharp">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Flat.T_mellin_representation_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Flat.T_mellin_representation" style="display: none">
+    <div class="thm_thmheading">
+      <span class="theorem_thmcaption">
+      Theorem
+      </span>
+      <span class="theorem_thmlabel">9.32</span><span class="theorem_thmtitle">Mellin representation of \(T_\varepsilon \)</span></div>
+    <div class="thm_thmcontent"><p>    Let \((f, g)\) be a supported pair, \(\nu \) a bump function, \(0 {\lt} \varepsilon {\lt} 1\), \(0 {\lt} \sigma \le 2\), \(y \ge 1\) and \(\chi \) a Dirichlet character. Then </p>
+<div class="displaymath" id="a0000000199">
+  \[ T_\varepsilon (y, \chi ) = \frac{1}{2\pi } \int _{-\infty }^{\infty } F_{\sigma + it}(\chi )\,  G_{\sigma + it}(\chi )\,  y^{\sigma + it}\,  \mathcal M[\widetilde1_\varepsilon ](\sigma + it)\,  \mathrm{d}t, \]
+</div>
+<p> and consequently </p>
+<div class="displaymath" id="a0000000200">
+  \[ \| T_\varepsilon (y, \chi )\|  \le \frac{y^{\sigma }}{2\pi } \int _{-\infty }^{\infty } \| F_{\sigma +it}(\chi )\| \,  \| G_{\sigma +it}(\chi )\| \,  \| \mathcal M[\widetilde1_\varepsilon ](\sigma + it)\| \,  \mathrm{d}t , \]
+</div>
+<p> where the last integrand is integrable. </p>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#Flat.T_mellin_representation">LaTeX</a>
+    
+    
+  <div class="tooltip">
+      <span class="lean_link">Lean</span>
+      <ul class="tooltip_list">
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Flat.T_eq_sum_integral" class="lean_decl">Flat.T_eq_sum_integral</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Flat.T_eq_integral_sum" class="lean_decl">Flat.T_eq_integral_sum</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Flat.T_norm_le_integral" class="lean_decl">Flat.T_norm_le_integral</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Flat.integrable_norm_FG_mellin" class="lean_decl">Flat.integrable_norm_FG_mellin</a></li>
+        
+      </ul>
+  </div>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="invTotientAF_eq_mul_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="invTotientAF_eq_mul" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">5.5</span><span class="lemma_thmtitle">A convolution identity for \(1/\varphi \)</span></div>
+    <div class="thm_thmcontent"><p>   Let \(f_{AF}(d) := \mu (d)^2 / (d\,  \varphi (d))\). Then, as arithmetic functions, </p>
+<div class="displaymath" id="a0000000074">
+  \[ \frac{1}{\varphi (n)} = \sum _{d e = n} f_{AF}(d) \cdot \frac{1}{e}, \qquad \text{i.e.}\qquad \frac{1}{\varphi } = f_{AF} * \frac{1}{\mathrm{id}} . \]
+</div>
+<p> Moreover \(f_{AF} \ge 0\), \(f_{AF}(d) \ll d^{-3/2}\) and \(\sum _{d \ge 1} f_{AF}(d)\) converges. </p>
+</div>
+
+    <a class="latex_link" href="ch-aux.html#invTotientAF_eq_mul">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/invTotientAF_eq_mul">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="l1_norms_coefficients_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="l1_norms_coefficients" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">8.14</span><span class="lemma_thmtitle">\(\ell ^1\) norms of the coefficient functions</span></div>
+    <div class="thm_thmcontent"><p>    For every parameter datum and every real \(x\), </p>
+<div class="displaymath" id="a0000000130">
+  \[ \sum _{k \le x} |\mu _{\le V}(k)| \le V, \qquad \text{and, if } x \ge 2,\qquad \sum _{k \le x} |\Lambda _{\le U}(k)| \le U \log x . \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-typeI.html#l1_norms_coefficients">LaTeX</a>
+    
+    
+  <div class="tooltip">
+      <span class="lean_link">Lean</span>
+      <ul class="tooltip_list">
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/summatory_abs_moebiusLEV_le" class="lean_decl">summatory_abs_moebiusLEV_le</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/summatory_abs_LambdaLEU_le" class="lean_decl">summatory_abs_LambdaLEU_le</a></li>
+        
+      </ul>
+  </div>
     
     
   
@@ -904,11 +2026,14 @@
       <span class="theorem_thmcaption">
       Theorem
       </span>
-      <span class="theorem_thmlabel">17</span></div>
-    <div class="thm_thmcontent"><p>   Decompose \(\Lambda = \Lambda ^\sharp + \Lambda ^\flat + \Lambda _{\le U}\) </p>
+      <span class="theorem_thmlabel">6.5</span><span class="theorem_thmtitle">Vaughan’s identity</span></div>
+    <div class="thm_thmcontent"><p>    For every \(n \in \mathbb {N}\), </p>
+<div class="displaymath" id="a0000000090">
+  \[ \Lambda (n) = \Lambda ^\sharp (n) + \Lambda ^\flat (n) + \Lambda _{\le U}(n). \]
+</div>
 </div>
 
-    <a class="latex_link" href="sect0001.html#Lambda_decomp">LaTeX</a>
+    <a class="latex_link" href="ch-vaughan.html#Lambda_decomp">LaTeX</a>
     
     
   <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Lambda_decomp">Lean</a>
@@ -934,11 +2059,14 @@
       <span class="definition_thmcaption">
       Definition
       </span>
-      <span class="definition_thmlabel">15</span></div>
-    <div class="thm_thmcontent"><p>  \(\Lambda ^\flat = (\Lambda _{{\gt}U} * 1) * \mu _{{\gt}V}\) </p>
+      <span class="definition_thmlabel">6.4</span><span class="definition_thmtitle">The Type II part \(\Lambda ^\flat \)</span></div>
+    <div class="thm_thmcontent">
+<div class="displaymath" id="a0000000088">
+  \[ \Lambda ^\flat := (\Lambda _{{\gt} U} * 1) * \mu _{{\gt} V} = \big((\Lambda - \Lambda _{\le U}) * 1\big) * (\mu - \mu _{\le V}). \]
+</div>
 </div>
 
-    <a class="latex_link" href="sect0001.html#LambdaFlat">LaTeX</a>
+    <a class="latex_link" href="ch-vaughan.html#LambdaFlat">LaTeX</a>
     
     
   <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/LambdaFlat">Lean</a>
@@ -964,15 +2092,14 @@
       <span class="lemma_thmcaption">
       Lemma
       </span>
-      <span class="lemma_thmlabel">36</span></div>
-    <div class="thm_thmcontent">
-<div class="displaymath" id="a0000000072">
-  \[ \Lambda ^\flat (n) = \sum _{U {\lt} 2^j \le 2x/V} (f_j * g_j)(n) \quad \text{for } n \le x, \]
+      <span class="lemma_thmlabel">9.38</span><span class="lemma_thmtitle">Dyadic decomposition of \(\Lambda ^\flat \)</span></div>
+    <div class="thm_thmcontent"><p>    For every parameter datum and every integer \(n \le x\), </p>
+<div class="displaymath" id="a0000000215">
+  \[ \Lambda ^\flat (n) = \sum _{\substack {j \in \mathbb {N}\\ U {\lt} 2^j \le 2x/V}} (f_j * g_j)(n), \qquad f_j := (\Lambda _{{\gt}U} * 1)\,  1_{(2^{j-1}, 2^j]}, \quad g_j := \mu \cdot 1_{(V, x/2^{j-1}]} . \]
 </div>
-<p> where \(f_j(k) = (\Lambda _{{\gt}U} * 1)(k)\, 1_{2^{j-1} {\lt} k \le 2^j}\) and \(g_j(\ell ) = \mu (\ell )\, 1_{V {\lt} \ell \le x/2^{j-1}}\). </p>
 </div>
 
-    <a class="latex_link" href="sect0001.html#LambdaFlat_dyadic">LaTeX</a>
+    <a class="latex_link" href="ch-typeII.html#LambdaFlat_dyadic">LaTeX</a>
     
     
   <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/LambdaFlat_dyadic">Lean</a>
@@ -987,25 +2114,25 @@
 
 
     
-    <div class="dep-modal-container" id="LambdaLE_modal">
+    <div class="dep-modal-container" id="LambdaLEU_modal">
       <div class="dep-modal-content">
           <button class="dep-closebtn">
 <svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
 </button>
         
-  <div class="thm" id="LambdaLE" style="display: none">
+  <div class="thm" id="LambdaLEU" style="display: none">
     <div class="thm_thmheading">
       <span class="definition_thmcaption">
       Definition
       </span>
-      <span class="definition_thmlabel">16</span></div>
-    <div class="thm_thmcontent"><p>  \(\Lambda _{\le U} = 1_{≤ U} \cdot \Lambda \) </p>
+      <span class="definition_thmlabel">6.1</span><span class="definition_thmtitle">The truncated von Mangoldt function \(\Lambda _{\le U}\)</span></div>
+    <div class="thm_thmcontent"><p>    \(\Lambda _{\le U} := \Lambda \cdot 1_{[1, U]}\), i.e. \(\Lambda _{\le U}(n) = \Lambda (n)\) if \(n \le U\) and \(\Lambda _{\le U}(n) = 0\) if \(n {\gt} U\). We also write \(\Lambda _{{\gt} U} := \Lambda - \Lambda _{\le U}\). </p>
 </div>
 
-    <a class="latex_link" href="sect0001.html#LambdaLE">LaTeX</a>
+    <a class="latex_link" href="ch-vaughan.html#LambdaLEU">LaTeX</a>
     
     
-  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/LambdaLE">Lean</a>
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/LambdaLEU">Lean</a>
     
     
   
@@ -1028,14 +2155,52 @@
       <span class="definition_thmcaption">
       Definition
       </span>
-      <span class="definition_thmlabel">14</span></div>
-    <div class="thm_thmcontent"><p>  \(\Lambda ^\sharp = \mu _{\le V} * \log - (\Lambda _{\le U} * \mu _{\le V}) * 1\) </p>
+      <span class="definition_thmlabel">6.3</span><span class="definition_thmtitle">The Type I part \(\Lambda ^\sharp \)</span></div>
+    <div class="thm_thmcontent">
+<div class="displaymath" id="a0000000087">
+  \[ \Lambda ^\sharp := \mu _{\le V} * \log \; -\;  \Lambda _{\le U} * \mu _{\le V} * 1, \]
+</div>
+<p> where \(*\) is Dirichlet convolution, \(\log \) is the arithmetic function \(n \mapsto \log n\) and \(1 = \zeta \) is the constant function \(1\) on \(\mathbb {N}_{\ge 1}\). </p>
 </div>
 
-    <a class="latex_link" href="sect0001.html#LambdaSharp">LaTeX</a>
+    <a class="latex_link" href="ch-vaughan.html#LambdaSharp">LaTeX</a>
     
     
   <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/LambdaSharp">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="large_sieve_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="large_sieve" style="display: none">
+    <div class="thm_thmheading">
+      <span class="assumption_thmcaption">
+      Assumption
+      </span>
+      <span class="assumption_thmlabel">4.6</span><span class="assumption_thmtitle">The large sieve inequality</span></div>
+    <div class="thm_thmcontent"><p>   For all real \(Q \ge 1\), all \(H \in \mathbb {Z}\), all integers \(N \ge 1\) and all \(c : \mathbb {Z}\to \mathbb {C}\), </p>
+<div class="displaymath" id="a0000000066">
+  \[ \sum _{q \le Q} \mathop{{\sum \nolimits ^{*}}}_{\chi \bmod q} \frac{q}{\varphi (q)} \left| \sum _{H {\lt} n \le H + N} c_n \chi (n) \right|^2 \ll (N + Q^2) \sum _{H {\lt} n \le H + N} |c_n|^2, \]
+</div>
+<p> where \(\mathop{{\sum \nolimits ^{*}}}\) denotes a sum over primitive characters and the implied constant is absolute. This is the multiplicative large sieve inequality and is taken as an external input (an axiom in Lean, whose implied constant is an unspecified real number); no proof is given here. </p>
+</div>
+
+    <a class="latex_link" href="ch-axioms.html#large_sieve">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/large_sieve">Lean</a>
     
     
   
@@ -1058,14 +2223,15 @@
       <span class="theorem_thmcaption">
       Theorem
       </span>
-      <span class="theorem_thmlabel">35</span></div>
-    <div class="thm_thmcontent"><p>   Let \(f\) and \(g\) be arithmetic functions supported on \([1, M]\) and \([1, N]\) respectively. For \(x, Q \ge 1\), </p>
-<div class="displaymath" id="a0000000071">
-  \[ \sum _{q \le Q} \mathop{{\sum \nolimits ^{*}}}_{\chi \pmod{q}} \frac{q}{\varphi (q)} \max _{y \le x}\left|\sum _{n \le y} (f*g)(n)\chi (n)\right| \ll \left(\sqrt{MN} + \sqrt{M}\, Q + \sqrt{N}\, Q + Q^2\right)(\log x)\, \| f\| _2\, \| g\| _2 \]
+      <span class="theorem_thmlabel">9.37</span><span class="theorem_thmtitle">Maximal large sieve for convolutions</span></div>
+    <div class="thm_thmcontent"><p>    Let \(M, N \in \mathbb {N}\) and let \(f, g\) be real arithmetic functions with \(f(n) = 0\) for \(n {\gt} M\) and \(g(n) = 0\) for \(n {\gt} N\). Then for all real \(x \ge 2\) and \(Q \ge 1\), </p>
+<div class="displaymath" id="a0000000213">
+  \[ \sum _{q \le Q} \mathop{{\sum \nolimits ^{*}}}_{\chi \bmod q} \frac{q}{\varphi (q)} \sup _{1 \le y \le x} \Big| \sum _{n \le y} (f * g)(n) \chi (n) \Big| \ll \big(\sqrt{NM} + \sqrt{M} Q + \sqrt{N} Q + Q^2\big) (\log x)\,  \Big(\sum _{n \le M} f(n)^2\Big)^{1/2} \Big(\sum _{n \le N} g(n)^2\Big)^{1/2} , \]
 </div>
+<p> with an implied constant depending only on the fixed bump function and on the constant in <a href="ch-axioms.html#large_sieve">Assumption 4.6</a>. </p>
 </div>
 
-    <a class="latex_link" href="sect0001.html#LargeSieve_convolution">LaTeX</a>
+    <a class="latex_link" href="ch-typeII.html#LargeSieve_convolution">LaTeX</a>
     
     
   <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/LargeSieve_convolution">Lean</a>
@@ -1080,25 +2246,663 @@
 
 
     
-    <div class="dep-modal-container" id="logIntegral_modal">
+    <div class="dep-modal-container" id="log_pow_le_const_mul_rpow_modal">
       <div class="dep-modal-content">
           <button class="dep-closebtn">
 <svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
 </button>
         
-  <div class="thm" id="logIntegral" style="display: none">
+  <div class="thm" id="log_pow_le_const_mul_rpow" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">5.8</span><span class="lemma_thmtitle">Powers of \(\log \) against powers of \(x\)</span></div>
+    <div class="thm_thmcontent"><p>   For every real \(x \ge 1\), every \(M \in \mathbb {N}\) and every real \(\delta {\gt} 0\), </p>
+<div class="displaymath" id="a0000000082">
+  \[ (\log x)^M \ll _{M, \delta } x^{\delta }. \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-aux.html#log_pow_le_const_mul_rpow">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/log_pow_le_const_mul_rpow">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="log_pow_le_const_mul_sqrt_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="log_pow_le_const_mul_sqrt" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">5.10</span><span class="lemma_thmtitle">Powers of \(\log x\) against \(\sqrt{U}\)</span></div>
+    <div class="thm_thmcontent"><p>    For every parameter datum, every real \(W \ge e^{\sqrt{\log x}}\) and every \(n \in \mathbb {N}\), </p>
+<div class="displaymath" id="a0000000086">
+  \[ (\log x)^n \ll _n \sqrt{W}. \]
+</div>
+<p> In particular this applies to \(W = U\) and \(W = V\). </p>
+</div>
+
+    <a class="latex_link" href="ch-aux.html#log_pow_le_const_mul_sqrt">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/log_pow_le_const_mul_sqrt">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="log_power_absorption_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="log_power_absorption" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">5.9</span><span class="lemma_thmtitle">Absorbing powers of \(\log x\) into \(x/(\log x)^N\)</span></div>
+    <div class="thm_thmcontent"><p>    For every parameter datum, all \(j, N \in \mathbb {N}\) and every \(q \le \sqrt x\): </p>
+<div class="displaymath" id="a0000000084">
+  \[ (\log x)^j \ll _{j, N} \frac{x}{(\log x)^N}, \qquad \sqrt x\,  (\log x)^j \ll _{j,N} \frac{x}{(\log x)^N}, \qquad \tau (q)\,  \sqrt x \log x \ll _{N} \frac{x}{(\log x)^N} . \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-aux.html#log_power_absorption">LaTeX</a>
+    
+    
+  <div class="tooltip">
+      <span class="lean_link">Lean</span>
+      <ul class="tooltip_list">
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/card_divisors_mul_sqrt_mul_log_le_div" class="lean_decl">card_divisors_mul_sqrt_mul_log_le_div</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/log_pow_le_div" class="lean_decl">log_pow_le_div</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/sqrt_mul_log_pow_le_div" class="lean_decl">sqrt_mul_log_pow_le_div</a></li>
+        
+      </ul>
+  </div>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="log_x_large_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="log_x_large" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">3.14</span><span class="lemma_thmtitle">The parameters force \(\log x\) to be large</span></div>
+    <div class="thm_thmcontent"><p>    For every parameter datum \((x, U, V)\) we have \(\log x \ge 16\); in particular \(\log x \ge 1\), \(x \ge e^{16}\), \(\sqrt{x} \ge 2\) and \(\sqrt x \le x\). </p>
+</div>
+
+    <a class="latex_link" href="ch-prelim.html#log_x_large">LaTeX</a>
+    
+    
+  <div class="tooltip">
+      <span class="lean_link">Lean</span>
+      <ul class="tooltip_list">
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/one_le_log_x" class="lean_decl">one_le_log_x</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/sixteen_le_log_x" class="lean_decl">sixteen_le_log_x</a></li>
+        
+      </ul>
+  </div>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="maxya_basic_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="maxya_basic" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">3.18</span><span class="lemma_thmtitle">Basic properties of the maximum</span></div>
+    <div class="thm_thmcontent"><p>    Let \(q \in \mathbb {N}\) and \(F : \mathbb {R}\times \mathbb {Z}/q\mathbb {Z}\to [0, \infty ]\). </p>
+<ol class="enumerate">
+  <li><p>If \(a \in (\mathbb {Z}/q\mathbb {Z})^*\) and \(\sqrt x \le y \le x\), then \(F(y, a) \le \max _{y, a} F(y, a)\). </p>
+</li>
+  <li><p>If \(F(y, a) \le M\) for all \(a \in (\mathbb {Z}/q\mathbb {Z})^*\) and all \(\sqrt x \le y \le x\), then \(\max _{y,a} F(y, a) \le M\). </p>
+</li>
+</ol>
+<p> The same holds for <a href="ch-prelim.html#BV.maxy">Definition 3.16</a> without the residue variable. </p>
+</div>
+
+    <a class="latex_link" href="ch-prelim.html#maxya_basic">LaTeX</a>
+    
+    
+  <div class="tooltip">
+      <span class="lean_link">Lean</span>
+      <ul class="tooltip_list">
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/BV.le_maxy" class="lean_decl">BV.le_maxy</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/BV.maxy_le" class="lean_decl">BV.maxy_le</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/BV.le_maxya" class="lean_decl">BV.le_maxya</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/BV.maxya_le_unit" class="lean_decl">BV.maxya_le_unit</a></li>
+        
+      </ul>
+  </div>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="maxya_Delta_add_le_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="maxya_Delta_add_le" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">3.20</span><span class="lemma_thmtitle">Triangle inequality for maximal discrepancies</span></div>
+    <div class="thm_thmcontent"><p>    For all \(f, g : \mathbb {N}\to \mathbb {R}\) and \(q \in \mathbb {N}\), </p>
+<div class="displaymath" id="a0000000055">
+  \[ \max _{\substack {\sqrt x \le y \le x \\ a \in (\mathbb {Z}/q\mathbb {Z})^*}} |\Delta _{f+g}(y; q, a)| \le \max _{\substack {\sqrt x \le y \le x \\ a \in (\mathbb {Z}/q\mathbb {Z})^*}} |\Delta _{f}(y; q, a)| + \max _{\substack {\sqrt x \le y \le x \\ a \in (\mathbb {Z}/q\mathbb {Z})^*}} |\Delta _{g}(y; q, a)|. \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-prelim.html#maxya_Delta_add_le">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/maxya_Delta_add_le">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="maxya_Delta_enorm_le_of_abs_le_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="maxya_Delta_enorm_le_of_abs_le" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">3.19</span><span class="lemma_thmtitle">From pointwise bounds to maximal bounds</span></div>
+    <div class="thm_thmcontent"><p>    Let \(f : \mathbb {N}\to \mathbb {R}\), \(q \in \mathbb {N}\) and \(B \in \mathbb {R}\). If \(|\Delta _f(y; q, a)| \le B\) for all \(\sqrt{x} \le y \le x\) and all \(a \in (\mathbb {Z}/q\mathbb {Z})^*\), then </p>
+<div class="displaymath" id="a0000000053">
+  \[ \max _{\substack {\sqrt x \le y \le x \\ a \in (\mathbb {Z}/q\mathbb {Z})^*}} |\Delta _f(y; q, a)| \le B, \]
+</div>
+<p> where the left-hand side is the maximum of <a href="ch-prelim.html#BV.maxya">Definition 3.17</a> applied to the (extended) absolute value. Conversely each \(|\Delta _f(y; q, a)|\) with \(a\) a unit and \(\sqrt x \le y \le x\) is bounded by this maximum. </p>
+</div>
+
+    <a class="latex_link" href="ch-prelim.html#maxya_Delta_enorm_le_of_abs_le">LaTeX</a>
+    
+    
+  <div class="tooltip">
+      <span class="lean_link">Lean</span>
+      <ul class="tooltip_list">
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Delta_enorm_le_maxya" class="lean_decl">Delta_enorm_le_maxya</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/maxya_Delta_enorm_le_of_abs_le" class="lean_decl">maxya_Delta_enorm_le_of_abs_le</a></li>
+        
+      </ul>
+  </div>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="maxya_Delta_Lambda_enorm_le_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="maxya_Delta_Lambda_enorm_le" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">10.1</span><span class="lemma_thmtitle">Splitting \(\Delta _\Lambda \) into three parts</span></div>
+    <div class="thm_thmcontent"><p>    For every parameter datum and every \(q \in \mathbb {N}\), </p>
+<div class="displaymath" id="a0000000227">
+  \[ \max _{\substack {\sqrt x \le y \le x \\ a \in (\mathbb {Z}/q\mathbb {Z})^*}} |\Delta _{\Lambda }(y; q, a)| \le \max _{y, a} |\Delta _{\Lambda ^\sharp }(y; q, a)| + \max _{y, a} |\Delta _{\Lambda ^\flat }(y; q, a)| + \max _{y, a} |\Delta _{\Lambda _{\le U}}(y; q, a)| . \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-assembly.html#maxya_Delta_Lambda_enorm_le">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/maxya_Delta_Lambda_enorm_le">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="maxya_Delta_LambdaFlat_enorm_le_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="maxya_Delta_LambdaFlat_enorm_le" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">9.10</span><span class="lemma_thmtitle">Maximal form of the conductor decomposition</span></div>
+    <div class="thm_thmcontent"><p>    Let \(A, C \in \mathbb {N}\). For every parameter datum and every integer \(1 \le q \le \sqrt x\), </p>
+<div class="displaymath" id="a0000000166">
+  \[ \max _{\substack {\sqrt x \le y \le x \\ a \in (\mathbb {Z}/q\mathbb {Z})^*}} |\Delta _{\Lambda ^\flat }(y; q, a)| \le \frac{1}{\varphi (q)} \sum _{\substack {d \mid q \\ d {\gt} (\log x)^C}} \mathop{{\sum \nolimits ^{*}}}_{\xi \bmod d} \max _{\sqrt x \le y \le x} S_{q/d}(y, \xi ) + O_{A,C}\! \left(\frac{1}{\varphi (q)}\,  \frac{x}{(\log x)^{A+1}}\right). \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#maxya_Delta_LambdaFlat_enorm_le">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/maxya_Delta_LambdaFlat_enorm_le">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="mellin_bump_bounded_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="mellin_bump_bounded" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">9.25</span><span class="lemma_thmtitle">The Mellin transform of a bump is bounded on strips</span></div>
+    <div class="thm_thmcontent"><p>   Let \(\nu \in C^1(\mathbb {R})\) be supported in \([1/2, 2]\) and let \(\sigma _1 \le \sigma _2\) with \(\sigma _2 \ge 0\). Then there is a constant \(C\) such that \(\| \mathcal{M}[\nu ](s)\|  \le C \| s\| ^{-1}\) for all \(s \ne 0\) with \(\sigma _1 \le \Re s \le \sigma _2\); consequently \(\mathcal M[\nu ]\) is bounded on the whole strip \(\{ \sigma _1 \le \Re s \le \sigma _2\} \). </p>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#mellin_bump_bounded">LaTeX</a>
+    
+    
+  <div class="tooltip">
+      <span class="lean_link">Lean</span>
+      <ul class="tooltip_list">
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/MellinOfPsi_better" class="lean_decl">MellinOfPsi_better</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/mellin_bump_bounded" class="lean_decl">mellin_bump_bounded</a></li>
+        
+      </ul>
+  </div>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="mellin_smooth1_bounds_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="mellin_smooth1_bounds" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">9.27</span><span class="lemma_thmtitle">Two bounds for the Mellin transform of \(\widetilde1_\varepsilon \)</span></div>
+    <div class="thm_thmcontent"><p>    Let \(\nu \) be a bump function. For all \(0 {\lt} \varepsilon {\lt} 1\), all \(0 {\lt} \sigma \le 2\) and all \(t \in \mathbb {R}\), with \(s = \sigma + it\), </p>
+<div class="displaymath" id="a0000000188">
+  \[ \| \mathcal M[\widetilde1_\varepsilon ](s)\|  \ll \frac{1}{\| s\| } \qquad \text{and}\qquad \| \mathcal M[\widetilde1_\varepsilon ](s)\|  \ll \frac{1}{\varepsilon \| s\| ^2}, \]
+</div>
+<p> the implied constants depending only on \(\nu \). </p>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#mellin_smooth1_bounds">LaTeX</a>
+    
+    
+  <div class="tooltip">
+      <span class="lean_link">Lean</span>
+      <ul class="tooltip_list">
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Flat.exists_mellin_smooth1_boundA" class="lean_decl">Flat.exists_mellin_smooth1_boundA</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Flat.exists_mellin_smooth1_boundB" class="lean_decl">Flat.exists_mellin_smooth1_boundB</a></li>
+        
+      </ul>
+  </div>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="MellinOfSmooth1a_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="MellinOfSmooth1a" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">9.19</span><span class="lemma_thmtitle">Mellin transform of the smoothed cutoff</span></div>
+    <div class="thm_thmcontent"><p> For \(\varepsilon {\gt} 0\) and \(\Re s {\gt} 0\), </p>
+<div class="displaymath" id="a0000000178">
+  \[ \mathcal{M}[\widetilde1_\varepsilon ](s) = \frac{1}{s}\,  \mathcal{M}[\nu ](\varepsilon s), \qquad \text{where } \mathcal M[f](s) := \int _0^\infty u^{s-1} f(u)\, \mathrm{d}u . \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#MellinOfSmooth1a">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/MellinOfSmooth1a">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="MellinOfSmooth1b_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="MellinOfSmooth1b" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">9.20</span><span class="lemma_thmtitle">Decay of the Mellin transform of the smoothed cutoff</span></div>
+    <div class="thm_thmcontent"><p> There is a constant \(C {\gt} 0\), depending only on \(\nu \), such that for all \(\sigma _1 {\gt} 0\), all \(s\) with \(\sigma _1 \le \Re s \le 2\) and all \(0 {\lt} \varepsilon {\lt} 1\), </p>
+<div class="displaymath" id="a0000000180">
+  \[ \| \mathcal{M}[\widetilde1_\varepsilon ](s)\|  \le \frac{C}{\varepsilon \| s\| ^2} . \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#MellinOfSmooth1b">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/MellinOfSmooth1b">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="moebius_coprime_indicator_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="moebius_coprime_indicator" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">8.10</span><span class="lemma_thmtitle">Möbius inversion of the coprimality indicator</span></div>
+    <div class="thm_thmcontent"><p>   For every \(r \ge 1\) and every \(b \in \mathbb {N}\), </p>
+<div class="displaymath" id="a0000000122">
+  \[ \sum _{e \mid r} \mu (e)\,  1_{e \mid b} = 1_{(r, b) = 1} . \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-typeI.html#moebius_coprime_indicator">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/moebius_coprime_indicator">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="moebiusLEV_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="moebiusLEV" style="display: none">
     <div class="thm_thmheading">
       <span class="definition_thmcaption">
       Definition
       </span>
-      <span class="definition_thmlabel">5</span></div>
-    <div class="thm_thmcontent"><p>  \(\operatorname {li}(x) = \int _2^x \frac{\mathrm{d}t}{\log t}\) </p>
+      <span class="definition_thmlabel">6.2</span><span class="definition_thmtitle">The truncated Möbius function \(\mu _{\le V}\)</span></div>
+    <div class="thm_thmcontent"><p>    \(\mu _{\le V} := \mu \cdot 1_{[1, V]}\), i.e. \(\mu _{\le V}(n) = \mu (n)\) if \(n \le V\) and \(\mu _{\le V}(n) = 0\) if \(n {\gt} V\). We also write \(\mu _{{\gt} V} := \mu - \mu _{\le V}\). </p>
 </div>
 
-    <a class="latex_link" href="sect0001.html#logIntegral">LaTeX</a>
+    <a class="latex_link" href="ch-vaughan.html#moebiusLEV">LaTeX</a>
     
     
-  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/logIntegral">Lean</a>
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/moebiusLEV">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="mul_dilate_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="mul_dilate" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">8.7</span><span class="lemma_thmtitle">Dilation commutes with convolution</span></div>
+    <div class="thm_thmcontent"><p>    For \(e \ge 1\) and real arithmetic functions \(f, g\), </p>
+<div class="displaymath" id="a0000000116">
+  \[ f * (\delta _e * g) = \delta _e * (f * g) \qquad \text{and}\qquad (\delta _e * f) * g = f * (\delta _e * g). \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-typeI.html#mul_dilate">LaTeX</a>
+    
+    
+  <div class="tooltip">
+      <span class="lean_link">Lean</span>
+      <ul class="tooltip_list">
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/mul_dilate" class="lean_decl">mul_dilate</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/dilate_mul_left" class="lean_decl">dilate_mul_left</a></li>
+        
+      </ul>
+  </div>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="mul_on_coprime_expansion_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="mul_on_coprime_expansion" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">8.12</span><span class="lemma_thmtitle">Convolution with a restricted analytic factor</span></div>
+    <div class="thm_thmcontent"><p>    Let \(H\) be a real arithmetic function and \(r \ge 1\). Then, as functions on \(\mathbb {N}\), </p>
+<div class="displaymath" id="a0000000126">
+  \[ H * 1_r = \sum _{e \mid r} \mu (e)\,  \big( (\delta _e * H) * 1 \big), \qquad H * \log _r = \sum _{e \mid r} \mu (e) \Big( \log e \cdot \big((\delta _e * H) * 1\big) + (\delta _e * H) * \log \Big). \]
+</div>
+<p> (The second identity holds for all \(r \in \mathbb {N}\).) </p>
+</div>
+
+    <a class="latex_link" href="ch-typeI.html#mul_on_coprime_expansion">LaTeX</a>
+    
+    
+  <div class="tooltip">
+      <span class="lean_link">Lean</span>
+      <ul class="tooltip_list">
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/mul_log_on_coprime_coe" class="lean_decl">mul_log_on_coprime_coe</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/mul_zeta_on_coprime_coe" class="lean_decl">mul_zeta_on_coprime_coe</a></li>
+        
+      </ul>
+  </div>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Nat.modEqs_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Nat.modEqs" style="display: none">
+    <div class="thm_thmheading">
+      <span class="definition_thmcaption">
+      Definition
+      </span>
+      <span class="definition_thmlabel">3.2</span><span class="definition_thmtitle">Residue classes</span></div>
+    <div class="thm_thmcontent"><p>   For \(q \in \mathbb {N}\) and \(a \in \mathbb {Z}/q\mathbb {Z}\), we write \(\{ n \in \mathbb {N}: n \equiv a \pmod q\} \) for the set of natural numbers whose residue class modulo \(q\) is \(a\). When \(q = 0\) we identify \(\mathbb {Z}/0\mathbb {Z}= \mathbb {Z}\), and when \(q = 1\) every natural number lies in the single residue class. </p>
+</div>
+
+    <a class="latex_link" href="ch-prelim.html#Nat.modEqs">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Nat.modEqs">Lean</a>
     
     
   
@@ -1121,11 +2925,15 @@
       <span class="definition_thmcaption">
       Definition
       </span>
-      <span class="definition_thmlabel">8</span></div>
-    <div class="thm_thmcontent"><p>  For \(f : \mathbb {N}\rightarrow \mathbb {R}\) and \(r : \mathbb {N}\) we use \(f_r\) to denote \(n \mapsto f(n) 1_{(n, r) = 1}\) </p>
+      <span class="definition_thmlabel">3.4</span><span class="definition_thmtitle">Restriction to integers coprime to \(r\)</span></div>
+    <div class="thm_thmcontent"><p>   For \(r \in \mathbb {N}\) and \(f : \mathbb {N}\to R\) (with \(R\) having a zero), we write \(f_r\) for the function </p>
+<div class="displaymath" id="a0000000033">
+  \[ f_r(n) := f(n)\,  1_{(n, r) = 1} = \begin{cases}  f(n) &  \text{if } \gcd (r, n) = 1, \\ 0 &  \text{otherwise.}\end{cases} \]
+</div>
+<p> Note that \(f_0\) is supported on \(n = 1\) only (since \(\gcd (0, n) = n\)), and \(f_1 = f\). </p>
 </div>
 
-    <a class="latex_link" href="sect0001.html#onCoprime">LaTeX</a>
+    <a class="latex_link" href="ch-prelim.html#onCoprime">LaTeX</a>
     
     
   <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/onCoprime">Lean</a>
@@ -1140,61 +2948,25 @@
 
 
     
-    <div class="dep-modal-container" id="S_r_modal">
+    <div class="dep-modal-container" id="PartialIntegration_modal">
       <div class="dep-modal-content">
           <button class="dep-closebtn">
 <svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
 </button>
         
-  <div class="thm" id="S_r" style="display: none">
-    <div class="thm_thmheading">
-      <span class="definition_thmcaption">
-      Definition
-      </span>
-      <span class="definition_thmlabel">28</span></div>
-    <div class="thm_thmcontent">
-<div class="displaymath" id="a0000000053">
-  \[ S_r(y, \xi ) := \left|\sum _{n \le y} \Lambda _r^\flat (n)\, \xi (n)\right| \]
-</div>
-</div>
-
-    <a class="latex_link" href="sect0001.html#S_r">LaTeX</a>
-    
-    
-  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/S_r">Lean</a>
-    
-    
-  
-    
-  </div>
-    
-      </div>
-    </div>
-
-
-    
-    <div class="dep-modal-container" id="sum_vonMangoldt_le_modal">
-      <div class="dep-modal-content">
-          <button class="dep-closebtn">
-<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
-</button>
-        
-  <div class="thm" id="sum_vonMangoldt_le" style="display: none">
+  <div class="thm" id="PartialIntegration" style="display: none">
     <div class="thm_thmheading">
       <span class="lemma_thmcaption">
       Lemma
       </span>
-      <span class="lemma_thmlabel">18</span></div>
-    <div class="thm_thmcontent">
-<div class="displaymath" id="a0000000029">
-  \[ \sum _{n \le U} \Lambda (n) \ll U \]
-</div>
+      <span class="lemma_thmlabel">9.21</span><span class="lemma_thmtitle">Integration by parts on \((0,\infty )\)</span></div>
+    <div class="thm_thmcontent"><p>Let \(f, g : \mathbb {R}\to \mathbb {C}\) be differentiable on \((0, \infty )\) with \(f g'\) and \(f' g\) integrable on \((0,\infty )\) and \(f(u)g(u) \to 0\) as \(u \to 0^+\) and as \(u \to \infty \). Then \(\int _0^\infty f g' = -\int _0^\infty f' g\). </p>
 </div>
 
-    <a class="latex_link" href="sect0001.html#sum_vonMangoldt_le">LaTeX</a>
+    <a class="latex_link" href="ch-typeII.html#PartialIntegration">LaTeX</a>
     
     
-  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/sum_vonMangoldt_le">Lean</a>
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/PartialIntegration">Lean</a>
     
     
   
@@ -1206,28 +2978,753 @@
 
 
     
-    <div class="dep-modal-container" id="T_r_modal">
+    <div class="dep-modal-container" id="PNT_modal">
       <div class="dep-modal-content">
           <button class="dep-closebtn">
 <svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
 </button>
         
-  <div class="thm" id="T_r" style="display: none">
+  <div class="thm" id="PNT" style="display: none">
+    <div class="thm_thmheading">
+      <span class="theorem_thmcaption">
+      Theorem
+      </span>
+      <span class="theorem_thmlabel">4.2</span><span class="theorem_thmtitle">The prime number theorem with logarithmic savings</span></div>
+    <div class="thm_thmcontent"><p>    For every \(A \in \mathbb {N}\) and every real \(z \ge 2\), </p>
+<div class="displaymath" id="a0000000058">
+  \[ \sum _{n \le z} \Lambda (n) = z + O_A\! \left(\frac{z}{(\log z)^A}\right). \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-axioms.html#PNT">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/PNT">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="pnt_ratio_bound_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="pnt_ratio_bound" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">4.5</span><span class="lemma_thmtitle">Comparing \(z/(\log z)^B\) with \(x/(\log x)^B\)</span></div>
+    <div class="thm_thmcontent"><p>   Let \(B \in \mathbb {N}\) and let \(1 {\lt} z \le x\) be real numbers with \(\sqrt{x} \le z\). Then </p>
+<div class="displaymath" id="a0000000065">
+  \[ \frac{z}{(\log z)^B} \le 2^B \frac{x}{(\log x)^B}. \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-axioms.html#pnt_ratio_bound">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/pnt_ratio_bound">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="ProofData_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="ProofData" style="display: none">
     <div class="thm_thmheading">
       <span class="definition_thmcaption">
       Definition
       </span>
-      <span class="definition_thmlabel">29</span></div>
-    <div class="thm_thmcontent">
-<div class="displaymath" id="a0000000054">
-  \[ T_r(x, Q) := \sum _{(\log x)^C {\lt} d \le Q/r} \frac{1}{\varphi (d)} \mathop{{\sum \nolimits ^{*}}}_{\xi \pmod{d}} \max _{\sqrt{x} \le y \le x} S_r(y, \xi ) \]
+      <span class="definition_thmlabel">3.13</span><span class="definition_thmtitle">The parameters \(x, U, V\)</span></div>
+    <div class="thm_thmcontent"><p>   A <em>parameter datum</em> consists of real numbers \(x, U, V\) satisfying </p>
+<div class="displaymath" id="a0000000046">
+  \[ x \ge 2, \qquad UV \le \sqrt{x}, \qquad U \ge e^{\sqrt{\log x}}, \qquad V \ge e^{\sqrt{\log x}}. \]
+</div>
+<p> Every statement in Chapters 6 to 10 that mentions \(x\), \(U\) or \(V\) without quantifying them is implicitly universally quantified over such a datum; the constants in those statements never depend on the datum. (In Lean this is the typeclass <span class="ttfamily">ProofData</span>.) The main theorem is proved by instantiating \(U = V = e^{\sqrt{\log x}}\) once \(x {\gt} e^{32}\), see <a href="ch-assembly.html#Bombieri-Vinogradov">Theorem 10.6</a>. </p>
+</div>
+
+    <a class="latex_link" href="ch-prelim.html#ProofData">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/ProofData">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="psiMaxEnorm_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="psiMaxEnorm" style="display: none">
+    <div class="thm_thmheading">
+      <span class="definition_thmcaption">
+      Definition
+      </span>
+      <span class="definition_thmlabel">10.3</span><span class="definition_thmtitle">The maximal Chebyshev error</span></div>
+    <div class="thm_thmcontent"><p>    For a real \(x\) and \(q \in \mathbb {N}\) set </p>
+<div class="displaymath" id="a0000000230">
+  \[ E(x; q) := \sup _{1 \le y \le x}\  \sup _{a \in (\mathbb {Z}/q\mathbb {Z})^*} \left| \psi (y; q, a) - \frac{y}{\varphi (q)} \right| \in [0, \infty ] . \]
+</div>
+<p> Note that here \(y\) ranges over all of \([1, x]\), not only over \([\sqrt x, x]\), and that \(x \ge 2\) is arbitrary (no parameter datum is involved). For \(q \ge 1\), \(E(x;q) \ll x\) by <a href="ch-aux.html#Chebyshev.abs_psiMod_sub_div_le_const">Lemma 5.1</a>, so \(E(x; q)\) is finite. </p>
+</div>
+
+    <a class="latex_link" href="ch-assembly.html#psiMaxEnorm">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/psiMaxEnorm">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="S_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="S" style="display: none">
+    <div class="thm_thmheading">
+      <span class="definition_thmcaption">
+      Definition
+      </span>
+      <span class="definition_thmlabel">9.1</span><span class="definition_thmtitle">The twisted sums \(S_r(y, \xi )\)</span></div>
+    <div class="thm_thmcontent"><p>    For \(r \in \mathbb {N}\), a real \(y\) and a Dirichlet character \(\xi \) modulo some \(d \in \mathbb {N}\), set </p>
+<div class="displaymath" id="a0000000145">
+  \[ S_r(y, \xi ) := \Big| \sum _{n \le y} \Lambda ^\flat _r(n)\,  \xi (n) \Big| , \]
+</div>
+<p> where \(\Lambda ^\flat _r\) is the restriction of \(\Lambda ^\flat \) to the integers coprime to \(r\) (<a href="ch-prelim.html#onCoprime">Definition 3.4</a>). </p>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#S">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/S">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="siegel_walfisz_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="siegel_walfisz" style="display: none">
+    <div class="thm_thmheading">
+      <span class="assumption_thmcaption">
+      Assumption
+      </span>
+      <span class="assumption_thmlabel">4.1</span><span class="assumption_thmtitle">Siegel–Walfisz</span></div>
+    <div class="thm_thmcontent"><p>    Let \(A, C \in \mathbb {N}\). For all real \(x \ge 2\), all \(1 \le q \le (\log x)^C\) and all \(a \in (\mathbb {Z}/q\mathbb {Z})^*\), </p>
+<div class="displaymath" id="a0000000056">
+  \[ \psi (x; q, a) = \frac{x}{\varphi (q)} + O_{A, C}\! \left(\frac{x}{(\log x)^A}\right). \]
+</div>
+<p> This is the Siegel–Walfisz theorem in the form “an arbitrary power of \(\log \) savings, uniformly for \(q \le (\log x)^C\)”. It is taken as an external input (an axiom in Lean, whose implied constant is an unspecified real number); no proof is given here. Only the cases \(C \in \{ 0, 2C'\} \) are used, see <a href="ch-axioms.html#PNT">Theorem 4.2</a> and <a href="ch-typeII.html#Delta_onCoprime_Lambda_bound">Lemma 9.7</a>. </p>
+</div>
+
+    <a class="latex_link" href="ch-axioms.html#siegel_walfisz">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/siegel_walfisz">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Smooth1_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Smooth1" style="display: none">
+    <div class="thm_thmheading">
+      <span class="definition_thmcaption">
+      Definition
+      </span>
+      <span class="definition_thmlabel">9.13</span><span class="definition_thmtitle">The smoothed cutoff \(\widetilde1_\varepsilon \)</span></div>
+    <div class="thm_thmcontent"><p>For \(\varepsilon {\gt} 0\), the smoothed cutoff \(\widetilde{1}_\varepsilon : \mathbb {R}\to \mathbb {R}\) is the multiplicative (Mellin) convolution of the indicator of \((0, 1]\) with the spike \(t \mapsto \nu (t^{1/\varepsilon })/\varepsilon \): </p>
+<div class="displaymath" id="a0000000171">
+  \[ \widetilde{1}_\varepsilon (u) := \int _0^\infty 1_{(0,1]}(t)\,  \frac{1}{\varepsilon }\,  \nu \big((u/t)^{1/\varepsilon }\big)\,  \frac{\mathrm{d}t}{t} . \]
 </div>
 </div>
 
-    <a class="latex_link" href="sect0001.html#T_r">LaTeX</a>
+    <a class="latex_link" href="ch-typeII.html#Smooth1">LaTeX</a>
     
     
-  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/T_r">Lean</a>
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Smooth1">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Smooth1_mellinInv_mellin_eq_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Smooth1_mellinInv_mellin_eq" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">9.26</span><span class="lemma_thmtitle">Mellin inversion for the smoothed cutoff</span></div>
+    <div class="thm_thmcontent"><p>    Let \(\nu \) be a bump function (<a href="ch-typeII.html#Flat.Bump">Definition 9.22</a>; only \(\nu \in C^1\) is needed), \(0 {\lt} \varepsilon {\lt} 1\) and \(0 {\lt} \sigma \le 2\). Then \(t \mapsto \mathcal M[\widetilde1_\varepsilon ](\sigma + it)\) is integrable on \(\mathbb {R}\) and, for every \(u {\gt} 0\), </p>
+<div class="displaymath" id="a0000000186">
+  \[ \widetilde{1}_\varepsilon (u) = \frac{1}{2\pi } \int _{-\infty }^{\infty } u^{-(\sigma + it)}\,  \mathcal{M}[\widetilde1_\varepsilon ](\sigma + it)\,  \mathrm{d}t . \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#Smooth1_mellinInv_mellin_eq">LaTeX</a>
+    
+    
+  <div class="tooltip">
+      <span class="lean_link">Lean</span>
+      <ul class="tooltip_list">
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Smooth1_verticalIntegrable" class="lean_decl">Smooth1_verticalIntegrable</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Smooth1_mellinInv_mellin_eq" class="lean_decl">Smooth1_mellinInv_mellin_eq</a></li>
+        
+      </ul>
+  </div>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Smooth1ContinuousAt_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Smooth1ContinuousAt" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">9.18</span><span class="lemma_thmtitle">Continuity of the smoothed cutoff</span></div>
+    <div class="thm_thmcontent"><p> Assume \(\nu \ge 0\) on \((0,\infty )\). For \(\varepsilon {\gt} 0\), \(\widetilde1_\varepsilon \) is continuous at every \(u {\gt} 0\). </p>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#Smooth1ContinuousAt">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Smooth1ContinuousAt">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Smooth1LeOne_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Smooth1LeOne" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">9.17</span><span class="lemma_thmtitle">The smoothed cutoff is at most \(1\)</span></div>
+    <div class="thm_thmcontent"><p> Assume \(\nu \ge 0\) on \((0, \infty )\) and \(\int _0^\infty \nu (t)\, \mathrm{d}t/t = 1\). Then \(\widetilde1_\varepsilon (u) \le 1\) for all \(\varepsilon {\gt} 0\) and \(u {\gt} 0\). </p>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#Smooth1LeOne">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Smooth1LeOne">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Smooth1Nonneg_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Smooth1Nonneg" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">9.16</span><span class="lemma_thmtitle">Non-negativity of the smoothed cutoff</span></div>
+    <div class="thm_thmcontent"><p> Assume \(\nu \ge 0\) on \((0, \infty )\). Then \(\widetilde1_\varepsilon (u) \ge 0\) for all \(\varepsilon {\gt} 0\) and \(u {\gt} 0\). </p>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#Smooth1Nonneg">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Smooth1Nonneg">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Smooth1Properties_above_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Smooth1Properties_above" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">9.15</span><span class="lemma_thmtitle">The smoothed cutoff vanishes above \(1 + 2(\log 2)\varepsilon \)</span></div>
+    <div class="thm_thmcontent"><p> For \(0 {\lt} \varepsilon {\lt} 1\) and \(u \ge 1 + 2(\log 2)\varepsilon \) we have \(\widetilde1_\varepsilon (u) = 0\). </p>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#Smooth1Properties_above">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Smooth1Properties_above">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="Smooth1Properties_below_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="Smooth1Properties_below" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">9.14</span><span class="lemma_thmtitle">The smoothed cutoff equals \(1\) below \(1 - (\log 2)\varepsilon \)</span></div>
+    <div class="thm_thmcontent"><p> Assume \(\int _0^\infty \nu (t)\, \mathrm{d}t/t = 1\). For \(\varepsilon {\gt} 0\) and \(0 {\lt} u \le 1 - (\log 2)\varepsilon \) we have \(\widetilde1_\varepsilon (u) = 1\). </p>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#Smooth1Properties_below">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/Smooth1Properties_below">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="SmoothExistence_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="SmoothExistence" style="display: none">
+    <div class="thm_thmheading">
+      <span class="theorem_thmcaption">
+      Theorem
+      </span>
+      <span class="theorem_thmlabel">9.12</span><span class="theorem_thmtitle">Existence of a bump function</span></div>
+    <div class="thm_thmcontent"><p>There exists a \(C^\infty \) function \(\nu : \mathbb {R}\to \mathbb {R}\), supported in \([1/2, 2]\), with \(\nu \ge 0\) everywhere and \(\int _0^\infty \nu (t)\,  \frac{\mathrm{d}t}{t} = 1\). </p>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#SmoothExistence">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/SmoothExistence">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="sum_divisors_card_le_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="sum_divisors_card_le" style="display: none">
+    <div class="thm_thmheading">
+      <span class="theorem_thmcaption">
+      Theorem
+      </span>
+      <span class="theorem_thmlabel">5.2</span><span class="theorem_thmtitle">Average order of the divisor function</span></div>
+    <div class="thm_thmcontent"><p>   For every real \(Q \ge 2\), </p>
+<div class="displaymath" id="a0000000070">
+  \[ \sum _{q \le Q} \tau (q) \ll Q \log Q, \]
+</div>
+<p> where \(\tau (q)\) is the number of divisors of \(q\). </p>
+</div>
+
+    <a class="latex_link" href="ch-aux.html#sum_divisors_card_le">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/sum_divisors_card_le">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="sum_LambdaLEU_le_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="sum_LambdaLEU_le" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">7.1</span><span class="lemma_thmtitle">The \(\ell ^1\) norm of \(\Lambda _{\le U}\)</span></div>
+    <div class="thm_thmcontent"><p>    For every parameter datum and every real \(y\), </p>
+<div class="displaymath" id="a0000000093">
+  \[ \sum _{n \le y} \Lambda _{\le U}(n) \le U \log x. \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-small.html#sum_LambdaLEU_le">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/sum_LambdaLEU_le">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="sum_rphiInv_le_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="sum_rphiInv_le" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">5.7</span><span class="lemma_thmtitle">The sum of \(1/(r\varphi (r))\)</span></div>
+    <div class="thm_thmcontent"><p>   The series \(\sum _{d \ge 1} \frac{1}{d\varphi (d)}\) converges, so for every real \(Q\), </p>
+<div class="displaymath" id="a0000000080">
+  \[ \sum _{r \le Q} \frac{1}{r \varphi (r)} \ll 1 . \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-aux.html#sum_rphiInv_le">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/sum_rphiInv_le">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="sum_vonMangoldt_not_coprime_le_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="sum_vonMangoldt_not_coprime_le" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">4.3</span><span class="lemma_thmtitle">Prime powers sharing a factor with \(q\)</span></div>
+    <div class="thm_thmcontent"><p>   For every real \(z \ge 2\) and every integer \(q \ge 1\), </p>
+<div class="displaymath" id="a0000000060">
+  \[ 0 \le \sum _{\substack {n \le z \\ (n, q) {\gt} 1}} \Lambda (n) \le \frac{\log q \cdot \log z}{\log 2}. \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-axioms.html#sum_vonMangoldt_not_coprime_le">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/sum_vonMangoldt_not_coprime_le">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="summatory_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="summatory" style="display: none">
+    <div class="thm_thmheading">
+      <span class="definition_thmcaption">
+      Definition
+      </span>
+      <span class="definition_thmlabel">3.1</span><span class="definition_thmtitle">Summatory function</span></div>
+    <div class="thm_thmcontent"><p>   For \(f : \mathbb {N}\to R\) with values in an additive commutative monoid \(R\) and a real number \(x\), the <em>summatory function</em> of \(f\) is </p>
+<div class="displaymath" id="a0000000031">
+  \[ \sum _{n \le x} f(n) := \sum _{1 \le n \le \lfloor x \rfloor } f(n). \]
+</div>
+<p> The term \(n = 0\) is never included, and the sum is empty (hence \(0\)) when \(x {\lt} 1\). Throughout the blueprint, every sum of the form \(\sum _{n \le x}\) over a real endpoint \(x\) is to be read in this way. </p>
+</div>
+
+    <a class="latex_link" href="ch-prelim.html#summatory">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/summatory">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="summatory_abs_dilate_le_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="summatory_abs_dilate_le" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">8.8</span><span class="lemma_thmtitle">Dilation does not increase the \(\ell ^1\) norm</span></div>
+    <div class="thm_thmcontent"><p>    For \(e \ge 1\), every real arithmetic function \(f\) and every real \(x\), </p>
+<div class="displaymath" id="a0000000118">
+  \[ \sum _{k \le x} |(\delta _e * f)(k)| \le \sum _{k \le x} |f(k)|. \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-typeI.html#summatory_abs_dilate_le">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/summatory_abs_dilate_le">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="summatory_abs_mul_le_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="summatory_abs_mul_le" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">8.9</span><span class="lemma_thmtitle">Submultiplicativity of the \(\ell ^1\) norm</span></div>
+    <div class="thm_thmcontent"><p>    For real arithmetic functions \(f, g\) and every real \(x \ge 0\), </p>
+<div class="displaymath" id="a0000000120">
+  \[ \sum _{k \le x} |(f * g)(k)| \le \Big( \sum _{k \le x} |f(k)| \Big) \Big( \sum _{k \le x} |g(k)| \Big). \]
+</div>
+</div>
+
+    <a class="latex_link" href="ch-typeI.html#summatory_abs_mul_le">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/summatory_abs_mul_le">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="summatory_totient_inv_le_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="summatory_totient_inv_le" style="display: none">
+    <div class="thm_thmheading">
+      <span class="theorem_thmcaption">
+      Theorem
+      </span>
+      <span class="theorem_thmlabel">5.6</span><span class="theorem_thmtitle">The sum of \(1/\varphi \)</span></div>
+    <div class="thm_thmcontent"><p>    For every parameter datum and every real \(Q \le x\), </p>
+<div class="displaymath" id="a0000000077">
+  \[ \sum _{n \le Q} \frac{1}{\varphi (n)} \ll \log x, \]
+</div>
+<p> with an absolute implied constant. </p>
+</div>
+
+    <a class="latex_link" href="ch-aux.html#summatory_totient_inv_le">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/summatory_totient_inv_le">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="T_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="T" style="display: none">
+    <div class="thm_thmheading">
+      <span class="definition_thmcaption">
+      Definition
+      </span>
+      <span class="definition_thmlabel">9.2</span><span class="definition_thmtitle">The quantities \(T_r(Q)\)</span></div>
+    <div class="thm_thmcontent"><p>    For a real \(C\), an integer \(r \ge 1\) and a real \(Q\), set </p>
+<div class="displaymath" id="a0000000146">
+  \[ T^{(C)}_r(Q) := \sum _{(\log x)^C {\lt} d \le Q/r} \frac{1}{\varphi (d)} \mathop{{\sum \nolimits ^{*}}}_{\xi \bmod d} \  \max _{\sqrt x \le y \le x} S_r(y, \xi ) \  \in [0, \infty ], \]
+</div>
+<p> where \(\mathop{{\sum \nolimits ^{*}}}\) is a sum over primitive characters and the maximum is that of <a href="ch-prelim.html#BV.maxy">Definition 3.16</a>. (For \(r = 0\) the range of \(d\) is empty and \(T_r^{(C)}(Q) = 0\).) We usually suppress \(C\) from the notation. </p>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#T">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/T">Lean</a>
     
     
   
@@ -1250,17 +3747,142 @@
       <span class="theorem_thmcaption">
       Theorem
       </span>
-      <span class="theorem_thmlabel">38</span></div>
-    <div class="thm_thmcontent">
-<div class="displaymath" id="a0000000077">
-  \[ T_r(x,Q) \ll \frac{x}{(\log x)^{C-3}} + \frac{x(\log x)^4}{\sqrt{U}} + \frac{x(\log x)^4}{\sqrt{V}} + \frac{Q\sqrt{x}\, (\log x)^3}{r} \]
+      <span class="theorem_thmlabel">9.40</span><span class="theorem_thmtitle">The bound for \(T_r\)</span></div>
+    <div class="thm_thmcontent"><p>    For every parameter datum, every integer \(C \ge 3\), every \(r \in \mathbb {N}\) and every real \(2 \le Q \le x\), </p>
+<div class="displaymath" id="a0000000221">
+  \[ T^{(C)}_r(Q) \ll \frac{x}{(\log x)^{C-3}} + \frac{x (\log x)^4}{\sqrt U} + \frac{x(\log x)^4}{\sqrt V} + \frac{Q \sqrt x (\log x)^3}{r} , \]
 </div>
+<p> with an implied constant independent of \(C\) and \(r\). </p>
 </div>
 
-    <a class="latex_link" href="sect0001.html#T_r_bound">LaTeX</a>
+    <a class="latex_link" href="ch-typeII.html#T_r_bound">LaTeX</a>
     
     
   <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/T_r_bound">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="totient_mul_Delta_eq_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="totient_mul_Delta_eq" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">9.4</span><span class="lemma_thmtitle">\(\varphi (d)\Delta _g\) as a sum over conductors</span></div>
+    <div class="thm_thmcontent"><p>    Let \(q \ge 1\), \(a \in (\mathbb {Z}/q\mathbb {Z})^*\), and let \(g : \mathbb {N}\to \mathbb {R}\) vanish at every \(n\) with \((n, q) {\gt} 1\). For \(x \in \mathbb {R}\) and \(i \ge 1\) put </p>
+<div class="displaymath" id="a0000000150">
+  \[ G_i := \mathop{{\sum \nolimits ^{*}}}_{\xi \bmod i} \overline{\xi (a)} \sum _{n \le x} \xi (n) g(n) . \]
+</div>
+<p> Then for every divisor \(d\) of \(q\), </p>
+<div class="displaymath" id="a0000000151">
+  \[ \varphi (d)\,  \Delta _g(x; d, a) = \sum _{\substack {i \mid d \\ i \ne 1}} G_i , \]
+</div>
+<p> where \(a\) is reduced modulo \(d\) (resp. modulo \(i\)) on the right. </p>
+</div>
+
+    <a class="latex_link" href="ch-typeII.html#totient_mul_Delta_eq">LaTeX</a>
+    
+    
+  <a class="lean_link lean_decl" href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/totient_mul_Delta_eq">Lean</a>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="UV_range_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="UV_range" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">3.15</span><span class="lemma_thmtitle">Range of \(U\) and \(V\)</span></div>
+    <div class="thm_thmcontent"><p>    For every parameter datum, \(1 \le U \le \sqrt{x} \le x\) and \(1 \le V \le \sqrt x \le x\); moreover \(U, V \ge e\). </p>
+</div>
+
+    <a class="latex_link" href="ch-prelim.html#UV_range">LaTeX</a>
+    
+    
+  <div class="tooltip">
+      <span class="lean_link">Lean</span>
+      <ul class="tooltip_list">
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/ProofData.one_le_U" class="lean_decl">ProofData.one_le_U</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/ProofData.one_le_V" class="lean_decl">ProofData.one_le_V</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/ProofData.U_le_sqrt_x" class="lean_decl">ProofData.U_le_sqrt_x</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/ProofData.U_le_x" class="lean_decl">ProofData.U_le_x</a></li>
+        
+      </ul>
+  </div>
+    
+    
+  
+    
+  </div>
+    
+      </div>
+    </div>
+
+
+    
+    <div class="dep-modal-container" id="zeta_on_coprime_apply_modal">
+      <div class="dep-modal-content">
+          <button class="dep-closebtn">
+<svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        
+  <div class="thm" id="zeta_on_coprime_apply" style="display: none">
+    <div class="thm_thmheading">
+      <span class="lemma_thmcaption">
+      Lemma
+      </span>
+      <span class="lemma_thmlabel">8.11</span><span class="lemma_thmtitle">Möbius expansion of \(1_r\) and \(\log _r\)</span></div>
+    <div class="thm_thmcontent"><p>    Let \(r \ge 1\). As arithmetic functions, </p>
+<div class="displaymath" id="a0000000124">
+  \[ 1_r = \sum _{e \mid r} \mu (e)\,  (\delta _e * 1), \qquad \log _r = \sum _{e \mid r} \mu (e) \big( \log e \cdot (\delta _e * 1) + \delta _e * \log \big), \]
+</div>
+<p> where \(1_r\) and \(\log _r\) are the restrictions (<a href="ch-prelim.html#onCoprime">Definition 3.4</a>) of the constant function \(1\) and of \(\log \) to the integers coprime to \(r\), and \(\delta _e * (\cdot )\) is the dilation of <a href="ch-prelim.html#dilate">Definition 3.6</a>. (The identity for \(\log \) holds for \(r = 0\) as well, both sides then vanishing except at \(b = 1\) where \(\log 1 = 0\).) </p>
+</div>
+
+    <a class="latex_link" href="ch-typeI.html#zeta_on_coprime_apply">LaTeX</a>
+    
+    
+  <div class="tooltip">
+      <span class="lean_link">Lean</span>
+      <ul class="tooltip_list">
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/log_on_coprime_apply" class="lean_decl">log_on_coprime_apply</a></li>
+        
+           <li><a href="https://FLDutchmann.github.io/lean-bombieri-vinogradov/docs/find/#doc/zeta_on_coprime_apply" class="lean_decl">zeta_on_coprime_apply</a></li>
+        
+      </ul>
+  </div>
     
     
   
@@ -1288,7 +3910,7 @@ graphContainer.graphviz({useWorker: true})
     .width(width)
     .height(height)
     .fit(true)
-    .renderDot(`strict digraph "" {	graph [bgcolor=transparent];	node [label="\N",		penwidth=1.8	];	edge [arrowhead=vee];	Delta_LambdaLE_bound	[color=green,		label=Delta_LambdaLE_bound,		shape=ellipse];	BV_LambdaLE	[color=green,		label=BV_LambdaLE,		shape=ellipse];	Delta_LambdaLE_bound -> BV_LambdaLE	[style=dashed];	"BombieriVinogradov.BV_Delta_Lambda"	[color=green,		fillcolor="#A3D6FF",		label="BombieriVinogradov.BV_Delta_Lambda",		shape=ellipse,		style=filled];	BV_LambdaLE -> "BombieriVinogradov.BV_Delta_Lambda"	[style=dashed];	"Bombieri-Vinogradov"	[color=blue,		fillcolor="#A3D6FF",		label="Bombieri-Vinogradov",		shape=ellipse,		style=filled];	"BombieriVinogradov.BV_Delta_Lambda" -> "Bombieri-Vinogradov"	[style=dashed];	Delta_abel_summation	[color=green,		fillcolor="#A3D6FF",		label=Delta_abel_summation,		shape=ellipse,		style=filled];	Delta_monotone_bound	[color=green,		label=Delta_monotone_bound,		shape=ellipse];	Delta_abel_summation -> Delta_monotone_bound	[style=dashed];	Delta_flog_bound	[color=green,		fillcolor="#A3D6FF",		label=Delta_flog_bound,		shape=ellipse,		style=filled];	Delta_monotone_bound -> Delta_flog_bound	[style=dashed];	Delta_LambdaSharp_bound	[color=green,		fillcolor="#A3D6FF",		label=Delta_LambdaSharp_bound,		shape=ellipse,		style=filled];	Delta_flog_bound -> Delta_LambdaSharp_bound	[style=dashed];	BV_LambdaSharp	[color=green,		label=BV_LambdaSharp,		shape=ellipse];	Delta_LambdaSharp_bound -> BV_LambdaSharp	[style=dashed];	character_sum_by_conductor	[color=green,		label=character_sum_by_conductor,		shape=ellipse];	character_sum_Mobius	[color=green,		fillcolor="#A3D6FF",		label=character_sum_Mobius,		shape=ellipse,		style=filled];	character_sum_by_conductor -> character_sum_Mobius	[style=dashed];	Delta_LambdaFlat_decomp	[color=green,		label=Delta_LambdaFlat_decomp,		shape=ellipse];	character_sum_Mobius -> Delta_LambdaFlat_decomp	[style=dashed];	Delta_LambdaFlat_small_conductor	[color=green,		fillcolor="#A3D6FF",		label=Delta_LambdaFlat_small_conductor,		shape=ellipse,		style=filled];	Delta_LambdaFlat_decomp -> Delta_LambdaFlat_small_conductor	[style=dashed];	BV_LambdaFlat_via_T	[color=green,		label=BV_LambdaFlat_via_T,		shape=ellipse];	Delta_LambdaFlat_small_conductor -> BV_LambdaFlat_via_T	[style=dashed];	BV_LambdaFlat	[color=green,		fillcolor="#A3D6FF",		label=BV_LambdaFlat,		shape=ellipse,		style=filled];	BV_LambdaFlat -> "BombieriVinogradov.BV_Delta_Lambda"	[style=dashed];	sum_vonMangoldt_le	[color=green,		label=sum_vonMangoldt_le,		shape=ellipse];	sum_vonMangoldt_le -> Delta_LambdaLE_bound	[style=dashed];	Delta_eq_sum_char	[color=green,		label=Delta_eq_sum_char,		shape=ellipse];	Lambda_decomp	[color=green,		label=Lambda_decomp,		shape=ellipse];	"BombieriVinogradov.BV_Delta_1P"	[color=green,		fillcolor="#A3D6FF",		label="BombieriVinogradov.BV_Delta_1P",		shape=ellipse,		style=filled];	"BombieriVinogradov.max_Delta_1P_le_max_Delta_Lambda"	[color=green,		fillcolor="#A3D6FF",		label="BombieriVinogradov.max_Delta_1P_le_max_Delta_Lambda",		shape=ellipse,		style=filled];	BV_char_sum_bound	[color=green,		label=BV_char_sum_bound,		shape=ellipse];	T_r_bound	[color=green,		label=T_r_bound,		shape=ellipse];	BV_char_sum_bound -> T_r_bound	[style=dashed];	T_r_bound -> BV_LambdaFlat	[style=dashed];	Delta	[color=blue,		fillcolor="#A3D6FF",		label=Delta,		shape=box,		style=filled];	T_r	[label=T_r,		shape=box];	T_r -> T_r_bound	[style=dashed];	T_r -> BV_LambdaFlat_via_T	[style=dashed];	BV_LambdaFlat_via_T -> BV_LambdaFlat	[style=dashed];	Delta_convolution_eq	[color=green,		label=Delta_convolution_eq,		shape=ellipse];	Delta_convolution_eq -> Delta_LambdaSharp_bound	[style=dashed];	BV_LambdaSharp -> "BombieriVinogradov.BV_Delta_Lambda"	[style=dashed];	"BombieriVinogradov.Delta_primeIndicator_eq"	[color=green,		label="BombieriVinogradov.Delta_primeIndicator_eq",		shape=ellipse];	LargeSieve_convolution	[color=green,		fillcolor="#A3D6FF",		label=LargeSieve_convolution,		shape=ellipse,		style=filled];	LargeSieve_convolution -> BV_char_sum_bound	[style=dashed];	onCoprime	[color=green,		fillcolor="#B0ECA3",		label=onCoprime,		shape=box,		style=filled];	S_r	[color=blue,		fillcolor="#A3D6FF",		label=S_r,		shape=box,		style=filled];	S_r -> Delta_LambdaFlat_decomp	[style=dashed];	S_r -> BV_char_sum_bound	[style=dashed];	S_r -> T_r	[style=dashed];	logIntegral	[color=blue,		fillcolor="#A3D6FF",		label=logIntegral,		shape=box,		style=filled];	LambdaFlat	[color=blue,		fillcolor="#A3D6FF",		label=LambdaFlat,		shape=box,		style=filled];	LambdaFlat -> Lambda_decomp	[style=dashed];	LambdaLE	[color=blue,		fillcolor="#A3D6FF",		label=LambdaLE,		shape=box,		style=filled];	LambdaLE -> Lambda_decomp	[style=dashed];	"BombieriVinogradov.sum_primes_not_dvd_eq_li"	[color=green,		label="BombieriVinogradov.sum_primes_not_dvd_eq_li",		shape=ellipse];	LambdaSharp	[color=blue,		fillcolor="#A3D6FF",		label=LambdaSharp,		shape=box,		style=filled];	LambdaSharp -> Lambda_decomp	[style=dashed];	Delta_one_bound	[color=green,		fillcolor="#A3D6FF",		label=Delta_one_bound,		shape=ellipse,		style=filled];	Delta_one_bound -> Delta_abel_summation	[style=dashed];	LambdaFlat_dyadic	[color=green,		label=LambdaFlat_dyadic,		shape=ellipse];	LambdaFlat_dyadic -> BV_char_sum_bound	[style=dashed];}`)
+    .renderDot(`strict digraph "" {	graph [bgcolor=transparent];	node [label="\N",		penwidth=1.8	];	edge [arrowhead=vee];	Delta_dilate_flog_bound	[color=green,		fillcolor="#1CAC78",		label=Delta_dilate_flog_bound,		shape=ellipse,		style=filled];	Delta_term1_bound	[color=green,		fillcolor="#1CAC78",		label=Delta_term1_bound,		shape=ellipse,		style=filled];	Delta_dilate_flog_bound -> Delta_term1_bound;	Delta_term2_bound	[color=green,		fillcolor="#1CAC78",		label=Delta_term2_bound,		shape=ellipse,		style=filled];	Delta_dilate_flog_bound -> Delta_term2_bound;	Delta_LambdaSharp_bound	[color=green,		fillcolor="#1CAC78",		label=Delta_LambdaSharp_bound,		shape=ellipse,		style=filled];	Delta_term1_bound -> Delta_LambdaSharp_bound;	Delta_term2_bound -> Delta_LambdaSharp_bound;	BV_LambdaSharp_enorm	[color=green,		fillcolor="#1CAC78",		label=BV_LambdaSharp_enorm,		shape=ellipse,		style=filled];	Delta_LambdaSharp_bound -> BV_LambdaSharp_enorm;	Delta_onCoprime_LambdaFlat_pointwise	[color=green,		fillcolor="#9CEC8B",		label=Delta_onCoprime_LambdaFlat_pointwise,		shape=ellipse,		style=filled];	Delta_LambdaSharp_bound -> Delta_onCoprime_LambdaFlat_pointwise;	summatory_totient_inv_le	[color=green,		fillcolor="#1CAC78",		label=summatory_totient_inv_le,		shape=ellipse,		style=filled];	BV_LambdaFlat_via_T	[color=green,		fillcolor="#9CEC8B",		label=BV_LambdaFlat_via_T,		shape=ellipse,		style=filled];	summatory_totient_inv_le -> BV_LambdaFlat_via_T;	BV_LambdaFlat_enorm	[color=green,		fillcolor="#9CEC8B",		label=BV_LambdaFlat_enorm,		shape=ellipse,		style=filled];	BV_LambdaFlat_via_T -> BV_LambdaFlat_enorm;	BV_Delta_Lambda_enorm	[color=green,		fillcolor="#9CEC8B",		label=BV_Delta_Lambda_enorm,		shape=ellipse,		style=filled];	BV_LambdaFlat_enorm -> BV_Delta_Lambda_enorm;	BV_large_enorm	[color=green,		fillcolor="#9CEC8B",		label=BV_large_enorm,		shape=ellipse,		style=filled];	BV_Delta_Lambda_enorm -> BV_large_enorm;	"Bombieri-Vinogradov"	[color=green,		fillcolor="#9CEC8B",		label="Bombieri-Vinogradov",		shape=ellipse,		style=filled];	BV_large_enorm -> "Bombieri-Vinogradov";	bombieri_vinogradov	[color=green,		fillcolor="#9CEC8B",		label=bombieri_vinogradov,		shape=ellipse,		style=filled];	"Bombieri-Vinogradov" -> bombieri_vinogradov;	MellinOfSmooth1b	[color=green,		fillcolor="#1CAC78",		label=MellinOfSmooth1b,		shape=ellipse,		style=filled];	Smooth1_mellinInv_mellin_eq	[color=green,		fillcolor="#1CAC78",		label=Smooth1_mellinInv_mellin_eq,		shape=ellipse,		style=filled];	MellinOfSmooth1b -> Smooth1_mellinInv_mellin_eq;	mellin_smooth1_bounds	[color=green,		fillcolor="#1CAC78",		label=mellin_smooth1_bounds,		shape=ellipse,		style=filled];	MellinOfSmooth1b -> mellin_smooth1_bounds;	"Flat.T_mellin_representation"	[color=green,		fillcolor="#1CAC78",		label="Flat.T_mellin_representation",		shape=ellipse,		style=filled];	Smooth1_mellinInv_mellin_eq -> "Flat.T_mellin_representation";	"Flat.mellin_J_bound"	[color=green,		fillcolor="#1CAC78",		label="Flat.mellin_J_bound",		shape=ellipse,		style=filled];	Smooth1_mellinInv_mellin_eq -> "Flat.mellin_J_bound";	mellin_smooth1_bounds -> "Flat.mellin_J_bound"	[style=dashed];	"Flat.summatory_T_ll"	[color=green,		fillcolor="#9CEC8B",		label="Flat.summatory_T_ll",		shape=ellipse,		style=filled];	"Flat.T_mellin_representation" -> "Flat.summatory_T_ll";	"Flat.mellin_J_bound" -> "Flat.summatory_T_ll";	maxya_basic	[color=green,		fillcolor="#1CAC78",		label=maxya_basic,		shape=ellipse,		style=filled];	maxya_Delta_LambdaFlat_enorm_le	[color=green,		fillcolor="#9CEC8B",		label=maxya_Delta_LambdaFlat_enorm_le,		shape=ellipse,		style=filled];	maxya_basic -> maxya_Delta_LambdaFlat_enorm_le;	maxya_Delta_enorm_le_of_abs_le	[color=green,		fillcolor="#1CAC78",		label=maxya_Delta_enorm_le_of_abs_le,		shape=ellipse,		style=filled];	maxya_basic -> maxya_Delta_enorm_le_of_abs_le;	BV_char_sum_bound	[color=green,		fillcolor="#9CEC8B",		label=BV_char_sum_bound,		shape=ellipse,		style=filled];	maxya_basic -> BV_char_sum_bound;	maxya_Delta_LambdaFlat_enorm_le -> BV_LambdaFlat_via_T;	maxya_Delta_add_le	[color=green,		fillcolor="#1CAC78",		label=maxya_Delta_add_le,		shape=ellipse,		style=filled];	maxya_Delta_enorm_le_of_abs_le -> maxya_Delta_add_le;	maxya_Delta_enorm_le_of_abs_le -> BV_LambdaSharp_enorm;	BV_LambdaLE_enorm	[color=green,		fillcolor="#1CAC78",		label=BV_LambdaLE_enorm,		shape=ellipse,		style=filled];	maxya_Delta_enorm_le_of_abs_le -> BV_LambdaLE_enorm;	T_r_bound	[color=green,		fillcolor="#9CEC8B",		label=T_r_bound,		shape=ellipse,		style=filled];	BV_char_sum_bound -> T_r_bound;	maxya_Delta_Lambda_enorm_le	[color=green,		fillcolor="#1CAC78",		label=maxya_Delta_Lambda_enorm_le,		shape=ellipse,		style=filled];	maxya_Delta_add_le -> maxya_Delta_Lambda_enorm_le;	maxya_Delta_Lambda_enorm_le -> BV_Delta_Lambda_enorm;	BV_LambdaSharp_enorm -> BV_Delta_Lambda_enorm;	BV_LambdaLE_enorm -> BV_Delta_Lambda_enorm;	T_r_bound -> BV_LambdaFlat_enorm;	Delta_abel_summation	[color=green,		fillcolor="#1CAC78",		label=Delta_abel_summation,		shape=ellipse,		style=filled];	Delta_monotone_bound	[color=green,		fillcolor="#1CAC78",		label=Delta_monotone_bound,		shape=ellipse,		style=filled];	Delta_abel_summation -> Delta_monotone_bound;	Delta_flog_bound	[color=green,		fillcolor="#1CAC78",		label=Delta_flog_bound,		shape=ellipse,		style=filled];	Delta_monotone_bound -> Delta_flog_bound;	Delta_flog_bound -> Delta_dilate_flog_bound;	"Nat.modEqs"	[color=green,		fillcolor="#B0ECA3",		label="Nat.modEqs",		shape=box,		style=filled];	Delta	[color=green,		fillcolor="#B0ECA3",		label=Delta,		shape=box,		style=filled];	"Nat.modEqs" -> Delta	[style=dashed];	"Chebyshev.abs_psiMod_sub_div_le_const"	[color=green,		fillcolor="#1CAC78",		label="Chebyshev.abs_psiMod_sub_div_le_const",		shape=ellipse,		style=filled];	"Nat.modEqs" -> "Chebyshev.abs_psiMod_sub_div_le_const";	PNT	[color=green,		fillcolor="#9CEC8B",		label=PNT,		shape=ellipse,		style=filled];	"Nat.modEqs" -> PNT;	Delta -> maxya_Delta_enorm_le_of_abs_le	[style=dashed];	Delta_one_bound	[color=green,		fillcolor="#1CAC78",		label=Delta_one_bound,		shape=ellipse,		style=filled];	Delta -> Delta_one_bound	[style=dashed];	abs_Delta_le_two_summatory_abs	[color=green,		fillcolor="#1CAC78",		label=abs_Delta_le_two_summatory_abs,		shape=ellipse,		style=filled];	Delta -> abs_Delta_le_two_summatory_abs	[style=dashed];	Delta_Lambda_eq	[color=green,		fillcolor="#1CAC78",		label=Delta_Lambda_eq,		shape=ellipse,		style=filled];	Delta -> Delta_Lambda_eq	[style=dashed];	Delta_linear	[color=green,		fillcolor="#1CAC78",		label=Delta_linear,		shape=ellipse,		style=filled];	Delta -> Delta_linear	[style=dashed];	Delta_LambdaLEU_bound	[color=green,		fillcolor="#1CAC78",		label=Delta_LambdaLEU_bound,		shape=ellipse,		style=filled];	Delta -> Delta_LambdaLEU_bound	[style=dashed];	Delta_eq_sum_char	[color=green,		fillcolor="#1CAC78",		label=Delta_eq_sum_char,		shape=ellipse,		style=filled];	Delta -> Delta_eq_sum_char	[style=dashed];	Delta_onCoprime_self	[color=green,		fillcolor="#1CAC78",		label=Delta_onCoprime_self,		shape=ellipse,		style=filled];	Delta -> Delta_onCoprime_self	[style=dashed];	"Chebyshev.abs_psiMod_sub_div_le_const" -> BV_large_enorm;	BV_compact_enorm	[color=green,		fillcolor="#1CAC78",		label=BV_compact_enorm,		shape=ellipse,		style=filled];	"Chebyshev.abs_psiMod_sub_div_le_const" -> BV_compact_enorm;	Delta_onCoprime_Lambda_bound	[color=green,		fillcolor="#9CEC8B",		label=Delta_onCoprime_Lambda_bound,		shape=ellipse,		style=filled];	PNT -> Delta_onCoprime_Lambda_bound;	coprime_vonMangoldt_error	[color=green,		fillcolor="#9CEC8B",		label=coprime_vonMangoldt_error,		shape=ellipse,		style=filled];	PNT -> coprime_vonMangoldt_error;	Delta_one_bound -> Delta_monotone_bound;	Delta_Lambda_eq -> BV_large_enorm;	Delta_linear -> Delta_term1_bound;	Delta_linear -> Delta_term2_bound;	Delta_linear -> maxya_Delta_add_le;	Delta_linear -> Delta_onCoprime_Lambda_bound;	Delta_LambdaLEU_bound -> BV_LambdaLE_enorm;	Delta_eq_sum_char -> Delta_abel_summation;	totient_mul_Delta_eq	[color=green,		fillcolor="#1CAC78",		label=totient_mul_Delta_eq,		shape=ellipse,		style=filled];	Delta_eq_sum_char -> totient_mul_Delta_eq;	Delta_convolution_eq	[color=green,		fillcolor="#1CAC78",		label=Delta_convolution_eq,		shape=ellipse,		style=filled];	Delta_eq_sum_char -> Delta_convolution_eq;	Delta_onCoprime_self -> BV_LambdaSharp_enorm;	Delta_LambdaFlat_decomp	[color=green,		fillcolor="#1CAC78",		label=Delta_LambdaFlat_decomp,		shape=ellipse,		style=filled];	Delta_onCoprime_self -> Delta_LambdaFlat_decomp;	BV_compact_enorm -> "Bombieri-Vinogradov";	Delta_onCoprime_Lambda_bound -> Delta_onCoprime_LambdaFlat_pointwise;	Delta_LambdaFlat_small_conductor	[color=green,		fillcolor="#9CEC8B",		label=Delta_LambdaFlat_small_conductor,		shape=ellipse,		style=filled];	Delta_onCoprime_LambdaFlat_pointwise -> Delta_LambdaFlat_small_conductor;	Delta_LambdaFlat_small_conductor -> maxya_Delta_LambdaFlat_enorm_le;	character_sum_Mobius	[color=green,		fillcolor="#1CAC78",		label=character_sum_Mobius,		shape=ellipse,		style=filled];	totient_mul_Delta_eq -> character_sum_Mobius;	Delta_convolution_eq -> Delta_flog_bound;	Delta_LambdaFlat_decomp -> maxya_Delta_LambdaFlat_enorm_le;	coprime_vonMangoldt_error -> BV_large_enorm;	"ArithmeticFunction.on"	[color=green,		fillcolor="#B0ECA3",		label="ArithmeticFunction.on",		shape=box,		style=filled];	zeta_on_coprime_apply	[color=green,		fillcolor="#1CAC78",		label=zeta_on_coprime_apply,		shape=ellipse,		style=filled];	"ArithmeticFunction.on" -> zeta_on_coprime_apply	[style=dashed];	LambdaLEU	[color=green,		fillcolor="#B0ECA3",		label=LambdaLEU,		shape=box,		style=filled];	"ArithmeticFunction.on" -> LambdaLEU	[style=dashed];	moebiusLEV	[color=green,		fillcolor="#B0ECA3",		label=moebiusLEV,		shape=box,		style=filled];	"ArithmeticFunction.on" -> moebiusLEV	[style=dashed];	"ArithmeticFunction.on_mul_of_saturated"	[color=green,		fillcolor="#1CAC78",		label="ArithmeticFunction.on_mul_of_saturated",		shape=ellipse,		style=filled];	"ArithmeticFunction.on" -> "ArithmeticFunction.on_mul_of_saturated"	[style=dashed];	mul_on_coprime_expansion	[color=green,		fillcolor="#1CAC78",		label=mul_on_coprime_expansion,		shape=ellipse,		style=filled];	zeta_on_coprime_apply -> mul_on_coprime_expansion;	sum_LambdaLEU_le	[color=green,		fillcolor="#1CAC78",		label=sum_LambdaLEU_le,		shape=ellipse,		style=filled];	LambdaLEU -> sum_LambdaLEU_le	[style=dashed];	l1_norms_coefficients	[color=green,		fillcolor="#1CAC78",		label=l1_norms_coefficients,		shape=ellipse,		style=filled];	LambdaLEU -> l1_norms_coefficients	[style=dashed];	LambdaSharp	[color=green,		fillcolor="#B0ECA3",		label=LambdaSharp,		shape=box,		style=filled];	LambdaLEU -> LambdaSharp	[style=dashed];	LambdaFlat	[color=green,		fillcolor="#B0ECA3",		label=LambdaFlat,		shape=box,		style=filled];	LambdaLEU -> LambdaFlat	[style=dashed];	moebiusLEV -> l1_norms_coefficients	[style=dashed];	moebiusLEV -> LambdaSharp	[style=dashed];	moebiusLEV -> LambdaFlat	[style=dashed];	"ArithmeticFunction.on_mul_of_saturated" -> Delta_term1_bound;	"ArithmeticFunction.on_mul_of_saturated" -> Delta_term2_bound;	"ArithmeticFunction.on_mul_of_saturated" -> BV_char_sum_bound;	mul_on_coprime_expansion -> Delta_term1_bound;	mul_on_coprime_expansion -> Delta_term2_bound;	sum_LambdaLEU_le -> Delta_LambdaLEU_bound;	sum_LambdaLEU_le -> Delta_onCoprime_LambdaFlat_pointwise;	l1_norms_coefficients -> Delta_term1_bound;	l1_norms_coefficients -> Delta_term2_bound;	LambdaSharp -> Delta_LambdaSharp_bound	[style=dashed];	Lambda_decomp	[color=green,		fillcolor="#1CAC78",		label=Lambda_decomp,		shape=ellipse,		style=filled];	LambdaSharp -> Lambda_decomp	[style=dashed];	LambdaFlat -> Lambda_decomp	[style=dashed];	LambdaFlat_dyadic	[color=green,		fillcolor="#1CAC78",		label=LambdaFlat_dyadic,		shape=ellipse,		style=filled];	LambdaFlat -> LambdaFlat_dyadic	[style=dashed];	S	[color=green,		fillcolor="#B0ECA3",		label=S,		shape=box,		style=filled];	LambdaFlat -> S	[style=dashed];	Lambda_decomp -> maxya_Delta_Lambda_enorm_le;	Lambda_decomp -> Delta_onCoprime_LambdaFlat_pointwise;	LambdaFlat_dyadic -> BV_char_sum_bound;	"Flat.T"	[color=green,		fillcolor="#B0ECA3",		label="Flat.T",		shape=box,		style=filled];	"Flat.T" -> "Flat.T_mellin_representation"	[style=dashed];	"Flat.T_eq_sharp"	[color=green,		fillcolor="#1CAC78",		label="Flat.T_eq_sharp",		shape=ellipse,		style=filled];	"Flat.T" -> "Flat.T_eq_sharp"	[style=dashed];	"Flat.LargeSieve_convolution_aux"	[color=green,		fillcolor="#9CEC8B",		label="Flat.LargeSieve_convolution_aux",		shape=ellipse,		style=filled];	"Flat.T_eq_sharp" -> "Flat.LargeSieve_convolution_aux";	"Flat.summatory_T_ll" -> "Flat.LargeSieve_convolution_aux";	LargeSieve_convolution	[color=green,		fillcolor="#9CEC8B",		label=LargeSieve_convolution,		shape=ellipse,		style=filled];	"Flat.LargeSieve_convolution_aux" -> LargeSieve_convolution;	LargeSieve_convolution -> BV_char_sum_bound;	"Flat.FG.summatory_mul_char"	[color=green,		fillcolor="#1CAC78",		label="Flat.FG.summatory_mul_char",		shape=ellipse,		style=filled];	"Flat.FG.summatory_mul_char" -> "Flat.LargeSieve_convolution_aux";	ProofData	[color=green,		fillcolor="#B0ECA3",		label=ProofData,		shape=box,		style=filled];	ProofData -> Delta_onCoprime_Lambda_bound	[style=dashed];	ProofData -> LambdaLEU	[style=dashed];	ProofData -> moebiusLEV	[style=dashed];	log_pow_le_const_mul_sqrt	[color=green,		fillcolor="#1CAC78",		label=log_pow_le_const_mul_sqrt,		shape=ellipse,		style=filled];	ProofData -> log_pow_le_const_mul_sqrt	[style=dashed];	"BV.maxy"	[color=green,		fillcolor="#B0ECA3",		label="BV.maxy",		shape=box,		style=filled];	ProofData -> "BV.maxy"	[style=dashed];	log_x_large	[color=green,		fillcolor="#1CAC78",		label=log_x_large,		shape=ellipse,		style=filled];	ProofData -> log_x_large	[style=dashed];	UV_range	[color=green,		fillcolor="#1CAC78",		label=UV_range,		shape=ellipse,		style=filled];	ProofData -> UV_range	[style=dashed];	log_power_absorption	[color=green,		fillcolor="#1CAC78",		label=log_power_absorption,		shape=ellipse,		style=filled];	ProofData -> log_power_absorption	[style=dashed];	log_pow_le_const_mul_sqrt -> BV_LambdaFlat_enorm;	T	[color=green,		fillcolor="#B0ECA3",		label=T,		shape=box,		style=filled];	"BV.maxy" -> T	[style=dashed];	"BV.maxya"	[color=green,		fillcolor="#B0ECA3",		label="BV.maxya",		shape=box,		style=filled];	"BV.maxy" -> "BV.maxya"	[style=dashed];	log_x_large -> summatory_totient_inv_le;	log_x_large -> BV_LambdaSharp_enorm;	log_x_large -> T_r_bound;	log_x_large -> Delta_onCoprime_LambdaFlat_pointwise;	log_x_large -> Delta_LambdaFlat_decomp;	UV_range -> Delta_term2_bound;	UV_range -> sum_LambdaLEU_le;	UV_range -> LambdaFlat_dyadic;	log_power_absorption -> Delta_onCoprime_LambdaFlat_pointwise;	T -> BV_LambdaFlat_via_T	[style=dashed];	T -> T_r_bound	[style=dashed];	"BV.maxya" -> maxya_basic	[style=dashed];	S -> BV_char_sum_bound	[style=dashed];	S -> Delta_LambdaFlat_decomp	[style=dashed];	S -> T	[style=dashed];	pnt_ratio_bound	[color=green,		fillcolor="#1CAC78",		label=pnt_ratio_bound,		shape=ellipse,		style=filled];	pnt_ratio_bound -> Delta_onCoprime_LambdaFlat_pointwise;	"Flat.largeSieve_factor"	[color=green,		fillcolor="#9CEC8B",		label="Flat.largeSieve_factor",		shape=ellipse,		style=filled];	"Flat.largeSieve_char_bound"	[color=green,		fillcolor="#9CEC8B",		label="Flat.largeSieve_char_bound",		shape=ellipse,		style=filled];	"Flat.largeSieve_factor" -> "Flat.largeSieve_char_bound";	"Flat.largeSieve_char_bound" -> "Flat.summatory_T_ll";	SmoothExistence	[color=green,		fillcolor="#1CAC78",		label=SmoothExistence,		shape=ellipse,		style=filled];	SmoothExistence -> LargeSieve_convolution	[style=dashed];	character_sum_Mobius -> Delta_LambdaFlat_decomp;	sum_rphiInv_le	[color=green,		fillcolor="#1CAC78",		label=sum_rphiInv_le,		shape=ellipse,		style=filled];	sum_rphiInv_le -> BV_LambdaFlat_enorm;	Smooth1	[color=green,		fillcolor="#B0ECA3",		label=Smooth1,		shape=box,		style=filled];	Smooth1 -> "Flat.T"	[style=dashed];	MellinOfSmooth1a	[color=green,		fillcolor="#1CAC78",		label=MellinOfSmooth1a,		shape=ellipse,		style=filled];	Smooth1 -> MellinOfSmooth1a	[style=dashed];	Smooth1Properties_above	[color=green,		fillcolor="#1CAC78",		label=Smooth1Properties_above,		shape=ellipse,		style=filled];	Smooth1 -> Smooth1Properties_above	[style=dashed];	Smooth1Nonneg	[color=green,		fillcolor="#1CAC78",		label=Smooth1Nonneg,		shape=ellipse,		style=filled];	Smooth1 -> Smooth1Nonneg	[style=dashed];	Smooth1Properties_below	[color=green,		fillcolor="#1CAC78",		label=Smooth1Properties_below,		shape=ellipse,		style=filled];	Smooth1 -> Smooth1Properties_below	[style=dashed];	Smooth1ContinuousAt	[color=green,		fillcolor="#1CAC78",		label=Smooth1ContinuousAt,		shape=ellipse,		style=filled];	Smooth1 -> Smooth1ContinuousAt	[style=dashed];	Smooth1LeOne	[color=green,		fillcolor="#1CAC78",		label=Smooth1LeOne,		shape=ellipse,		style=filled];	Smooth1 -> Smooth1LeOne	[style=dashed];	MellinOfSmooth1a -> MellinOfSmooth1b	[style=dashed];	Smooth1Properties_above -> Smooth1_mellinInv_mellin_eq;	Smooth1Properties_above -> "Flat.T_eq_sharp";	Smooth1Nonneg -> Smooth1_mellinInv_mellin_eq;	Smooth1Properties_below -> "Flat.T_eq_sharp";	Smooth1ContinuousAt -> Smooth1_mellinInv_mellin_eq;	Smooth1LeOne -> Smooth1_mellinInv_mellin_eq;	d_le_two_mul_totient_sq	[color=green,		fillcolor="#1CAC78",		label=d_le_two_mul_totient_sq,		shape=ellipse,		style=filled];	d_le_two_mul_totient_sq -> summatory_totient_inv_le;	d_le_two_mul_totient_sq -> sum_rphiInv_le;	onCoprime	[color=green,		fillcolor="#B0ECA3",		label=onCoprime,		shape=box,		style=filled];	onCoprime -> Delta	[style=dashed];	onCoprime -> S	[style=dashed];	invTotientAF_eq_mul	[color=green,		fillcolor="#1CAC78",		label=invTotientAF_eq_mul,		shape=ellipse,		style=filled];	invTotientAF_eq_mul -> summatory_totient_inv_le;	"Flat.FG"	[color=green,		fillcolor="#B0ECA3",		label="Flat.FG",		shape=box,		style=filled];	"Flat.FG" -> "Flat.T"	[style=dashed];	"Flat.FG" -> "Flat.FG.summatory_mul_char"	[style=dashed];	"Flat.FG" -> "Flat.largeSieve_char_bound"	[style=dashed];	"Flat.sup_summatory_eq_sup_nat"	[color=green,		fillcolor="#1CAC78",		label="Flat.sup_summatory_eq_sup_nat",		shape=ellipse,		style=filled];	"Flat.FG" -> "Flat.sup_summatory_eq_sup_nat"	[style=dashed];	"Flat.sup_summatory_eq_sup_nat" -> "Flat.LargeSieve_convolution_aux";	psiMaxEnorm	[color=green,		fillcolor="#B0ECA3",		label=psiMaxEnorm,		shape=box,		style=filled];	psiMaxEnorm -> BV_large_enorm	[style=dashed];	psiMaxEnorm -> BV_compact_enorm	[style=dashed];	card_divisors_le_two_mul_sqrt	[color=green,		fillcolor="#1CAC78",		label=card_divisors_le_two_mul_sqrt,		shape=ellipse,		style=filled];	card_divisors_le_two_mul_sqrt -> log_power_absorption;	summatory	[color=green,		fillcolor="#B0ECA3",		label=summatory,		shape=box,		style=filled];	summatory -> summatory_totient_inv_le	[style=dashed];	summatory -> Delta	[style=dashed];	summatory -> "Chebyshev.abs_psiMod_sub_div_le_const";	summatory -> PNT	[style=dashed];	summatory -> sum_LambdaLEU_le	[style=dashed];	summatory -> l1_norms_coefficients	[style=dashed];	summatory -> "Flat.T"	[style=dashed];	summatory -> "Flat.FG.summatory_mul_char"	[style=dashed];	summatory -> S	[style=dashed];	summatory -> "Flat.largeSieve_factor"	[style=dashed];	summatory -> "Flat.sup_summatory_eq_sup_nat"	[style=dashed];	summatory_abs_mul_le	[color=green,		fillcolor="#1CAC78",		label=summatory_abs_mul_le,		shape=ellipse,		style=filled];	summatory -> summatory_abs_mul_le	[style=dashed];	summatory_abs_dilate_le	[color=green,		fillcolor="#1CAC78",		label=summatory_abs_dilate_le,		shape=ellipse,		style=filled];	summatory -> summatory_abs_dilate_le	[style=dashed];	summatory_abs_mul_le -> Delta_term2_bound;	summatory_abs_dilate_le -> Delta_dilate_flog_bound;	mellin_bump_bounded	[color=green,		fillcolor="#1CAC78",		label=mellin_bump_bounded,		shape=ellipse,		style=filled];	mellin_bump_bounded -> mellin_smooth1_bounds;	log_pow_le_const_mul_rpow	[color=green,		fillcolor="#1CAC78",		label=log_pow_le_const_mul_rpow,		shape=ellipse,		style=filled];	log_pow_le_const_mul_rpow -> log_power_absorption;	mul_dilate	[color=green,		fillcolor="#1CAC78",		label=mul_dilate,		shape=ellipse,		style=filled];	mul_dilate -> mul_on_coprime_expansion;	"Flat.Bump"	[color=green,		fillcolor="#B0ECA3",		label="Flat.Bump",		shape=box,		style=filled];	"Flat.Bump" -> mellin_smooth1_bounds	[style=dashed];	"Flat.Bump" -> "Flat.T"	[style=dashed];	character_sum_by_conductor	[color=green,		fillcolor="#1CAC78",		label=character_sum_by_conductor,		shape=ellipse,		style=filled];	character_sum_by_conductor -> totient_mul_Delta_eq;	dilate	[color=green,		fillcolor="#B0ECA3",		label=dilate,		shape=box,		style=filled];	dilate -> zeta_on_coprime_apply	[style=dashed];	dilate -> summatory_abs_dilate_le	[style=dashed];	dilate -> mul_dilate	[style=dashed];	siegel_walfisz	[color=green,		label=siegel_walfisz,		shape=ellipse];	siegel_walfisz -> PNT;	moebius_coprime_indicator	[color=green,		fillcolor="#1CAC78",		label=moebius_coprime_indicator,		shape=ellipse,		style=filled];	moebius_coprime_indicator -> zeta_on_coprime_apply;	sum_divisors_card_le	[color=green,		fillcolor="#1CAC78",		label=sum_divisors_card_le,		shape=ellipse,		style=filled];	sum_divisors_card_le -> BV_LambdaSharp_enorm;	"Chebyshev.psiMod"	[color=green,		fillcolor="#B0ECA3",		label="Chebyshev.psiMod",		shape=box,		style=filled];	"Chebyshev.psiMod" -> "Chebyshev.abs_psiMod_sub_div_le_const"	[style=dashed];	"Chebyshev.psiMod" -> Delta_Lambda_eq	[style=dashed];	"Chebyshev.psiMod" -> psiMaxEnorm	[style=dashed];	"Chebyshev.psiMod" -> siegel_walfisz	[style=dashed];	PartialIntegration	[color=green,		fillcolor="#1CAC78",		label=PartialIntegration,		shape=ellipse,		style=filled];	PartialIntegration -> mellin_bump_bounded;	large_sieve	[color=green,		label=large_sieve,		shape=ellipse];	large_sieve -> "Flat.largeSieve_factor";	sum_vonMangoldt_not_coprime_le	[color=green,		fillcolor="#1CAC78",		label=sum_vonMangoldt_not_coprime_le,		shape=ellipse,		style=filled];	sum_vonMangoldt_not_coprime_le -> Delta_onCoprime_Lambda_bound;	sum_vonMangoldt_not_coprime_le -> coprime_vonMangoldt_error;}`)
     .on("end", interactive);
 
 latexLabelEscaper = function(label) {

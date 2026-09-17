@@ -26,12 +26,21 @@ coefficients `μ(e)` and `log e` sitting outside the arithmetic functions.
 
 /-- Move a dilation across a convolution onto the whole product: `dilate e H * g = H * dilate e g`.
 -/
+@[blueprint "mul_dilate" (latexEnv := "lemma")]
 theorem dilate_mul_left {e : ℕ} (he : 0 < e) (H g : ArithmeticFunction ℝ) :
     dilate e H * g = H * dilate e g := by
   rw [mul_comm (dilate e H) g, mul_dilate he, mul_dilate he, mul_comm g H]
 
 /-- Möbius inversion of the coprimality indicator: `1_{(r,b)=1} = ∑_{e ∣ r} μ(e)·1_{e ∣ b}`.
 Needs `r ≠ 0` (for `r = 0` the empty divisor set `Nat.divisors 0 = ∅` breaks the identity). -/
+@[blueprint (latexEnv := "lemma") (title := /-- Möbius inversion of the coprimality indicator -/) (statement := /--
+For every $r \ge 1$ and every $b \in \N$,
+$$\sum_{e \mid r} \mu(e)\, 1_{e \mid b} = 1_{(r, b) = 1} .$$
+-/) (proof := /--
+The divisors $e$ of $r$ with $e \mid b$ are exactly the divisors of $\gcd(r, b)$, and
+$\sum_{e \mid m} \mu(e) = 1_{m = 1}$ for $m \ge 1$ (this is $\mu * 1 = \delta_1$). Note that $r \ge 1$ is
+needed: for $r = 0$ the left side is an empty sum while $(0, 1) = 1$.
+-/)]
 theorem moebius_coprime_indicator {r : ℕ} (hr : r ≠ 0) (b : ℕ) :
     ∑ e ∈ r.divisors, (if e ∣ b then (μ e : ℝ) else 0) = if r.Coprime b then 1 else 0 := by
   rw [← Finset.sum_filter]
@@ -48,6 +57,7 @@ theorem moebius_coprime_indicator {r : ℕ} (hr : r ≠ 0) (b : ℕ) :
 
 /-- Pointwise Möbius expansion (B1): the restriction of `log` to integers coprime to `r`
 equals a divisor-sum of dilated `ζ`/`log`. -/
+@[blueprint "zeta_on_coprime_apply" (latexEnv := "lemma")]
 theorem log_on_coprime_apply (r b : ℕ) :
     ((log : ArithmeticFunction ℝ).on {k | r.Coprime k}) b
       = ∑ e ∈ r.divisors,
@@ -91,6 +101,15 @@ theorem log_on_coprime_apply (r b : ℕ) :
     · rw [ArithmeticFunction.on_apply_of_not_mem {k | r.Coprime k} log b hcop,
           if_neg hcop, zero_mul]
 
+@[blueprint "mul_on_coprime_expansion" (latexEnv := "lemma") (title := /-- Convolution with a restricted analytic factor -/) (statement := /--
+Let $H$ be a real arithmetic function and $r \ge 1$. Then, as functions on $\N$,
+$$H * 1_r = \sum_{e \mid r} \mu(e)\, \big( (\delta_e * H) * 1 \big), \qquad
+H * \log_r = \sum_{e \mid r} \mu(e) \Big( \log e \cdot \big((\delta_e * H) * 1\big) + (\delta_e * H) * \log \Big).$$
+(The second identity holds for all $r \in \N$.)
+-/) (proof := /--
+Convolve the identities of \Cref{zeta_on_coprime_apply} with $H$, using bilinearity of the convolution
+and $H * (\delta_e * g) = (\delta_e * H) * g$ (\Cref{mul_dilate}).
+-/)]
 theorem mul_log_on_coprime_coe (r : ℕ) (H : ArithmeticFunction ℝ) :
     (⇑(H * (log : ArithmeticFunction ℝ).on {k | r.Coprime k}) : ℕ → ℝ)
       = ∑ e ∈ r.divisors,
@@ -121,6 +140,21 @@ theorem mul_log_on_coprime_coe (r : ℕ) (H : ArithmeticFunction ℝ) :
 equals a divisor-sum of dilated `ζ`. Requires `r ≠ 0`: for `r = 0` the coprimality set is
 `{1}`, so the restriction is the identity arithmetic function `1`, while the divisor sum is
 empty (`Nat.divisors 0 = ∅`). -/
+@[blueprint (latexEnv := "lemma") (title := /-- Möbius expansion of $1_r$ and $\log_r$ -/) (statement := /--
+Let $r \ge 1$. As arithmetic functions,
+$$1_r = \sum_{e \mid r} \mu(e)\, (\delta_e * 1), \qquad
+\log_r = \sum_{e \mid r} \mu(e) \big( \log e \cdot (\delta_e * 1) + \delta_e * \log \big),$$
+where $1_r$ and $\log_r$ are the restrictions (\Cref{onCoprime}) of the constant function $1$ and of
+$\log$ to the integers coprime to $r$, and $\delta_e * (\cdot)$ is the dilation of \Cref{dilate}. (The
+identity for $\log$ holds for $r = 0$ as well, both sides then vanishing except at $b = 1$ where
+$\log 1 = 0$.)
+-/) (proof := /--
+Evaluate at $b \ge 1$. Since $(\delta_e * 1)(b) = 1_{e \mid b}$, the first identity is
+\Cref{moebius_coprime_indicator}. For the second, $(\delta_e * \log)(b) = 1_{e \mid b} \log(b/e)$, so
+$\log e \cdot (\delta_e * 1)(b) + (\delta_e * \log)(b) = 1_{e \mid b} (\log e + \log(b/e)) = 1_{e \mid b} \log b$;
+summing against $\mu(e)$ over $e \mid r$ and using \Cref{moebius_coprime_indicator} gives
+$1_{(r,b)=1} \log b = \log_r(b)$. At $b = 0$ all terms vanish.
+-/)]
 theorem zeta_on_coprime_apply {r : ℕ} (hr : r ≠ 0) (b : ℕ) :
     ((ζ : ArithmeticFunction ℝ).on {k | r.Coprime k}) b
       = ∑ e ∈ r.divisors, (μ e : ℝ) * dilate e (ζ : ArithmeticFunction ℝ) b := by
@@ -144,6 +178,7 @@ theorem zeta_on_coprime_apply {r : ℕ} (hr : r ≠ 0) (b : ℕ) :
           ArithmeticFunction.natCoe_apply, ArithmeticFunction.zeta_apply_ne hb0, Nat.cast_one]
     · rw [ArithmeticFunction.on_apply_of_not_mem {k | r.Coprime k} _ b hcop, if_neg hcop]
 
+@[blueprint "mul_on_coprime_expansion" (latexEnv := "lemma")]
 theorem mul_zeta_on_coprime_coe {r : ℕ} (hr : r ≠ 0) (H : ArithmeticFunction ℝ) :
     (⇑(H * (ζ : ArithmeticFunction ℝ).on {k | r.Coprime k}) : ℕ → ℝ)
       = ∑ e ∈ r.divisors,
@@ -166,6 +201,14 @@ theorem mul_zeta_on_coprime_coe {r : ℕ} (hr : r ≠ 0) (H : ArithmeticFunction
 
 /-! ### `Δ`-bound for a single dilated summand (flog bound + dilation `ℓ¹` preservation) -/
 
+@[blueprint (latexEnv := "lemma") (title := /-- Type I estimate for a dilated coefficient function -/) (statement := /--
+Let $v \in \N$, $e \ge 1$, let $h$ be a real arithmetic function, $x \ge 2$, $q \ge 1$ and
+$a \in (\Z/q\Z)^*$. Then
+$$\big| \Delta_{(\delta_e * h) * \log^v}(x; q, a) \big| \le 2 (\log x)^v \sum_{k \le x} |h(k)|.$$
+-/) (proof := /--
+Apply \Cref{Delta_flog_bound} to the arithmetic function $\delta_e * h$ and then
+\Cref{summatory_abs_dilate_le}.
+-/)]
 theorem Delta_dilate_flog_bound {v e : ℕ} (he : 0 < e) (h : ArithmeticFunction ℝ)
     {x : ℝ} (hx : 2 ≤ x) {q : ℕ} [NeZero q] (a : ZMod q) (ha : IsUnit a) :
     |Δ_[⇑(dilate e h * ppow log v)](x; q, a)|
@@ -180,6 +223,16 @@ theorem Delta_dilate_flog_bound {v e : ℕ} (he : 0 < e) (h : ArithmeticFunction
 /-! ### Group E (specialised `ℓ¹` bounds) -/
 
 /-- `‖μ_{≤V}‖₁ ≤ V`: `|μ| ≤ 1` on the `≤ V` supported values. -/
+@[blueprint "l1_norms_coefficients" (latexEnv := "lemma") (title := /-- $\ell^1$ norms of the coefficient functions -/) (statement := /--
+For every parameter datum and every real $x$,
+$$\sum_{k \le x} |\mu_{\le V}(k)| \le V, \qquad\text{and, if } x \ge 2,\qquad \sum_{k \le x} |\Lambda_{\le U}(k)| \le U \log x .$$
+-/) (proof := /--
+The function $\mu_{\le V}$ is supported on the at most $V$ integers $1 \le k \le V$ and satisfies
+$|\mu_{\le V}| \le 1$. The function $\Lambda_{\le U}$ is non-negative, supported on $1 \le k \le U$, and
+$\Lambda(k) \le \log k$. If $U \le x$ its support has at most $U$ points each contributing at most
+$\log U \le \log x$; if $x < U$ the range $k \le x$ has at most $x \le U$ points each contributing at most
+$\log x$.
+-/)]
 theorem summatory_abs_moebiusLEV_le [ProofData] {x : ℝ} :
     summatory (fun k => |(μ≤V : ArithmeticFunction ℝ) k|) x ≤ V := by
   refine le_trans (le_abs_self _) ?_
@@ -205,6 +258,7 @@ theorem summatory_abs_moebiusLEV_le [ProofData] {x : ℝ} :
 
 /-- `‖Λ_{≤U}‖₁ ≤ U·log x`: `Λ(k) ≤ log k ≤ log x` on the `≤ U` supported values
 (`vonMangoldt_le_log`); the extra `log` is absorbed by the target `UV log x`. -/
+@[blueprint "l1_norms_coefficients" (latexEnv := "lemma")]
 theorem summatory_abs_LambdaLEU_le [ProofData] {x : ℝ} (hx : 2 ≤ x) :
     summatory (fun k => |(Λ≤U : ArithmeticFunction ℝ) k|) x ≤ U * Real.log x := by
   have hx0 : (0:ℝ) ≤ Real.log x := Real.log_nonneg (by linarith)
@@ -238,6 +292,23 @@ theorem summatory_abs_LambdaLEU_le [ProofData] {x : ℝ} (hx : 2 ≤ x) :
 /-! ### Group F: the two term bounds -/
 
 /-- Term 1 of `Λ♯`: `μ_{≤V} * log`, restricted to coprimes of `r`. -/
+@[blueprint (latexEnv := "lemma") (title := /-- The first term of $\Lambda^\sharp_r$ -/) (statement := /--
+For every parameter datum, every $q \ge 1$, $a \in (\Z/q\Z)^*$, every $r \in \N$ with $r \le x$ and every
+real $2 \le y \le x$,
+$$\big| \Delta_{(\mu_{\le V} * \log)_r}(y; q, a) \big| \le 4\, \tau(r)\, V \log x .$$
+-/) (proof := /--
+By \Cref{ArithmeticFunction.on_mul_of_saturated}, $(\mu_{\le V} * \log)_r = (\mu_{\le V})_r * \log_r$, and by
+\Cref{mul_on_coprime_expansion} with $H = (\mu_{\le V})_r$,
+$$(\mu_{\le V} * \log)_r = \sum_{e \mid r} \mu(e) \Big( \log e \cdot (\delta_e * H) * 1 + (\delta_e * H) * \log \Big).$$
+(If $r = 0$ both sides are supported on $n = 1$, where $\log 1 = 0$, so the identity is trivial.) By
+linearity (\Cref{Delta_linear}) and the triangle inequality it suffices to bound each of the $\tau(r)$
+summands by $4 V \log x$. Fix $e \mid r$; then $1 \le e \le r \le x$, so $0 \le \log e \le \log x$, and
+$|\mu(e)| \le 1$. By \Cref{Delta_dilate_flog_bound} with $v = 0$ and $v = 1$ at the point $y \ge 2$,
+$$|\Delta_{(\delta_e * H) * 1}(y;q,a)| \le 2 \|H\|_1, \qquad |\Delta_{(\delta_e * H) * \log}(y;q,a)| \le 2 \log y\, \|H\|_1,$$
+where $\|H\|_1 = \sum_{k \le y} |H(k)| \le \sum_{k \le y} |\mu_{\le V}(k)| \le V$ by
+\Cref{l1_norms_coefficients}. Since $\log y \le \log x$, the $e$-th summand is at most
+$\log x \cdot 2V + 2 \log x \cdot V = 4 V \log x$.
+-/)]
 theorem Delta_term1_bound [ProofData] {q r : ℕ} [NeZero q] {a : ZMod q}
     (ha : IsUnit a) (hr : r ≤ x) {y : ℝ} (h2y : 2 ≤ y) (hy : y ≤ x) :
     |Δ_[onCoprime r ⇑(μ≤V * log)](y; q, a)| ≤ 4 * (r.divisors.card : ℝ) * V * Real.log x := by
@@ -344,6 +415,20 @@ theorem Delta_term1_bound [ProofData] {q r : ℕ} [NeZero q] {a : ZMod q}
     _ = 4 * (r.divisors.card : ℝ) * V * Real.log x := by ring
 
 /-- Term 2 of `Λ♯`: `Λ_{≤U} * μ_{≤V} * ζ`, restricted to coprimes of `r`. -/
+@[blueprint (latexEnv := "lemma") (title := /-- The second term of $\Lambda^\sharp_r$ -/) (statement := /--
+For every parameter datum, every $q \ge 1$, $a \in (\Z/q\Z)^*$, every $r \in \N$ with $r \le x$ and every
+real $2 \le y \le x$,
+$$\big| \Delta_{(\Lambda_{\le U} * \mu_{\le V} * 1)_r}(y; q, a) \big| \le 2\, \tau(r)\, U V \log x .$$
+-/) (proof := /--
+If $r = 0$, the restricted function is supported on $n = 1$ where $(\Lambda_{\le U} * \mu_{\le V} * 1)(1) = \Lambda(1) \mu(1) = 0$,
+so the discrepancy vanishes. Let $r \ge 1$. By \Cref{ArithmeticFunction.on_mul_of_saturated} and
+\Cref{mul_on_coprime_expansion} with $H = (\Lambda_{\le U} * \mu_{\le V})_r$,
+$$(\Lambda_{\le U} * \mu_{\le V} * 1)_r = H * 1_r = \sum_{e \mid r} \mu(e)\, (\delta_e * H) * 1 .$$
+By \Cref{Delta_linear}, the triangle inequality, $|\mu(e)| \le 1$ and \Cref{Delta_dilate_flog_bound} with
+$v = 0$, each of the $\tau(r)$ summands has discrepancy at most $2 \|H\|_1$, where
+$$\|H\|_1 = \sum_{k \le y} |H(k)| \le \sum_{k \le y} |(\Lambda_{\le U} * \mu_{\le V})(k)| \le \Big(\sum_{k \le y} |\Lambda_{\le U}(k)|\Big)\Big(\sum_{k \le y} |\mu_{\le V}(k)|\Big) \le U \log y \cdot V$$
+by \Cref{summatory_abs_mul_le} and \Cref{l1_norms_coefficients}. Since $\log y \le \log x$ the claim follows.
+-/)]
 theorem Delta_term2_bound [ProofData] {q r : ℕ} [NeZero q] {a : ZMod q}
     (ha : IsUnit a) (hr : r ≤ x) {y : ℝ} (h2y : 2 ≤ y) (hy : y ≤ x) :
     |Δ_[onCoprime r ⇑(Λ≤U * μ≤V * (ζ : ArithmeticFunction ℝ))](y; q, a)|
@@ -428,18 +513,23 @@ theorem Delta_term2_bound [ProofData] {q r : ℕ} [NeZero q] {a : ZMod q}
 
 /-! ### Group G: the main Type I bound -/
 
--- Note: corrected statement carries a `τ(r) = r.divisors.card` factor (see
--- `notes/delta_lambda_sharp_bound.md`); the original blueprint `≪ UV log x` is unprovable.
 /-- Canonical `ℝ≥0∞` form of the Type I estimate. -/
-@[blueprint (statement := /--
-For $U, V \ge 1$, $x \ge 2$, $q \in \N$, $r \le x$ and $a \in (\Z/q\Z)^*$,
-$$\max_{y \le x} \max_{a \in (\Z/q\Z)^*} |\Delta_{\Lambda^\sharp_r}(y;\, q,\, a)| \ll \tau(r)\, UV \log x$$
+@[blueprint (title := /-- Pointwise Type I bound for $\Lambda^\sharp_r$ -/) (statement := /--
+For every parameter datum, every $q \ge 1$, $a \in (\Z/q\Z)^*$, every $r \in \N$ with $r \le x$ and every
+real $2 \le y \le x$,
+$$\big| \Delta_{\Lambda^\sharp_r}(y; q, a) \big| \ll \tau(r)\, U V \log x ,$$
+with an absolute implied constant. The factor $\tau(r)$ cannot be dropped: the discrepancy of $\log_r$
+is a signed combination of $2^{\omega(r)}$ residue-class counts with no cancellation in general, and the
+Möbius expansion above records this honestly. Downstream it is harmless because $\tau$ is only ever
+\emph{averaged} over the modulus (\Cref{BV_LambdaSharp_enorm}) or bounded by $2x^{1/4}$
+(\Cref{Delta_onCoprime_LambdaFlat_pointwise}).
 -/) (proof := /--
-Restriction `(\cdot)_r` is a Dirichlet-convolution homomorphism, so the analytic
-factor becomes $\log_r$ / $\zeta_r$. Möbius-expand it as $\sum_{e \mid r} \mu(e)$
-of dilated literal $\log$ / $\zeta$, then apply \ref{Delta_flog_bound} to each
-summand. The number of summands contributes the $\tau(r)$ factor.
--/) (uses := [Delta_flog_bound, Delta_convolution_eq])]
+Since restriction to integers coprime to $r$ is linear, $\Lambda^\sharp_r = (\mu_{\le V} * \log)_r - (\Lambda_{\le U} * \mu_{\le V} * 1)_r$,
+so by \Cref{Delta_linear} and the triangle inequality
+$|\Delta_{\Lambda^\sharp_r}(y;q,a)| \le 4 \tau(r) V \log x + 2 \tau(r) U V \log x$ by
+\Cref{Delta_term1_bound} and \Cref{Delta_term2_bound}. As $U \ge 1$ (\Cref{UV_range}), this is at most
+$6 \tau(r) U V \log x$.
+-/)]
 theorem Delta_LambdaSharp_bound [ProofData] {q r : ℕ} [NeZero q] {a : ZMod q} (ha : IsUnit a)
     (hr : r ≤ x) {y : ℝ} (h2y : 2 ≤ y) (hy : y ≤ x) :
     |Δ_[onCoprime r ⇑Λ♯](y; q, a)| ≤ C_DLS * (r.divisors.card : ℝ) * U * V * Real.log x := by
@@ -468,10 +558,15 @@ theorem Delta_LambdaSharp_bound [ProofData] {q r : ℕ} [NeZero q] {a : ZMod q} 
   simp only [C_DLS]
   nlinarith [mul_nonneg (mul_nonneg (mul_nonneg hτ hV) hlogx) (by positivity : (0:ℝ) ≤ U - 1)]
 
-@[blueprint (statement := /--
-The divisor function has average order $\log$:
+@[blueprint (title := /-- Average order of the divisor function -/) (statement := /--
+For every real $Q \ge 2$,
 $$\sum_{q \le Q} \tau(q) \ll Q \log Q,$$
-uniformly for $Q \ge 2$ (where $\tau(q) = $ `q.divisors.card`).
+where $\tau(q)$ is the number of divisors of $q$.
+-/) (proof := /--
+Let $N = \lfloor Q \rfloor$. Counting pairs $(q, d)$ with $d \mid q \le N$ according to $d$ gives the
+classical identity $\sum_{q \le N} \tau(q) = \sum_{d \le N} \lfloor N/d \rfloor$, which is at most
+$N \sum_{d \le N} 1/d = N H_N$. The harmonic number satisfies $H_N \le 1 + \log N \le 1 + \log Q$, and
+$1 \ll \log Q$ because $Q \ge 2$.
 -/)]
 theorem sum_divisors_card_le {Q : ℝ} (hQ : 2 ≤ Q) :
     ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊, (q.divisors.card : ℝ) ≤ C_tau * Q * Real.log Q := by
@@ -514,10 +609,29 @@ theorem sum_divisors_card_le {Q : ℝ} (hQ : 2 ≤ Q) :
         rw [C_tau]
         nlinarith [mul_nonneg hQ0 (by positivity : (0:ℝ) ≤ Real.log Q - 1/2)]
 
-@[blueprint (statement := /--
-For each fixed $A \ge 0$, $x \ge 2$ and $1 \le Q \le \sqrt{x}/(\log x)^{A+3}$,
-$$\sum_{q \le Q} \max_{\sqrt{x} \le y \le x} \max_{a \in (\Z/q\Z)^*} |\Delta_{\Lambda^\sharp}(y;\, q,\, a)| \ll_A \frac{x}{(\log x)^A}$$
--/) (uses := [Delta_LambdaSharp_bound, sum_divisors_card_le])]
+@[blueprint (title := /-- The Type I part on average -/) (statement := /--
+For every parameter datum, every $A \in \N$ and every real $1 \le Q \le \sqrt{x}/(\log x)^{A+3}$,
+$$\sum_{q \le Q}\ \max_{\substack{\sqrt x \le y \le x \\ a \in (\Z/q\Z)^*}} |\Delta_{\Lambda^\sharp}(y; q, a)| \ll \frac{x}{(\log x)^{A}},$$
+with an absolute implied constant.
+-/) (proof := /--
+Since $\log x \ge 1$, the hypothesis gives $Q \le \sqrt x \le x$; also $\sqrt x \ge 2$
+(\Cref{log_x_large}), so every $y \in [\sqrt x, x]$ satisfies $2 \le y \le x$.
+
+\emph{Pointwise bound.} Fix $1 \le q \le Q$, a unit $a$ and $\sqrt x \le y \le x$. By
+\Cref{Delta_onCoprime_self}, $\Delta_{\Lambda^\sharp}(y;q,a) = \Delta_{\Lambda^\sharp_q}(y;q,a)$, and
+\Cref{Delta_LambdaSharp_bound} with $r = q \le x$ gives
+$|\Delta_{\Lambda^\sharp}(y;q,a)| \ll \tau(q)\, UV \log x$. By
+\Cref{maxya_Delta_enorm_le_of_abs_le} the same bound holds for the maximum over $y$ and $a$.
+
+\emph{Averaging the divisor function.} Summing over $q \le Q$,
+$$\sum_{q \le Q} \max_{y, a} |\Delta_{\Lambda^\sharp}(y;q,a)| \ll UV \log x \sum_{q \le Q} \tau(q) \ll UV \log x \cdot Q \log x ,$$
+where for $Q \ge 2$ we used \Cref{sum_divisors_card_le} and $\log Q \le \log x$, while for $1 \le Q < 2$
+the sum is $\tau(1) = 1 \le Q \log x$.
+
+\emph{Conclusion.} Using $UV \le \sqrt x$ and $Q (\log x)^{A+2} \le Q (\log x)^{A+3} \le \sqrt x$,
+$$UV \cdot Q (\log x)^{2} \cdot (\log x)^A = UV \cdot Q (\log x)^{A+2} \le \sqrt x \cdot \sqrt x = x,$$
+so the right-hand side above is $\ll x/(\log x)^A$.
+-/)]
 theorem BV_LambdaSharp_enorm [ProofData] {A : ℕ} (Q : ℝ) (h1Q : 1 ≤ Q)
     (hQ : Q ≤ √x / (Real.log x) ^ (A + 3)) :
     ∑ q ∈ Finset.Ioc 0 ⌊Q⌋₊,

@@ -8,8 +8,12 @@
 
 \usepackage{amssymb, amsthm, amsmath}
 \usepackage{hyperref}
-\usepackage[showmore, dep_graph]{blueprint}
+\usepackage[showmore, dep_graph, thms=definition+lemma+proposition+theorem+corollary+assumption]{blueprint}
 
+
+\usepackage{cleveref}
+\crefname{assumption}{Assumption}{Assumptions}
+\Crefname{assumption}{Assumption}{Assumptions}
 
 \input{macros/common}
 \input{macros/web}

@@ -10,7 +10,7 @@ The main theorem (`bombieri_vinogradov` in `BV/MainResults.lean`) states that fo
 $$\sum_{q \le Q} \max_{y \le x} \max_{a \in (\mathbb{Z}/q\mathbb{Z})^*} \left| \psi(y;q,a) - \frac{y}{\varphi(q)} \right| \ll_A \frac{x}{(\log x)^A}$$
 uniformly for $x \ge 2$, $1 \le Q \le \sqrt{x}/(\log x)^{A+3}$.
 
-The proof blueprint is in `notes/Blueprint.md` (follows Koukoulopoulos *The Distribution of Prime Numbers*).
+The proof blueprint is generated from the `@[blueprint (statement := …) (proof := …)]` annotations in the Lean sources plus the narrative in `blueprint/src/content.tex` (build: `lake build :blueprint` then `uvx leanblueprint web`). It follows Koukoulopoulos *The Distribution of Prime Numbers*, Ch. 26; `notes/Blueprint.md` is a one-page summary with a log of where the formal proof deviates from the textbook.
 
 ---
 
@@ -58,9 +58,10 @@ notes/Blueprint.md — Mathematical proof sketch with LaTeX
 | Parameters $U, V, x, y$ | `ProofData` typeclass fields | `BV/Defs.lean` |
 
 The `ProofData` typeclass bundles all proof parameters with their hypotheses:
-- `U, V, x, y : ℝ`
-- `le_x : 2 ≤ x`, `sqrt_x_le_y : √x ≤ y`, `y_le_x : y ≤ x`
-- `UV_le : U * V ≤ √x`, `le_U : exp(√x) ≤ U`, `le_V : exp(√x) ≤ V`
+- `U, V, x : ℝ`
+- `le_x : 2 ≤ x`
+- `UV_le : U * V ≤ √x`, `le_U : exp(√(log x)) ≤ U`, `le_V : exp(√(log x)) ≤ V`
+- (these force `16 ≤ log x`, see `sixteen_le_log_x`; `y` is always a free variable with `√x ≤ y ≤ x`)
 
 ---
 

@@ -8,22 +8,47 @@ open scoped ENNReal
 namespace BV
 
 /-- The supremum of an `ℝ≥0∞`-valued function on `[√x, x]`. -/
+@[blueprint (title := /-- Maximum over $\sqrt x \le y \le x$ -/) (statement := /--
+For a function $F : \R \to [0, \infty]$ we write
+$$\max_{\sqrt x \le y \le x} F(y) := \sup \{ F(y) : \sqrt{x} \le y \le x \} \in [0, \infty].$$
+The supremum is taken in the extended non-negative reals, so it always exists; all the maxima
+appearing in the estimates below are of this form (or the analogous \Cref{BV.maxya}), and it is part
+of each estimate that the supremum is finite.
+-/)]
 noncomputable def maxy [ProofData] (f : ℝ → ℝ≥0∞) : ℝ≥0∞ :=
   ⨆ y : Set.Icc (√x) x, f y
 
 /-- The supremum over `y ∈ [√x,x]` and unit residue classes modulo `q`. -/
+@[blueprint (title := /-- Maximum over $y$ and over reduced residues -/) (statement := /--
+For $q \in \N$ and $F : \R \times \Z/q\Z \to [0, \infty]$ we write
+$$\max_{\substack{\sqrt x \le y \le x \\ a \in (\Z/q\Z)^*}} F(y, a) := \sup_{a \in (\Z/q\Z)^*} \ \sup_{\sqrt x \le y \le x} F(y, a) \in [0,\infty],$$
+the inner supremum being \Cref{BV.maxy}. The residue $a$ ranges over the units of $\Z/q\Z$ only.
+-/)]
 noncomputable def maxya [ProofData] (q : ℕ) (f : ℝ → ZMod q → ℝ≥0∞) : ℝ≥0∞ :=
   ⨆ a : (ZMod q)ˣ, maxy (fun y ↦ f y a)
 
+@[blueprint "maxya_basic" (latexEnv := "lemma")]
 theorem le_maxy [ProofData] {f : ℝ → ℝ≥0∞} {y : ℝ}
     (hy1 : √x ≤ y) (hy2 : y ≤ x) : f y ≤ maxy f := by
   exact le_iSup (fun z : Set.Icc (√x) x ↦ f z) ⟨y, hy1, hy2⟩
 
+@[blueprint "maxya_basic" (latexEnv := "lemma")]
 theorem maxy_le [ProofData] {f : ℝ → ℝ≥0∞} {M : ℝ≥0∞}
     (hf : ∀ y, √x ≤ y → y ≤ x → f y ≤ M) : maxy f ≤ M := by
   refine iSup_le fun y ↦ ?_
   exact hf y y.2.1 y.2.2
 
+@[blueprint "maxya_basic" (latexEnv := "lemma") (title := /-- Basic properties of the maximum -/) (statement := /--
+Let $q \in \N$ and $F : \R \times \Z/q\Z \to [0, \infty]$.
+\begin{enumerate}
+\item If $a \in (\Z/q\Z)^*$ and $\sqrt x \le y \le x$, then $F(y, a) \le \max_{y, a} F(y, a)$.
+\item If $F(y, a) \le M$ for all $a \in (\Z/q\Z)^*$ and all $\sqrt x \le y \le x$, then
+$\max_{y,a} F(y, a) \le M$.
+\end{enumerate}
+The same holds for \Cref{BV.maxy} without the residue variable.
+-/) (proof := /--
+These are the defining properties of a supremum in the complete lattice $[0, \infty]$.
+-/)]
 theorem le_maxya [ProofData] {q : ℕ} {f : ℝ → ZMod q → ℝ≥0∞}
     {y : ℝ} {a : ZMod q} (ha : IsUnit a) (hy1 : √x ≤ y) (hy2 : y ≤ x) :
     f y a ≤ maxya q f := by
@@ -36,6 +61,7 @@ theorem maxya_le [ProofData] {q : ℕ} {f : ℝ → ZMod q → ℝ≥0∞} {M : 
   grind
 
 /-- Units-only version of `maxya_le`. -/
+@[blueprint "maxya_basic" (latexEnv := "lemma")]
 theorem maxya_le_unit [ProofData] {q : ℕ} {f : ℝ → ZMod q → ℝ≥0∞} {M : ℝ≥0∞}
     (hf : ∀ y, √x ≤ y → y ≤ x → ∀ a : ZMod q, IsUnit a → f y a ≤ M) :
     maxya q f ≤ M := by

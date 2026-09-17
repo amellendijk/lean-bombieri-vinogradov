@@ -5,6 +5,11 @@ import BV.Summatory
 open ArithmeticFunction
 
 /-- The set of natural numbers congruent to `a` modulo `q`. -/
+@[blueprint (title := /-- Residue classes -/) (statement := /--
+For $q \in \N$ and $a \in \Z/q\Z$, we write $\{n \in \N : n \equiv a \pmod q\}$ for the set of natural
+numbers whose residue class modulo $q$ is $a$. When $q = 0$ we identify $\Z/0\Z = \Z$, and when
+$q = 1$ every natural number lies in the single residue class.
+-/)]
 def Nat.modEqs {q : ℕ} (a : ZMod q) : Set ℕ := {n : ℕ | n = a}
 
 @[simp]
@@ -19,6 +24,12 @@ theorem Nat.mem_modEqs {q : ℕ} (a : ZMod q) (n : ℕ) :
 namespace Chebyshev
 
 /-- The modular Chebyshev function `ψ(x; q, a)`. -/
+@[blueprint (title := /-- Chebyshev's function in arithmetic progressions -/) (statement := /--
+For a real number $x$, a modulus $q \in \N$ and a residue class $a \in \Z/q\Z$, set
+$$\psi(x; q, a) := \sum_{\substack{n \le x \\ n \equiv a \pmod q}} \Lambda(n),$$
+where $\Lambda$ is the von Mangoldt function. We do not require $a$ to be coprime to $q$ in the
+definition. For $q = 1$ this is the classical Chebyshev function $\psi(x) = \sum_{n \le x} \Lambda(n)$.
+-/)]
 noncomputable def psiMod (x : ℝ) {q : ℕ} (a : ZMod q) : ℝ :=
   ∑ n ∈ Finset.Ioc 0 ⌊x⌋₊, if ((n : ℕ) : ZMod q) = a then Λ n else 0
 
@@ -71,6 +82,16 @@ theorem abs_psiMod_sub_div_le {q : ℕ} (hq : 0 < q) {z : ℝ} (hz : 0 ≤ z)
   grind
 
 /-- Explicit compact-range consequence of `abs_psiMod_sub_div_le`. -/
+@[blueprint (latexEnv := "lemma") (title := /-- Trivial bound for the modular Chebyshev error -/) (statement := /--
+Let $q \ge 1$, let $a \in \Z/q\Z$ and let $z \ge 1$ be real. Then
+$$\left| \psi(z; q, a) - \frac{z}{\varphi(q)} \right| \ll z ,$$
+with an absolute implied constant.
+-/) (proof := /--
+Both $\psi(z;q,a)$ and $z/\varphi(q)$ are non-negative, so the absolute value is at most the larger of
+the two. Since every summand $\Lambda(n)$ is non-negative, $0 \le \psi(z;q,a) \le \psi(z)$, and
+Chebyshev's elementary bound $\psi(z) \ll z$ (Mathlib's \texttt{Chebyshev.psi\_le\_const\_mul\_self})
+applies. On the other hand $\varphi(q) \ge 1$, so $0 \le z/\varphi(q) \le z$.
+-/)]
 theorem abs_psiMod_sub_div_le_const {q : ℕ} (hq : 0 < q) {z : ℝ} (hz : 1 ≤ z)
     (a : ZMod q) :
     |psiMod z a - z / q.totient| ≤ (Real.log 4 + 5) * z := by

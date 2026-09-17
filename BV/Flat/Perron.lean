@@ -50,6 +50,14 @@ lemma integral_summatory {α E : Type*} [MeasurableSpace α] [NormedAddCommGroup
 
 open ArithmeticFunction Set
 
+@[blueprint (title := /-- Supported pairs of arithmetic functions -/) (statement := /--
+A \emph{supported pair} consists of complex arithmetic functions $f, g$ and real numbers $M, N > 0$
+with $f(n) = 0$ for $n > M$ and $g(n) = 0$ for $n > N$. For such a pair, a character $\chi$ and
+$s \in \C$ we write
+$$F_s(\chi) := \sum_{m \le M} f(m)\chi(m) m^{-s}, \qquad G_s(\chi) := \sum_{n \le N} g(n)\chi(n) n^{-s}$$
+for the associated Dirichlet polynomials, and $\|f\|_2 := \big(\sum_{m \le M} |f(m)|^2\big)^{1/2}$,
+$\|g\|_2 := \big(\sum_{n \le N} |g(n)|^2\big)^{1/2}$.
+-/)]
 class Flat.FG where
   f : ArithmeticFunction ℂ
   g : ArithmeticFunction ℂ
@@ -62,6 +70,16 @@ class Flat.FG where
 
 open MeasureTheory Set Real ContDiff
 
+@[blueprint (title := /-- Bump functions and the smoothed cutoff -/) (statement := /--
+A \emph{bump function} is a function $\nu : \R \to \R$ that is $C^\infty$, supported in $[1/2, 2]$,
+non-negative, and normalised by $\int_0^\infty \nu(t)\, \frac{\mathrm{d}t}{t} = 1$. Such functions exist
+(\Cref{SmoothExistence}); one is fixed once and for all, and the implied constants in this section may
+depend on this choice. For $\varepsilon > 0$ we write $\widetilde{1}_\varepsilon$ for the smoothed cutoff of
+\Cref{Smooth1} built from $\nu$; it satisfies $0 \le \widetilde 1_\varepsilon \le 1$ (\Cref{Smooth1Nonneg}), equals
+$1$ on $(0, 1 - (\log 2)\varepsilon]$ and $0$ on $[1 + 2(\log 2)\varepsilon, \infty)$ when $\varepsilon < 1$
+(\Cref{Smooth1Properties_below}), and has Mellin transform $\mathcal{M}[\widetilde 1_\varepsilon](s) = s^{-1} \mathcal{M}[\nu](\varepsilon s)$
+for $\Re s > 0$ (\Cref{MellinOfSmooth1a}).
+-/)]
 class Flat.Bump where
   ν : ℝ → ℝ
   diffν : ContDiff ℝ ∞ ν
@@ -73,6 +91,11 @@ class Flat.ProofData extends FG, Bump where
 
 open Flat.FG Flat.Bump
 
+@[blueprint (title := /-- The smoothed bilinear sums $T_\varepsilon(y, \chi)$ -/) (statement := /--
+For a supported pair $(f, g)$, a bump function $\nu$, $\varepsilon > 0$, $y > 0$ and a Dirichlet character
+$\chi$, set
+$$T_\varepsilon(y, \chi) := \sum_{m \le M} \sum_{n \le N} f(m)\chi(m)\, g(n) \chi(n)\, \widetilde{1}_\varepsilon\!\Big(\frac{mn}{y}\Big).$$
+-/)]
 noncomputable def Flat.T [Bump] [FG] {q : ℕ} (ε y : ℝ) (χ : DirichletCharacter ℂ q) : ℂ :=
   summatory (fun m ↦ summatory (fun n ↦ f m * χ m * g n * χ n * Smooth1 ν ε (m*n/y)) N) M
 
@@ -124,6 +147,7 @@ lemma norm_dirichletSum_le (c : ℕ → ℂ) (σ P t : ℝ) :
   rw [norm_mul, Complex.norm_natCast_cpow_of_pos hm]
   simp
 
+@[blueprint "Flat.T_mellin_representation"]
 theorem T_eq_sum_integral {σ : ℝ} (hσ_pos : 0 < σ) (hσ : σ ≤ 2)
     [Bump] [FG] {q : ℕ} {ε : ℝ} (hε_pos : 0 < ε) {χ : DirichletCharacter ℂ q} (y : ℝ) (hy : 1 ≤ y) (hε_one : ε < 1) :
   T ε y χ =
@@ -172,6 +196,7 @@ theorem integrable_term {σ : ℝ} (hσ_pos : 0 < σ) (hσ : σ ≤ 2)
   simp [mul_assoc]
 
 
+@[blueprint "Flat.T_mellin_representation"]
 theorem T_eq_integral_sum {σ : ℝ} (hσ_pos : 0 < σ) (hσ : σ ≤ 2)
     [Bump] [FG] {q : ℕ} {ε : ℝ} (hε_pos : 0 < ε) {χ : DirichletCharacter ℂ q} (y : ℝ) (hy : 1 ≤ y) (hε_one : ε < 1) :
   T ε y χ =
@@ -247,6 +272,17 @@ private lemma norm_T_le [Bump] [FG] {q : ℕ} {ε : ℝ} (hε_pos : 0 < ε)
   simp only [norm_mul]
   exact mul_le_of_le_one_right (by positivity) (Bump.norm_smooth1_le_one hε_pos (by positivity))
 
+@[blueprint (latexEnv := "lemma") (title := /-- Reduction of $\max_{y \le x}$ to half-integers -/) (statement := /--
+For $x \ge 1$ and $f : \N \to \C$,
+$$\sup_{1 \le y \le x} \Big\| \sum_{n \le y} f(n) \Big\| = \max_{1 \le K \le \lfloor x \rfloor} \Big\| \sum_{n \le K + 1/2} f(n) \Big\| .$$
+Consequently, for every supported pair $(f,g)$ (\Cref{Flat.FG}) and $Q \ge 1$,
+$$\sum_{q \le Q} \sumstar_{\chi \bmod q} \frac{q}{\varphi(q)} \sup_{1 \le y \le x} \Big\| \sum_{n \le y} (f*g)(n)\chi(n) \Big\| = \sum_{q \le Q} \sumstar_{\chi \bmod q} \frac{q}{\varphi(q)} \max_{1 \le K \le \lfloor x \rfloor} \Big\| \sum_{n \le K + 1/2} (f*g)(n) \chi(n) \Big\| .$$
+-/) (proof := /--
+The partial sum $\sum_{n \le y} f(n)$ depends only on $\lfloor y \rfloor$, and $\lfloor K + 1/2 \rfloor = K$.
+As $y$ ranges over $[1, x]$, $\lfloor y \rfloor$ ranges over $\{1, \dots, \lfloor x \rfloor\}$, so both sides
+are the maximum of the same finite set of numbers. The second statement follows by applying the
+first inside each summand.
+-/)]
 theorem sup_summatory_eq_sup_nat {f : ℕ → ℂ}
     {x : ℝ} (hx : 1 ≤ x) :
   open Classical in
@@ -297,6 +333,7 @@ theorem sup_summatory_eq_sup_nat {f : ℕ → ℂ}
       exact norm_summatory_le (Nat.floor_mono hy.2)
 
 
+@[blueprint "Flat.sup_summatory_eq_sup_nat" (latexEnv := "lemma")]
 theorem temp [fg : FG]
     {x Q : ℝ} (hx : 1 ≤ x) :
   open Classical in
@@ -310,6 +347,24 @@ theorem temp [fg : FG]
 /-- Pointwise bound on `‖T ε y χ‖`: from the Mellin integral representation
 `T_eq_integral_sum`, take norms inside the integral.  The factor
 `‖(1/y)^{-(σ+t I)}‖ = y^σ` is constant in `t` and is pulled out. -/
+@[blueprint "Flat.T_mellin_representation" (title := /-- Mellin representation of $T_\varepsilon$ -/) (statement := /--
+Let $(f, g)$ be a supported pair, $\nu$ a bump function, $0 < \varepsilon < 1$, $0 < \sigma \le 2$, $y \ge 1$
+and $\chi$ a Dirichlet character. Then
+$$T_\varepsilon(y, \chi) = \frac{1}{2\pi} \int_{-\infty}^{\infty} F_{\sigma + it}(\chi)\, G_{\sigma + it}(\chi)\, y^{\sigma + it}\, \mathcal M[\widetilde 1_\varepsilon](\sigma + it)\, \mathrm{d}t,$$
+and consequently
+$$\|T_\varepsilon(y, \chi)\| \le \frac{y^{\sigma}}{2\pi} \int_{-\infty}^{\infty} \|F_{\sigma+it}(\chi)\|\, \|G_{\sigma+it}(\chi)\|\, \|\mathcal M[\widetilde 1_\varepsilon](\sigma + it)\|\, \mathrm{d}t ,$$
+where the last integrand is integrable.
+-/) (proof := /--
+Apply \Cref{Smooth1_mellinInv_mellin_eq} to each term of $T_\varepsilon(y,\chi)$ at $u = mn/y > 0$:
+$$T_\varepsilon(y, \chi) = \sum_{m \le M} \sum_{n \le N} f(m)\chi(m) g(n)\chi(n) \cdot \frac{1}{2\pi} \int_{\R} \Big(\frac{mn}{y}\Big)^{-(\sigma+it)} \mathcal M[\widetilde 1_\varepsilon](\sigma+it)\,\mathrm{d}t .$$
+Each integrand is a continuous function of constant modulus $\|f(m)\chi(m)\| m^{-\sigma} \|g(n)\chi(n)\| n^{-\sigma} y^{\sigma}$
+times the integrable function $\mathcal M[\widetilde 1_\varepsilon](\sigma + it)$, hence integrable, so the finite
+double sum can be moved inside the integral. Using $(mn/y)^{-s} = m^{-s} n^{-s} y^{s}$ for positive
+reals and collecting the sums gives $F_s(\chi) G_s(\chi) y^{s}$. The inequality follows by taking norms
+inside the integral and using $|y^{\sigma + it}| = y^\sigma$; integrability of the majorant follows
+since $\|F_{\sigma+it}\| \|G_{\sigma+it}\|$ is continuous and bounded by
+$\sum_{m \le M} |f(m)| m^{-\sigma} \cdot \sum_{n \le N} |g(n)| n^{-\sigma}$.
+-/)]
 theorem T_norm_le_integral [Bump] [FG] {q : ℕ} {ε : ℝ} (hε_pos : 0 < ε) (hε_one : ε < 1)
     {χ : DirichletCharacter ℂ q} {σ : ℝ} (hσ_pos : 0 < σ) (hσ : σ ≤ 2) {y : ℝ} (hy : 1 ≤ y) :
     ‖T ε y χ‖ ≤ (y ^ σ / (2 * π)) *
@@ -428,6 +483,18 @@ private lemma integral_Icc_inv_abs {σ T : ℝ} (hσ : 0 < σ) (hT : 0 ≤ T) :
 /-- Bound A of Step 4: on the vertical line `Re s = σ` with `0 < σ ≤ 2` and `0 < ε < 1`, the
 Mellin transform of `Smooth1 ν ε` decays like `1/‖s‖`, with a constant depending only on `ν`.
 Combines `MellinOfSmooth1a` with the strip bound `mellin_bump_bounded`. -/
+@[blueprint "mellin_smooth1_bounds" (latexEnv := "lemma") (title := /-- Two bounds for the Mellin transform of $\widetilde 1_\varepsilon$ -/) (statement := /--
+Let $\nu$ be a bump function. For all $0 < \varepsilon < 1$, all $0 < \sigma \le 2$ and all $t \in \R$, with
+$s = \sigma + it$,
+$$\|\mathcal M[\widetilde 1_\varepsilon](s)\| \ll \frac{1}{\|s\|} \qquad\text{and}\qquad \|\mathcal M[\widetilde 1_\varepsilon](s)\| \ll \frac{1}{\varepsilon \|s\|^2},$$
+the implied constants depending only on $\nu$.
+-/) (proof := /--
+For the first bound use $\mathcal M[\widetilde 1_\varepsilon](s) = s^{-1} \mathcal M[\nu](\varepsilon s)$
+(\Cref{Flat.Bump}) and the boundedness of $\mathcal M[\nu]$ on the strip $0 \le \Re \le 2$
+(\Cref{mellin_bump_bounded}); note $\Re(\varepsilon s) = \varepsilon\sigma \in (0, 2)$. The second bound is
+\Cref{MellinOfSmooth1b}, applied with lower edge $\sigma_1 = \sigma$; its constant depends only on $\nu$.
+(Only these two bounds are needed; in particular no rapid decay of $\mathcal M[\nu]$ is used.)
+-/)]
 lemma exists_mellin_smooth1_boundA [Bump] :
     ∃ C : ℝ, 0 ≤ C ∧ ∀ (ε σ t : ℝ), 0 < ε → ε < 1 → 0 < σ → σ ≤ 2 →
       ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) ((σ : ℂ) + t * I)‖
@@ -449,6 +516,7 @@ lemma exists_mellin_smooth1_boundA [Bump] :
 
 /-- Bound B of Step 4, specialised to the line `Re s = σ`: `‖𝓜(Smooth1 ν ε)(σ+tI)‖ ≤
 C·(ε‖σ+tI‖²)⁻¹` for `0 < σ ≤ 2`, `0 < ε < 1`, with `C > 0` depending only on `ν`. -/
+@[blueprint "mellin_smooth1_bounds" (latexEnv := "lemma")]
 lemma exists_mellin_smooth1_boundB [Bump] :
     ∃ C : ℝ, 0 < C ∧ ∀ (σ : ℝ), 0 < σ → σ ≤ 2 → ∀ (ε t : ℝ), 0 < ε → ε < 1 →
       ‖mellin (fun u ↦ (Smooth1 ν ε u : ℂ)) ((σ : ℂ) + t * I)‖
@@ -553,6 +621,16 @@ lemma sum_Ioc_natCast {R : Type*} [AddCommMonoid R] (k : ℕ) (G : ℤ → R) :
 /-- One application of the large sieve to a single Dirichlet polynomial:
 `∑_{q≤Q} ∑*_χ (q/φq) ‖∑_{m≤P} h(m) χ(m) m^{-(σ+it)}‖² ≤ C_LS (P+Q²) ∑_{m≤P} ‖h(m)‖²`,
 where the `m^{-σ}` factors with `σ > 0`, `m ≥ 1` only shrink the coefficients. -/
+@[blueprint (latexEnv := "lemma") (title := /-- The large sieve for a Dirichlet polynomial -/) (statement := /--
+Let $Q \ge 1$, $\sigma > 0$, $t \in \R$, $h : \N \to \C$ and $P \in \R$. Then
+$$\sum_{q \le Q} \sumstar_{\chi \bmod q} \frac{q}{\varphi(q)} \Big\| \sum_{m \le P} h(m) \chi(m) m^{-(\sigma + it)} \Big\|^2 \ll (P + Q^2) \sum_{m \le P} |h(m)|^2 ,$$
+with the implied constant of \Cref{large_sieve}.
+-/) (proof := /--
+If $P < 1$ the left side is $0$. Otherwise apply \Cref{large_sieve} with $H = 0$, $N = \lfloor P \rfloor$ and
+$c_n = h(n) n^{-(\sigma + it)}$ for $1 \le n \le N$. Since $|c_n|^2 = |h(n)|^2 n^{-2\sigma} \le |h(n)|^2$ for
+$n \ge 1$, and $\lfloor P \rfloor \le P$, the right-hand side of the large sieve inequality is
+$\ll (P + Q^2) \sum_{m \le P} |h(m)|^2$.
+-/)]
 lemma largeSieve_factor {Q : ℝ} (hQ : 1 ≤ Q) {σ : ℝ} (hσ_pos : 0 < σ) (t : ℝ)
     (h : ℕ → ℂ) (P : ℝ) :
     open Classical in
@@ -642,6 +720,18 @@ lemma sqrt_add_sq_mul_le {M N Q : ℝ} (hM : 0 ≤ M) (hN : 0 ≤ N) (hQ : 0 ≤
 `‖F_{σ+tI}(χ)‖·‖G_{σ+tI}(χ)‖` over `q ≤ Q` and primitive `χ (mod q)` (weighted by `q/φ(q)`),
 Cauchy–Schwarz and two applications of the large sieve give a bound in terms of the `ℓ²` norms
 of `f` and `g`, uniformly in `t`. -/
+@[blueprint (title := /-- Cauchy--Schwarz and the large sieve twice -/) (statement := /--
+Let $(f, g)$ be a supported pair (\Cref{Flat.FG}), $Q \ge 1$, $\sigma > 0$ and $t \in \R$. Then
+$$\sum_{q \le Q} \sumstar_{\chi \bmod q} \frac{q}{\varphi(q)} \|F_{\sigma+it}(\chi)\|\, \|G_{\sigma+it}(\chi)\| \ll \big( \sqrt{NM} + \sqrt{M}\, Q + \sqrt{N}\, Q + Q^2 \big)\, \|f\|_2 \|g\|_2 ,$$
+with the implied constant of \Cref{large_sieve}; in particular it is uniform in $t$ and $\sigma$.
+-/) (proof := /--
+By the Cauchy--Schwarz inequality with weights $w_{q,\chi} = q/\varphi(q) \ge 0$ over the pairs $(q, \chi)$,
+$$\sum_{q, \chi} w_{q,\chi} \|F\| \|G\| \le \Big( \sum_{q,\chi} w_{q,\chi} \|F\|^2 \Big)^{1/2} \Big( \sum_{q,\chi} w_{q,\chi} \|G\|^2 \Big)^{1/2} .$$
+By \Cref{Flat.largeSieve_factor} (with $h = f$, $P = M$, and with $h = g$, $P = N$) the two factors are
+$\ll \sqrt{M + Q^2}\, \|f\|_2$ and $\ll \sqrt{N + Q^2}\, \|g\|_2$. Finally
+$\sqrt{M + Q^2}\, \sqrt{N + Q^2} \le (\sqrt M + Q)(\sqrt N + Q) = \sqrt{NM} + \sqrt M Q + \sqrt N Q + Q^2$,
+using $\sqrt{a + Q^2} \le \sqrt a + Q$ for $a, Q \ge 0$.
+-/)]
 theorem largeSieve_char_bound [FG] {Q : ℝ} (hQ : 1 ≤ Q) {σ : ℝ} (hσ_pos : 0 < σ) (t : ℝ) :
     open Classical in
     summatory (fun q ↦ ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
@@ -668,7 +758,9 @@ theorem largeSieve_char_bound [FG] {Q : ℝ} (hQ : 1 ≤ Q) {σ : ℝ} (hσ_pos 
       simp only [Real.sqrt_mul (by positivity : 0 ≤ C_LS * (M + Q ^ 2)),
         Real.sqrt_mul (by positivity : 0 ≤ C_LS * (N + Q ^ 2)),
         Real.sqrt_mul C_LS_nonneg]
-      nlinarith [Real.sq_sqrt C_LS_nonneg]
+      have h := Real.mul_self_sqrt C_LS_nonneg
+      linear_combination (√(M + Q ^ 2) * √(N + Q ^ 2) * √(summatory (fun m ↦ ‖f m‖ ^ 2) M) *
+        √(summatory (fun n ↦ ‖g n‖ ^ 2) N)) * h
     _ ≤ _ := by
       gcongr
       exact sqrt_add_sq_mul_le (by positivity) (by positivity) (by positivity)
@@ -690,6 +782,25 @@ private lemma normI_inv_le {σ : ℝ} (hσ : 0 < σ) (t : ℝ) :
 /-- Step 4 of `notes/theorem26_6_smooth.md`: the `J`-integral estimate.  The Mellin kernel
 `𝓜(Smooth1 ν ε)` decays like `1/‖s‖` near the real axis and like `1/(ε‖s‖²)` in the tails;
 splitting the integral at `|t| = 1/ε` gives `J ≪ log(1/(σε)) ≍ log(x+1)`. -/
+@[blueprint (latexEnv := "lemma") (title := /-- The kernel integral $J$ -/) (statement := /--
+Let $\nu$ be a bump function. Let $x \ge 1$, $\sigma := 1/\log(x+1)$ and $\varepsilon := \frac{1}{6 \log 2} \cdot \frac{1}{x}$
+(so that $0 < \varepsilon < 1$ and $0 < \sigma \le 2$). Then
+$$J := \int_{-\infty}^{\infty} \big\| \mathcal M[\widetilde 1_\varepsilon](\sigma + it) \big\|\, \mathrm{d}t \ll \log(x + 1),$$
+the implied constant depending only on $\nu$.
+-/) (proof := /--
+Write $L = \log(x+1) \ge \log 2$ and split the integral at $|t| = T := 1/\varepsilon$.
+
+\emph{Centre $|t| \le T$.} By the first bound of \Cref{mellin_smooth1_bounds} and the elementary
+inequality $\|\sigma + it\|^{-1} \le \sqrt 2 (\sigma + |t|)^{-1}$ (equivalent to $(\sigma - |t|)^2 \ge 0$), the
+integrand is $\ll (\sigma + |t|)^{-1}$, and
+$\int_{-T}^{T} (\sigma + |t|)^{-1} \mathrm{d}t = 2 \log\big((\sigma + T)/\sigma\big) = 2\log(1 + 6 \log 2 \cdot x L)$.
+Since $1 + 6\log 2\cdot xL \le (1+x)(1 + 6 \log 2 \cdot L)$ and $\log(1+u) \le u$, this is
+$\ll L$.
+
+\emph{Tails $|t| > T$.} By the second bound of \Cref{mellin_smooth1_bounds} and $t^2 \le \|\sigma+it\|^2$, the
+integrand is $\ll \varepsilon^{-1} t^{-2}$, and $\int_{|t| > T} t^{-2}\,\mathrm{d}t = 2/T = 2\varepsilon$. The tails
+contribute $\ll 1 \ll L$.
+-/)]
 theorem mellin_J_bound [Bump] {ε : ℝ} (hε_pos : 0 < ε) (hε_one : ε < 1) {σ : ℝ} (hσ_pos : 0 < σ)
     (hσ : σ ≤ 2) {x : ℝ} (hx : 1 ≤ x) (hσx : σ = (Real.log (x + 1))⁻¹)
     (hε : ε = (6 * Real.log 2)⁻¹ * x⁻¹) :
@@ -795,6 +906,7 @@ theorem mellin_J_bound [Bump] {ε : ℝ} (hε_pos : 0 < ε) (hε_one : ε < 1) {
 `t ↦ ‖F_{σ+tI}(χ)‖·‖G_{σ+tI}(χ)‖·‖𝓜(σ+tI)‖` is integrable: the two partial-sum norms are
 continuous and bounded (constant `r^{-σ}` factors), and the Mellin factor is vertically
 integrable. -/
+@[blueprint "Flat.T_mellin_representation"]
 theorem integrable_norm_FG_mellin [Bump] [FG] {q : ℕ} {ε : ℝ} (hε_pos : 0 < ε) (hε_one : ε < 1)
     {χ : DirichletCharacter ℂ q} {σ : ℝ} (hσ_pos : 0 < σ) (hσ : σ ≤ 2) :
     Integrable (fun t : ℝ =>
@@ -815,6 +927,27 @@ theorem integrable_norm_FG_mellin [Bump] [FG] {q : ℕ} {ε : ℝ} (hε_pos : 0 
     (norm_nonneg _) (by positivity)
 
 open _root_.Classical in
+@[blueprint (title := /-- The smoothed bilinear sums on average -/) (statement := /--
+Let $(f, g)$ be a supported pair, $\nu$ a bump function, $Q \ge 1$, $x \ge 1$ and
+$\varepsilon := \frac{1}{6 \log 2} \cdot \frac{1}{x}$. Then
+$$\sum_{q \le Q} \sumstar_{\chi \bmod q} \frac{q}{\varphi(q)} \sup_{1 \le y \le x+1} \|T_\varepsilon(y, \chi)\| \ll \big(\sqrt{NM} + \sqrt M Q + \sqrt N Q + Q^2\big)\, \|f\|_2 \|g\|_2\, \log(x+1),$$
+and the same bound holds with the supremum replaced by $\max_{1 \le K \le \lfloor x \rfloor} \|T_\varepsilon(K + \tfrac12, \chi)\|$.
+The implied constant depends only on $\nu$ and on the constant in \Cref{large_sieve}.
+-/) (proof := /--
+Put $L := \log(x+1) \ge \log 2$ and $\sigma := 1/L$, so that $0 < \sigma \le 2$ and $(x+1)^\sigma = e$; hence
+$y^\sigma \le e$ for $1 \le y \le x + 1$. Also $\varepsilon \le 1/(6\log 2) < 1$. For each pair $(q, \chi)$,
+\Cref{Flat.T_mellin_representation} gives the $y$-free majorant
+$$\sup_{1 \le y \le x+1} \|T_\varepsilon(y,\chi)\| \le \frac{e}{2\pi} \int_{\R} \|F_{\sigma+it}(\chi)\| \|G_{\sigma+it}(\chi)\| \|\mathcal M[\widetilde 1_\varepsilon](\sigma+it)\|\,\mathrm{d}t .$$
+Multiply by $q/\varphi(q)$, sum over the finitely many $(q, \chi)$, and interchange the sum with the
+integral (all integrands are integrable). The resulting integrand is
+$D(t)\, \|\mathcal M[\widetilde 1_\varepsilon](\sigma+it)\|$ with
+$D(t) = \sum_{q,\chi} \frac{q}{\varphi(q)} \|F_{\sigma+it}(\chi)\| \|G_{\sigma+it}(\chi)\|$, which by
+\Cref{Flat.largeSieve_char_bound} is $\ll (\sqrt{NM} + \sqrt M Q + \sqrt N Q + Q^2) \|f\|_2 \|g\|_2$ uniformly
+in $t$. Pulling this bound out, the remaining integral is $J \ll L$ by \Cref{Flat.mellin_J_bound}.
+
+For the discrete version note that $K + \tfrac12 \in [1, x+1]$ for $1 \le K \le \lfloor x \rfloor$, so the
+maximum over $K$ is at most the supremum over $y$.
+-/)]
 theorem summatory_T_ll [Bump] [FG] {ε Q : ℝ} (hε_pos : 0 < ε) (hQ : 1 ≤ Q)
     {x : ℝ} (hx : 1 ≤ x) (hε : ε = (6 * Real.log 2)⁻¹ * x⁻¹)  :
     summatory (fun q => ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive, ↑q * (↑q.totient)⁻¹ * ⨆ y ∈ Icc 1 (x+1), ‖T ε y χ‖) Q ≤ C_LSC *
@@ -941,6 +1074,7 @@ theorem summatory_T_ll [Bump] [FG] {ε Q : ℝ} (hε_pos : 0 < ε) (hQ : 1 ≤ Q
         rw [hCbdef]; unfold C_LSC; ring
 
 open _root_.Classical in
+@[blueprint "Flat.summatory_T_ll"]
 theorem summatory_T_ll_nat [Bump] [FG] {ε Q : ℝ} (hε_pos : 0 < ε)(hQ : 1 ≤ Q) {x : ℝ} (hx : 1 ≤ x) (hε : ε = (6 * Real.log 2)⁻¹ * x⁻¹)  :
     summatory (fun q => ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive, ↑q * (↑q.totient)⁻¹ * ⨆ K ∈ Icc 1 ⌊x⌋₊, ‖T ε (↑K + 2⁻¹) χ‖) Q ≤ C_LSC *
     (√(N * M) + √M * Q + √N * Q + Q ^ 2) * √(summatory (fun m => ‖f m‖ ^ 2) M) * √(summatory (fun n => ‖g n‖ ^ 2) N) * Real.log (x + 1) := by
@@ -994,6 +1128,23 @@ theorem Nat.le_of_add_real_le {m n : ℕ} {x : ℝ} (hx_pos : 0 < x) (hx : x ≤
   exact Nat.ceil_mono
 
 
+@[blueprint (title := /-- The smoothed sum is sharp at half-integers -/) (statement := /--
+Let $x \ge 1$, let $(f, g)$ be a supported pair, $\nu$ a bump function, $\chi$ a Dirichlet character, and
+let $0 < \varepsilon \le \frac{1}{6\log 2} \cdot \frac{1}{x}$. Then for every integer $0 \le K \le x$,
+$$T_\varepsilon\big(K + \tfrac12, \chi\big) = \sum_{m \le M} \sum_{n \le N} 1_{mn \le K + 1/2}\, f(m)\chi(m)\, g(n)\chi(n) .$$
+In words: with this choice of $\varepsilon$ the smoothed cutoff $\widetilde 1_\varepsilon(mn/(K+\tfrac12))$ agrees
+with the sharp cutoff $1_{mn \le K + 1/2}$ at every integer $mn$, so no error term arises.
+-/) (proof := /--
+Compare the two sums termwise; put $u = mn/(K + \tfrac12)$ with $mn \ge 1$ an integer.
+
+If $mn \le K + \tfrac12$ then $mn \le K$, so $u \le K/(K+\tfrac12) = 1 - \tfrac{1}{2K+1}$. Since
+$(\log 2)\varepsilon \le \tfrac{1}{6x} \le \tfrac{1}{2K+1}$ (as $2K + 1 \le 6x$ for $K \le x$, $x \ge 1$), we get
+$u \le 1 - (\log 2)\varepsilon$ and $\widetilde 1_\varepsilon(u) = 1$ (\Cref{Flat.Bump}).
+
+If $mn > K + \tfrac12$ then $mn \ge K+1$, so $u \ge (K+1)/(K + \tfrac12) = 1 + \tfrac{1}{2K+1}$. Since
+$2 (\log 2)\varepsilon \le \tfrac{1}{3x} \le \tfrac{1}{2K+1}$ (as $4K + 2 \le 6x$), we get $u \ge 1 + 2(\log 2)\varepsilon$,
+and also $\varepsilon < 1$, so $\widetilde 1_\varepsilon(u) = 0$ (\Cref{Flat.Bump}).
+-/)]
 theorem T_eq_sharp {x : ℝ} (hx : 1 ≤ x) [Bump] [FG] {q : ℕ} {ε : ℝ} (hε_pos : 0 < ε) {χ : DirichletCharacter ℂ q} (K : ℕ) (hK : K ≤ x) (hε : ε ≤ (6 * Real.log 2)⁻¹ * x⁻¹) :
   Flat.T ε (K + 2⁻¹) χ =
     summatory (fun m ↦ summatory (fun n ↦ if m * n ≤ (K + 2⁻¹ : ℝ) then f m * χ m * g n * χ n else 0) N) M := by
@@ -1033,6 +1184,7 @@ theorem T_eq_sharp {x : ℝ} (hx : 1 ≤ x) [Bump] [FG] {q : ℕ} {ε : ℝ} (h�
       field_simp
       nlinarith
 
+@[blueprint "Flat.FG.summatory_mul_char" (latexEnv := "lemma")]
 theorem FG.summatory_mul [fg : FG] {y : ℝ} :
     summatory (fun n ↦ (f * g) n) y =
     summatory (fun m ↦ summatory (fun n ↦ if m * n ≤ y then f m * g n else 0) N) M := by
@@ -1089,6 +1241,16 @@ theorem FG.summatory_mul [fg : FG] {y : ℝ} :
         rw [hg n ((Nat.floor_lt hN_pos.le).mp (by omega))]; simp
 
 
+@[blueprint (latexEnv := "lemma") (title := /-- Partial sums of a convolution as a double sum -/) (statement := /--
+For a supported pair $(f, g)$ (\Cref{Flat.FG}), a character $\chi$ and every real $y$,
+$$\sum_{n \le y} (f * g)(n) \chi(n) = \sum_{m \le M} \sum_{n \le N} 1_{mn \le y}\, f(m)\chi(m)\, g(n)\chi(n).$$
+-/) (proof := /--
+The hyperbola identity $\sum_{n \le y}(F * G)(n) = \sum_{m \le y} F(m) \sum_{n \le y/m} G(n)$ with $F = f\chi$,
+$G = g\chi$ (using complete multiplicativity of $\chi$) writes the left side as
+$\sum_{m \le y} \sum_{n \le y/m} f(m)\chi(m) g(n)\chi(n)$. Enlarging both ranges to $m \le \lfloor y \rfloor + \lfloor M \rfloor + \lfloor N \rfloor$
+and inserting the indicator $1_{mn \le y}$ changes nothing, and then the support conditions on $f$ and
+$g$ allow one to shrink the ranges to $m \le M$, $n \le N$.
+-/)]
 theorem FG.summatory_mul_char [fg : FG] {q : ℕ} {χ : DirichletCharacter ℂ q} {y : ℝ} : summatory (fun n ↦ (f * g) n * χ n) y =
     summatory (fun m ↦ summatory (fun n ↦ if m * n ≤ y then f m * χ m * g n * χ n else 0) N) M := by
   let inst : FG := {
@@ -1104,6 +1266,19 @@ theorem FG.summatory_mul_char [fg : FG] {q : ℕ} {χ : DirichletCharacter ℂ q
     RingHom.id_apply, mul_assoc] using h
 
 
+@[blueprint (title := /-- Maximal large sieve for convolutions (smoothed form) -/) (statement := /--
+Let $(f, g)$ be a supported pair (\Cref{Flat.FG}), $\nu$ a bump function, $x \ge 1$ and $Q \ge 1$. Then
+$$\sum_{q \le Q} \sumstar_{\chi \bmod q} \frac{q}{\varphi(q)} \sup_{1 \le y \le x} \Big\| \sum_{n \le y} (f * g)(n) \chi(n) \Big\| \ll \big(\sqrt{NM} + \sqrt M Q + \sqrt N Q + Q^2\big)\, \|f\|_2 \|g\|_2\, \log(x+1) .$$
+This is Theorem 26.6 of Koukoulopoulos, proved with a smoothed cutoff instead of the truncated Perron
+formula; the implied constant depends only on the bump $\nu$ and on the constant in \Cref{large_sieve}.
+-/) (proof := /--
+By \Cref{Flat.sup_summatory_eq_sup_nat} the supremum over $y \in [1, x]$ may be replaced by the maximum
+over integers $1 \le K \le \lfloor x \rfloor$ of the partial sum at $y = K + \tfrac12$. By
+\Cref{Flat.FG.summatory_mul_char} that partial sum is
+$\sum_{m \le M}\sum_{n \le N} 1_{mn \le K + 1/2} f(m)\chi(m)g(n)\chi(n)$, which by \Cref{Flat.T_eq_sharp} with
+$\varepsilon = \frac{1}{6\log 2}\cdot\frac1x$ equals $T_\varepsilon(K + \tfrac12, \chi)$ (note $K \le \lfloor x \rfloor \le x$).
+Now apply the discrete form of \Cref{Flat.summatory_T_ll}.
+-/)]
 theorem LargeSieve_convolution_aux [Bump] [fg : FG]
     {x Q : ℝ} (hx : 1 ≤ x) (hQ : 1 ≤ Q) :
   open Classical in
