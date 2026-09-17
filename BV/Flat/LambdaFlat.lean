@@ -1,9 +1,11 @@
 import Mathlib
 import Architect
-import BV.Delta
-import BV.Axioms
 
-open ArithmeticFunction BV ProofData
+import BV.Axioms
+import BV.Delta
+import BV.Flat.Perron
+
+open ArithmeticFunction BV ProofData DirichletAverage
 open scoped Moebius BV zeta
 
 /-! ## Type II sums: the flat part $\Lambda^\flat$ -/
@@ -159,7 +161,7 @@ def C_BV_char_sum : ℝ := sorry
 
 @[blueprint (statement := /--
 For $x, Q \ge 2$, $U, V \in [1, x]$ and $r \in \N$,
-$$\sum_{q \le Q} \sumstar_{\chi \pmod{q}} \frac{q}{\varphi(q)}\, S_r(y, \chi) \ll \left(x + \frac{Qx}{\sqrt{U}} + \frac{Qx}{\sqrt{V}} + Q^2\sqrt{x}\right)(\log x)^3$$
+$$\sum_{q \le Q} \sumstar_{\chi \pmod{q}} \frac{q}{\varphi(q)}\, \max_{y \le x} S_r(y, \chi) \ll \left(x + \frac{Qx}{\sqrt{U}} + \frac{Qx}{\sqrt{V}} + Q^2\sqrt{x}\right)(\log x)^3$$
 -/) (proof := /--
 Apply the dyadic decomposition \ref{LambdaFlat_dyadic} (restricted to integers coprime to $r$)
 and apply \ref{LargeSieve_convolution} to each dyadic piece.
