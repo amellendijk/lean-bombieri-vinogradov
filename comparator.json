@@ -1,0 +1,14 @@
+{
+    "challenge_module": "Challenge",
+    "solution_module": "Solution",
+    "theorem_names": ["Challenge.bombieri_vinogradov"],
+    "permitted_axioms": [
+        "propext",
+        "Quot.sound",
+        "Classical.choice",
+        "C_SW",
+        "siegel_walfisz",
+        "C_LS",
+        "large_sieve"
+    ]
+}

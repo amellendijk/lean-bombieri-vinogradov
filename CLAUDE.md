@@ -3,8 +3,13 @@
 ## Project Goal
 
 Formalize the **Bombieri-Vinogradov theorem** in Lean 4 / Mathlib, modulo two axioms:
-- **Siegel-Walfisz** (`BV/Axioms.lean`)
-- **Large sieve inequality** (`BV/Axioms.lean`)
+- **Siegel-Walfisz** (`siegel_walfisz`, constant `C_SW`)
+- **Large sieve inequality** (`large_sieve`, constant `C_LS`)
+
+Both axioms are declared in `Challenge/Axioms.lean` (Mathlib-only imports), shared by the root file
+`Challenge.lean`, the trusted statement for the [comparator](https://github.com/leanprover/comparator) tool,
+and by `BV/Axioms.lean`, which attaches the `@[blueprint]` annotations. Do not add axioms anywhere else, and keep `Challenge.lean`,
+`Solution.lean`, and the `permitted_axioms` list in `comparator.json` in sync.
 
 The main theorem (`bombieri_vinogradov` in `BV/MainResults.lean`) states that for fixed $A \ge 0$,
 $$\sum_{q \le Q} \max_{y \le x} \max_{a \in (\mathbb{Z}/q\mathbb{Z})^*} \left| \psi(y;q,a) - \frac{y}{\varphi(q)} \right| \ll_A \frac{x}{(\log x)^A}$$
@@ -26,9 +31,14 @@ The `LeanArchitect` package provides the `@[blueprint ...]` attribute used throu
 ## File Structure
 
 ```
+Challenge.lean     — Comparator challenge: Challenge.bombieri_vinogradov := sorry
+Challenge/
+  Axioms.lean      — chebyPsi and the axioms C_SW, siegel_walfisz, C_LS, large_sieve. Imports only Mathlib.
+Solution.lean      — Comparator solution: restates and proves Challenge.bombieri_vinogradov from BV
+comparator.json    — Comparator config (theorem_names, permitted_axioms)
 BV/
   Defs.lean        — Core definitions: Delta, Lambda decomposition, ψ, summatory, ProofData
-  Axioms.lean      — Axiomatic inputs: siegel_walfisz, large_sieve
+  Axioms.lean      — Imports Challenge/Axioms.lean; blueprint annotations for siegel_walfisz, large_sieve
   MainResults.lean — Top-level theorems: bombieri_vinogradov, BV_Delta_Lambda, BV_Delta_1P
   LambdaSharp.lean — Type I sums (Λ♯ = μ_{≤V} * log − (Λ_{≤U} * μ_{≤V}) * 1)
   LambdaFlat.lean  — Type II sums (Λ♭ = (Λ_{>U} * 1) * μ_{>V})
@@ -219,7 +229,7 @@ The `BV` scope must be open for these notations to work: `open BV` or `open scop
 All main theorems are stubbed with `sorry`. The proof structure/skeleton is in place:
 
 - `BV/Defs.lean` — definitions complete (or nearly so)
-- `BV/Axioms.lean` — Siegel-Walfisz and large sieve as axioms
+- `Challenge/Axioms.lean` / `BV/Axioms.lean` — Siegel-Walfisz and large sieve as axioms
 - `BV/MainResults.lean` — main theorem structure in place
 - `BV/LambdaSharp.lean` — empty (needs type I sum bounds)
 - `BV/LambdaFlat.lean` — early notes only (needs type II sum bounds)

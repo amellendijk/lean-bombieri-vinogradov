@@ -19,7 +19,7 @@ This theorem is often described as the "Generalized Riemann Hypothesis on averag
 ## The Project
 
 The main target of this project is the formalization of the Bombieri-Vinogradov theorem, as stated in `BV/MainResults.lean`. 
-We assume two axioms, both documented in `BV/Axioms.lean`: 
+We assume two axioms, both stated in `Challenge/Axioms.lean` (with blueprint annotations in `BV/Axioms.lean`):
 * The Siegel-Walfisz Theorem
 * The Large Sieve Inequality
 
@@ -34,3 +34,27 @@ This project depends on [Mathlib](https://github.com/leanprover-community/mathli
 1. [Install Lean](https://lean-lang.org/install/)
 2. Run `lake exe cache get`
 3. Run `lake build`
+
+## Verifying the result with comparator
+
+The repository is set up for [comparator](https://github.com/leanprover/comparator), the Lean FRO's
+trustworthy judge for Lean proofs.
+
+* `Challenge.lean` contains the claimed statement of Bombieri-Vinogradov.
+  It imports `Challenge/Axioms.lean`, which imports only Mathlib, and states the Siegel-Walfisz and Large Sieve axioms.
+* `Solution.lean` imports the whole project and proves `Challenge.bombieri_vinogradov` from
+  `bombieri_vinogradov` in `BV/MainResults.lean`.
+* `comparator.json` lists the theorem to check and the permitted axioms: the three standard Lean
+  axioms `propext`, `Quot.sound`, `Classical.choice` together with the axioms above.
+
+To run the check you need `landrun` and `lean4export` (matching the `lean-toolchain` version)
+in your `PATH`, plus a build of `comparator`; then, from the root of this repository,
+
+```sh
+lake exe cache get
+systemd-run --property=RestrictAddressFamilies=~AF_UNIX --user --pty -E PATH="$PATH" \
+  --working-directory $(pwd) -- bash -c 'lake env path/to/comparator comparator.json'
+```
+
+Comparator succeeds exactly when `Solution` proves the same statement as `Challenge` using no
+axioms other than those listed (in particular, no `sorryAx`). 
