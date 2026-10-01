@@ -53,23 +53,25 @@ lemma sum_vonMangoldt_prime_pow_not_coprime_le_log {z : ℝ} {k : ℕ} (hk : 0 <
   · exact le_of_eq ArithmeticFunction.vonMangoldt_sum
 
 /-- The non-coprime von Mangoldt sum is nonnegative. -/
+@[blueprint "lem:vonMangoldt-not-coprime" (latexEnv := "lemma") (uses := ["def:summatory"]) (title := /-- Prime powers sharing a factor with $q$ -/) (statement := /--
+For every real $z \ge 2$ and every integer $q \ge 1$,
+$$0 \le \sum_{\substack{n \le z \\ (n, q) > 1}} \Lambda(n) \le \frac{\log q \cdot \log z}{\log 2}.$$
+-/) (proof := /--
+Non-negativity is clear. The summand vanishes unless $n = p^k$ is a prime power, and
+$\Lambda(p^k) = \log p$. Grouping by the exponent $k$, which satisfies $1 \le k \le \log z / \log 2$
+(as $2^k \le p^k \le z$), the sum equals
+$$\sum_{1 \le k \le \log z/\log 2}\ \sum_{\substack{p \le z^{1/k} \\ (p^k, q) > 1}} \log p .$$
+For a prime $p$ the condition $(p^k, q) > 1$ means $p \mid q$, so the inner sum is over a subset of
+the prime divisors of $q$ and is at most $\sum_{p \mid q} \log p \le \sum_{d \mid q} \Lambda(d) = \log q$.
+There are at most $\log z / \log 2$ values of $k$, which gives the bound.
+-/)]
 theorem sum_vonMangoldt_not_coprime_nonneg (z : ℝ) (q : ℕ) :
     0 ≤ ∑ n ∈ Finset.Ioc 0 ⌊z⌋₊, if ¬q.Coprime n then Λ n else 0 := by
   positivity
 
 /-- Explicit endpoint estimate for the von Mangoldt mass on integers not
 coprime to `q`, stated entirely using standard Mathlib finsets. -/
-@[blueprint (latexEnv := "lemma") (title := /-- Prime powers sharing a factor with $q$ -/) (statement := /--
-For every real $z \ge 2$ and every integer $q \ge 1$,
-$$0 \le \sum_{\substack{n \le z \\ (n, q) > 1}} \Lambda(n) \le \frac{\log q \cdot \log z}{\log 2}.$$
--/) (proof := /--
-The summand vanishes unless $n = p^k$ is a prime power, and $\Lambda(p^k) = \log p$. Grouping by the
-exponent $k$, which satisfies $1 \le k \le \log z / \log 2$ (as $2^k \le p^k \le z$), the sum equals
-$$\sum_{1 \le k \le \log z/\log 2}\ \sum_{\substack{p \le z^{1/k} \\ (p^k, q) > 1}} \log p .$$
-For a prime $p$ the condition $(p^k, q) > 1$ means $p \mid q$, so the inner sum is over a subset of
-the prime divisors of $q$ and is at most $\sum_{p \mid q} \log p \le \sum_{d \mid q} \Lambda(d) = \log q$.
-There are at most $\log z / \log 2$ values of $k$, which gives the bound. Non-negativity is clear.
--/)]
+@[blueprint "lem:vonMangoldt-not-coprime" (latexEnv := "lemma")]
 theorem sum_vonMangoldt_not_coprime_le {z : ℝ} (hz : 2 ≤ z) {q : ℕ} (hq : 0 < q) :
     ∑ n ∈ Finset.Ioc 0 ⌊z⌋₊, (if ¬q.Coprime n then Λ n else 0) ≤
       Real.log q * Real.log z / Real.log 2 := by
@@ -90,3 +92,13 @@ lemma summatory_sub_ite {P : ℕ → Prop} [DecidablePred P] (f : ℕ → ℝ) {
     summatory (fun n ↦ if ¬P n then f n else 0) x := by
   pull summatory
   grind
+
+
+-- Blueprint backlinks for results quoted from Mathlib / PrimeNumberTheoremAnd.
+attribute [blueprint "lem:moebius" (latexEnv := "lemma") (title := /-- Möbius identities -/) (statement := /--
+As arithmetic functions, $\mu * 1 = \delta_1$ and $\Lambda * 1 = \log$; that is, $\sum_{d \mid n} \mu(d) = 1_{n = 1}$
+and $\sum_{d \mid n} \Lambda(d) = \log n$ for $n \ge 1$. Moreover, for functions $F, G$ on $\N_{\ge 1}$,
+$$F(n) = \sum_{d \mid n} G(d) \ \text{ for all } n \ge 1 \qquad\iff\qquad G(n) = \sum_{d \mid n} \mu(n/d)\, F(d) \ \text{ for all } n \ge 1 .$$
+-/) (proof := /--
+These are in Mathlib.
+-/)] ArithmeticFunction.moebius_mul_coe_zeta ArithmeticFunction.vonMangoldt_mul_zeta ArithmeticFunction.sum_eq_iff_sum_mul_moebius_eq

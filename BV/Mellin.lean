@@ -82,7 +82,20 @@ theorem aestronglyMeasurable_mellin_comp {α : Type*} [MeasurableSpace α] {μ :
   (stronglyMeasurable_mellin_comp f hg).aestronglyMeasurable
 
 /-- Variant of MellinOfPsi on aribtrary vertial strips. `hσ₂` is unnecessary but harmless.  -/
-@[blueprint "mellin_bump_bounded" (latexEnv := "lemma")]
+@[blueprint "lem:mellin-bump" (latexEnv := "lemma") (proofUses := [-PartialIntegration]) (title := /-- The Mellin transform of a bump is bounded on strips -/) (statement := /--
+Let $\nu \in C^1(\R)$ be supported in $[1/2, 2]$ and let $\sigma_1 \le \sigma_2$ with $\sigma_2 \ge 0$. Then
+there is a constant $C$ such that $|\Mellin[\nu](s)| \le C |s|^{-1}$ for all $s \ne 0$ with
+$\sigma_1 \le \Re s \le \sigma_2$; consequently $\Mellin[\nu]$ is bounded on the whole strip
+$\{\sigma_1 \le \Re s \le \sigma_2\}$.
+-/) (proof := /--
+Integration by parts (valid since $\nu$ has compact support in $(0,\infty)$) gives
+$\Mellin[\nu](s) = \int_0^\infty \nu(u) u^{s-1}\,\mathrm{d}u = -\frac{1}{s} \int_0^\infty \nu'(u) u^{s}\,\mathrm{d}u$
+for $s \ne 0$. On $[1/2, 2]$ we have $|u^s| = u^{\Re s} \le \max(2^{\sigma_2}, 2^{-\sigma_1})$, and $|\nu'|$ is
+bounded by its maximum on $[1/2,2]$; the interval has length $3/2$. This gives the first bound with
+$C = \tfrac32 \max|\nu'| \cdot \max(2^{\sigma_2}, 2^{-\sigma_1})$. For boundedness on the strip, note that
+$\Mellin[\nu]$ is entire (the Mellin integral of a compactly supported $C^1$ function converges for
+every $s$), hence bounded near $s = 0$; away from a small ball around $0$ the first bound applies.
+-/)]
 lemma MellinOfPsi_better {σ₁ σ₂ : ℝ} (hσ₂ : 0 ≤ σ₂) {ν : ℝ → ℝ} (diffν : ContDiff ℝ 1 ν)
     (suppν : ν.support ⊆ Set.Icc (1 / 2) 2) :
     ∃ C > 0, ∀ (s : ℂ) (_ : s ≠ 0) (_ : σ₁ ≤ s.re) (_ : s.re ≤ σ₂),
@@ -236,6 +249,7 @@ lemma isBigO_nhds_eventually_principal {X E F : Type*} [PseudoMetricSpace X] [No
   use c
   simpa using hr
 
+@[blueprint "lem:mellin-bump" (latexEnv := "lemma")]
 lemma mellin_bump_bounded_aux
     {ν : ℝ → ℝ} (diffν : ContDiff ℝ 1 ν)
     (suppν : ν.support ⊆ Set.Icc (1 / 2) 2) :
@@ -243,20 +257,7 @@ lemma mellin_bump_bounded_aux
   exact mellin_bump_differentiable diffν suppν
     |>.continuous.continuousAt (x := 0) |>.boundedAtFilter
 
-@[blueprint (latexEnv := "lemma") (title := /-- The Mellin transform of a bump is bounded on strips -/) (statement := /--
-Let $\nu \in C^1(\R)$ be supported in $[1/2, 2]$ and let $\sigma_1 \le \sigma_2$ with $\sigma_2 \ge 0$. Then
-there is a constant $C$ such that $\|\mathcal{M}[\nu](s)\| \le C \|s\|^{-1}$ for all $s \ne 0$ with
-$\sigma_1 \le \Re s \le \sigma_2$; consequently $\mathcal M[\nu]$ is bounded on the whole strip
-$\{\sigma_1 \le \Re s \le \sigma_2\}$.
--/) (proof := /--
-Integration by parts (valid since $\nu$ has compact support in $(0,\infty)$) gives
-$\mathcal M[\nu](s) = \int_0^\infty \nu(u) u^{s-1}\,\mathrm{d}u = -\frac{1}{s} \int_0^\infty \nu'(u) u^{s}\,\mathrm{d}u$
-for $s \ne 0$. On $[1/2, 2]$ we have $|u^s| = u^{\Re s} \le \max(2^{\sigma_2}, 2^{-\sigma_1})$, and $|\nu'|$ is
-bounded by its maximum on $[1/2,2]$; the interval has length $3/2$. This gives the first bound with
-$C = \tfrac32 \max|\nu'| \cdot \max(2^{\sigma_2}, 2^{-\sigma_1})$. For boundedness on the strip, note that
-$\mathcal M[\nu]$ is entire (the Mellin integral of a compactly supported $C^1$ function converges for
-every $s$), hence bounded near $s = 0$; away from a small ball around $0$ the first bound applies.
--/)]
+@[blueprint "lem:mellin-bump" (latexEnv := "lemma")]
 lemma mellin_bump_bounded {σ₁ σ₂ : ℝ} (hσ₂ : 0 ≤ σ₂) {ν : ℝ → ℝ} (diffν : ContDiff ℝ 1 ν)
     (suppν : ν.support ⊆ Set.Icc (1 / 2) 2) :
     𝓜 (fun x ↦ (ν x : ℂ)) =O[principal {s | σ₁ ≤ s.re ∧ s.re ≤ σ₂}] fun _ ↦ (1 : ℝ) := by
@@ -310,7 +311,7 @@ The Mellin transform of the smoothed indicator `Smooth1 ν ε` is vertically int
 line `Re s = σ`, for any `0 < σ ≤ 2`. The integrand is `O(1/(σ² + t²))` by `MellinOfSmooth1b`, and
 `t ↦ (σ² + t²)⁻¹` is integrable since `σ ≠ 0`. (This is the content of
 `SmoothedChebyshevDirichlet_aux_integrable` in `MediumPNT`, generalised from `1 < σ` to `0 < σ`.) -/
-@[blueprint "Smooth1_mellinInv_mellin_eq" (latexEnv := "lemma")]
+@[blueprint "lem:mellin-cutoff" (latexEnv := "lemma") (uses := [-Smooth1]) (proofUses := [-Smooth1Properties_above, -Smooth1Nonneg, -Smooth1LeOne, -Smooth1ContinuousAt, -MellinOfSmooth1b])]
 lemma Smooth1_verticalIntegrable
     {ν : ℝ → ℝ}
     (diffν : ContDiff ℝ 1 ν)
@@ -356,20 +357,7 @@ Mellin transform — equation (*) of `notes/theorem26_6_smooth.md`. This is the 
 `SmoothedChebyshevDirichlet` in `PrimeNumberTheoremAnd.MediumPNT`. The vertical integrability of
 the Mellin transform is established inline (as in `SmoothedChebyshevDirichlet_aux_integrable`) from
 the `O(1/‖s‖²)` decay of `MellinOfSmooth1b`, valid for any `0 < σ ≤ 2`. -/
-@[blueprint (latexEnv := "lemma") (title := /-- Mellin inversion for the smoothed cutoff -/) (statement := /--
-Let $\nu$ be a bump function (\Cref{Flat.Bump}; only $\nu \in C^1$ is needed), $0 < \varepsilon < 1$ and
-$0 < \sigma \le 2$. Then $t \mapsto \mathcal M[\widetilde 1_\varepsilon](\sigma + it)$ is integrable on $\R$ and,
-for every $u > 0$,
-$$\widetilde{1}_\varepsilon(u) = \frac{1}{2\pi} \int_{-\infty}^{\infty} u^{-(\sigma + it)}\, \mathcal{M}[\widetilde 1_\varepsilon](\sigma + it)\, \mathrm{d}t .$$
--/) (proof := /--
-Integrability: by the bound $\|\mathcal M[\widetilde 1_\varepsilon](s)\| \ll_\nu 1/(\varepsilon \|s\|^2)$ on the strip
-$\sigma/2 \le \Re s \le 2$ (\Cref{MellinOfSmooth1b}), the integrand is dominated by a constant multiple of
-$(\sigma^2 + t^2)^{-1}$, which is integrable; measurability
-follows from continuity of $\mathcal M[\widetilde 1_\varepsilon]$ on $\Re s > 0$. The inversion formula is then
-Mathlib's Mellin inversion theorem (\texttt{mellinInv\_mellin\_eq}), whose hypotheses are: convergence
-of the Mellin integral at $\sigma$ (\texttt{Smooth1MellinConvergent}), vertical integrability of the
-transform (just shown), and continuity of $\widetilde 1_\varepsilon$ at $u$ (\texttt{Smooth1ContinuousAt}).
--/)]
+@[blueprint "lem:mellin-cutoff" (latexEnv := "lemma") (uses := [-Smooth1]) (proofUses := [-Smooth1Properties_above, -Smooth1Nonneg, -Smooth1LeOne, -Smooth1ContinuousAt])]
 lemma Smooth1_mellinInv_mellin_eq
     {ν : ℝ → ℝ}
     (diffν : ContDiff ℝ 1 ν)

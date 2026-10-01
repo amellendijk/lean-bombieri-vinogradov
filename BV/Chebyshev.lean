@@ -5,10 +5,22 @@ import BV.Summatory
 open ArithmeticFunction
 
 /-- The set of natural numbers congruent to `a` modulo `q`. -/
-@[blueprint (title := /-- Residue classes -/) (statement := /--
-For $q \in \N$ and $a \in \Z/q\Z$, we write $\{n \in \N : n \equiv a \pmod q\}$ for the set of natural
-numbers whose residue class modulo $q$ is $a$. When $q = 0$ we identify $\Z/0\Z = \Z$, and when
-$q = 1$ every natural number lies in the single residue class.
+@[blueprint "not:arith" (hasProof := false) (latexEnv := "definition") (title := /-- Arithmetic functions -/) (statement := /--
+$\N = \{0, 1, 2, \dots\}$ denotes the natural numbers, although all sums over $n \le x$ start at $n = 1$
+(\Cref{def:summatory}). For $a, b \in \N$ we write $(a, b) = \gcd(a, b)$, with the convention
+$(0, b) = b$. Dirichlet convolution is written $f * g$; $1$ denotes the constant function $1$ on
+$\N_{\ge 1}$ (so that $f * 1$ is the divisor sum of $f$), $\delta_1$ its convolution identity, $\mu$ the
+Möbius function, $\varphi$ Euler's totient, $\tau$ the divisor function and $\Lambda$ the von Mangoldt
+function; $\log$ also denotes the arithmetic function $n \mapsto \log n$, and $\log^v$ its pointwise
+$v$-th power (with $\log^0 = 1$). All arithmetic functions vanish at $0$.
+
+For $q \in \N$ and $a \in \Z/q\Z$ we write $n \equiv a \pmod q$ for the natural numbers whose residue
+class modulo $q$ is $a$; when $q = 0$ we identify $\Z/0\Z = \Z$, and when $q = 1$ every natural number
+lies in the single residue class. $(\Z/q\Z)^*$ is the unit group, of order $\varphi(q)$ for $q \ge 1$.
+For a Dirichlet character $\chi$ modulo $q$ we write $\chi_0$ for the principal character,
+$\sumstar_{\chi \bmod q}$ for a sum over primitive characters, and $\xi \uparrow^q$ for the character
+modulo $q$ induced by a character $\xi$ modulo a divisor of $q$, i.e.\ $(\xi\uparrow^q)(n) = \xi(n) 1_{(n,q) = 1}$.
+Complex conjugation is $\overline{z}$ and $|z|$ is the absolute value, also for complex $z$.
 -/)]
 def Nat.modEqs {q : ℕ} (a : ZMod q) : Set ℕ := {n : ℕ | n = a}
 
@@ -24,11 +36,11 @@ theorem Nat.mem_modEqs {q : ℕ} (a : ZMod q) (n : ℕ) :
 namespace Chebyshev
 
 /-- The modular Chebyshev function `ψ(x; q, a)`. -/
-@[blueprint (title := /-- Chebyshev's function in arithmetic progressions -/) (statement := /--
+@[blueprint "def:psi" (latexEnv := "definition") (uses := ["def:summatory"]) (title := /-- Chebyshev's function in progressions -/) (statement := /--
 For a real number $x$, a modulus $q \in \N$ and a residue class $a \in \Z/q\Z$, set
-$$\psi(x; q, a) := \sum_{\substack{n \le x \\ n \equiv a \pmod q}} \Lambda(n),$$
-where $\Lambda$ is the von Mangoldt function. We do not require $a$ to be coprime to $q$ in the
-definition. For $q = 1$ this is the classical Chebyshev function $\psi(x) = \sum_{n \le x} \Lambda(n)$.
+$$\psi(x; q, a) := \sum_{\substack{n \le x \\ n \equiv a \pmod q}} \Lambda(n).$$
+We do not require $a$ to be coprime to $q$ in the definition. For $q = 1$ this is the classical
+Chebyshev function $\psi(x) = \sum_{n \le x} \Lambda(n)$.
 -/)]
 noncomputable def psiMod (x : ℝ) {q : ℕ} (a : ZMod q) : ℝ :=
   ∑ n ∈ Finset.Ioc 0 ⌊x⌋₊, if ((n : ℕ) : ZMod q) = a then Λ n else 0
@@ -49,6 +61,23 @@ theorem summatory_vonMangoldt {x : ℝ} :
 theorem psiMod_one_one {x : ℝ} : psiMod x (1 : ZMod 1) = Chebyshev.psi x := by
   simp [psiMod_eq_summatory, summatory_vonMangoldt]
 
+attribute [blueprint "lem:chebyshev" (latexEnv := "lemma") (title := /-- Chebyshev's bound -/) (statement := /--
+For every real $x \ge 0$, $\psi(x) \ll x$, with an absolute implied constant.
+-/) (proof := /--
+This is Chebyshev's elementary estimate, available in Mathlib (with the explicit constant
+$\log 4 + 4$).
+-/)] Chebyshev.psi_le_const_mul_self
+
+@[blueprint "lem:psi-trivial" (latexEnv := "lemma") (title := /-- Trivial bound for the Chebyshev error -/) (statement := /--
+Let $q \ge 1$, let $a \in \Z/q\Z$ and let $z \ge 1$ be real. Then
+$$0 \le \psi(z; q, a) \le \psi(z) \qquad\text{and}\qquad \left| \psi(z; q, a) - \frac{z}{\varphi(q)} \right| \ll z ,$$
+with an absolute implied constant.
+-/) (proof := /--
+Every summand $\Lambda(n)$ is non-negative, so $\psi(z; q, a)$ is a sub-sum of $\psi(z)$ and
+$0 \le \psi(z;q,a) \le \psi(z)$. Both $\psi(z;q,a)$ and $z/\varphi(q)$ are non-negative, so the absolute
+value of their difference is at most the larger of the two. By \Cref{lem:chebyshev},
+$\psi(z; q, a) \le \psi(z) \ll z$; on the other hand $\varphi(q) \ge 1$, so $0 \le z/\varphi(q) \le z$.
+-/)]
 theorem psiMod_nonneg {q : ℕ} (z : ℝ) (a : ZMod q) : 0 ≤ psiMod z a := by
   classical
   rw [psiMod_eq_summatory]
@@ -57,6 +86,7 @@ theorem psiMod_nonneg {q : ℕ} (z : ℝ) (a : ZMod q) : 0 ≤ psiMod z a := by
     positivity
 
 /-- Restricting the von Mangoldt sum to one residue class can only decrease it. -/
+@[blueprint "lem:psi-trivial" (latexEnv := "lemma")]
 theorem psiMod_le_psi {q : ℕ} (z : ℝ) (a : ZMod q) :
     psiMod z a ≤ Chebyshev.psi z := by
   classical
@@ -68,6 +98,7 @@ theorem psiMod_le_psi {q : ℕ} (z : ℝ) (a : ZMod q) :
   · exact ArithmeticFunction.vonMangoldt_nonneg
 
 /-- A reusable elementary error bound for the modular Chebyshev function. -/
+@[blueprint "lem:psi-trivial" (latexEnv := "lemma")]
 theorem abs_psiMod_sub_div_le {q : ℕ} (hq : 0 < q) {z : ℝ} (hz : 0 ≤ z)
     (a : ZMod q) :
     |psiMod z a - z / q.totient| ≤ Chebyshev.psi z + z := by
@@ -82,16 +113,7 @@ theorem abs_psiMod_sub_div_le {q : ℕ} (hq : 0 < q) {z : ℝ} (hz : 0 ≤ z)
   grind
 
 /-- Explicit compact-range consequence of `abs_psiMod_sub_div_le`. -/
-@[blueprint (latexEnv := "lemma") (title := /-- Trivial bound for the modular Chebyshev error -/) (statement := /--
-Let $q \ge 1$, let $a \in \Z/q\Z$ and let $z \ge 1$ be real. Then
-$$\left| \psi(z; q, a) - \frac{z}{\varphi(q)} \right| \ll z ,$$
-with an absolute implied constant.
--/) (proof := /--
-Both $\psi(z;q,a)$ and $z/\varphi(q)$ are non-negative, so the absolute value is at most the larger of
-the two. Since every summand $\Lambda(n)$ is non-negative, $0 \le \psi(z;q,a) \le \psi(z)$, and
-Chebyshev's elementary bound $\psi(z) \ll z$ (Mathlib's \texttt{Chebyshev.psi\_le\_const\_mul\_self})
-applies. On the other hand $\varphi(q) \ge 1$, so $0 \le z/\varphi(q) \le z$.
--/)]
+@[blueprint "lem:psi-trivial" (latexEnv := "lemma")]
 theorem abs_psiMod_sub_div_le_const {q : ℕ} (hq : 0 < q) {z : ℝ} (hz : 1 ≤ z)
     (a : ZMod q) :
     |psiMod z a - z / q.totient| ≤ (Real.log 4 + 5) * z := by

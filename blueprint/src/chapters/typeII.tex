@@ -1,0 +1,125 @@
+\chapter{Type II sums: \texorpdfstring{$\Lambda^\flat$}{Lambda flat}}\label{ch:typeII}
+
+The Type~II part $\Lambda^\flat = (\Lambda_{>U} * 1) * \mu_{>V}$ is a convolution of two functions neither of
+which is smooth, and it cannot be bounded pointwise. Instead it is bounded on average over the
+modulus. By orthogonality, $\varphi(q)\Delta_{\Lambda^\flat}(y; q, a)$ is a sum over the non-principal
+characters $\chi \bmod q$ of character sums $\sum_{n \le y} \Lambda^\flat(n)\chi(n)$. Grouping the characters
+by their conductor $d \mid q$ produces, for each $d$, a sum over the primitive characters $\xi$ modulo
+$d$ of the twisted sums $S_{q/d}(y, \xi) = |\sum_{n \le y} \Lambda^\flat_{q/d}(n)\xi(n)|$. The conductors
+$d \le (\log x)^C$ are treated by Siegel--Walfisz, after converting the primitive-character sums
+back into discrepancies by Möbius inversion (\Cref{sec:small-cond}). The conductors $d > (\log x)^C$
+are collected, after the sum over $q$ has been reorganised, into the quantities $T_r(Q)$ of
+\Cref{sec:reduction-T}, which are bounded by a maximal large sieve inequality for Dirichlet
+convolutions (\Cref{sec:perron}), applied to a dyadic decomposition of $\Lambda^\flat$
+(\Cref{sec:dyadic}).
+
+\section{Characters and conductors}\label{sec:conductors}
+
+\inputleannode{lem:conductor-grouping}
+
+\inputleannode{lem:primitive-moebius}
+
+\inputleannode{def:S}
+
+\inputleannode{prop:conductor-decomp}
+
+\section{Small conductors}\label{sec:small-cond}
+
+For conductors $d \le (\log x)^C$ the Siegel--Walfisz theorem applies to every modulus $s \mid d$. We
+bound the discrepancy of $\Lambda^\flat_q$ by writing $\Lambda^\flat_q = \Lambda_q - \Lambda^\sharp_q - (\Lambda_{\le U})_q$
+(Vaughan's identity restricted to integers coprime to $q$) and bounding the three pieces separately:
+the first by Siegel--Walfisz, the second by the pointwise Type~I bound of \Cref{prop:sharp-pointwise},
+and the third trivially. Here it is essential that the Type~I bound is available for the
+\emph{restricted} function $\Lambda^\sharp_q$, and the factor $\tau(q)$ it carries is absorbed using
+$q \le \sqrt x$.
+
+\inputleannode{lem:SW-Lambda-q}
+
+\inputleannode{lem:SW-flat-q}
+
+\inputleannode{prop:small-conductors}
+
+\section{Reduction to the quantities \texorpdfstring{$T_r$}{T\_r}}\label{sec:reduction-T}
+
+\inputleannode{def:T}
+
+\inputleannode{prop:reduction-T}
+
+\section{A maximal large sieve for convolutions}\label{sec:perron}
+
+The remaining input is a maximal version of the large sieve inequality for Dirichlet convolutions
+(\Cref{prop:large-sieve-convolution}), Theorem~26.6 of \cite{Koukoulopoulos2019}. The textbook proof
+uses the truncated Perron formula. We use instead a smoothed cutoff $\smooth_\varepsilon$, whose Mellin
+transform is $s^{-1}\Mellin[\nu](\varepsilon s)$ for a fixed bump function $\nu$. The point is that for
+$y = K + \tfrac12$ a half-integer and $\varepsilon = 1/(6\log 2 \cdot x)$, the smoothed cutoff coincides
+with the sharp cutoff at every integer (\Cref{lem:sharp-half-integers}), so the smoothed bilinear
+sums $T_\varepsilon(y, \chi)$ are \emph{equal} to the partial sums we want to bound, and no error term
+needs to be estimated. Throughout this section $x \ge 1$ and $Q \ge 1$ are arbitrary reals, $(f, g)$
+is a supported pair and $\nu$ a bump function; no parameter datum is involved. We write
+$\Mellin[F](s) := \int_0^\infty u^{s-1} F(u)\,\mathrm{d}u$ for the Mellin transform.
+
+\inputleannode{def:supported-pair}
+
+% The smoothed cutoff is quoted from PrimeNumberTheoremAnd, whose declarations already carry
+% their own @[blueprint] tags, so this node is written by hand (with \lean{} and \uses{}).
+\begin{proposition}[The smoothed cutoff]\label{prop:smooth-cutoff}
+Let $\nu : \R \to \R$ be a $C^1$ function supported in $[1/2, 2]$. For $\varepsilon > 0$ define the
+\emph{smoothed cutoff} $\smooth_\varepsilon : \R \to \R$ as the multiplicative convolution of the indicator
+of $(0, 1]$ with the spike $t \mapsto \nu(t^{1/\varepsilon})/\varepsilon$:
+$$\smooth_\varepsilon(u) := \int_0^\infty 1_{(0,1]}(t)\, \frac{1}{\varepsilon}\, \nu\big((u/t)^{1/\varepsilon}\big)\, \frac{\mathrm{d}t}{t} .$$
+\begin{enumerate}
+\item There exists a $C^\infty$ function $\nu$ supported in $[1/2, 2]$ with $\nu \ge 0$ and $\int_0^\infty \nu(t)\,\mathrm{d}t/t = 1$.
+\item If $\int_0^\infty \nu(t)\,\mathrm{d}t/t = 1$, then $\smooth_\varepsilon(u) = 1$ for $\varepsilon > 0$ and $0 < u \le 1 - (\log 2)\varepsilon$.
+\item If $0 < \varepsilon < 1$, then $\smooth_\varepsilon(u) = 0$ for $u \ge 1 + 2(\log 2)\varepsilon$.
+\item If $\nu \ge 0$ on $(0, \infty)$, then $\smooth_\varepsilon(u) \ge 0$ for all $\varepsilon > 0$ and $u > 0$; if moreover
+$\int_0^\infty \nu(t)\,\mathrm{d}t/t = 1$, then $\smooth_\varepsilon(u) \le 1$.
+\item If $\nu \ge 0$ on $(0, \infty)$, then $\smooth_\varepsilon$ is continuous at every $u > 0$.
+\item For $\varepsilon > 0$ and $\Re s > 0$, $\Mellin[\smooth_\varepsilon](s) = s^{-1}\, \Mellin[\nu](\varepsilon s)$.
+\item There is a constant $C > 0$, depending only on $\nu$, such that for all $\sigma_1 > 0$, all $s$ with
+$\sigma_1 \le \Re s \le 2$ and all $0 < \varepsilon < 1$, $|\Mellin[\smooth_\varepsilon](s)| \le C/(\varepsilon |s|^2)$.
+\end{enumerate}
+\lean{Smooth1, SmoothExistence, Smooth1Properties_below, Smooth1Properties_above, Smooth1Nonneg, Smooth1LeOne, Smooth1ContinuousAt, MellinOfSmooth1a, MellinOfSmooth1b}\leanok
+\end{proposition}
+\begin{proof}\leanok
+The definition and all seven properties are taken from the PrimeNumberTheoremAnd library
+\cite{PNTplus} (module \texttt{MellinCalculus}), where they are proved; the proofs are not reproduced
+here.
+\end{proof}
+
+\inputleannode{def:bump}
+
+\inputleannode{lem:mellin-bump}
+
+\inputleannode{lem:mellin-cutoff}
+
+\inputleannode{def:T-eps}
+
+\inputleannode{lem:T-mellin}
+
+\inputleannode{lem:LS-dirichlet-poly}
+
+\inputleannode{lem:kernel-J}
+
+\inputleannode{prop:T-average}
+
+\inputleannode{lem:sharp-half-integers}
+
+\inputleannode{prop:large-sieve-convolution}
+
+\section{Dyadic decomposition and the bound for \texorpdfstring{$T_r$}{T\_r}}\label{sec:dyadic}
+
+We return to a fixed parameter datum. To apply \Cref{prop:large-sieve-convolution} to $\Lambda^\flat_r$
+we must write it as a sum of convolutions $f_j * g_j$ with $f_j$ supported on a dyadic interval
+$(2^{j-1}, 2^j]$ and $g_j$ supported on an initial segment. The savings $1/\sqrt U$ and $1/\sqrt V$
+come from the support conditions $U < 2^j$ and $2^j \le 2x/V$ that Vaughan's identity imposes.
+
+\inputleannode{lem:dyadic}
+
+\inputleannode{prop:S-average}
+
+\inputleannode{prop:T-bound}
+
+\section{The Type II estimate}
+
+\inputleannode{prop:typeII-average}
+

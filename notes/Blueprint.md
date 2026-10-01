@@ -1,18 +1,20 @@
 # Blueprint (informal overview and divergence log)
 
-The maintained, detailed blueprint of this project is **generated from the Lean sources**:
-every numbered definition, lemma and theorem carries a
-`@[blueprint (title := …) (statement := …) (proof := …)]` annotation in `BV/*.lean`, and the
-narrative and ordering live in `blueprint/src/content.tex`. Build it with
+The maintained, detailed blueprint of this project is the hand-written LaTeX in
+`blueprint/src/chapters/*.tex` (included from `blueprint/src/content.tex`). It is organised as a
+paper: each numbered node is a mathematical statement, and lists in `\lean{...}` the Lean
+declarations that formalise it (often several per node, occasionally a Mathlib or
+PrimeNumberTheoremAnd declaration for a quoted standard fact); dependencies are recorded by hand
+with `\uses{...}`, inside the statement for statement dependencies and inside the proof for proof
+dependencies. Build it with
 
 ```sh
-lake build :blueprint          # extracts .lake/build/blueprint/library/BV.tex
-uvx leanblueprint pdf          # or: uvx leanblueprint web
+uvx leanblueprint web          # or: uvx leanblueprint pdf
 ```
 
 (or run `./build_blueprint.sh`). The rendered version is linked from the README. When a Lean
-statement changes, change the annotation next to it; the LaTeX in `content.tex` should not need
-to change.
+statement changes, update the corresponding node in `blueprint/src/chapters/`; the style
+conventions (environments, numbering, level of detail) are those of `notes/blueprint_style_review.md`.
 
 This file is only a short informal summary of the argument, followed by a log of the places
 where the formal proof deviates from the textbook (Koukoulopoulos, *The Distribution of Prime

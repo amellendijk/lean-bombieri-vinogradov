@@ -17,11 +17,11 @@ open scoped Moebius zeta
 
 /-- Dilation of an arithmetic function: `dilate e f (n) = 1_{e ∣ n} · f (n / e)`.
 Equivalently `δ_e * f` where `δ_e(n) = 1_{n = e}`. -/
-@[blueprint (title := /-- Dilation of an arithmetic function -/) (statement := /--
+@[blueprint "def:dilate" (latexEnv := "definition") (title := /-- Dilation -/) (statement := /--
 For $e \ge 1$ and an arithmetic function $f$, the \emph{dilation} of $f$ by $e$ is the arithmetic
 function
 $$(\delta_e * f)(n) := 1_{e \mid n}\, f(n/e),$$
-i.e. the Dirichlet convolution of $f$ with the indicator $\delta_e$ of the singleton $\{e\}$.
+i.e.\ the Dirichlet convolution of $f$ with the indicator $\delta_e$ of the singleton $\{e\}$.
 -/)]
 noncomputable def dilate (e : ℕ) (f : ArithmeticFunction ℝ) : ArithmeticFunction ℝ :=
   ⟨fun n => if e ∣ n then f (n / e) else 0, by simp⟩
@@ -32,14 +32,19 @@ noncomputable def dilate (e : ℕ) (f : ArithmeticFunction ℝ) : ArithmeticFunc
 /-- Convolution passes through dilation: `f * dilate e g = dilate e (f * g)`.
 (Reindex `d = e · b`; needs `0 < e`.) Combined with `mul_comm` this lets the
 dilation land on the left factor, as `Delta_flog_bound` requires. -/
-@[blueprint (latexEnv := "lemma") (title := /-- Dilation commutes with convolution -/) (statement := /--
-For $e \ge 1$ and real arithmetic functions $f, g$,
-$$f * (\delta_e * g) = \delta_e * (f * g) \qquad\text{and}\qquad (\delta_e * f) * g = f * (\delta_e * g).$$
+@[blueprint "lem:dilate" (latexEnv := "lemma") (title := /-- Properties of dilation -/) (statement := /--
+Let $e \ge 1$ and let $f, g$ be real arithmetic functions. Then
+$$f * (\delta_e * g) = \delta_e * (f * g) = (\delta_e * f) * g ,$$
+and for every real $x$,
+$$\sum_{k \le x} |(\delta_e * f)(k)| \le \sum_{k \le x} |f(k)|.$$
 -/) (proof := /--
-Both are instances of associativity and commutativity of Dirichlet convolution, with $\delta_e * g$
-the dilation of \Cref{dilate}. Concretely, at $n = em$ both sides of the first identity equal
-$\sum_{ab = m} f(a) g(b)$ after the substitution $b \mapsto eb$ in the divisor sum, and both vanish
-when $e \nmid n$.
+The identities are instances of associativity and commutativity of Dirichlet convolution. Concretely,
+at $n = em$ all three functions equal $\sum_{ab = m} f(a) g(b)$ after the substitution $b \mapsto eb$
+(respectively $a \mapsto ea$) in the divisor sum, and all three vanish when $e \nmid n$.
+
+For the inequality, the non-zero terms on the left have $k = em$ with $m \le x/e$, and
+$|(\delta_e * f)(em)| = |f(m)|$; reindexing by $m$ gives $\sum_{m \le x/e} |f(m)|$, which is a sub-sum of
+the right-hand side since $x/e \le x$ and the terms are non-negative.
 -/)]
 theorem mul_dilate {e : ℕ} (he : 0 < e) (f g : ArithmeticFunction ℝ) :
     f * dilate e g = dilate e (f * g) := by
@@ -117,14 +122,7 @@ theorem image_div_filter_dvd {e : ℕ} (he : 0 < e) (x : ℝ) :
 
 /-- Dilation does not increase the `ℓ¹` mass (reindex `k = e·m`, identifying the
 support with `{1, …, x/e} ⊆ {1, …, x}`). -/
-@[blueprint (latexEnv := "lemma") (title := /-- Dilation does not increase the $\ell^1$ norm -/) (statement := /--
-For $e \ge 1$, every real arithmetic function $f$ and every real $x$,
-$$\sum_{k \le x} |(\delta_e * f)(k)| \le \sum_{k \le x} |f(k)|.$$
--/) (proof := /--
-The non-zero terms on the left have $k = em$ with $m \le x/e$, and $|(\delta_e * f)(em)| = |f(m)|$;
-reindexing by $m$ gives $\sum_{m \le x/e} |f(m)|$, a sub-sum of the right-hand side since
-$x/e \le x$ (the terms being non-negative).
--/)]
+@[blueprint "lem:dilate" (latexEnv := "lemma")]
 theorem summatory_abs_dilate_le {e : ℕ} (he : 0 < e) (f : ArithmeticFunction ℝ) {x : ℝ} :
     summatory (fun k => |dilate e f k|) x ≤ summatory (fun k => |f k|) x := by
   have he' : (0 : ℝ) < e := by positivity
@@ -156,6 +154,7 @@ theorem summatory_abs_dilate_le {e : ℕ} (he : 0 < e) (f : ArithmeticFunction �
         · grind
 
 /-- `.on` is additive (the `sub` form is what the `Λ♯` decomposition needs). -/
+@[blueprint "lem:restriction-hom" (latexEnv := "lemma")]
 theorem ArithmeticFunction.on_sub {R : Type*} [Ring R] (S : Set ℕ) (f g : ArithmeticFunction R) :
     (f - g).on S = f.on S - g.on S := by
   ext n
@@ -165,16 +164,16 @@ theorem ArithmeticFunction.on_sub {R : Type*} [Ring R] (S : Set ℕ) (f g : Arit
 /-- Restriction to a multiplicatively saturated set `S`
 (`a * b ∈ S ↔ a ∈ S ∧ b ∈ S`) is a Dirichlet-convolution homomorphism. The
 coprime set `{n | r.Coprime n}` is saturated by `Nat.coprime_mul_iff_right`. -/
-@[blueprint (latexEnv := "lemma") (title := /-- Restriction is a convolution homomorphism -/) (statement := /--
+@[blueprint "lem:restriction-hom" (latexEnv := "lemma") (title := /-- Restriction is a convolution homomorphism -/) (statement := /--
 Let $S \subseteq \N$ be \emph{multiplicatively saturated}: $ab \in S$ if and only if $a \in S$ and $b \in S$.
 Then for all arithmetic functions $f, g$ (with values in a semiring),
-$$(f * g)|_S = f|_S * g|_S .$$
-In particular, since $(ab, r) = 1$ if and only if $(a, r) = 1$ and $(b, r) = 1$, this applies to
-$S = \{n : (n, r) = 1\}$: $(f * g)_r = f_r * g_r$ for every $r \in \N$.
+$$(f * g)|_S = f|_S * g|_S , \qquad\text{and}\qquad (f - g)|_S = f|_S - g|_S$$
+for any $S$ when the values lie in a ring. In particular, since $(ab, r) = 1$ if and only if $(a, r) = 1$
+and $(b, r) = 1$, this applies to $S = \{n : (n, r) = 1\}$: $(f * g)_r = f_r * g_r$ for every $r \in \N$.
 -/) (proof := /--
-Evaluate both sides at $n$: the left side is $1_{n \in S} \sum_{ab = n} f(a) g(b)$ and the right side is
-$\sum_{ab = n} 1_{a \in S} 1_{b \in S} f(a) g(b)$. For each pair $ab = n$ saturation gives
-$1_{n \in S} = 1_{a \in S} 1_{b \in S}$.
+Linearity of restriction is clear. For the convolution, evaluate both sides at $n$: the left side is
+$1_{n \in S} \sum_{ab = n} f(a) g(b)$ and the right side is $\sum_{ab = n} 1_{a \in S} 1_{b \in S} f(a) g(b)$.
+For each pair $ab = n$ saturation gives $1_{n \in S} = 1_{a \in S} 1_{b \in S}$.
 -/)]
 theorem ArithmeticFunction.on_mul_of_saturated {R : Type*} [Semiring R] (S : Set ℕ)
     (hS : ∀ a b, a * b ∈ S ↔ a ∈ S ∧ b ∈ S) (f g : ArithmeticFunction R) :
@@ -198,6 +197,7 @@ theorem ArithmeticFunction.on_mul_of_saturated {R : Type*} [Semiring R] (S : Set
 
 /-- The `ℕ → R` restriction `onCoprime` agrees with the arithmetic-function
 restriction `.on {n | r.Coprime n}` (both send `0 ↦ 0` as `f 0 = 0`). -/
+@[blueprint "def:restriction" (latexEnv := "definition") (hasProof := false)]
 theorem onCoprime_eq_on_coe {R : Type*} [Zero R] (r : ℕ) (f : ArithmeticFunction R) :
     onCoprime r (⇑f) = ⇑(f.on {n | r.Coprime n}) := by
   funext n
@@ -215,14 +215,13 @@ theorem abs_on_le (S : Set ℕ) (f : ArithmeticFunction ℝ) (k : ℕ) :
     positivity
 
 /-- `ℓ¹` submultiplicativity of Dirichlet convolution. -/
-@[blueprint (latexEnv := "lemma") (title := /-- Submultiplicativity of the $\ell^1$ norm -/) (statement := /--
+@[blueprint "lem:l1-submult" (latexEnv := "lemma") (title := /-- Submultiplicativity of the $\ell^1$ norm -/) (statement := /--
 For real arithmetic functions $f, g$ and every real $x \ge 0$,
 $$\sum_{k \le x} |(f * g)(k)| \le \Big( \sum_{k \le x} |f(k)| \Big) \Big( \sum_{k \le x} |g(k)| \Big).$$
 -/) (proof := /--
-By the triangle inequality the left side is at most $\sum_{k \le x} \sum_{ab = k} |f(a)||g(b)|$. The map
-$(a, b) \mapsto (a, b)$ from pairs with $ab = k \le x$ into $\{1 \le a \le x\} \times \{1 \le b \le x\}$ is
-injective (with disjoint images for distinct $k$), so this double sum is at most
-$\sum_{a \le x} \sum_{b \le x} |f(a)||g(b)|$.
+By the triangle inequality the left side is at most $\sum_{k \le x} \sum_{ab = k} |f(a)||g(b)|$. The
+pairs $(a, b)$ with $ab = k \le x$ for the various $k$ are pairwise distinct and all satisfy
+$1 \le a \le x$, $1 \le b \le x$, so this double sum is at most $\sum_{a \le x} \sum_{b \le x} |f(a)||g(b)|$.
 -/)]
 theorem summatory_abs_mul_le (f g : ArithmeticFunction ℝ) {x : ℝ} (_hx : 0 ≤ x) :
     summatory (fun k => |(f * g) k|) x

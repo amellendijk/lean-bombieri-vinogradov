@@ -3,6 +3,7 @@ import Architect
 
 import BV.ForMathlib.IsLocallyBounded
 
+@[blueprint "def:summatory" (latexEnv := "definition")]
 noncomputable def Nat.Icc (x y : ℝ) : Finset ℕ :=
   if x ≤ y ∧ 0 ≤ y then Finset.Icc (⌈x⌉₊) (⌊y⌋₊) else ∅
 
@@ -61,12 +62,13 @@ theorem Nat.Icc_mono_right {x y₁ y₂ : ℝ} (hy : y₁ ≤ y₂) : Nat.Icc x 
   simp only [mem_Icc, and_imp]
   grind
 
-@[blueprint (title := /-- Summatory function -/) (statement := /--
-For $f : \N \to R$ with values in an additive commutative monoid $R$ and a real number $x$, the
+@[blueprint "def:summatory" (latexEnv := "definition") (title := /-- Sums over $n \le x$ -/) (statement := /--
+For $f : \N \to R$ with values in an additive commutative monoid and a real number $x$, the
 \emph{summatory function} of $f$ is
 $$\sum_{n \le x} f(n) := \sum_{1 \le n \le \lfloor x \rfloor} f(n).$$
-The term $n = 0$ is never included, and the sum is empty (hence $0$) when $x < 1$. Throughout the
-blueprint, every sum of the form $\sum_{n \le x}$ over a real endpoint $x$ is to be read in this way.
+The term $n = 0$ is never included, and the sum is empty (hence $0$) when $x < 1$. Throughout,
+every sum of the form $\sum_{n \le x}$ with a real endpoint $x$ is to be read in this way, and a sum
+$\sum_{n \le x, P(n)}$ with a side condition is the summatory function of $f \cdot 1_P$.
 -/)]
 noncomputable def summatory {R : Type*} [AddCommMonoid R] (f : ℕ → R) (x : ℝ) : R :=
   ∑ i ∈ Finset.Ioc 0 ⌊x⌋₊, f i

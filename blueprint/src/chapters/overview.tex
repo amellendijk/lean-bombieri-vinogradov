@@ -1,0 +1,68 @@
+\chapter{Overview of the proof}\label{ch:overview}
+
+\section{Discrepancies and the reduction to \texorpdfstring{$\Lambda$}{Lambda}}
+For an arithmetic function $f$ we measure its distribution in progressions by the
+\emph{discrepancy}
+$$\Delta_f(y; q, a) := \sum_{\substack{n \le y \\ n \equiv a \pmod q}} f(n) - \frac{1}{\varphi(q)} \sum_{\substack{n \le y \\ (n,q) = 1}} f(n)$$
+(\Cref{def:Delta}). For $f = \Lambda$ the difference between $\psi(y; q, a) - y/\varphi(q)$ and
+$\Delta_\Lambda(y; q, a)$ is $\varphi(q)^{-1}\big(\sum_{n \le y, (n,q)=1} \Lambda(n) - y\big)$, which is
+controlled by the prime number theorem with logarithmic savings (a special case of Siegel--Walfisz,
+\Cref{cor:pnt}) together with the elementary bound $\sum_{n \le y, (n,q) > 1} \Lambda(n) \ll \log q \log y$
+(\Cref{lem:vonMangoldt-not-coprime}). Summing $1/\varphi(q)$ over $q \le Q$ costs a factor $\log x$
+(\Cref{lem:totient-inv-sum}). The main theorem is thus reduced to a statement about $\Delta_\Lambda$
+(\Cref{prop:BV-Delta}), in which the maximum over $y$ is restricted to $\sqrt x \le y \le x$; the
+range $y < \sqrt x$ is handled by the trivial bound $|\psi(y;q,a) - y/\varphi(q)| \ll y$
+(\Cref{lem:psi-trivial}).
+
+\section{Vaughan's identity}
+Fix parameters $U, V$ with $UV \le \sqrt x$ and $U, V \ge e^{\sqrt{\log x}}$ (\Cref{def:parameters}).
+Vaughan's identity (\Cref{prop:vaughan}) decomposes
+$$\Lambda = \Lambda^\sharp + \Lambda^\flat + \Lambda_{\le U}, \qquad
+\Lambda^\sharp = \mu_{\le V} * \log - \Lambda_{\le U} * \mu_{\le V} * 1, \qquad
+\Lambda^\flat = (\Lambda_{> U} * 1) * \mu_{> V} .$$
+The three pieces are treated separately, in \Cref{ch:small}, \Cref{ch:typeI} and \Cref{ch:typeII}
+respectively, and recombined by the triangle inequality in \Cref{ch:assembly}. The piece
+$\Lambda_{\le U}$ is supported on $[1, U]$ and is bounded trivially. The piece $\Lambda^\sharp$ is a
+\emph{Type~I} sum: a convolution of a coefficient function of small support with the smooth functions
+$\log$ and $1$, whose discrepancies are bounded pointwise by Abel summation and $|\Delta_1| \le 1$.
+The piece $\Lambda^\flat$ is a \emph{Type~II} (bilinear) sum, which is bounded on average over $q$ by
+expanding $\Delta_{\Lambda^\flat}$ in Dirichlet characters, grouping characters by conductor,
+treating the small conductors with Siegel--Walfisz, and treating the large conductors with the large
+sieve.
+
+\section{The two external inputs}
+\emph{Siegel--Walfisz} (\Cref{thm:siegel-walfisz}) is used in three places: with $q = 1$ as the prime
+number theorem (\Cref{cor:pnt}), in the reduction from $\psi$ to $\Delta_\Lambda$
+(\Cref{lem:large-range}), and in the treatment of the small conductors $d \le (\log x)^C$ in the
+Type~II sum (\Cref{lem:SW-Lambda-q}). The \emph{large sieve} (\Cref{thm:large-sieve}) enters only
+through the maximal large sieve inequality for convolutions (\Cref{prop:large-sieve-convolution},
+Theorem~26.6 of \cite{Koukoulopoulos2019}), which we prove via a smoothed Perron formula rather than
+the truncated Perron formula of the textbook (\Cref{sec:perron}).
+
+\section{Where the formalisation deviates from the textbook}\label{sec:deviations}
+The following points are worth keeping in mind when comparing with \cite{Koukoulopoulos2019}.
+\begin{itemize}
+\item \emph{A divisor factor in the Type~I bound.} The pointwise bound for the restricted function
+$\Lambda^\sharp_r$ carries a factor $\tau(r)$ (\Cref{prop:sharp-pointwise}). Restriction to integers
+coprime to $r$ commutes with convolution (\Cref{lem:restriction-hom}), so the smooth factor $\log$
+becomes $\log_r$, which is neither smooth nor monotone, and we Möbius-expand it as a sum of $\tau(r)$
+dilated copies of $\log$ and $1$ (\Cref{lem:moebius-expansion}). The factor is harmless: in the Type~I
+average it is summed over the modulus using $\sum_{q \le Q} \tau(q) \ll Q \log Q$
+(\Cref{lem:divisor}), and in the small-conductor analysis it is absorbed by $\tau(q) \le 2\sqrt q \le 2x^{1/4}$,
+which is why the small-conductor lemmas assume $q \le \sqrt x$.
+\item \emph{The large sieve for convolutions is proved by smoothing.} Instead of the truncated Perron
+formula, we use the smoothed cutoff $\smooth_\varepsilon$ of the PrimeNumberTheoremAnd library
+(\Cref{def:bump}). At half-integers $y = K + \tfrac12$ the smoothed and sharp cutoffs agree exactly
+when $\varepsilon = 1/(6 \log 2 \cdot x)$ (\Cref{lem:sharp-half-integers}), so no error term arises, and
+Mellin inversion on the line $\Re s = 1/\log(x+1)$ (\Cref{lem:T-mellin}) reduces the problem to the
+large sieve for Dirichlet polynomials (\Cref{lem:LS-dirichlet-poly}) and to a kernel integral of size
+$O(\log x)$ (\Cref{lem:kernel-J}).
+\item \emph{Uniformity in $U, V$.} All Type~I/II estimates are proved for an arbitrary parameter datum
+(\Cref{def:parameters}); the choice $U = V = e^{\sqrt{\log x}}$ is only made in the final assembly. The
+constraints force $\log x \ge 16$ (\Cref{lem:parameters}), so the main theorem splits into the range
+$x \le e^{32}$, where the trivial bound suffices (\Cref{lem:compact-range}), and the range $x > e^{32}$.
+\item \emph{Maxima are suprema in $[0, \infty]$.} The maxima over $y$ and $a$ are formalised as suprema in
+the extended non-negative reals (\Cref{def:max}), so that no boundedness hypotheses need to be
+carried around; finiteness is part of each estimate. This is invisible in the statements below, where
+we simply write $\max$.
+\end{itemize}

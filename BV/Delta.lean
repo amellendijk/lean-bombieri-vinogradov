@@ -21,12 +21,12 @@ open BV
 
 Decomposing the von Mangoldt function into type I and type II functions. -/
 
-@[blueprint (title := /-- The discrepancy $\Delta_f$ -/) (statement := /--
-Let $R$ be a field, $f : \N \to R$, $x \in \R$, $q \in \N$ and $a \in \Z/q\Z$. The
-\emph{discrepancy} of $f$ in the progression $a \bmod q$ up to $x$ is
+@[blueprint "def:Delta" (latexEnv := "definition") (title := /-- The discrepancy $\Delta_f$ -/) (statement := /--
+Let $f : \N \to R$ with $R$ a field (in practice $R = \R$ or $\C$), let $x \in \R$, $q \in \N$ and
+$a \in \Z/q\Z$. The \emph{discrepancy} of $f$ in the progression $a \bmod q$ up to $x$ is
 $$\Delta_f(x; q, a) := \sum_{\substack{n \le x \\ n \equiv a \pmod q}} f(n) - \frac{1}{\varphi(q)} \sum_{\substack{n \le x \\ (n, q) = 1}} f(n).$$
-Here $\varphi$ is Euler's totient function, and $1/\varphi(0)$ is read as $0$ (as is customary in Lean),
-so that for $q = 0$ only the first sum survives; all estimates below assume $q \ge 1$.
+Here $1/\varphi(0)$ is read as $0$, so that for $q = 0$ only the first sum survives; all estimates
+below assume $q \ge 1$.
 -/)]
 noncomputable def Delta {R : Type*} [Field R] (f : ℕ → R) (x : ℝ) (q : ℕ) (a : ZMod q) : R :=
   summatory ((Nat.modEqs (a : ZMod q)).indicator f) x -
@@ -55,7 +55,7 @@ notation3 "Δ_[" f "](" x "; " q ", " a ")" => Delta f x q a
 
 /-! ### Linearity and uniform maximal estimates -/
 
-@[blueprint "Delta_linear" (latexEnv := "lemma")]
+@[blueprint "lem:Delta-linear" (latexEnv := "lemma")]
 theorem Delta_sub {R : Type*} [Field R] (f g : ℕ → R) (x : ℝ) (q : ℕ) (a : ZMod q) :
     Δ_[f - g](x; q, a) = Δ_[f](x; q, a) - Δ_[g](x; q, a) := by
   have hind : (Nat.modEqs (a : ZMod q)).indicator (f - g)
@@ -68,7 +68,7 @@ theorem Delta_sub {R : Type*} [Field R] (f g : ℕ → R) (x : ℝ) (q : ℕ) (a
   simp only [Delta, hind, hcop, summatory_sub_distrib]
   ring
 
-@[blueprint "Delta_linear" (latexEnv := "lemma")]
+@[blueprint "lem:Delta-linear" (latexEnv := "lemma")]
 theorem Delta_smul {R : Type*} [Field R] (c : R) (f : ℕ → R) (x : ℝ) (q : ℕ)
     (a : ZMod q) : Δ_[c • f](x; q, a) = c • Δ_[f](x; q, a) := by
   have hind : (Nat.modEqs (a : ZMod q)).indicator (c • f)
@@ -79,14 +79,14 @@ theorem Delta_smul {R : Type*} [Field R] (c : R) (f : ℕ → R) (x : ℝ) (q : 
   simp only [Delta, hind, hcop, smul_eq_mul, summatory, ← Finset.mul_sum]
   ring
 
-@[blueprint "Delta_linear" (latexEnv := "lemma") (title := /-- Linearity of $\Delta$ -/) (statement := /--
+@[blueprint "lem:Delta-linear" (latexEnv := "lemma") (title := /-- Linearity of $\Delta$ -/) (statement := /--
 For fixed $x, q, a$ the map $f \mapsto \Delta_f(x; q, a)$ is $R$-linear:
 $\Delta_{f + g} = \Delta_f + \Delta_g$, $\Delta_{f - g} = \Delta_f - \Delta_g$,
 $\Delta_{c f} = c\, \Delta_f$ for $c \in R$, and $\Delta_{\sum_{i \in I} f_i} = \sum_{i \in I} \Delta_{f_i}$
 for every finite index set $I$.
 -/) (proof := /--
-Both sums in \Cref{Delta} are finite sums of values of $f$, hence linear in $f$; the finite-sum
-version follows by induction on $I$.
+Both sums in \Cref{def:Delta} are finite sums of values of $f$, hence linear in $f$. The finite-sum
+version follows from additivity by induction on $I$.
 -/)]
 theorem Delta_add {R : Type*} [Field R] (f g : ℕ → R) (x : ℝ) (q : ℕ) (a : ZMod q) :
     Δ_[f + g](x; q, a) = Δ_[f](x; q, a) + Δ_[g](x; q, a) := by
@@ -99,7 +99,7 @@ theorem Delta_add {R : Type*} [Field R] (f g : ℕ → R) (x : ℝ) (q : ℕ) (a
   simp only [Delta, hind, hcop, summatory_add_distrib]
   ring
 
-@[blueprint "Delta_linear" (latexEnv := "lemma")]
+@[blueprint "lem:Delta-linear" (latexEnv := "lemma")]
 theorem Delta_finset_sum {R : Type*} [Field R] {ι : Type*} (s : Finset ι) (F : ι → ℕ → R)
     (x : ℝ) (q : ℕ) (a : ZMod q) :
     Δ_[∑ i ∈ s, F i](x; q, a) = ∑ i ∈ s, Δ_[F i](x; q, a) := by
@@ -109,13 +109,16 @@ theorem Delta_finset_sum {R : Type*} [Field R] {ι : Type*} (s : Finset ι) (F :
   | insert i s hi ih => rw [Finset.sum_insert hi, Finset.sum_insert hi, Delta_add, ih]
 
 /-- Uniform triangle bound, valid for every conductor. -/
-@[blueprint (latexEnv := "lemma") (title := /-- Trivial bound for $\Delta_f$ -/) (statement := /--
+@[blueprint "lem:Delta-trivial" (latexEnv := "lemma") (title := /-- Trivial bound for $\Delta_f$ -/) (statement := /--
 For every $f : \N \to \R$, every real $z$, every $q \in \N$ and every $a \in \Z/q\Z$,
 $$|\Delta_f(z; q, a)| \le 2 \sum_{n \le z} |f(n)|.$$
+If moreover $f \ge 0$ and $q \ge 1$, then $|\Delta_f(z; q, a)| \le 2 \sum_{n \le z} f(n)$.
 -/) (proof := /--
-Each of the two sums in \Cref{Delta} is a sub-sum of $\sum_{n \le z} f(n)$, so each is bounded in
+Each of the two sums in \Cref{def:Delta} is a sub-sum of $\sum_{n \le z} f(n)$, so each is bounded in
 absolute value by $\sum_{n \le z} |f(n)|$; moreover $1/\varphi(q) \le 1$ (this also holds for
-$q = 0$, where the factor is $0$). The triangle inequality gives the claim.
+$q = 0$, where the factor is $0$). The triangle inequality gives the claim. When $f \ge 0$ both
+sub-sums lie in $[0, \sum_{n \le z} f(n)]$, so their difference (with the second scaled by
+$1/\varphi(q) \in (0, 1]$) has absolute value at most $2\sum_{n \le z} f(n)$.
 -/)]
 theorem abs_Delta_le_two_summatory_abs (f : ℕ → ℝ) (z : ℝ) (q : ℕ) (a : ZMod q) :
     |Δ_[f](z; q, a)| ≤ 2 * summatory (fun n ↦ |f n|) z := by
@@ -156,23 +159,13 @@ theorem abs_Delta_le_two_summatory_abs (f : ℕ → ℝ) (z : ℝ) (q : ℕ) (a 
     _ = 2 * summatory (fun n ↦ |f n|) z := by ring
 
 /-- A discrepancy is bounded by its canonical unit-class maximum. -/
-@[blueprint "maxya_Delta_enorm_le_of_abs_le" (latexEnv := "lemma")]
+@[blueprint "lem:max" (latexEnv := "lemma")]
 theorem Delta_enorm_le_maxya [ProofData] (f : ℕ → ℝ) {q : ℕ} {y : ℝ} {a : ZMod q}
     (ha : IsUnit a) (hy1 : √(ProofData.x) ≤ y) (hy2 : y ≤ ProofData.x) :
     ‖Δ_[f](y; q, a)‖ₑ ≤ maxya q (fun z b ↦ ‖Δ_[f](z; q, b)‖ₑ) :=
   le_maxya ha hy1 hy2
 
-@[blueprint (latexEnv := "lemma") (title := /-- From pointwise bounds to maximal bounds -/) (statement := /--
-Let $f : \N \to \R$, $q \in \N$ and $B \in \R$. If $|\Delta_f(y; q, a)| \le B$ for all
-$\sqrt{x} \le y \le x$ and all $a \in (\Z/q\Z)^*$, then
-$$\max_{\substack{\sqrt x \le y \le x \\ a \in (\Z/q\Z)^*}} |\Delta_f(y; q, a)| \le B,$$
-where the left-hand side is the maximum of \Cref{BV.maxya} applied to the (extended) absolute value.
-Conversely each $|\Delta_f(y; q, a)|$ with $a$ a unit and $\sqrt x \le y \le x$ is bounded by this
-maximum.
--/) (proof := /--
-Immediate from \Cref{maxya_basic}, after identifying the extended-real absolute value
-$\|\cdot\|_e$ with $|\cdot|$ on $\R$.
--/)]
+@[blueprint "lem:max" (latexEnv := "lemma")]
 theorem maxya_Delta_enorm_le_of_abs_le [ProofData] (f : ℕ → ℝ) {q : ℕ} {B : ℝ}
     (h : ∀ y, √(ProofData.x) ≤ y → y ≤ ProofData.x → ∀ a : ZMod q,
       IsUnit a → |Δ_[f](y; q, a)| ≤ B) :
@@ -182,15 +175,7 @@ theorem maxya_Delta_enorm_le_of_abs_le [ProofData] (f : ℕ → ℝ) {q : ℕ} {
   exact ENNReal.ofReal_le_ofReal (h y hy1 hy2 a ha)
 
 /-- Generic two-function maximal triangle inequality for `Delta`. -/
-@[blueprint (latexEnv := "lemma") (title := /-- Triangle inequality for maximal discrepancies -/) (statement := /--
-For all $f, g : \N \to \R$ and $q \in \N$,
-$$\max_{\substack{\sqrt x \le y \le x \\ a \in (\Z/q\Z)^*}} |\Delta_{f+g}(y; q, a)| \le \max_{\substack{\sqrt x \le y \le x \\ a \in (\Z/q\Z)^*}} |\Delta_{f}(y; q, a)| + \max_{\substack{\sqrt x \le y \le x \\ a \in (\Z/q\Z)^*}} |\Delta_{g}(y; q, a)|.$$
--/) (proof := /--
-Fix a unit $a$ and $\sqrt x \le y \le x$. By \Cref{Delta_linear} and the triangle inequality,
-$|\Delta_{f+g}(y;q,a)| \le |\Delta_f(y;q,a)| + |\Delta_g(y;q,a)|$, and each term on the right is at
-most the corresponding maximum by \Cref{maxya_basic}. Taking the supremum over $y$ and $a$ on the
-left (\Cref{maxya_basic} again) gives the claim.
--/)]
+@[blueprint "lem:max" (latexEnv := "lemma")]
 theorem maxya_Delta_add_le [ProofData] (f g : ℕ → ℝ) (q : ℕ) :
     maxya q (fun y a ↦ ‖Δ_[f + g](y; q, a)‖ₑ) ≤
       maxya q (fun y a ↦ ‖Δ_[f](y; q, a)‖ₑ) +
@@ -200,6 +185,7 @@ theorem maxya_Delta_add_le [ProofData] (f g : ℕ → ℝ) (q : ℕ) :
   exact (enorm_add_le _ _).trans (add_le_add (Delta_enorm_le_maxya f ha hy1 hy2)
     (Delta_enorm_le_maxya g ha hy1 hy2))
 
+@[blueprint "lem:max" (latexEnv := "lemma")]
 theorem maxya_Delta_enorm_ne_top [ProofData] (f : ℕ → ℝ) (q : ℕ) :
     maxya q (fun y a ↦ ‖Δ_[f](y; q, a)‖ₑ) ≠ ⊤ := by
   let B := 2 * summatory (fun n ↦ |f n|) ProofData.x
@@ -212,13 +198,14 @@ theorem maxya_Delta_enorm_ne_top [ProofData] (f : ℕ → ℝ) (q : ℕ) :
 
 /-- For a unit `a`, restricting `f` to integers coprime to `q` does not change `Δ_[f](y; q, a)`,
 since `n ≡ a (mod q)` with `a` a unit forces `q.Coprime n`. -/
-@[blueprint (latexEnv := "lemma") (title := /-- Restricting to integers coprime to the modulus -/) (statement := /--
-Let $f : \N \to R$ ($R$ a field), $y \in \R$, $q \in \N$ and $a \in (\Z/q\Z)^*$. Then
+@[blueprint "lem:Delta-coprime" (latexEnv := "lemma") (title := /-- Restricting to integers coprime to the modulus -/) (statement := /--
+Let $f : \N \to R$, $y \in \R$, $q \in \N$ and $a \in (\Z/q\Z)^*$. Then
 $$\Delta_{f_q}(y; q, a) = \Delta_f(y; q, a),$$
-with $f_q$ as in \Cref{onCoprime}.
+with $f_q$ as in \Cref{def:restriction}.
 -/) (proof := /--
-If $n \equiv a \pmod q$ with $a$ a unit, then $n$ is a unit modulo $q$, i.e. $(n, q) = 1$, so
-$f_q(n) = f(n)$ on the first sum in \Cref{Delta}. On the second sum $f_q = f$ by definition.
+If $n \equiv a \pmod q$ with $a$ a unit, then $n$ is a unit modulo $q$, i.e.\ $(n, q) = 1$, so
+$f_q(n) = f(n)$ for every $n$ in the first sum of \Cref{def:Delta}. On the second sum $f_q = f$ by
+definition.
 -/)]
 theorem Delta_onCoprime_self {R : Type*} [Field R] (f : ℕ → R) (y : ℝ) {q : ℕ} {a : ZMod q}
     (ha : IsUnit a) :
@@ -287,20 +274,33 @@ attribute [push] RingHom.map_add
 attribute [push] RingHom.map_sub
 
 -- Thought: Instead of RCLike should I just take anything that ℂ is an algebra over? I don't need completeness here...
-@[blueprint (latexEnv := "lemma") (title := /-- $\Delta_f$ via Dirichlet characters -/) (statement := /--
-Let $\mathbb{K}$ be a field equipped with an algebra map $\mathbb K \to \C$ (in practice
-$\mathbb K = \R$ or $\C$), $f : \N \to \mathbb K$, $y \in \R$, $q \ge 1$ and $a \in (\Z/q\Z)^*$. Then,
-in $\C$,
+attribute [blueprint "lem:orthogonality" (latexEnv := "lemma") (title := /-- Orthogonality of Dirichlet characters -/) (statement := /--
+Let $q \ge 1$, let $a \in (\Z/q\Z)^*$ and let $b \in \Z/q\Z$. Then
+$$\sum_{\chi \bmod q} \chi(a)^{-1}\, \chi(b) = \begin{cases} \varphi(q) & \text{if } a = b, \\ 0 & \text{otherwise.} \end{cases}$$
+For a unit $a$ one has $\chi(a)^{-1} = \overline{\chi(a)}$, since $|\chi(a)| = 1$.
+-/) (proof := /--
+This is in Mathlib.
+-/)] DirichletCharacter.sum_char_inv_mul_char_eq
+
+attribute [blueprint "lem:totient" (latexEnv := "lemma") (title := /-- Elementary facts about $\varphi$ -/) (statement := /--
+For all $a, b, n \in \N$,
+$$\sum_{d \mid n} \varphi(d) = n, \qquad \varphi(a)\varphi(b) \le \varphi(ab), \qquad \varphi(ab) = \varphi(a)\varphi(b) \text{ if } (a, b) = 1,$$
+and for $q \ge 1$ the unit group $(\Z/q\Z)^*$ has exactly $\varphi(q)$ elements.
+-/) (proof := /--
+These are in Mathlib.
+-/)] Nat.sum_totient Nat.totient_super_multiplicative Nat.totient_mul ZMod.card_units_eq_totient
+
+@[blueprint "lem:Delta-char" (latexEnv := "lemma") (title := /-- $\Delta_f$ via Dirichlet characters -/) (statement := /--
+Let $f : \N \to \R$ or $f : \N \to \C$, let $y \in \R$, $q \ge 1$ and $a \in (\Z/q\Z)^*$. Then
 $$\Delta_f(y; q, a) = \frac{1}{\varphi(q)} \sum_{\substack{\chi \bmod q \\ \chi \ne \chi_0}} \overline{\chi(a)} \sum_{n \le y} f(n) \chi(n),$$
 where $\chi_0$ is the principal character modulo $q$.
 -/) (proof := /--
-By the orthogonality relation $\sum_{\chi \bmod q} \overline{\chi(a)}\chi(n) = \varphi(q)\, 1_{n \equiv a \pmod q}$,
-valid for $a$ a unit, summing over all characters gives
+By \Cref{lem:orthogonality}, $\sum_{\chi \bmod q} \overline{\chi(a)}\chi(n) = \varphi(q)\, 1_{n \equiv a \pmod q}$
+for every $n$, since $a$ is a unit. Summing over all characters therefore gives
 $\sum_{\chi} \overline{\chi(a)} \sum_{n \le y} f(n)\chi(n) = \varphi(q) \sum_{n \le y, n \equiv a} f(n)$.
-The principal character contributes $\sum_{n \le y} f(n) \chi_0(n) = \sum_{n \le y, (n, q) = 1} f(n)$
-since $\chi_0(a) = 1$. Subtracting the principal term and dividing by $\varphi(q)$ gives exactly the
-two sums in \Cref{Delta}. (Here $\overline{\chi(a)} = \chi(a)^{-1} = \chi(a^{-1})$ because
-$|\chi(a)| = 1$ for units $a$.)
+The principal character contributes $\sum_{n \le y} f(n) \chi_0(n) = \sum_{n \le y, (n, q) = 1} f(n)$,
+because $\chi_0(a) = 1$. Subtracting the principal term and dividing by $\varphi(q)$ gives exactly the
+two sums in \Cref{def:Delta}.
 -/)]
 lemma Delta_eq_sum_char {𝕜 : Type*} [Field 𝕜] [Algebra 𝕜 ℂ] {f : ℕ → 𝕜} {y : ℝ} {q : ℕ} [NeZero q] {a : ZMod q}
     (ha : IsUnit a) :
@@ -355,14 +355,14 @@ lemma Delta_eq_sum_char {𝕜 : Type*} [Field 𝕜] [Algebra 𝕜 ℂ] {f : ℕ 
 --   sorry
 
 
-@[blueprint (latexEnv := "lemma") (title := /-- $\Delta_\Lambda$ and the Chebyshev error -/) (statement := /--
+@[blueprint "lem:Delta-psi" (latexEnv := "lemma") (title := /-- $\Delta_\Lambda$ and the Chebyshev error -/) (statement := /--
 For all $z \in \R$, $q \in \N$ and $a \in \Z/q\Z$,
 $$\Delta_\Lambda(z; q, a) = \psi(z; q, a) - \frac{1}{\varphi(q)} \sum_{\substack{n \le z \\ (n, q) = 1}} \Lambda(n),$$
 and consequently
 $$\psi(z; q, a) - \frac{z}{\varphi(q)} = \Delta_\Lambda(z; q, a) + \frac{1}{\varphi(q)} \Big( \sum_{\substack{n \le z \\ (n, q) = 1}} \Lambda(n) - z \Big).$$
 -/) (proof := /--
 The first identity is the definition of $\Delta_\Lambda$ together with the definition of
-$\psi(z; q, a)$ (\Cref{Chebyshev.psiMod}); the second follows by adding and subtracting $z/\varphi(q)$.
+$\psi(z; q, a)$; the second follows by adding and subtracting $z/\varphi(q)$.
 -/)]
 theorem Delta_Lambda_eq (x : ℝ) (q : ℕ) (a : ZMod q) :
     Δ_[Λ](x; q, a) = ψ x a - (q.totient : ℝ)⁻¹ *
@@ -374,7 +374,7 @@ theorem Delta_Lambda_eq (x : ℝ) (q : ℕ) (a : ZMod q) :
   congr! 1 with n hn
 
 /-- Relate the usual modular Chebyshev error to `Delta Λ` and the coprime PNT error. -/
-@[blueprint "Delta_Lambda_eq" (latexEnv := "lemma")]
+@[blueprint "lem:Delta-psi" (latexEnv := "lemma")]
 theorem psi_sub_div_eq_Delta_add (z : ℝ) (q : ℕ) (a : ZMod q) :
     ψ z a - z / q.totient = Δ_[Λ](z; q, a) +
       (q.totient : ℝ)⁻¹ *
@@ -382,6 +382,7 @@ theorem psi_sub_div_eq_Delta_add (z : ℝ) (q : ℕ) (a : ZMod q) :
   rw [Delta_Lambda_eq, summatory, Finset.sum_filter]
   ring
 
+@[blueprint "lem:Delta-convolution" (latexEnv := "lemma") (hasProof := true)]
 noncomputable def ArithmeticFunction.twist {𝕜 : Type*} [Field 𝕜] [Algebra 𝕜 ℂ] {q : ℕ} (f : ArithmeticFunction 𝕜) (c : DirichletCharacter ℂ q)  : ArithmeticFunction ℂ := ⟨
   fun n ↦ algebraMap _ _ (f n) * c n,
   by simp
@@ -392,6 +393,7 @@ theorem ArithmeticFunction.twist_apply {𝕜 : Type*} [Field 𝕜] [Algebra 𝕜
     f.twist χ n = algebraMap _ _ (f n) * χ ↑n := rfl
 
 open ArithmeticFunction in
+@[blueprint "lem:Delta-convolution" (latexEnv := "lemma")]
 theorem ArithmeticFunction.mul_twist {𝕜 : Type*} [Field 𝕜] [Algebra 𝕜 ℂ] {q : ℕ} (f g : ArithmeticFunction 𝕜) (χ : DirichletCharacter ℂ q) (n : ℕ) :
     (f * g).twist χ n = (f.twist χ * g.twist χ) n := by
   simp [← mul_assoc, Finset.sum_mul]
@@ -400,6 +402,15 @@ theorem ArithmeticFunction.mul_twist {𝕜 : Type*} [Field 𝕜] [Algebra 𝕜 �
   rw [← hab.1]
   grind
 
+attribute [blueprint "lem:hyperbola" (latexEnv := "lemma")] ArithmeticFunction.sum_Ioc_mul_eq_sum_sum
+
+@[blueprint "lem:hyperbola" (latexEnv := "lemma") (title := /-- Hyperbola identity -/) (statement := /--
+For arithmetic functions $f, g$ with values in a semiring and every real $x$,
+$$\sum_{n \le x} (f * g)(n) = \sum_{k \le x} f(k) \sum_{l \le x/k} g(l) .$$
+-/) (proof := /--
+Expand $(f*g)(n) = \sum_{kl = n} f(k) g(l)$ and interchange the order of summation: the pairs $(k, l)$
+with $kl \le x$ are exactly those with $k \le x$ and $l \le x/k$.
+-/)]
 theorem ArithmeticFunction.summatory_mul_eq_summatory {R : Type*} [Semiring R] (f g : ArithmeticFunction R) (x : ℝ) :
     summatory (f * g) x  = summatory (fun n ↦ f n * summatory g (x/n)) x := by
   have := ArithmeticFunction.sum_Ioc_mul_eq_sum_sum f g (⌊x⌋₊)
@@ -421,20 +432,20 @@ lemma ZMod.isUnit_inv' {q : ℕ} (n : ZMod q) : IsUnit n → IsUnit n⁻¹ := by
   rw [isUnit_iff_exists]
   exact ⟨n, ZMod.inv_mul_of_unit _ h, ZMod.mul_inv_of_unit _ h⟩
 
-@[blueprint (latexEnv := "lemma") (title := /-- $\Delta$ of a Dirichlet convolution -/) (statement := /--
-Let $\mathbb K$ be a field with an algebra map to $\C$, let $f, g$ be arithmetic functions with values in
-$\mathbb K$, let $y \in \R$, $q \ge 1$ and $a \in (\Z/q\Z)^*$. Then
+@[blueprint "lem:Delta-convolution" (latexEnv := "lemma") (title := /-- $\Delta$ of a Dirichlet convolution -/) (statement := /--
+Let $f, g$ be arithmetic functions with values in $\R$ or $\C$, let $y \in \R$, $q \ge 1$ and
+$a \in (\Z/q\Z)^*$. Then
 $$\Delta_{f * g}(y; q, a) = \sum_{\substack{k \le y \\ (k, q) = 1}} f(k)\, \Delta_g\!\left(\frac{y}{k};\, q,\, a \bar k\right),$$
 where $\bar k$ denotes the inverse of $k$ in $(\Z/q\Z)^*$.
 -/) (proof := /--
-Both sides may be computed in $\C$ after applying the algebra map. By \Cref{Delta_eq_sum_char},
+Both sides may be computed in $\C$. By \Cref{lem:Delta-char},
 $\varphi(q) \Delta_{f*g}(y;q,a) = \sum_{\chi \ne \chi_0} \overline{\chi(a)} \sum_{n \le y} (f*g)(n) \chi(n)$.
 Since $\chi$ is completely multiplicative, $(f*g)(n)\chi(n) = ((f\chi) * (g\chi))(n)$, and the
-hyperbola identity $\sum_{n \le y} (F*G)(n) = \sum_{k \le y} F(k) \sum_{l \le y/k} G(l)$ gives
+hyperbola identity (\Cref{lem:hyperbola}) gives
 $$\varphi(q)\Delta_{f*g}(y;q,a) = \sum_{k \le y} f(k) \sum_{\chi \ne \chi_0} \overline{\chi(a)}\chi(k) \sum_{l \le y/k} g(l)\chi(l).$$
 If $(k, q) > 1$ then $\chi(k) = 0$ and the term vanishes. If $(k, q) = 1$ then $k$ is a unit and
-$\overline{\chi(a)}\chi(k) = \overline{\chi(a \bar k)}$, so by \Cref{Delta_eq_sum_char} (applied to $g$ at
-the point $y/k$ and the unit $a \bar k$) the inner double sum equals $\varphi(q) \Delta_g(y/k; q, a\bar k)$.
+$\overline{\chi(a)}\chi(k) = \overline{\chi(a \bar k)}$, so by \Cref{lem:Delta-char} applied to $g$ at the
+point $y/k$ and the unit $a \bar k$, the inner double sum equals $\varphi(q) \Delta_g(y/k; q, a\bar k)$.
 Dividing by $\varphi(q)$ gives the claim.
 -/)]
 theorem Delta_convolution_eq {𝕜 : Type*} [Field 𝕜] [Algebra 𝕜 ℂ] {y : ℝ} {q : ℕ} [NeZero q] {a : ZMod q} (ha : IsUnit a) (f g : ArithmeticFunction 𝕜) :
@@ -640,6 +651,7 @@ theorem Set.indicator_apply_congr {α β : Type*} [Zero β] (r s : Set α) (f g 
   · simp [h, hfg]
   · simp [h]
 
+@[blueprint "lem:Delta-one" (latexEnv := "lemma")]
 theorem Delta_zeta_eq_Delta_one {x : ℝ} {q : ℕ} (a : ZMod q) :
     Δ_[(ζ : ArithmeticFunction ℝ)](x; q, a) = Δ_[fun _ ↦ (1 : ℝ)](x; q, a) := by
   simp [Delta]
@@ -649,13 +661,14 @@ theorem Delta_zeta_eq_Delta_one {x : ℝ} {q : ℕ} (a : ZMod q) :
   · congr! 2 with n hn hnx n rfl hqn
     grind
 
-@[blueprint (latexEnv := "lemma") (title := /-- The discrepancy of the constant function $1$ -/) (statement := /--
+@[blueprint "lem:Delta-one" (latexEnv := "lemma") (proofUses := ["lem:totient"]) (title := /-- The discrepancy of the constant function $1$ -/) (statement := /--
 For every real $x$, every $q \ge 1$ and every $a \in \Z/q\Z$ (not necessarily a unit),
 $$|\Delta_1(x; q, a)| \le 1 .$$
 -/) (proof := /--
 Let $N = \lfloor x \rfloor$ and write $N = kq + m$ with $0 \le m < q$. The integers $1 \le n \le N$ form
 $k$ complete residue systems modulo $q$ followed by $m$ further integers. Each complete system
-contains exactly one $n \equiv a \pmod q$ and exactly $\varphi(q)$ integers coprime to $q$. Hence
+contains exactly one $n \equiv a \pmod q$ and exactly $\varphi(q)$ integers coprime to $q$
+(\Cref{lem:totient}). Hence
 $$\#\{n \le N : n \equiv a\} = k + c, \qquad \#\{n \le N : (n,q) = 1\} = \varphi(q) k + c',$$
 with $0 \le c \le 1$ and $0 \le c' \le \varphi(q)$ counting the contributions of the last $m$ integers.
 Therefore $\Delta_1(x; q, a) = c - c'/\varphi(q) \in [-1, 1]$.
@@ -681,6 +694,23 @@ theorem Delta_one_bound {x : ℝ} {q : ℕ} (a : ZMod q) (hq : 0 < q) : ‖Δ_[f
 
 -- TODO: make this proof pretty.
 /-- Abel summation stated interms of `summatory`. -/
+@[blueprint "lem:Delta-abel" (latexEnv := "lemma") (title := /-- Abel summation for $\Delta$ -/) (statement := /--
+Let $q \ge 1$, $a \in (\Z/q\Z)^*$ and $x \ge 1$. Let $g, g' : \R \to \C$ be such that $g$ has derivative
+$g'(t)$ at every $t \in [1, x]$, $g'$ is locally integrable on $[1, x]$, and $g(1) = 0$. Then
+$$\Delta_{g}(x; q, a) = \Delta_1(x; q, a)\, g(x) - \int_1^x \Delta_1(t; q, a)\, g'(t)\, \mathrm{d}t,$$
+where $\Delta_g$ is the discrepancy of the arithmetic function $n \mapsto g(n)$. The same holds for
+real-valued $g, g'$.
+-/) (proof := /--
+By \Cref{lem:Delta-char} both sides are, up to the factor $1/\varphi(q)$, sums over the
+non-principal characters $\chi \bmod q$ of $\overline{\chi(a)}$ times a character sum, so it suffices to
+prove the identity character by character; the integral may be exchanged with the finite sum
+because each integrand is the product of the locally integrable $g'$ with a locally bounded step
+function. For a fixed $\chi$ put $S(t) = \sum_{n \le t} \chi(n)$. Abel's summation formula gives
+$$\sum_{1 < n \le x} g(n) \chi(n) = g(x) S(x) - g(1) S(1) - \int_1^x g'(t) S(t)\, \mathrm{d}t,$$
+and the term $n = 1$ as well as the boundary term at $1$ vanish because $g(1) = 0$. Recombining over
+$\chi$ gives the identity with $\Delta_1$ in place of $S$. The real case follows by viewing $g, g'$ as
+complex-valued.
+-/)]
 theorem abel_summation_summatory {𝕜 : Type*} [RCLike 𝕜] (c : ℕ → 𝕜) {f f' : ℝ → 𝕜}
     {a b : ℝ} (hac : ∀ n : ℕ, 0 < n → n ≤ a → c n * f n = 0) (ha : 0 ≤ a) (hab : a ≤ b)
     (hf_diff : ∀ t ∈ Set.Icc a b, HasDerivAt f (f' t) t)
@@ -740,22 +770,7 @@ The API surrounding LocallyIntegrableOn is annoying and disjointed.
 The main problem is that proving f*g is locally integrable basically requires one of the two functions to be continuous.
 -/
 open MeasureTheory in
-@[blueprint (latexEnv := "lemma") (title := /-- Abel summation for $\Delta$ -/) (statement := /--
-Let $q \ge 1$, $a \in (\Z/q\Z)^*$ and $x \ge 1$. Let $g, g' : \R \to \C$ be such that $g$ has derivative
-$g'(t)$ at every $t \in [1, x]$, $g'$ is locally integrable on $[1, x]$, and $g(1) = 0$. Then
-$$\Delta_{g}(x; q, a) = \Delta_1(x; q, a)\, g(x) - \int_1^x \Delta_1(t; q, a)\, g'(t)\, \mathrm{d}t,$$
-where $\Delta_g$ is the discrepancy of the arithmetic function $n \mapsto g(n)$.
--/) (proof := /--
-By \Cref{Delta_eq_sum_char} both sides are, up to the factor $1/\varphi(q)$, sums over the
-non-principal characters $\chi \bmod q$ of $\overline{\chi(a)}$ times a character sum; it suffices to
-prove the identity character by character, and the integral may be exchanged with the finite sum
-because each integrand is the product of the locally integrable $g'$ with the locally bounded step
-function $t \mapsto \sum_{n \le t} \chi(n)$. For a fixed $\chi$ put $S(t) = \sum_{n \le t} \chi(n)$; Abel
-summation (Mathlib's \texttt{sum\_mul\_eq\_sub\_sub\_integral\_mul}) gives
-$$\sum_{1 < n \le x} g(n) \chi(n) = g(x) S(x) - g(1) S(1) - \int_1^x g'(t) S(t)\, \mathrm{d}t,$$
-and the term $n = 1$ as well as the boundary term at $1$ vanish because $g(1) = 0$. Recombining over
-$\chi$ gives the identity with $\Delta_1$ in place of $S$.
--/)]
+@[blueprint "lem:Delta-abel" (latexEnv := "lemma")]
 theorem Delta_abel_summation {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit a) (g g' : ℝ → ℂ) {x : ℝ} (hx : 1 ≤ x)
     (hg : ∀ t ∈ Set.Icc 1 x, HasDerivAt g (g' t) t)
     (hg_int : MeasureTheory.LocallyIntegrableOn g' (Set.Icc 1 x))
@@ -790,6 +805,7 @@ theorem Delta_abel_summation {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit
   grind
 
 -- There really ought to be an RCLike version.
+@[blueprint "lem:Delta-abel" (latexEnv := "lemma")]
 theorem Delta_abel_summation_real {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit a) (g g' : ℝ → ℝ) {x : ℝ} (hx : 1 ≤ x)
     (hg : ∀ t ∈ Set.Icc 1 x, HasDerivAt g (g' t) t)
     (hg_int : MeasureTheory.LocallyIntegrableOn g' (Set.Icc 1 x))
@@ -832,6 +848,17 @@ theorem Complex.ofReal_antilipschitzWith : AntilipschitzWith 1 Complex.ofReal :=
 attribute [fun_prop] MeasureTheory.LocallyIntegrableOn.norm
 
 open MeasureTheory in
+@[blueprint "lem:Delta-monotone" (latexEnv := "lemma") (title := /-- Discrepancy of a monotone weight -/) (statement := /--
+Let $q \ge 1$, $a \in (\Z/q\Z)^*$ and $x \ge 1$. Let $g : \R \to \R$ be differentiable at every point of
+$[1, x]$, with $g'$ locally integrable on $[1, x]$, monotone increasing on $[1, x]$ and $g(1) = 0$. Then
+$$|\Delta_g(x; q, a)| \le 2 g(x).$$
+-/) (proof := /--
+Apply \Cref{lem:Delta-abel} and bound the two terms. By \Cref{lem:Delta-one},
+$|\Delta_1(x;q,a) g(x)| \le g(x)$, where $g(x) \ge g(1) = 0$ by monotonicity. Since $g$ is monotone
+on $[1, x]$, its derivative satisfies $g' \ge 0$ on $(1, x)$, so
+$$\left| \int_1^x \Delta_1(t;q,a) g'(t)\,\mathrm{d}t \right| \le \int_1^x g'(t)\,\mathrm{d}t = g(x) - g(1) = g(x)$$
+by the fundamental theorem of calculus. Adding the two bounds gives $2g(x)$.
+-/)]
 theorem Delta_monotone_bound_aux {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit a) (g g' : ℝ → ℝ) {x : ℝ} (hx : 1 ≤ x)
     (hg : ∀ t ∈ Set.Icc 1 x, HasDerivAt g (g' t) t)
     (hg_int : MeasureTheory.LocallyIntegrableOn g' (Set.Icc 1 x))
@@ -883,17 +910,7 @@ theorem Delta_monotone_bound_aux {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : Is
 
 open MeasureTheory in
 --TODO : Add g 0 = 0 condition and remove ‖‖
-@[blueprint (latexEnv := "lemma") (title := /-- Discrepancy of a monotone weight -/) (statement := /--
-Let $q \ge 1$, $a \in (\Z/q\Z)^*$ and $x \ge 1$. Let $g : \R \to \R$ be differentiable at every point of
-$[1, x]$, with $g'$ locally integrable on $[1, x]$, monotone increasing on $[1, x]$ and $g(1) = 0$. Then
-$$|\Delta_g(x; q, a)| \le 2 g(x).$$
--/) (proof := /--
-Apply \Cref{Delta_abel_summation} (to the real functions $g, g'$, viewed in $\C$) and bound the two
-terms. By \Cref{Delta_one_bound}, $|\Delta_1(x;q,a) g(x)| \le g(x)$, where $g(x) \ge g(1) = 0$ by
-monotonicity. Since $g$ is monotone on $[1, x]$, its derivative satisfies $g' \ge 0$ on $(1, x)$, so
-$$\left| \int_1^x \Delta_1(t;q,a) g'(t)\,\mathrm{d}t \right| \le \int_1^x g'(t)\,\mathrm{d}t = g(x) - g(1) = g(x)$$
-by the fundamental theorem of calculus. Adding the two bounds gives $2g(x)$.
--/)]
+@[blueprint "lem:Delta-monotone" (latexEnv := "lemma")]
 theorem Delta_monotone_bound {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit a) (g : ℝ → ℝ) {x : ℝ} (hx : 1 ≤ x)
     (hg : ∀ t ∈ Set.Icc 1 x, DifferentiableAt ℝ g t)
     (hg_int : MeasureTheory.LocallyIntegrableOn (deriv g) (Set.Icc 1 x))
@@ -905,19 +922,23 @@ theorem Delta_monotone_bound {q : ℕ} [hq : NeZero q] {a : ZMod q} (ha : IsUnit
   case deriv => apply fun t ht ↦ (hg t ht).hasDerivAt
 
 open MeasureTheory in
-@[blueprint (title := /-- Type I estimate: $\Delta$ of $f * \log^v$ -/) (statement := /--
+@[blueprint "prop:typeI-basic" (latexEnv := "proposition") (uses := ["def:dilate", "not:arith"]) (proofUses := ["lem:dilate"]) (title := /-- Basic Type I estimate -/) (statement := /--
 Let $v \in \N$ and let $f$ be a real arithmetic function. For every real $x \ge 2$, every $q \ge 1$ and
 every $a \in (\Z/q\Z)^*$,
-$$\big|\Delta_{f * \log^v}(x; q, a)\big| \le 2 (\log x)^v \sum_{k \le x} |f(k)|,$$
-where $\log^v$ denotes the arithmetic function $n \mapsto (\log n)^v$ (so $\log^0 = 1$).
+$$\big|\Delta_{f * \log^v}(x; q, a)\big| \le 2 (\log x)^v \sum_{k \le x} |f(k)| .$$
+In particular, for every $e \ge 1$ and every real arithmetic function $h$,
+$$\big| \Delta_{(\delta_e * h) * \log^v}(x; q, a) \big| \le 2 (\log x)^v \sum_{k \le x} |h(k)| .$$
 -/) (proof := /--
-By \Cref{Delta_convolution_eq},
+By \Cref{lem:Delta-convolution},
 $\Delta_{f * \log^v}(x;q,a) = \sum_{k \le x, (k,q)=1} f(k) \Delta_{\log^v}(x/k; q, a\bar k)$, so by the
 triangle inequality it suffices to show $|\Delta_{\log^v}(x/k; q, b)| \le 2 (\log x)^v$ for every
-unit $b$ and every $1 \le k \le x$. If $v = 0$ this is \Cref{Delta_one_bound}. If $v \ge 1$, apply
-\Cref{Delta_monotone_bound} with $g(t) = (\log t)^v$ on $[1, x/k]$ (note $x/k \ge 1$): $g$ is
+unit $b$ and every $1 \le k \le x$. If $v = 0$ this is \Cref{lem:Delta-one}. If $v \ge 1$, apply
+\Cref{lem:Delta-monotone} with $g(t) = (\log t)^v$ on $[1, x/k]$ (note $x/k \ge 1$): $g$ is
 differentiable with locally integrable derivative $v (\log t)^{v-1}/t$, monotone on $[1, x/k]$ and
 $g(1) = 0$, so $|\Delta_{\log^v}(x/k; q, b)| \le 2 (\log (x/k))^v \le 2 (\log x)^v$.
+
+The second statement is the first applied to $f = \delta_e * h$, together with
+$\sum_{k \le x} |(\delta_e * h)(k)| \le \sum_{k \le x} |h(k)|$ (\Cref{lem:dilate}).
 -/)]
 theorem Delta_flog_bound {v : ℕ} {f : ArithmeticFunction ℝ} {x : ℝ} (hx : 2 ≤ x) {q : ℕ} [NeZero q] (a : ZMod q) (ha : IsUnit a) :
     ‖Δ_[f * ppow log v](x; q, a)‖ ≤ 2 * (Real.log x)^v * summatory (fun k ↦ |f k|) x := by

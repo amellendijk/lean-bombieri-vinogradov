@@ -10,7 +10,9 @@ The main theorem (`bombieri_vinogradov` in `BV/MainResults.lean`) states that fo
 $$\sum_{q \le Q} \max_{y \le x} \max_{a \in (\mathbb{Z}/q\mathbb{Z})^*} \left| \psi(y;q,a) - \frac{y}{\varphi(q)} \right| \ll_A \frac{x}{(\log x)^A}$$
 uniformly for $x \ge 2$, $1 \le Q \le \sqrt{x}/(\log x)^{A+3}$.
 
-The proof blueprint is generated from the `@[blueprint (statement := …) (proof := …)]` annotations in the Lean sources plus the narrative in `blueprint/src/content.tex` (build: `lake build :blueprint` then `uvx leanblueprint web`). It follows Koukoulopoulos *The Distribution of Prime Numbers*, Ch. 26; `notes/Blueprint.md` is a one-page summary with a log of where the formal proof deviates from the textbook.
+The proof blueprint is organised as a paper, but its nodes live in the Lean sources. Every declaration that formalises part of a node carries a LeanArchitect annotation `@[blueprint "label" (latexEnv := "lemma")]`; exactly one "main" declaration per label additionally carries `(title := /-- ... -/) (statement := /-- LaTeX -/) (proof := /-- LaTeX -/)`. Results quoted from Mathlib/PrimeNumberTheoremAnd get the same annotation via `attribute [blueprint ...] name` in a nearby BV file. `lake build :blueprint` merges all declarations with the same label into one node (union of the inferred `\uses`, `\lean{}` lists every name, `\leanok` iff all are sorry-free) and writes `.lake/build/blueprint/library/BV.tex`; the chapter files `blueprint/src/chapters/*.tex` supply narrative and ordering and pull each node in with `\inputleannode{label}`. Build with `./build_blueprint.sh`, or `lake build :blueprint` followed by `uvx leanblueprint web` / `uvx leanblueprint pdf`. Use `#show_blueprint "label"` in Lean to see a node, and `#show_blueprint name` for one declaration. It follows Koukoulopoulos *The Distribution of Prime Numbers*, Ch. 26; `notes/Blueprint.md` is a one-page summary with a log of where the formal proof deviates from the textbook, and `notes/blueprint_style_review.md` records the style conventions (modelled on the primegaps blueprint).
+
+Rules for keeping Lean and blueprint consistent: when you add or rename a declaration belonging to a node, add or update its `@[blueprint "label"]`; when a statement changes, edit the LaTeX in the main declaration's annotation, not the chapter file; every annotation of a label sets the same `latexEnv` (the environment is taken from the first declaration seen), and a definition inside a lemma node (or a lemma inside a definition node) needs an explicit `(hasProof := true/false)`. Do not name implied constants in the LaTeX; use $\ll$. Further gotchas: (i) declarations of one label may live in several modules only if those modules are linearly ordered by import (the last module in the generated header wins the node, and it must see all names), which is why `BV/LambdaSharp.lean` imports `BV.LambdaLE` and `BV/LambdaFlat.lean` imports `BV.ForMathlib.Log`; (ii) PrimeNumberTheoremAnd declarations already carry their own `@[blueprint]` tags and cannot be re-tagged, so the smoothed-cutoff node `prop:smooth-cutoff` is hand-written in `chapters/typeII.tex` and every declaration using one of those constants excludes it from the inferred dependencies with `(uses := [-Smooth1])` / `(proofUses := [-Smooth1LeOne, ...])`, placed on the declaration that actually uses the constant; (iii) `scripts/check_blueprint.py` (after `lake build :blueprint`) reports dangling `\uses`, nodes without `\inputleannode` and vice versa, and non-`\leanok` nodes; (iv) `rm -rf .lake/build/blueprint` if stale artifacts from renamed labels confuse you.
 
 ---
 
@@ -19,7 +21,7 @@ The proof blueprint is generated from the `@[blueprint (statement := …) (proof
 - Lean: `leanprover/lean4:v4.29.0-rc6` (see `lean-toolchain`)
 - Dependencies (`lakefile.toml`): `mathlib`, `LeanArchitect`, `checkdecls`, `doc-gen4`
 
-The `LeanArchitect` package provides the `@[blueprint ...]` attribute used throughout to link Lean declarations to the mathematical blueprint.
+`LeanArchitect` provides the `@[blueprint]` attribute and the `:blueprint` lake facet; every BV file imports it (transitively through `import Architect` in `BV/Defs.lean`, `BV/Summatory.lean`, `BV/Axioms.lean` and `BV/ForMathlib/Log.lean`).
 
 ---
 
@@ -164,7 +166,7 @@ lean_build()
 
 ## Proof Workflow
 
-Most theorems currently have `sorry` bodies with `@[blueprint ...]` annotations. The typical workflow for filling in a proof:
+The typical workflow for filling in a proof (when a Lean statement changes, update the LaTeX in its `@[blueprint ...]` annotation as well):
 
 1. **Read the blueprint** (`notes/Blueprint.md`) for the mathematical argument.
 2. **Check the current state** with `lean_goal` or `lean_diagnostic_messages`.

@@ -1,0 +1,48 @@
+\chapter{Type I sums: \texorpdfstring{$\Lambda^\sharp$}{Lambda sharp}}\label{ch:typeI}
+
+The Type~I part $\Lambda^\sharp = \mu_{\le V} * \log - \Lambda_{\le U} * \mu_{\le V} * 1$ is a convolution of a
+coefficient function of small support ($\mu_{\le V}$, respectively $\Lambda_{\le U} * \mu_{\le V}$) with one of
+the smooth functions $\log$ and $1$. The discrepancy of such a convolution is a short sum of
+discrepancies of the smooth factor at the points $y/k$ (\Cref{lem:Delta-convolution}), and those
+are bounded pointwise, uniformly in the modulus, by Abel summation against the trivial bound
+$|\Delta_1| \le 1$. This gives a pointwise bound of size $UV \log x$ for $\Delta_{\Lambda^\sharp}(y; q, a)$,
+which is summed trivially over $q \le Q$.
+
+There is one complication. What the conductor analysis of \Cref{ch:typeII} produces is not
+$\Lambda^\sharp$ but its restriction $\Lambda^\sharp_r$ to integers coprime to $r$, and restriction turns the
+smooth factor $\log$ into $\log_r$, which is neither smooth nor monotone. We therefore prove the
+pointwise bound for $\Lambda^\sharp_r$, expanding $\log_r$ and $1_r$ as Möbius sums of dilations of
+$\log$ and $1$; this costs a factor $\tau(r)$, which is harmless in both applications.
+
+\section{Discrepancies of smooth weights}
+
+\inputleannode{lem:Delta-convolution}
+
+\inputleannode{lem:Delta-one}
+
+\inputleannode{lem:Delta-abel}
+
+\inputleannode{lem:Delta-monotone}
+
+\inputleannode{prop:typeI-basic}
+
+\section{Möbius expansion of restricted smooth weights}
+
+\inputleannode{lem:moebius-expansion}
+
+\section{The pointwise bound for \texorpdfstring{$\Lambda^\sharp_r$}{Lambda sharp r}}
+
+\inputleannode{prop:sharp-pointwise}
+
+\begin{remark}
+The factor $\tau(r)$ cannot be dropped from \Cref{prop:sharp-pointwise}: the discrepancy of $\log_r$ is
+a signed combination of $2^{\omega(r)}$ residue-class counts with no cancellation in general, and the
+Möbius expansion records this honestly. Downstream it is harmless, because $\tau$ is only ever
+\emph{averaged} over the modulus (\Cref{prop:typeI-average}) or bounded by $2x^{1/4}$
+(\Cref{lem:SW-flat-q}).
+\end{remark}
+
+\section{Averaging over the modulus}
+
+\inputleannode{prop:typeI-average}
+

@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2026.8.13)  16 SEP 2026 16:40
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2026.8.13)  18 SEP 2026 15:09
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -392,6 +392,7 @@ Package cleveref Info: `amsthm' support loaded on input line 3026.
 )
 (./macros/common.tex
 \c@theorem=\count309
+\c@lemma=\count310
 ) (./macros/print.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/blueprint/print/print.aux)
 \openout1 = `print.aux'.
@@ -757,339 +758,300 @@ Mellin.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
 Flat/Perron.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
 ForMathlib/Log.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+LambdaFlat.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
 MainResults.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV.
-tex))
+tex)) (./chapters/introduction.tex
 Chapter 1.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 10.00107pt on input line 13.
+(Font)              scaled to size 10.00107pt on input line 3.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 7.00075pt on input line 13.
+(Font)              scaled to size 7.00075pt on input line 3.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 5.00053pt on input line 13.
+(Font)              scaled to size 5.00053pt on input line 3.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 9.99893pt on input line 13.
+(Font)              scaled to size 9.99893pt on input line 3.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 6.99925pt on input line 13.
+(Font)              scaled to size 6.99925pt on input line 3.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 4.99947pt on input line 13.
+(Font)              scaled to size 4.99947pt on input line 3.
 
-Overfull \hbox (8.1459pt too wide) detected at line 23
+Overfull \hbox (8.1459pt too wide) detected at line 14
 [] [] [] [] [][] [] [][] [] [][][] [] [] [] [][]
  []
 
 [1
 
-] [2]
+]) (./chapters/overview.tex [2]
 Chapter 2.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 14.40152pt on input line 53.
+(Font)              scaled to size 14.40152pt on input line 3.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 14.39845pt on input line 53.
-
-Overfull \hbox (69.57617pt too wide) in paragraph at lines 56--66
-\TU/lmr/m/n/10 (Definition [][]3.7[][]). For $[] [] []$ the difference between 
-$[][][][] [][] [][] [] [][][][][][]$ and $[][][][][] [][] [][]$ is $[][][][][][
-] [][] [][][][] []
- []
-
-
-Overfull \hbox (20.33522pt too wide) in paragraph at lines 56--66
-\TU/lmr/m/n/10 Siegel–Walfisz, Theorem [][]4.2[][]) together with the elementar
-y bound $[][] [][][][] [] [] [] [] [][] [] []$
- []
-
+(Font)              scaled to size 14.39845pt on input line 3.
 [3
 
-] [4]
+]) (./chapters/preliminaries.tex [4]
 Chapter 3.
 
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Summatory.artifacts/summatory.tex)
+Chebyshev.artifacts/not:arith.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Chebyshev.artifacts/Nat.modEqs.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Chebyshev.artifacts/Chebyshev.psiMod.tex [5
+Summatory.artifacts/def:summatory.tex [5
 
 ])
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Defs.artifacts/onCoprime.tex)
+Chebyshev.artifacts/def:psi.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Defs.artifacts/ArithmeticFunction.on.tex)
+Chebyshev.artifacts/lem:chebyshev.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Dilate.artifacts/dilate.tex)
+Chebyshev.artifacts/lem:psi-trivial.tex
+Overfull \hbox (1.67955pt too wide) in paragraph at lines 12--18
+[][][][][][]\TU/lmr/m/n/10 Every summand $[][][][]$ is non-negative, so $[][][]
+[] [][] [][]$ is a sub-sum of $[][][][]$ and $[] [] [][][][] [][] [][] []
+ []
+
+)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Delta.artifacts/Delta.tex)
+VonMangoldt.artifacts/lem:vonMangoldt-not-coprime.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Delta.artifacts/Delta_linear.tex)
+Delta.artifacts/lem:hyperbola.tex [6])
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Delta.artifacts/abs_Delta_le_two_summatory_abs.tex)
+VonMangoldt.artifacts/lem:moebius.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Delta.artifacts/Delta_onCoprime_self.tex [6])
+Delta.artifacts/lem:totient.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Delta.artifacts/Delta_eq_sum_char.tex)
+Delta.artifacts/lem:orthogonality.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Delta.artifacts/Delta_Lambda_eq.tex)
+Dilate.artifacts/def:restriction.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Defs.artifacts/ProofData.tex)
+Dilate.artifacts/lem:restriction-hom.tex [7])
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Defs.artifacts/log_x_large.tex [7])
+Dilate.artifacts/def:dilate.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Defs.artifacts/UV_range.tex)
+LambdaSharp.artifacts/lem:dilate.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Maximal.artifacts/BV.maxy.tex)
+Dilate.artifacts/lem:l1-submult.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Maximal.artifacts/BV.maxya.tex)
+Delta.artifacts/def:Delta.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Maximal.artifacts/maxya_basic.tex)
+Delta.artifacts/lem:Delta-linear.tex [8])
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Delta.artifacts/maxya_Delta_enorm_le_of_abs_le.tex)
+LambdaFlat.artifacts/lem:Delta-trivial.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Delta.artifacts/maxya_Delta_add_le.tex [8]) [9]
+Delta.artifacts/lem:Delta-coprime.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Delta.artifacts/lem:Delta-psi.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Delta.artifacts/lem:Delta-char.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Defs.artifacts/def:parameters.tex [9])
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Defs.artifacts/lem:parameters.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Maximal.artifacts/def:max.tex)
+(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
+Delta.artifacts/lem:max.tex)) (./chapters/inputs.tex [10]
 Chapter 4.
 
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Axioms.artifacts/siegel_walfisz.tex)
+Axioms.artifacts/thm:siegel-walfisz.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-SiegelWalfisz.artifacts/PNT.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-VonMangoldt.artifacts/sum_vonMangoldt_not_coprime_le.tex [10
+SiegelWalfisz.artifacts/cor:pnt.tex [11
 
 ])
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-SiegelWalfisz.artifacts/coprime_vonMangoldt_error.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-ForMathlib/Log.artifacts/pnt_ratio_bound.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Axioms.artifacts/large_sieve.tex) [11]
+Axioms.artifacts/thm:large-sieve.tex)) (./chapters/auxiliary.tex [12]
 Chapter 5.
 
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Chebyshev.artifacts/Chebyshev.abs_psiMod_sub_div_le_const.tex)
+LambdaFlat.artifacts/lem:divisor.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaSharp.artifacts/sum_divisors_card_le.tex)
+LambdaFlat.artifacts/lem:totient-lower.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.artifacts/card_divisors_le_two_mul_sqrt.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.artifacts/d_le_two_mul_totient_sq.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.artifacts/invTotientAF_eq_mul.tex [12
+LambdaFlat.artifacts/lem:totient-inv-sum.tex [13
 
 ])
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.artifacts/summatory_totient_inv_le.tex)
+LambdaFlat.artifacts/lem:log-powers.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.artifacts/sum_rphiInv_le.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.artifacts/log_pow_le_const_mul_rpow.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.artifacts/log_power_absorption.tex [13])
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.artifacts/log_pow_le_const_mul_sqrt.tex) [14]
+LambdaFlat.artifacts/lem:log-absorb.tex [14])) (./chapters/vaughan.tex [15]
 Chapter 6.
 
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Defs.artifacts/LambdaLEU.tex)
+Defs.artifacts/def:vaughan-pieces.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Defs.artifacts/moebiusLEV.tex)
+Defs.artifacts/prop:vaughan.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Defs.artifacts/LambdaSharp.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Defs.artifacts/LambdaFlat.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Defs.artifacts/Lambda_decomp.tex) [15
+MainResults.artifacts/lem:split-max.tex)) (./chapters/small.tex [16
 
 ]
 Chapter 7.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 24.88266pt on input line 207.
+(Font)              scaled to size 24.88266pt on input line 1.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 20.74222pt on input line 207.
+(Font)              scaled to size 20.74222pt on input line 1.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(2)/m/n' will be
-(Font)              scaled to size 17.28183pt on input line 207.
+(Font)              scaled to size 17.28183pt on input line 1.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 24.87733pt on input line 207.
+(Font)              scaled to size 24.87733pt on input line 1.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 20.73778pt on input line 207.
+(Font)              scaled to size 20.73778pt on input line 1.
 LaTeX Font Info:    Font shape `TU/latinmodern-math.otf(3)/m/n' will be
-(Font)              scaled to size 17.27815pt on input line 207.
+(Font)              scaled to size 17.27815pt on input line 1.
 
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaLE.artifacts/sum_LambdaLEU_le.tex)
+LambdaSharp.artifacts/lem:l1-coefficients.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaLE.artifacts/Delta_LambdaLEU_bound.tex)
+LambdaFlat.artifacts/lem:small-pointwise.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaLE.artifacts/BV_LambdaLE_enorm.tex) [16
+LambdaLE.artifacts/prop:small-average.tex
+
+Package amsthm Warning: The \qedhere command may not work correctly here on inp
+ut line 15.
+
+)) (./chapters/typeI.tex [17
 
 ]
 Chapter 8.
 
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Delta.artifacts/Delta_convolution_eq.tex
-Overfull \hbox (5.77371pt too wide) in paragraph at lines 13--19
-[][][][][][][][][] [] [][][][][] [] [][][][][][][][]$\TU/lmr/m/n/10 , and the h
-yperbola identity $[][][][] [] [][][][][] [] [][] [][][][] [][] [][][][]$
+Delta.artifacts/lem:Delta-convolution.tex
+Overfull \hbox (12.42455pt too wide) in paragraph at lines 13--19
+[][][]\TU/lmr/m/n/10 Both sides may be computed in $[]$. By Lemma [][]3.22[][],
+ $[][][][][][][][][] [][] [][] [] [][] [] [][][][] []
  []
 
 )
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Delta.artifacts/Delta_one_bound.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Delta.artifacts/Delta_abel_summation.tex [17
+Delta.artifacts/lem:Delta-one.tex [18
 
 ])
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Delta.artifacts/Delta_monotone_bound.tex)
+Delta.artifacts/lem:Delta-abel.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Delta.artifacts/Delta_flog_bound.tex)
+Delta.artifacts/lem:Delta-monotone.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Dilate.artifacts/ArithmeticFunction.on_mul_of_saturated.tex [18])
+LambdaSharp.artifacts/prop:typeI-basic.tex [19])
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaSharp.artifacts/mul_dilate.tex)
+LambdaSharp.artifacts/lem:moebius-expansion.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Dilate.artifacts/summatory_abs_dilate_le.tex)
+LambdaSharp.artifacts/prop:sharp-pointwise.tex [20])
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Dilate.artifacts/summatory_abs_mul_le.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaSharp.artifacts/moebius_coprime_indicator.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaSharp.artifacts/zeta_on_coprime_apply.tex [19])
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaSharp.artifacts/mul_on_coprime_expansion.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaSharp.artifacts/Delta_dilate_flog_bound.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaSharp.artifacts/l1_norms_coefficients.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaSharp.artifacts/Delta_term1_bound.tex [20])
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaSharp.artifacts/Delta_term2_bound.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaSharp.artifacts/Delta_LambdaSharp_bound.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaSharp.artifacts/BV_LambdaSharp_enorm.tex [21]) [22]
+LambdaSharp.artifacts/prop:typeI-average.tex [21]
+Overfull \hbox (4.1207pt too wide) in paragraph at lines 17--22
+[][][][][] [][] [][] [] [][][][][] [][] [][]$\TU/lmr/m/n/10 , and Proposition [
+][]8.7[][] with $[] [] [] [] []$ gives $[][][][][][] [][] [][][] [] [][][][] []
+[] [] []$.
+ []
+
+)) (./chapters/typeII.tex [22]
 Chapter 9.
 
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.artifacts/S.tex)
+LambdaFlat.artifacts/lem:conductor-grouping.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.artifacts/T.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.artifacts/character_sum_by_conductor.tex [23
+LambdaFlat.artifacts/lem:primitive-moebius.tex [23
 
 ])
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.artifacts/totient_mul_Delta_eq.tex)
+LambdaFlat.artifacts/def:S.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.artifacts/character_sum_Mobius.tex)
+LambdaFlat.artifacts/prop:conductor-decomp.tex) [24]
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.artifacts/Delta_LambdaFlat_decomp.tex [24])
+LambdaFlat.artifacts/lem:SW-Lambda-q.tex
+Overfull \hbox (2.09468pt too wide) in paragraph at lines 17--21
+[]\TU/lmr/m/it/10 Step 1: the non-coprime part. \TU/lmr/m/n/10 Since $[][] [] [
+]$, Lemma [][]3.19[][] and Lemma [][]3.7[][] give $[][][][][][] [][] [][][] []
+ []
+
+)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.artifacts/Delta_onCoprime_Lambda_bound.tex)
+LambdaFlat.artifacts/lem:SW-flat-q.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.artifacts/Delta_onCoprime_LambdaFlat_pointwise.tex)
+LambdaFlat.artifacts/prop:small-conductors.tex [25])
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.artifacts/Delta_LambdaFlat_small_conductor.tex [25])
+LambdaFlat.artifacts/def:T.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.artifacts/maxya_Delta_LambdaFlat_enorm_le.tex)
+LambdaFlat.artifacts/prop:reduction-T.tex [26])
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.artifacts/BV_LambdaFlat_via_T.tex) [26] [27]
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Flat/Perron.artifacts/Flat.Bump.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Flat/Perron.artifacts/Flat.FG.tex
-Overfull \hbox (19.3776pt too wide) in paragraph at lines 9--12
+Flat/Perron.artifacts/def:supported-pair.tex
+Overfull \hbox (19.3776pt too wide) in paragraph at lines 10--13
 \TU/lmr/m/n/10 for the associated Dirichlet polynomials, and $[][][][] [][] [] 
 [][] [][][][][][][][][]$, $[][][][] [][] [] [][] [][][][][][][][][]$. 
  []
 
 )
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Flat/Perron.artifacts/Flat.T.tex)
+LambdaFlat.artifacts/def:bump.tex [27])
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Mellin.artifacts/mellin_bump_bounded.tex)
+Mellin.artifacts/lem:mellin-bump.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Mellin.artifacts/Smooth1_mellinInv_mellin_eq.tex [28])
+Flat/Perron.artifacts/lem:mellin-cutoff.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Flat/Perron.artifacts/mellin_smooth1_bounds.tex)
+Flat/Perron.artifacts/def:T-eps.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Flat/Perron.artifacts/Flat.mellin_J_bound.tex)
+Flat/Perron.artifacts/lem:T-mellin.tex [28])
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Flat/Perron.artifacts/Flat.sup_summatory_eq_sup_nat.tex [29])
+Flat/Perron.artifacts/lem:LS-dirichlet-poly.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Flat/Perron.artifacts/Flat.FG.summatory_mul_char.tex
-Overfull \hbox (2.43193pt too wide) in paragraph at lines 12--17
-[][]$ \TU/lmr/m/n/10 (using complete multiplicativity of $[]$) writes the left 
-side as $[][] [][] [][][][][][][][][][][][][][][][]$.
- []
-
-)
+Flat/Perron.artifacts/lem:kernel-J.tex [29])
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Flat/Perron.artifacts/Flat.T_eq_sharp.tex)
+Flat/Perron.artifacts/prop:T-average.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Flat/Perron.artifacts/Flat.T_mellin_representation.tex [30])
+Flat/Perron.artifacts/lem:sharp-half-integers.tex [30])
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Flat/Perron.artifacts/Flat.largeSieve_factor.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Flat/Perron.artifacts/Flat.largeSieve_char_bound.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Flat/Perron.artifacts/Flat.summatory_T_ll.tex [31])
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-Flat/Perron.artifacts/Flat.LargeSieve_convolution_aux.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.artifacts/LargeSieve_convolution.tex
-Overfull \hbox (66.00938pt too wide) detected at line 9
+LambdaFlat.artifacts/prop:large-sieve-convolution.tex
+Overfull \hbox (66.00938pt too wide) detected at line 11
 [] [] [] [] [] [][][] [] [][][][][][][][][][] [] [][] [] [][] [] [][] [] [][][]
 [][] [][] [] [] [][][][][][][][] [] [][][][][][][][]
  []
 
-)
+) [31]
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.artifacts/LambdaFlat_dyadic.tex [32])
+LambdaFlat.artifacts/lem:dyadic.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.artifacts/BV_char_sum_bound.tex)
+LambdaFlat.artifacts/prop:S-average.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.artifacts/T_r_bound.tex [33])
+LambdaFlat.artifacts/prop:T-bound.tex [32])
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-LambdaFlat.artifacts/BV_LambdaFlat_enorm.tex) [34]
+LambdaFlat.artifacts/prop:typeII-average.tex)) (./chapters/assembly.tex
+[33]
 Chapter 10.
 
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-MainResults.artifacts/maxya_Delta_Lambda_enorm_le.tex)
+MainResults.artifacts/prop:BV-Delta.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-MainResults.artifacts/BV_Delta_Lambda_enorm.tex)
+MainResults.artifacts/def:E.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-MainResults.artifacts/psiMaxEnorm.tex)
+MainResults.artifacts/lem:compact-range.tex)
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-MainResults.artifacts/BV_compact_enorm.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-MainResults.artifacts/BV_large_enorm.tex [35
+MainResults.artifacts/lem:large-range.tex [34
 
 ])
 (/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-MainResults.artifacts/Bombieri-Vinogradov.tex)
-(/home/arend/lean/lean-bombieri-vinogradov-dev/.lake/build/blueprint/module/BV/
-MainResults.artifacts/bombieri_vinogradov.tex)) [36]
+MainResults.artifacts/thm:bombieri-vinogradov.tex))
+(./chapters/bibliography.tex [35])) [36
+
+]
 (/home/arend/lean/lean-bombieri-vinogradov-dev/blueprint/print/print.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
  ***********
 Package rerunfilecheck Info: File `print.out' has not changed.
-(rerunfilecheck)             Checksum: BB4864F3FC2BA479690E2DE95BE8C7BD;6258.
+(rerunfilecheck)             Checksum: EC431A07DE9E92B3B81ECABA7C4CEC9D;6919.
  ) 
 Here is how much of TeX's memory you used:
- 19800 strings out of 474878
- 455760 string characters out of 5762516
- 1964627 words of memory out of 5000000
- 41208 multiletter control sequences out of 15000+600000
- 567324 words of font info for 114 fonts, out of 8000000 for 9000
+ 19658 strings out of 474878
+ 436645 string characters out of 5762516
+ 1963627 words of memory out of 5000000
+ 41128 multiletter control sequences out of 15000+600000
+ 567316 words of font info for 113 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 90i,9n,114p,418b,477s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 90i,9n,114p,498b,545s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 Output written on /home/arend/lean/lean-bombieri-vinogradov-dev/blueprint/print
 /print.pdf (37 pages).

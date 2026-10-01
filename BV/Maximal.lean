@@ -8,60 +8,67 @@ open scoped ENNReal
 namespace BV
 
 /-- The supremum of an `ℝ≥0∞`-valued function on `[√x, x]`. -/
-@[blueprint (title := /-- Maximum over $\sqrt x \le y \le x$ -/) (statement := /--
-For a function $F : \R \to [0, \infty]$ we write
-$$\max_{\sqrt x \le y \le x} F(y) := \sup \{ F(y) : \sqrt{x} \le y \le x \} \in [0, \infty].$$
-The supremum is taken in the extended non-negative reals, so it always exists; all the maxima
-appearing in the estimates below are of this form (or the analogous \Cref{BV.maxya}), and it is part
-of each estimate that the supremum is finite.
+@[blueprint "def:max" (latexEnv := "definition") (title := /-- Maxima over $y$ and over reduced residues -/) (statement := /--
+Fix a parameter datum. For a function $F$ on $\R$ with values in $[0, \infty]$ we write
+$$\max_{\sqrt x \le y \le x} F(y) := \sup \{ F(y) : \sqrt{x} \le y \le x \} ,$$
+and for $q \in \N$ and $F$ a function on $\R \times \Z/q\Z$ with values in $[0, \infty]$,
+$$\max_{\substack{\sqrt x \le y \le x \\ a \in (\Z/q\Z)^*}} F(y, a) := \sup_{a \in (\Z/q\Z)^*} \ \sup_{\sqrt x \le y \le x} F(y, a) .$$
+Both suprema are taken in $[0, \infty]$, so they always exist, and the residue $a$ ranges over the
+units of $\Z/q\Z$ only. We apply this to $F(y, a) = |\Delta_f(y; q, a)|$, and when $y$ and $a$ are
+clear from the context we abbreviate the left-hand side to $\max_{y, a} |\Delta_f(y; q, a)|$. It is
+part of every estimate for such a maximum that the supremum is finite.
 -/)]
 noncomputable def maxy [ProofData] (f : ℝ → ℝ≥0∞) : ℝ≥0∞ :=
   ⨆ y : Set.Icc (√x) x, f y
 
 /-- The supremum over `y ∈ [√x,x]` and unit residue classes modulo `q`. -/
-@[blueprint (title := /-- Maximum over $y$ and over reduced residues -/) (statement := /--
-For $q \in \N$ and $F : \R \times \Z/q\Z \to [0, \infty]$ we write
-$$\max_{\substack{\sqrt x \le y \le x \\ a \in (\Z/q\Z)^*}} F(y, a) := \sup_{a \in (\Z/q\Z)^*} \ \sup_{\sqrt x \le y \le x} F(y, a) \in [0,\infty],$$
-the inner supremum being \Cref{BV.maxy}. The residue $a$ ranges over the units of $\Z/q\Z$ only.
--/)]
+@[blueprint "def:max" (latexEnv := "definition")]
 noncomputable def maxya [ProofData] (q : ℕ) (f : ℝ → ZMod q → ℝ≥0∞) : ℝ≥0∞ :=
   ⨆ a : (ZMod q)ˣ, maxy (fun y ↦ f y a)
 
-@[blueprint "maxya_basic" (latexEnv := "lemma")]
+@[blueprint "lem:max" (latexEnv := "lemma") (title := /-- Working with the maxima -/) (statement := /--
+Fix a parameter datum, let $q \in \N$ and let $f, g : \N \to \R$.
+\begin{enumerate}
+\item If $a \in (\Z/q\Z)^*$ and $\sqrt x \le y \le x$, then $|\Delta_f(y; q, a)| \le \max_{y, a} |\Delta_f(y; q, a)|$.
+\item If $|\Delta_f(y; q, a)| \le B$ for all $a \in (\Z/q\Z)^*$ and all $\sqrt x \le y \le x$, then
+$\max_{y,a} |\Delta_f(y; q, a)| \le B$; in particular the maximum is always finite.
+\item $\max_{y, a} |\Delta_{f+g}(y; q, a)| \le \max_{y, a} |\Delta_{f}(y; q, a)| + \max_{y, a} |\Delta_{g}(y; q, a)|$.
+\end{enumerate}
+The analogues of (1) and (2) hold for $\max_{\sqrt x \le y \le x} F(y)$ without the residue variable.
+-/) (proof := /--
+(1) and (2) are the defining properties of a supremum in the complete lattice $[0, \infty]$.
+Finiteness in (2) follows because, by \Cref{lem:Delta-trivial}, $|\Delta_f(y; q, a)| \le 2 \sum_{n \le x} |f(n)|$
+for all $y \le x$, which is a real number. For (3), fix a unit $a$ and $\sqrt x \le y \le x$. By
+\Cref{lem:Delta-linear} and the triangle inequality,
+$|\Delta_{f+g}(y;q,a)| \le |\Delta_f(y;q,a)| + |\Delta_g(y;q,a)|$, and each term on the right is at
+most the corresponding maximum by (1). Taking the supremum over $y$ and $a$ on the left, using (2),
+gives the claim.
+-/)]
 theorem le_maxy [ProofData] {f : ℝ → ℝ≥0∞} {y : ℝ}
     (hy1 : √x ≤ y) (hy2 : y ≤ x) : f y ≤ maxy f := by
   exact le_iSup (fun z : Set.Icc (√x) x ↦ f z) ⟨y, hy1, hy2⟩
 
-@[blueprint "maxya_basic" (latexEnv := "lemma")]
+@[blueprint "lem:max" (latexEnv := "lemma")]
 theorem maxy_le [ProofData] {f : ℝ → ℝ≥0∞} {M : ℝ≥0∞}
     (hf : ∀ y, √x ≤ y → y ≤ x → f y ≤ M) : maxy f ≤ M := by
   refine iSup_le fun y ↦ ?_
   exact hf y y.2.1 y.2.2
 
-@[blueprint "maxya_basic" (latexEnv := "lemma") (title := /-- Basic properties of the maximum -/) (statement := /--
-Let $q \in \N$ and $F : \R \times \Z/q\Z \to [0, \infty]$.
-\begin{enumerate}
-\item If $a \in (\Z/q\Z)^*$ and $\sqrt x \le y \le x$, then $F(y, a) \le \max_{y, a} F(y, a)$.
-\item If $F(y, a) \le M$ for all $a \in (\Z/q\Z)^*$ and all $\sqrt x \le y \le x$, then
-$\max_{y,a} F(y, a) \le M$.
-\end{enumerate}
-The same holds for \Cref{BV.maxy} without the residue variable.
--/) (proof := /--
-These are the defining properties of a supremum in the complete lattice $[0, \infty]$.
--/)]
+@[blueprint "lem:max" (latexEnv := "lemma")]
 theorem le_maxya [ProofData] {q : ℕ} {f : ℝ → ZMod q → ℝ≥0∞}
     {y : ℝ} {a : ZMod q} (ha : IsUnit a) (hy1 : √x ≤ y) (hy2 : y ≤ x) :
     f y a ≤ maxya q f := by
   obtain ⟨a, rfl⟩ := ha
   exact (le_maxy hy1 hy2).trans (le_iSup (fun u : (ZMod q)ˣ ↦ maxy (fun z ↦ f z u)) a)
 
+@[blueprint "lem:max" (latexEnv := "lemma")]
 theorem maxya_le [ProofData] {q : ℕ} {f : ℝ → ZMod q → ℝ≥0∞} {M : ℝ≥0∞}
     (hf : ∀ y, √x ≤ y → y ≤ x → ∀ a, f y a ≤ M) : maxya q f ≤ M := by
   refine iSup_le fun a ↦ maxy_le ?_
   grind
 
 /-- Units-only version of `maxya_le`. -/
-@[blueprint "maxya_basic" (latexEnv := "lemma")]
+@[blueprint "lem:max" (latexEnv := "lemma")]
 theorem maxya_le_unit [ProofData] {q : ℕ} {f : ℝ → ZMod q → ℝ≥0∞} {M : ℝ≥0∞}
     (hf : ∀ y, √x ≤ y → y ≤ x → ∀ a : ZMod q, IsUnit a → f y a ≤ M) :
     maxya q f ≤ M := by
@@ -73,6 +80,7 @@ theorem maxy_ne_top_of_le_ofReal [ProofData] {f : ℝ → ℝ≥0∞} {B : ℝ}
     (h : maxy f ≤ ENNReal.ofReal B) : maxy f ≠ ⊤ :=
   ne_top_of_le_ne_top ENNReal.ofReal_ne_top h
 
+@[blueprint "lem:max" (latexEnv := "lemma")]
 theorem maxya_ne_top_of_le_ofReal [ProofData] {q : ℕ} {f : ℝ → ZMod q → ℝ≥0∞} {B : ℝ}
     (h : maxya q f ≤ ENNReal.ofReal B) : maxya q f ≠ ⊤ :=
   ne_top_of_le_ne_top ENNReal.ofReal_ne_top h

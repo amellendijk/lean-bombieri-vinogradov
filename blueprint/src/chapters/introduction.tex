@@ -1,0 +1,61 @@
+\chapter{Introduction}\label{ch:intro}
+
+Let $\Lambda$ be the von Mangoldt function and, for a modulus $q \ge 1$ and a residue class
+$a \bmod q$, let
+$$\psi(x; q, a) := \sum_{\substack{n \le x \\ n \equiv a \pmod q}} \Lambda(n)$$
+be Chebyshev's function in the arithmetic progression $a \bmod q$. The prime number theorem in
+arithmetic progressions predicts $\psi(x; q, a) \approx x/\varphi(q)$ when $(a, q) = 1$. The best
+unconditional estimate for an \emph{individual} modulus, the Siegel--Walfisz theorem
+\cite{Siegel1935, Walfisz1936}, only covers $q \le (\log x)^C$, and even the generalised Riemann
+hypothesis would only reach $q \le x^{1/2 - \varepsilon}$. The theorem of Bombieri \cite{Bombieri1965}
+and A.~I.~Vinogradov \cite{Vinogradov1965} shows that the latter range is available \emph{on average}
+over the modulus: for every $A \ge 0$,
+$$\sum_{q \le Q} \max_{y \le x} \max_{a \in (\Z/q\Z)^*} \left| \psi(y; q, a) - \frac{y}{\varphi(q)} \right| \ll_A \frac{x}{(\log x)^A}
+\qquad \text{uniformly for } x \ge 2 \text{ and } 1 \le Q \le \frac{\sqrt x}{(\log x)^{A+3}} .$$
+This is often described as ``the generalised Riemann hypothesis on average''. It is the main
+analytic input in sieve-theoretic applications such as the work of Goldston--Pintz--Y\i ld\i r\i m and
+Maynard on small gaps between primes, and it is the reason the level of distribution $1/2$ plays such a
+prominent role in that subject.
+
+The original proofs used the large sieve together with zero-density estimates for Dirichlet
+$L$-functions. The proof formalised here is the elementary one due to Vaughan
+\cite{Vaughan1977, Vaughan1980}, in the form presented in Chapter~26 of Koukoulopoulos
+\cite{Koukoulopoulos2019} (see also \cite[Ch.~28]{Davenport2000} and \cite[\S 17.4]{IwaniecKowalski2004}).
+Vaughan's identity splits $\Lambda$ into three pieces; one is small, one is a \emph{Type~I} sum that
+is bounded pointwise by elementary means, and one is a \emph{Type~II} (bilinear) sum that is bounded
+on average over $q$ by the large sieve, after the small conductors have been handled with the
+Siegel--Walfisz theorem.
+
+\section*{What is formalised}
+
+This blueprint describes a formalisation of the Bombieri--Vinogradov theorem in Lean~4 and Mathlib.
+Two analytic results are taken as external inputs, i.e.\ as axioms in Lean: the Siegel--Walfisz
+theorem (\Cref{thm:siegel-walfisz}) and the multiplicative large sieve inequality
+(\Cref{thm:large-sieve}). Everything else is proved from Mathlib, apart from the smoothed cutoff
+function and its basic properties, which are borrowed from the PrimeNumberTheoremAnd library
+\cite{PNTplus} (see \Cref{prop:smooth-cutoff}).
+
+\begin{theorem*}[Main result, informal form]
+Assume the Siegel--Walfisz theorem and the large sieve inequality. Then for every $A \in \N$, all real
+$x \ge 2$ and $1 \le Q \le \sqrt x/(\log x)^{A+3}$,
+$$\sum_{q \le Q}\ \sup_{1 \le y \le x}\ \max_{a \in (\Z/q\Z)^*} \left| \psi(y; q, a) - \frac{y}{\varphi(q)} \right| \ll_A \frac{x}{(\log x)^A} .$$
+\end{theorem*}
+The precise statement is \Cref{thm:bombieri-vinogradov}.
+
+\section*{How to read this document}
+
+The text is organised as a paper, not as a commentary on the Lean code. Each numbered statement
+carries exactly the hypotheses that the formal statement carries, and each proof is complete
+modulo earlier numbered results; the proofs do, however, follow the route taken by the
+formalisation, which occasionally differs from the textbook route (\Cref{sec:deviations}). Below each
+statement, the line \emph{Lean} lists the declarations that formalise it. A single mathematical
+statement is frequently spread over several Lean declarations, for instance a pointwise bound and its
+maximal or summed form, or an identity and the two or three special cases in which it is applied. A
+few standard facts that are quoted from Mathlib or from the PrimeNumberTheoremAnd library appear as
+numbered results with a one-line proof saying so, so that no proof in this document appeals to an
+unnamed ``standard fact''.
+
+Implied constants are not tracked: in Lean every $\ll$ below is witnessed by some real number,
+obtained where convenient by a choice or a compactness argument, and nothing is claimed about its
+size. In particular the implied constant in the Siegel--Walfisz axiom is not effective, and neither is
+any constant that depends on it. \Cref{not:asymptotic} fixes the conventions.

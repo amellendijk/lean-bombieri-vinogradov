@@ -2,7 +2,9 @@
 
 # Compile and serve the web version of the blueprint.
 
+set -euo pipefail
+
 lake build :blueprint
 
-uv run leanblueprint web
-uv run leanblueprint serve
+uvx leanblueprint web
+uvx leanblueprint serve

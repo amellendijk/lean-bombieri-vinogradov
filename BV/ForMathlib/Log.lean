@@ -25,14 +25,7 @@ theorem Real.log_locallyIntegrableOn :
 
 /-- Comparing a logarithmic denominator at `z` with one at `x` when
 `√x ≤ z ≤ x`. The hypotheses are independent of the project-specific `ProofData`. -/
-@[blueprint (latexEnv := "lemma") (title := /-- Comparing $z/(\log z)^B$ with $x/(\log x)^B$ -/) (statement := /--
-Let $B \in \N$ and let $1 < z \le x$ be real numbers with $\sqrt{x} \le z$. Then
-$$\frac{z}{(\log z)^B} \le 2^B \frac{x}{(\log x)^B}.$$
--/) (proof := /--
-From $z \ge \sqrt x$ we get $\log z \ge \tfrac12 \log x > 0$, so $(\log x)^B \le 2^B (\log z)^B$. Combining
-with $z \le x$ gives $z (\log x)^B \le 2^B x (\log z)^B$, which is the claim after dividing by the
-positive quantity $(\log z)^B (\log x)^B$.
--/)]
+@[blueprint "lem:log-powers" (latexEnv := "lemma")]
 theorem pnt_ratio_bound (x z : ℝ) (B : ℕ) (hz : 1 < z) (hzx : z ≤ x)
     (hsqrt : √x ≤ z) :
     z / (Real.log z) ^ B ≤ 2 ^ B * x / (Real.log x) ^ B := by

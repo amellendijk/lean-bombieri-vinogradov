@@ -1,0 +1,84 @@
+\chapter{Notation and preliminaries}\label{ch:prelim}
+
+This chapter fixes conventions, records the handful of standard facts from analytic number theory
+that the argument quotes from Mathlib, and introduces the two objects around which the whole proof is
+organised: the discrepancy $\Delta_f(y; q, a)$ of an arithmetic function in a residue class, and the
+parameter datum $(x, U, V)$ with respect to which all the estimates of Chapters~\ref{ch:vaughan}
+to~\ref{ch:assembly} are uniform.
+
+\section{Conventions}
+
+\begin{notation}[Asymptotic notation and implied constants]\label{not:asymptotic}
+For real-valued quantities $f, g$ the statement $f \ll g$ (equivalently $f = O(g)$) means $|f| \le C g$
+for some constant $C > 0$; a subscript, as in $f \ll_A g$, records the parameters the constant may
+depend on. Unless stated otherwise the constant may also depend on the implied constants of the two
+external inputs (\Cref{thm:siegel-walfisz}, \Cref{thm:large-sieve}) and on the fixed bump function of
+\Cref{def:bump}, but never on $x, y, q, a, Q$ or on the parameter datum of \Cref{def:parameters}.
+Constants are not tracked in the formalisation: each $\ll$ is witnessed by some real number and
+nothing is asserted about its size.
+\leanok
+\end{notation}
+
+\inputleannode{not:arith}
+
+\inputleannode{def:summatory}
+
+\section{Chebyshev's function in arithmetic progressions}
+
+\inputleannode{def:psi}
+
+\inputleannode{lem:chebyshev}
+
+\inputleannode{lem:psi-trivial}
+
+\inputleannode{lem:vonMangoldt-not-coprime}
+
+\section{Standard identities}
+
+The following facts are classical and are quoted from Mathlib; we record them so that they can be
+cited by number.
+
+\inputleannode{lem:hyperbola}
+
+\inputleannode{lem:moebius}
+
+\inputleannode{lem:totient}
+
+\inputleannode{lem:orthogonality}
+
+\section{Restriction and dilation of arithmetic functions}
+
+\inputleannode{def:restriction}
+
+\inputleannode{lem:restriction-hom}
+
+\inputleannode{def:dilate}
+
+\inputleannode{lem:dilate}
+
+\inputleannode{lem:l1-submult}
+
+\section{The discrepancy \texorpdfstring{$\Delta_f$}{Delta\_f}}
+
+\inputleannode{def:Delta}
+
+\inputleannode{lem:Delta-linear}
+
+\inputleannode{lem:Delta-trivial}
+
+\inputleannode{lem:Delta-coprime}
+
+\inputleannode{lem:Delta-psi}
+
+\inputleannode{lem:Delta-char}
+
+\section{The parameters and the maximal quantities}
+
+\inputleannode{def:parameters}
+
+\inputleannode{lem:parameters}
+
+\inputleannode{def:max}
+
+\inputleannode{lem:max}
+

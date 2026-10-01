@@ -1,0 +1,20 @@
+\chapter{The two external inputs}\label{ch:inputs}
+
+Two analytic results are quoted from the literature and taken as axioms in Lean. Both are stated
+with an unspecified constant, which is itself part of the axiom, and in accordance with
+\Cref{not:asymptotic} every implied constant in this document is allowed to depend on these two
+constants. A statement whose proof invokes one of the two inputs, directly or through an earlier
+result, lists it among the results its proof uses; in this sense every estimate from
+\Cref{cor:pnt} onwards should be read as beginning with ``Assume \Cref{thm:siegel-walfisz} and
+\Cref{thm:large-sieve}''.
+
+\section{The Siegel--Walfisz theorem}
+
+\inputleannode{thm:siegel-walfisz}
+
+\inputleannode{cor:pnt}
+
+\section{The large sieve inequality}
+
+\inputleannode{thm:large-sieve}
+
