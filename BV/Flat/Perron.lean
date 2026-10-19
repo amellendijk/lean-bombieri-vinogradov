@@ -73,7 +73,9 @@ lemma hlogx_succ_pos : 0 < Real.log (x + 1) := by
 noncomputable def ε : ℝ := (6 * Real.log 2)⁻¹ * x⁻¹
 
 lemma hε_pos : 0 < ε := by
-  sorry
+  rw [ε]
+  have : 0 < x := hx_pos
+  positivity
 
 lemma hε_lt_one : ε < 1 := by
   grw [ε, ← hx]
@@ -229,24 +231,25 @@ theorem T_eq_integral_sum
     exact integrable_term hy m i
       (Finset.mem_Ioc.mp hm).1 (Finset.mem_Ioc.mp hi).1
 
-noncomputable def twistedLSum {q : ℕ} (s : ℂ) (f : ℕ → ℂ) (χ : DirichletCharacter ℂ q) (N : ℝ) :=
-  summatory (fun n ↦ f n * χ n * n ^ s) N
+noncomputable def dirichletPoly {q : ℕ} (s : ℂ) (f : ℕ → ℂ) (χ : DirichletCharacter ℂ q) (N : ℝ) :=
+  summatory (fun n ↦ f n * χ n * n ^ (-s)) N
 
 @[fun_prop]
 lemma Measurable_twistedLSum {q : ℕ} (f : ℕ → ℂ) (χ : DirichletCharacter ℂ q) (N : ℝ) :
-    Measurable (fun t ↦ twistedLSum t f χ N) := by
-  simp only [twistedLSum]
+    Measurable (fun t ↦ dirichletPoly t f χ N) := by
+  simp only [dirichletPoly]
   fun_prop
 
 lemma dirichletAverage_twistedLSum_sq_le (s : ℂ) (f : ℕ → ℂ) (N Q : ℝ) :
-    ∫⁻ qχ, ‖twistedLSum s f qχ.2 N‖ₑ ^ 2 ∂dirichletMeas Q ≤ .ofReal (C_LS * (N + Q^2)) * (summatory (fun n ↦ ‖f n‖ₑ ^ 2) N)  := by
+    ∫⁻ qχ, ‖dirichletPoly s f qχ.2 N‖ₑ ^ 2 ∂dirichletMeas Q ≤ .ofReal (C_LS * (N + Q^2)) * (summatory (fun n ↦ ‖f n‖ₑ ^ 2) N)  := by
   have := large_sieve
+  rw [summatory, lintegral_dirichletMeas]
   sorry
 
 
 @[reducible]
 noncomputable def F [FG] {q : ℕ} (σ t : ℝ) (χ : DirichletCharacter ℂ q) :=
-  twistedLSum (-(σ + t * I)) f χ M
+  dirichletPoly (σ + t * I) f χ M
 
 lemma dirichletAverage_F_sq_le [FG] (σ t : ℝ) (Q : ℝ) :
     ∫⁻ qχ, ‖F σ t qχ.2‖ₑ ^ 2 ∂dirichletMeas Q ≤ .ofReal (C_LS * (M + Q^2)) * (summatory (fun n ↦ ‖f n‖ₑ ^ 2) M)  := by
@@ -254,7 +257,7 @@ lemma dirichletAverage_F_sq_le [FG] (σ t : ℝ) (Q : ℝ) :
 
 @[reducible]
 noncomputable def G [FG] {q : ℕ} (σ t : ℝ) (χ : DirichletCharacter ℂ q) :=
-  twistedLSum (-(σ + t * I)) g χ N
+  dirichletPoly (σ + t * I) g χ N
 
 -- noncomputable def B [Bump] [FG] {q : ℕ} (σ ε t : ℝ) (χ : DirichletCharacter ℂ q) : ℝ≥0∞ :=
 --     ‖summatory (fun m ↦ f m * χ m * m ^ (-(σ + t * I))) M‖ₑ *
@@ -288,7 +291,9 @@ theorem Complex.arg_ofReal_eq_pi_iff (x : ℝ) :
     (x : ℂ).arg = π ↔ x < 0 := by
   simp [Complex.arg_eq_pi_iff]
 
-theorem sup_T_le_lintegral_B [Bump] [FG] [ProofData] {q : ℕ} (χ : DirichletCharacter ℂ q) : ⨆ y ∈ Icc 1 (x+1), ‖T ε y χ‖ₑ ≤ C_TB * ∫⁻ t : ℝ, ‖F σ t χ‖ₑ * ‖G σ t χ‖ₑ * ‖mellin (fun x ↦ (Smooth1 ν ε x : ℂ)) (σ + t * I)‖ₑ := by
+theorem sup_T_le_lintegral_B [Bump] [FG] [ProofData] {q : ℕ} (χ : DirichletCharacter ℂ q) :
+    ⨆ y ∈ Icc 1 (x+1), ‖T ε y χ‖ₑ ≤
+      C_TB * ∫⁻ t : ℝ, ‖F σ t χ‖ₑ * ‖G σ t χ‖ₑ * ‖mellin (fun x ↦ (Smooth1 ν ε x : ℂ)) (σ + t * I)‖ₑ := by
   refine iSup_le fun y ↦ iSup_le fun hy ↦ ?_
   simp only [mem_Icc] at hy
   rw [T_eq_integral_sum y hy.1]
@@ -313,7 +318,7 @@ theorem sup_T_le_lintegral_B [Bump] [FG] [ProofData] {q : ℕ} (χ : DirichletCh
     · exact hσ_pos.le
   grw [F, G, C_TB_def, this]
   -- lemma enorm_eq_nnnorm let us side-step some issues with casts and enorms. Look into this.
-  simp [twistedLSum, ne_eq, Real.pi_ne_zero, not_false_eq_true, OfNat.ofNat_ne_zero, enorm_eq_nnnorm]
+  simp [dirichletPoly, ne_eq, Real.pi_ne_zero, not_false_eq_true, OfNat.ofNat_ne_zero, enorm_eq_nnnorm]
   apply le_of_eq
   ring
 

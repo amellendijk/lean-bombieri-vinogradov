@@ -162,7 +162,7 @@ lemma Delta_eq_sum_char {𝕜 : Type*} [Field 𝕜] [Algebra 𝕜 ℂ] {f : ℕ 
 
 @[blueprint (statement :=
 /--
-$$\Delta_{\Lambda}(x; q, a) = \psi(x; q,a) - \frac{1}{\varphi(q)} \sum_{n \le x, n \not\mid q} \Lambda{n} $$
+$$\Delta_{\Lambda}(x; q, a) = \psi(x; q,a) - \frac{1}{\varphi(q)} \sum_{n \le x, n \not\mid q} \Lambda(n) $$
 -/
 )]
 theorem Delta_Lambda_eq (x : ℝ) (q : ℕ) (a : ZMod q) :
@@ -179,7 +179,7 @@ open ProofData in
 @[blueprint (statement :=
 /--
 For all $A \in \N$,
-$$ \sum_{n \le x} \Lambda{n} = x + O_A(x/\log(x)^A)$$
+$$ \sum_{n \le x} \Lambda(n) = x + O_A(x/\log(x)^A)$$
 -/
 )]
 lemma PNT [ProofData] (A : ℕ) :
@@ -244,7 +244,7 @@ open ProofData in
 @[blueprint (statement :=
 /--
 For all $A \in \N$,
-$$ \sum_{n \le x, (q, n) \ne 1} \Lambda{n} \ll \log q \log x$$
+$$ \sum_{n \le x, (q, n) \ne 1} \Lambda(n) \ll \log q \log x$$
 -/
 )]
 lemma sum_vonMangoldt_not_coprime_ll_logq [ProofData] {q : ℕ} (hq : 0 < q) :
@@ -278,7 +278,7 @@ open ProofData in
 @[blueprint (statement :=
 /--
 For all $A \in \N$,
-$$ \sum_{n \le x, n \not \mid q} \Lambda{n} = x + O_A(x/\log(x)^A+\log q \log x)$$
+$$ \sum_{n \le x, n \not \mid q} \Lambda(n) = x + O_A(x/\log(x)^A+\log q \log x)$$
 -/
 )]
 lemma sum_primes_not_dvd_log_eq_id [ProofData] (A : ℕ) {q : ℕ} (hq : 0 < q) :
