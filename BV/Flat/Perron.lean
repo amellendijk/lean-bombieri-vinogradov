@@ -31,7 +31,7 @@ def tmp : PositivityExt where eval {u α} zα pα? e :=
 end Mathlib.Meta.Positivity
 
 
-open ArithmeticFunction Set ENNReal
+open ArithmeticFunction Set ENNReal NNReal
 
 class Flat.FG where
   f : ArithmeticFunction ℂ
@@ -83,6 +83,39 @@ lemma hε_lt_one : ε < 1 := by
   field_simp
   have := Real.log_two_gt_d9
   grind
+
+-- could be 1 + log (6 * log 2) / log 3 ≈ 2.297
+-- could be even better if we loosen 2 ≤ x
+def C_log_ε : ℝ≥0 := 3
+
+-- 3 ≤ x+1
+-- log 3 ≤ log (x+1)
+-- log 9 ≤ 2 * log (x+1)
+
+-- example {α : Type} {p : α → Prop} : ¬ (∃ x, p x) ↔ ∀ x, ¬ p x := by
+--   constructor
+--   · intro h x hx
+--     apply h
+--     use x
+--   · intro h ⟨x, hx⟩
+--     apply h x hx
+
+-- it sure would be nice if we could use big O...
+-- TODO: these kinds of calculations are not great... Maybe easier with correct constant?
+lemma log_ε_inv_le_log_x : Real.log ε⁻¹ ≤ C_log_ε * Real.log (x+1) := by
+  simp [ε, C_log_ε]
+  rw [Real.log_mul]
+  · have : Real.log x ≤ Real.log (x+1) := by
+      gcongr <;> linarith [hx]
+    have : Real.log (6*Real.log 2) ≤ 2*Real.log (x+1) := by
+      have : 3 ≤ x+1 := by linarith only [hx]
+      grw [← this, ]
+      erw [← Real.log_pow _ 2]
+      gcongr
+      linarith [Real.log_two_lt_d9]
+    linarith
+  · linarith [hx]
+  · positivity
 
 noncomputable def σ : ℝ := 1 / Real.log (x + 1)
 
@@ -243,7 +276,7 @@ lemma Measurable_twistedLSum {q : ℕ} (f : ℕ → ℂ) (χ : DirichletCharacte
 lemma dirichletAverage_twistedLSum_sq_le (s : ℂ) (f : ℕ → ℂ) (N Q : ℝ) :
     ∫⁻ qχ, ‖dirichletPoly s f qχ.2 N‖ₑ ^ 2 ∂dirichletMeas Q ≤ .ofReal (C_LS * (N + Q^2)) * (summatory (fun n ↦ ‖f n‖ₑ ^ 2) N)  := by
   have := large_sieve
-  rw [summatory, lintegral_dirichletMeas]
+  rw [summatory, lintegral_dirichletMeas']
   sorry
 
 
@@ -269,7 +302,6 @@ noncomputable def G [FG] {q : ℕ} (σ t : ℝ) (χ : DirichletCharacter ℂ q) 
 --   dsimp [B]
 --   fun_prop
 
-open NNReal
 
 noncomputable def C_TB : ℝ≥0 := ⟨Real.exp 1 * π⁻¹ * 2⁻¹, by positivity⟩
 
@@ -329,7 +361,10 @@ lemma CS (f g : {q : ℕ} → (DirichletCharacter ℂ q) → ENNReal) (Q : ℝ) 
   have := ENNReal.lintegral_mul_le_Lp_mul_Lq (μ := dirichletMeas Q) (f := fun p ↦ f p.2) (g := fun p ↦ g p.2) .two_two (by fun_prop) (by fun_prop)
   simpa using this
 
-theorem dirichletAverage_FG_le [Bump] [FG] [ProofData] {y : ℝ} : ∫⁻ (a : (q : ℕ) × DirichletCharacter ℂ q), ‖F σ y a.snd‖ₑ * ‖G σ y a.snd‖ₑ ∂dirichletMeas Q ≤ .ofReal ((√(N * M) + √M * Q + √N * Q + Q ^ 2) * √(summatory (fun m => ‖f m‖ ^ 2) M) * √(summatory (fun n => ‖g n‖^2) N)) := by
+theorem dirichletAverage_FG_le [Bump] [FG] [ProofData] {y : ℝ} :
+    ∫⁻ (a : (q : ℕ) × DirichletCharacter ℂ q), ‖F σ y a.snd‖ₑ * ‖G σ y a.snd‖ₑ ∂dirichletMeas Q ≤
+      .ofReal ((√(N * M) + √M * Q + √N * Q + Q ^ 2) *
+        √(summatory (fun m => ‖f m‖ ^ 2) M) * √(summatory (fun n => ‖g n‖^2) N)) := by
   have := CS (f := fun χ ↦ ‖F σ y χ‖ₑ) (g := fun χ ↦ ‖G σ y χ‖ₑ) Q
   apply this.trans
   grw [dirichletAverage_F_sq_le]
@@ -338,10 +373,14 @@ theorem dirichletAverage_FG_le [Bump] [FG] [ProofData] {y : ℝ} : ∫⁻ (a : (
 
 section Mellin
 
+
+#check mellin_smooth1_bound'
+
 def C_Center : ℝ≥0 := sorry
 
 lemma mellin_center_bound [Bump] {ε σ : ℝ} :
-    ∫⁻ (a : ℝ) in Set.Icc (-ε⁻¹) (ε⁻¹), ‖mellin (fun x => (Smooth1 ν ε x : ℂ)) (↑σ + ↑a * I)‖ₑ ≤ C_Center * .ofReal (Real.log (ε⁻¹)) := by
+    ∫⁻ (a : ℝ) in Set.Icc (-ε⁻¹) (ε⁻¹), ‖mellin (fun x => (Smooth1 ν ε x : ℂ)) (↑σ + ↑a * I)‖ₑ ≤
+    C_Center * .ofReal (Real.log (ε⁻¹)) := by
   sorry
 
 private lemma right_tail {σ T : ℝ} (hT : 0 < T) :
@@ -415,7 +454,7 @@ lemma mellin_tail_bound [Bump] {ε σ : ℝ} (hε_pos : 0 < ε) (hε_lt_one : ε
     field_simp
     rfl
 
-noncomputable def C_mellin [Bump] : ℝ≥0∞ := C_Center + 2 * C_Tail
+noncomputable def C_mellin [Bump] : ℝ≥0 := C_Center + 2 * C_Tail
 
 lemma lintegral_mellin_bdd [Bump] {ε σ : ℝ} (hσ_pos : 0 < σ) (hσ_le_two : σ ≤ 2) (hε_pos : 0 < ε) (hε_lt_one : ε < 1) :
     ∫⁻ (a : ℝ), ‖mellin (fun x => (Smooth1 ν ε x : ℂ)) (↑σ + ↑a * I)‖ₑ ≤ C_mellin * .ofReal (Real.log (ε⁻¹)) := by
@@ -429,7 +468,7 @@ lemma lintegral_mellin_bdd [Bump] {ε σ : ℝ} (hσ_pos : 0 < σ) (hσ_le_two :
 end Mellin
 
 
-def C_LSC : ℝ≥0 := sorry
+noncomputable def C_LSC [Bump] : ℝ≥0 := C_TB * C_mellin * C_log_ε
 
 
 open _root_.Classical in
@@ -442,8 +481,12 @@ theorem summatory_T_ll [Bump] [FG] [ProofData] :
   · conv_lhs =>
       right; right; intro y
       rw [lintegral_mul_const _ (by fun_prop)]
-    grw [dirichletAverage_FG_le, lintegral_const_mul _ (by fun_prop)]
-    sorry
+    grw [dirichletAverage_FG_le, lintegral_const_mul _ (by fun_prop),
+      lintegral_mellin_bdd sorry sorry sorry sorry, log_ε_inv_le_log_x]
+    conv_rhs => rw [ENNReal.ofReal_mul' (q := Real.log (x+1)) (sorry)]
+    simp [zero_le_coe, ENNReal.ofReal_mul, ofReal_coe_nnreal, C_LSC, NNReal.coe_mul, mul_assoc]
+    apply le_of_eq
+    ring
   · apply Measurable.aemeasurable
     apply measurable_from_prod_countable_right
     simp only [Function.uncurry_apply_pair]
@@ -657,9 +700,14 @@ theorem FG.summatory_mul_char [fg : FG] {q : ℕ} {χ : DirichletCharacter ℂ q
   simp [← hab.1]
   ring
 
+noncomputable instance : Bump :=
+  let ν := Classical.choose SmoothExistence
+  let ⟨diffν, νpos, suppν, mass_one⟩ := Classical.choose_spec SmoothExistence
+  {ν, diffν, νpos, suppν, mass_one}
+
+open Classical in
 theorem LargeSieve_convolution [fg : FG]
     {x Q : ℝ} (hx : 2 ≤ x) (hQ : 1 ≤ Q) :
-  open Classical in
     (summatory (fun q ↦ q * (q.totient : ℝ≥0∞)⁻¹ * ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
       ⨆ y ∈ Set.Icc 1 x, ‖summatory (fun n ↦ (f * g) n * χ n) y‖ₑ) Q)
       ≤ .ofReal (C_LSC * (√(N * M) + √M * Q + √N * Q + Q^2) *
@@ -668,7 +716,6 @@ theorem LargeSieve_convolution [fg : FG]
   let ε := (6 * Real.log 2)⁻¹ * x⁻¹
   simp_rw [temp hx, FG.summatory_mul_char]
   obtain ⟨ν, diffν, νpos, suppν, mass_one⟩ := SmoothExistence
-  let inst : Bump := {ν, diffν, νpos, suppν, mass_one}
   calc
     _ = (summatory (fun q ↦ q * (q.totient : ℝ≥0∞)⁻¹ * ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive,
         ⨆ K ∈ Set.Icc 1 ⌊x⌋₊, ‖T ε (K + 2⁻¹) χ‖ₑ) Q) := by

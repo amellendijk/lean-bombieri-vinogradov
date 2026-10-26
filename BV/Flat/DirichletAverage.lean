@@ -49,10 +49,18 @@ open Classical in
 lemma lintegral_dirichletMeas {Q : ℝ} (f : {q : ℕ} → (χ : DirichletCharacter ℂ q) → ℝ≥0∞) :
     ∫⁻ p, f p.2 ∂dirichletMeas Q = summatory (fun q ↦ q * (q.totient : ENNReal)⁻¹ * ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive, f χ) Q := by
   rw [dirichletMeas]
-
   rw [lintegral_withDensity_eq_lintegral_mul _ (by measurability) (by measurability)]
   simp only [Pi.mul_apply]
   have := @Set.indicator_mul_left (g := fun a : (q : ℕ) × (DirichletCharacter ℂ q) ↦ f a.2) (s := charsUpTo Q)
   simp_rw [← this, lintegral_count]
   rw [← sum_eq_tsum_indicator, Finset.sum_charsUpTo fun q χ ↦ q * (q.totient : ENNReal)⁻¹ * f χ]
   simp_rw [Finset.mul_sum]
+
+open Classical in
+lemma lintegral_dirichletMeas' {Q : ℝ} (f : (qχ : (q : ℕ) × DirichletCharacter ℂ q) → ℝ≥0∞) :
+    ∫⁻ p, f p ∂dirichletMeas Q = summatory (fun q ↦ q * (q.totient : ENNReal)⁻¹ * ∑ χ : DirichletCharacter ℂ q with χ.IsPrimitive, f ⟨_, χ⟩) Q := by
+  rw [dirichletMeas]
+  rw [lintegral_withDensity_eq_lintegral_mul _ (by measurability) (by measurability)]
+  simp only [Pi.mul_apply]
+  simp_rw [← Set.indicator_mul_left, lintegral_count, ← sum_eq_tsum_indicator,
+    Finset.sum_charsUpTo fun q χ ↦ q * (q.totient : ENNReal)⁻¹ * f ⟨q,χ⟩, Finset.mul_sum]
