@@ -11,7 +11,7 @@ theorem Nat.mem_Icc (x : ℝ) {y : ℝ} (n : ℕ) :
   by_cases h : y < x
   · grind [Nat.Icc]
   by_cases hy : 0 ≤ y
-  · rw [Nat.Icc, if_pos (by grind)]
+  · rw [Nat.Icc, ite_eq_left (by grind)]
     simp [Nat.le_floor_iff hy]
   · grind [Nat.Icc]
 

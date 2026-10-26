@@ -113,7 +113,7 @@ lemma Delta_eq_sum_char {𝕜 : Type*} [Field 𝕜] [Algebra 𝕜 ℂ] {f : ℕ 
       else 0 := by
   have hφ : (Nat.totient q : ℂ) ≠ 0 :=
     Nat.cast_ne_zero.mpr (Nat.totient_pos.mpr (NeZero.pos q)).ne'
-  simp only [Delta, summatory, Nat.modEqs, onCoprime, Set.indicator_apply, Set.mem_setOf_eq]
+  simp only [Delta, summatory, Nat.modEqs, onCoprime, Set.indicator_apply, Set.mem_ofPred_eq]
   -- Suffices to prove the equivalent form with φ cleared
   suffices h : (q.totient : ℂ) * ∑ i ∈ Nat.Icc 1 y, algebraMap _ _ (if (i : ZMod q) = (a : ZMod q) then f i else 0) -
       ∑ i ∈ Nat.Icc 1 y, algebraMap _ _ (if q.Coprime i then f i else 0) =
@@ -257,7 +257,6 @@ lemma sum_vonMangoldt_not_coprime_ll_logq [ProofData] {q : ℕ} (hq : 0 < q) :
     · gcongr with d hd
       -- TODO: fix bad convert
       convert sum_vonMangoldt_le_log _ hq
-      · rfl
       · simp
       · grind
     simp only [Finset.sum_const, Nat.card_Icc, add_tsub_cancel_right, nsmul_eq_mul]
@@ -541,9 +540,9 @@ theorem Delta_zeta_eq_Delta_one {x : ℝ} {q : ℕ} (a : ZMod q) :
   simp [Delta]
   congr! 2 with n hn hnx
   · congr! 1 with n rfl
-    grind
+    simp [hn.ne']
   · congr! 2 with n hn hnx n rfl hqn
-    grind
+    simp [hn.ne']
 
 @[blueprint (latexEnv := "lemma") (statement := /--
 For $x \ge 1$, $q \in \N$ and $a \in (\Z/q\Z)^*$,

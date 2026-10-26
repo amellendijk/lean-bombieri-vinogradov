@@ -79,7 +79,6 @@ lemma MellinOfPsi_better {σ₁ σ₂ : ℝ} (hσ₂ : 0 ≤ σ₂) {ν : ℝ �
               · simp
         rw [norm_mul]
         convert mul_le_mul f_bound pow_bound (norm_nonneg _) ?_ using 1
-        · rfl
         · simp [f]
         · simp [f]
   have Cnonneg : 0 ≤ C := by
@@ -100,8 +99,8 @@ lemma MellinOfPsi_filter {σ₁ σ₂ : ℝ} (hσ₂ : 0 ≤ σ₂) {ν : ℝ �
     𝓜 (fun x ↦ (ν x : ℂ)) =O[principal {s | σ₁ ≤ s.re ∧ s.re ≤ σ₂ ∧ s ≠ 0}]
       fun s ↦ s⁻¹ := by
   simp [IsBigO_def]
-  peel MellinOfPsi_better hσ₂ (σ₁ := σ₁) diffν suppν with c hc
-  grind
+  obtain ⟨c, -, hc⟩ := MellinOfPsi_better hσ₂ (σ₁ := σ₁) diffν suppν
+  exact ⟨c, fun s h₁ h₂ h₀ ↦ hc s h₀ h₁ h₂⟩
 
 attribute [fun_prop] Continuous.locallyIntegrable LocallyIntegrable.locallyIntegrableOn
 
@@ -140,7 +139,7 @@ lemma Complex.inv_isBigO_one {r : ℝ} (hr : 0 < r) :
   apply IsBigOWith.isBigO (c := r⁻¹)
   rw [IsBigOWith_def]
   simp only [norm_inv, one_mem, CStarRing.norm_of_mem_unitary, mul_one, eventually_principal,
-    mem_setOf_eq]
+    mem_ofPred_eq]
   intro s hs
   gcongr
 
@@ -193,9 +192,9 @@ lemma mellin_bump_bounded {σ₁ σ₂ : ℝ} (hσ₂ : 0 ≤ σ₂) {ν : ℝ �
     ((MellinOfPsi_filter (σ₁ := σ₁) hσ₂ diffν suppν).mono ?_).trans
       ((Complex.inv_isBigO_one hr.1).mono ?_)
   · have := h₄.sup hr.2
-    simp only [ne_eq, sup_principal, ← setOf_or] at this
+    simp only [ne_eq, sup_principal, ← ofPred_or] at this
     apply this.mono
-    simp only [le_principal_iff, mem_principal, setOf_subset_setOf, and_imp]
+    simp only [le_principal_iff, mem_principal, ofPred_subset_ofPred, and_imp]
     intro s hs₁ hs₂
     by_cases hs : ‖s‖ < r
     · simp [hs]
@@ -234,7 +233,7 @@ lemma mellin_smooth1_bound' {σ₂ : ℝ} (hσ₂ : 0 ≤ σ₂) {ν : ℝ → �
     ∃ C : NNReal, ∀ ε, 0 < ε → ε ≤ 1 → ∀ s : ℂ, 0 < s.re → s.re ≤ σ₂ →
     ‖𝓜 (fun x ↦ (Smooth1 ν ε x : ℂ)) s‖ ≤ C * ‖s⁻¹‖ := by
   obtain ⟨C, hC_pos, bdd⟩ := mellin_bump_bounded (σ₁ := 0) (σ₂ := σ₂) (by positivity) diffν suppν |> isBigO_iff'.mp
-  simp only [norm_one, mul_one, eventually_principal, mem_setOf_eq, and_imp] at bdd
+  simp only [norm_one, mul_one, eventually_principal, mem_ofPred_eq, and_imp] at bdd
   let C' : NNReal :=  ⟨C, hC_pos.le⟩
   use C'
   intro ε hε_pos hε_one s hs hs'

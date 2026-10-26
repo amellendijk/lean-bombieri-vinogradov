@@ -450,19 +450,19 @@ lemma mellin_tail_bound [Bump] {ε σ : ℝ} (hε_pos : 0 < ε) (hε_lt_one : ε
   · have {x : ℝ} : ‖σ + x * I‖^2 = σ^2 + x^2 := by rw [Complex.sq_norm, Complex.normSq_add_mul_I]
     simp [this]
     grw [lintegral_const_mul _ (by fun_prop), tail_bound (by positivity), C_Tail, ← ENNReal.ofReal_mul (by positivity)]
-    simp only [inv_inv, mul_inv_rev, exists_prop, ofReal_le_coe, C, NNReal.toReal]
+    simp only [inv_inv, mul_inv_rev, exists_prop, C]
     field_simp
-    rfl
+    exact (ENNReal.ofReal_eq_coe_nnreal _).le
 
 noncomputable def C_mellin [Bump] : ℝ≥0 := C_Center + 2 * C_Tail
 
 lemma lintegral_mellin_bdd [Bump] {ε σ : ℝ} (hσ_pos : 0 < σ) (hσ_le_two : σ ≤ 2) (hε_pos : 0 < ε) (hε_lt_one : ε < 1) :
     ∫⁻ (a : ℝ), ‖mellin (fun x => (Smooth1 ν ε x : ℂ)) (↑σ + ↑a * I)‖ₑ ≤ C_mellin * .ofReal (Real.log (ε⁻¹)) := by
-  rw [← MeasureTheory.lintegral_add_compl (A := Set.Icc (-ε⁻¹) (ε⁻¹)) _ (by measurability)]
+  rw [← MeasureTheory.lintegral_add_compl (s := Set.Icc (-ε⁻¹) (ε⁻¹)) _ (by measurability)]
   grw [mellin_center_bound, mellin_tail_bound hε_pos hε_lt_one hσ_pos hσ_le_two, C_mellin]
   rw [← ENNReal.toReal_le_toReal (by finiteness) (by finiteness)]
   have : 2⁻¹ ≤ -Real.log ε  := sorry
-  simp (disch := finiteness) [ENNReal.toReal_add,]
+  simp (disch := finiteness) [ENNReal.toReal_add]
   nlinarith
 
 end Mellin
@@ -636,7 +636,7 @@ theorem FG.summatory_mul [fg : FG] {y : ℝ} :
     intro m hm_pos hm
     apply summatory_eq_zero
     intro n hn_pos hn
-    rw [if_neg]
+    rw [ite_eq_right]
     have : 0 < (m * n : ℝ) := by positivity
     grind
   replace hy : 0 < y := by grind
@@ -654,18 +654,18 @@ theorem FG.summatory_mul [fg : FG] {y : ℝ} :
         refine Finset.sum_congr rfl fun m hm => ?_
         obtain ⟨hm0, -⟩ := Finset.mem_Ioc.mp hm
         rw [Finset.sum_congr rfl fun n hn =>
-              (if_pos ((key m n hm0).mpr (Finset.mem_Ioc.mp hn).2)).symm]
+              (ite_eq_left ((key m n hm0).mpr (Finset.mem_Ioc.mp hn).2)).symm]
         refine Finset.sum_subset (Finset.Ioc_subset_Ioc le_rfl
           (le_trans (Nat.div_le_self _ _) (by omega))) fun n hn hn' => ?_
         simp only [Finset.mem_Ioc] at hn hn'
-        exact if_neg fun h => hn' ⟨hn.1, (key m n hm0).mp h⟩
+        exact ite_eq_right fun h => hn' ⟨hn.1, (key m n hm0).mp h⟩
     _ = ∑ m ∈ Finset.Ioc 0 K, ∑ n ∈ Finset.Ioc 0 K,
           if (↑m * ↑n : ℝ) ≤ y then f m * g n else 0 := by
         refine Finset.sum_subset (Finset.Ioc_subset_Ioc le_rfl (by omega)) fun m hm hm' => ?_
         simp only [Finset.mem_Ioc] at hm hm'
         refine Finset.sum_eq_zero fun n hn => ?_
         simp only [Finset.mem_Ioc] at hn
-        refine if_neg fun h => ?_
+        refine ite_eq_right fun h => ?_
         have := (key m n hm.1).mp h
         have : ⌊y⌋₊ / m = 0 := Nat.div_eq_of_lt (by omega)
         omega

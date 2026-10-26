@@ -19,12 +19,12 @@ name = "Solution"
 [[require]]
 name = "LeanArchitect"
 git = "https://github.com/hanwenzhu/LeanArchitect.git"
-rev = "v4.32.0-rc1"
+rev = "v4.35.0"
 
 [[require]]
 name = "mathlib"
 git = "https://github.com/leanprover-community/mathlib4.git"
-rev = "v4.32.2"
+rev = "v4.35.0"
 
 [[require]]
 name = "checkdecls"
@@ -32,11 +32,11 @@ git = "https://github.com/PatrickMassot/checkdecls.git"
 
 [[require]]
 name = "leancert"
-git = "https://github.com/alerad/leancert"
-rev = "v4.32.2.2"
+git = "https://github.com/alerad/leancert.git"
+rev = "v4.35.0"
 
 [[require]]
 name = "PrimeNumberTheoremAnd"
 git = "https://github.com/AlexKontorovich/PrimeNumberTheoremAnd.git"
-rev = "6ea1a1532f758dd27be222d3314e798cb8a0b61c"
+rev = "127b50e33f6033e2147921167a117af96d9ba4ea"
 

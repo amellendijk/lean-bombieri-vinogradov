@@ -15,5 +15,5 @@ theorem Challenge.bombieri_vinogradov (A : ℕ) :
   refine ⟨C_BV A, fun x hx Q hQ hQx ↦ ?_⟩
   have h := _root_.bombieri_vinogradov A hx hQ hQx
   have hIcc : Nat.Icc 1 Q = Finset.Icc 1 ⌊Q⌋₊ := by
-    rw [Nat.Icc, if_pos ⟨hQ, by linarith⟩, Nat.ceil_one]
+    rw [Nat.Icc, ite_eq_left ⟨hQ, by linarith⟩, Nat.ceil_one]
   rwa [hIcc] at h
